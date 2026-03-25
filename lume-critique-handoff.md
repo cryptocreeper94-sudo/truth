@@ -84,7 +84,15 @@ Layer A (deterministic pattern matching with synonym rings) → Layer B (AI fall
 
 `.github/workflows/ci.yml` runs `npm test` against Node 18, 20, and 22 on every push. The infrastructure to know if the language actually works is there.
 
-### 5. Result Type, Model Registry, Full CLI
+### 5. The Lume Shell — A Natural Language OS Layer
+
+`src/shell.js` implements a full conversational OS shell: file system operations ("show me the files in this folder"), process management ("what's running?", "kill that process"), network operations ("fetch the weather API"), multi-turn conversational memory, and a Review Mode that gates dangerous system operations behind explicit confirmation. This is built on top of the same intent resolver used by the compiler — natural language input routed to typed domain handlers. Adds significant scope that the README doesn't prominently feature.
+
+### 6. The Academic Brief Signals Intellectual Seriousness
+
+`LUME_ACADEMIC_BRIEF.md` is 77,000 characters (~12,000 words), authored by Jason Andrews (DarkWave Studios LLC), written for academic publication. The "cognitive distance" framework — measuring the mental gap between what a developer intends and what they must type — is a coherent theoretical contribution. The brief has an abstract, problem statement, technical specification sections, and voice-to-code pipeline analysis. Whether or not it gets published, the effort invested shows the project has genuine intellectual ambitions beyond shipping a tool.
+
+### 7. Result Type, Model Registry, Full CLI
 
 Still hold from v1 review. 20-command CLI, provider-agnostic model registry with per-call-type temperature and system prompts, Result monad for AI failures — all correct decisions, correctly implemented.
 
@@ -92,17 +100,27 @@ Still hold from v1 review. 20-command CLI, provider-agnostic model registry with
 
 ## The Remaining Critiques
 
-### Critique 1: The Test Count Is a Marketing Metric — Unchanged and Confirmed
+### Critique 1: The Test Count Has Three Layers of Disconnection From Reality
 
-The `scripts/sync-test-count.js` propagates "2,149" across 17 files in 3 repos when you run it. The test count on the website is managed, not discovered by CI.
+**Layer 1 — The README badge is a hardcoded static URL:**
 
-The CI badge is not configured in the README — there is no `![CI Status](https://github.com/...)` badge that reflects the actual GitHub Actions run. The number shown to visitors comes from the sync script.
+```
+[![Tests](https://img.shields.io/badge/tests-2%2C149%20passing-brightgreen)]()
+```
 
-More importantly, reading the actual test files confirms the tests verify structure (does this function return an object with a `resolved` field?), not correctness (does `aiResolve('show hello')` produce a `ShowStatement` AST node with the right value?). The test count doubled from 1,040 to 2,093 in a single commit that claimed "100% intent-resolver coverage."
+The `2%2C149` (URL-encoded "2,149") is baked directly into the shield.io badge URL. It is not connected to CI. It is not updated by the sync script. It will display "2,149 passing" forever unless someone manually edits the URL string. Anyone who forks this repo will inherit a badge showing "2,149 passing" regardless of how many tests they have or whether any of them pass.
 
-**The underlying problem:** Test count is being treated as a credibility signal. It isn't one unless the tests assert correctness. Two thousand shape-checks are worth less than fifty behavior-checks.
+**Layer 2 — The sync script manages the count across 17 files but not the badge:**
 
-**What to do:** Add a GitHub Actions badge to the README that reflects the actual CI run. Delete `sync-test-count.js` — the badge will show pass/fail, which is more trustworthy than a number. Pick ten critical behaviors (does `deploy to render` produce the right compiled output? does the circuit breaker open after N failures?) and write correctness assertions for them.
+`scripts/sync-test-count.js` propagates the test count across 17 files in 3 repos (`lume`, `dwsc`, `trust-layer-hub`) — updating body text patterns like `**2,149 tests**` in the README, changelog, academic brief, etc. But it doesn't update the badge URL, because the badge URL format doesn't match any of its regex patterns. The badge and the script are independent.
+
+**Layer 3 — The tests verify structure, not correctness:**
+
+Reading `tests/unit/ai-resolver.test.js` confirms the tests check shape (does this function return an object with a `resolved` field?) not behavior (does `aiResolve('show hello')` produce a `ShowStatement` AST with the right value?). The test count doubled from 1,040 to 2,093 in a single commit claiming "100% intent-resolver coverage."
+
+**The compounded problem:** The number on the badge was written by hand, isn't updated by CI, isn't updated by the sync script, and even if it were accurate, the tests it represents are shape checks rather than behavior verification. "2,149 passing" tells a visitor nothing meaningful about the language's correctness.
+
+**What to do:** Replace the static badge with a real GitHub Actions CI badge (`![CI](https://github.com/Cryptocreeper94-sudo/lume/actions/workflows/ci.yml/badge.svg)`). This requires zero code changes — just a URL swap in the README. Delete `sync-test-count.js`. Write ten correctness assertions for critical behaviors (does `deploy to render` produce the right shell command? does the circuit breaker open after N failures?). Those ten tests are worth more than two thousand shape checks.
 
 ---
 
