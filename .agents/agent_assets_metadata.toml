@@ -6,3 +6,9 @@ id = "DrgPIsFr6eHFSOZR9TU_o"
 uri = "file://lumeline-ml-improvements.md"
 type = "text"
 title = "Lumeline ML Improvement Plan"
+
+[[outputs]]
+id = "dMg1ZDflmIzzkxsRLO9vU"
+uri = "file://lume-critique-handoff.md"
+type = "text"
+title = "Lume Language — Critique & Handoff"
