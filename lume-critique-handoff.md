@@ -1,238 +1,284 @@
-# Lume Language — Independent Code Review & Critique
+# Lume Language — Independent Code Review & Critique (Updated)
 
 **Repo:** Cryptocreeper94-sudo/lume  
 **Version reviewed:** 0.8.0  
-**Date:** March 24, 2026  
+**Dates:** March 24 (original) → March 25, 2026 (this revision)  
 **Purpose:** Honest third-party assessment of the Lume language project for agent review and response
 
 ---
 
-## What Was Reviewed
+## What Changed Since the Last Review
 
-The following files and structures were read in full before forming this critique:
+The first review was based on the README, lexer, parser, runtime, and CLI at a high level. This revision goes deeper into:
 
-- `README.md` — project claims, feature list, quick start
-- `src/lexer.js` — tokenizer, keyword set, INDENT/DEDENT handling
-- `src/parser.js` — AST node types, grammar structure
-- `src/runtime.js` — AI provider abstraction, model registry, Result type
-- `bin/lume.js` — CLI entry point, full command surface
-- `package.json` — exports, test setup, metadata
-- Commit history (66 commits, 13 milestones)
+- `src/intent-resolver/` — the full Layer A + Layer B resolution system
+- `src/intent-resolver/ai-resolver.js` — the actual `callAI()` implementation
+- `src/intent-resolver/pattern-library.js` — the synonym rings and pattern definitions
+- `src/intent-resolver/deploy-engine.js` — the deploy vertical
+- `tests/unit/ai-resolver.test.js` — representative test structure
+- `scripts/sync-test-count.js` — the test count management script
+- `src/transpiler.js` — full transpiler pipeline
+- `src/index.js` — the public compiler API
+- `bin/lume.js` — full CLI implementation
+- `package.json` — metadata, exports, scripts
+- All 66 commits and commit messages
 
----
-
-## Summary Verdict
-
-The infrastructure is real and the core architecture is genuinely solid. This is not a toy project or a GPT wrapper dressed up as a language. There is a proper lexer, parser, AST, transpiler pipeline, formatter, linter, REPL, watcher, bundler, and source map generator. Someone has been building this with discipline and moving fast.
-
-**However**, several of the headline features are either overstated, non-deterministic by design, or missing critical infrastructure that would be needed before the claims hold up under real-world use.
-
-The project is at a fork in the road: lean into what's working and be precise about guarantees, or continue expanding scope and risk eroding trust in the real parts with oversold magic.
+**Bottom line change:** The language is more real than the first review gave it credit for. The core pipeline is genuine compiler engineering. Several of the original critiques are confirmed, some are sharpened, and there are new findings that weren't visible before.
 
 ---
 
-## What Genuinely Impresses
+## Revised Summary Verdict
 
-### 1. The Lexer Is Real Work
+Lume is a real language with a genuine compile pipeline. The lexer, parser, AST (50+ node types), transpiler, formatter, linter, REPL, bundler, and CLI are all implemented and connected. This is not a GPT wrapper dressed up as a language.
 
-Python-style significant indentation (INDENT/DEDENT tokens) is one of the hardest parts of language design to get right. The Lume lexer handles it, along with string interpolation (`{expr}` inside strings), natural language operators (`is`, `is not`, `is greater than`), doc comments, and the full operator surface. This is actual compiler engineering.
+The intent resolver — the English Mode layer — is architecturally correct. Layer A uses deterministic regex pattern matching with synonym rings. Layer B uses an AI fallback only when Layer A fails. That architecture is the right design. The pattern library with canonical verb synonyms is well-thought-out.
 
-### 2. The AST Is Comprehensive
+**What remains unresolved from the first review:**
+- The test count is still being managed as a marketing metric, and that problem is now confirmed to be worse
+- The cost model for AI calls still doesn't exist
+- The "self-sustaining" claims are still the biggest credibility gap
+- The type system still has no checker
+- Non-English language support is still unclear about its determinism guarantees
 
-The parser produces 60+ distinct node types including:
-- Standard control flow (`IfStatement`, `ForRangeStatement`, `WhileStatement`)
-- AI-native constructs (`AskExpression`, `ThinkExpression`, `GenerateExpression`)
-- Self-sustaining blocks (`MonitorBlock`, `HealBlock`, `OptimizeBlock`, `EvolveBlock`)
-- English Mode types (`StoreOperation`, `FilterOperation`, `SendOperation`, etc.)
-- Module system (`UseStatement`, `ExportStatement`)
-- Pipeline operator (`PipeExpression`)
+**New finding:** The marketing effort (website, demos, photorealistic images) is now significantly outpacing language development. The last 8 commits are all website-facing. The language itself hasn't had a substantive commit in over a week.
 
-That's a serious grammar surface for v0.8.
+---
 
-### 3. The AI Runtime Model Registry Is Well-Designed
+## What Genuinely Impresses (Updated)
 
+### 1. The Full Compile Pipeline Is Real
+
+The pipeline actually closes:
+```
+.lume source → tokenize() → parse() → transpile() → JavaScript
+English source → resolveEnglishFile() → AST → transpile() → JavaScript
+```
+
+`src/index.js` exports `compile()`, which detects `mode: english` on the first line and routes accordingly. This is a real compiler entry point, not a stub.
+
+### 2. The Intent Resolver Architecture Is Correct
+
+Layer A (pattern matching) → Layer B (AI fallback) is the right two-tier design:
+- Layer A is deterministic, fast, testable
+- Layer B uses `gpt-4o-mini` only when Layer A fails
+- The `callAI()` function gracefully degrades when no API key is present — it returns a no-op result rather than crashing the compiler
+
+The synonym rings in the pattern library are thoughtful:
 ```js
-'gpt.4o':       { provider: 'openai',     model: 'gpt-4o' },
-'claude.sonnet': { provider: 'anthropic',  model: 'claude-sonnet-4-20250514' },
-'gemini.flash':  { provider: 'google',     model: 'gemini-2.0-flash' },
+get: ['get', 'fetch', 'retrieve', 'grab', 'pull', 'obtain', 'look up', 'query', 'read', 'load']
+show: ['show', 'display', 'render', 'present', 'print', 'output', 'log', 'let me see', 'reveal']
+```
+A `get` by any other name maps to the same AST node. This is how you build a natural language layer that doesn't require developers to memorize exact phrasing.
+
+### 3. The Deploy Engine Is a Concrete Feature That Works
+
+`src/intent-resolver/deploy-engine.js` is a real implementation:
+```
+deploy to render from "main"   → compiles to real execSync shell commands
+deploy status                  → checks deployment status
+deploy rollback                → executes rollback
+deploy monitor "url" every 30 seconds → sets up polling loop
+```
+The regex parsing is clean, the AST output is typed (`DeployCommand`), and the compiled JavaScript is readable. This is exactly what a language keyword should do — produce correct, readable output from a readable input.
+
+### 4. The Result Type, AI Runtime Model Registry, and CLI Still Hold Up
+
+The original review's praise of these still applies. 20-command CLI at v0.8, provider-agnostic model registry, Result monad for AI call failure — these are the right decisions made correctly.
+
+### 5. The Five Vertical Applications Add Real Scope
+
+Recently added:
+1. **Deploy Engine** — `deploy to render` as a keyword (real)
+2. **Testing Language** — `verify that X is Y` natural language assertions (real)
+3. **Config Language** — `config database = postgres at 'host'` replacing YAML (real)
+4. **Education Mode** — `draw a big red circle` / `add a button that says hello` (real for DOM/canvas)
+5. **Accessibility** — spoken error descriptions, voice-navigable code, auditory deploy status (real)
+
+These are implemented as separate engines in `src/intent-resolver/` with their own detect/compile functions. They follow the same pattern as the deploy engine. They're real.
+
+---
+
+## The Critiques (Updated)
+
+### Critique 1: The Test Count Is Now Actively Managed as a Marketing Metric
+
+**New finding since last review:**
+
+The `scripts/sync-test-count.js` script is explicit about its purpose:
+```
+Runs the full test suite, gets the exact count, then
+updates every file across every ecosystem repo that
+references the Lume test count.
 ```
 
-Provider-agnostic abstraction with dot-notation model names as first-class language identifiers is the right design. The separate temperature and system prompt defaults per call type (`ask` vs `think` vs `generate`) shows genuine thought about how different AI call semantics should behave differently.
+It updates 17 files across 3 repos (`lume`, `dwsc`, `trust-layer-hub`) with the current test count. The script has three modes: dry-run, apply, and apply + push.
 
-### 4. The Result Type Is the Right Instinct
+This means the "2,149 passing tests" shown on the website is a number that is:
+1. Run from a script
+2. Pushed to 17 files across 3 repos as a coordinated update
+3. Surfaced as a hero statistic with an `AnimatedNumber` component
 
+**The deeper problem — what the tests actually test:**
+
+Looking at `tests/unit/ai-resolver.test.js`:
 ```js
-Result.ok(value)
-Result.error(error)
-result.unwrapOr(fallback)
-result.match({ ok: ..., error: ... })
+it('returns result object', async () => {
+  const r = await aiResolve('show hello')
+  assert.ok(typeof r === 'object')
+  assert.ok('resolved' in r)
+})
 ```
 
-In a language where every `ask` call can fail, having a typed Result monad rather than thrown exceptions is exactly the right approach. This is the kind of thing most language designers get wrong or skip entirely at this stage.
+This test checks that `aiResolve()` returns an object with a `resolved` field. It does not check what value `resolved` has, whether the AST is correct, or whether `show hello` compiles to the right JavaScript. It verifies shape, not correctness.
 
-### 5. The CLI Surface Is Complete
+The test count went from 1,040 to 2,093 in a single commit ("33 new test files, 100% intent-resolver coverage"). A doubling of tests in one commit that claims 100% coverage is a strong signal that the tests were written to cover modules, not to verify behavior.
 
-`run`, `build`, `repl`, `watch`, `test`, `fmt`, `lint`, `ast`, `tokens`, `bundle`, `deploy`, `diff`, `explain`, `create`, `listen`, `heal status` — a 20-command CLI at v0.8 that mostly works is a meaningful accomplishment.
+**What this means practically:**
+- The 2,149 number reflects that test files exist for every module, not that every module's behavior is verified
+- The number is useless as a quality signal if the tests don't assert correctness
+- The sync script treats the count as a marketing number, which it effectively is
 
-### 6. English Mode as First-Class Syntax (Not a Bolt-On)
-
-Resolving English phrases at the lexer/parser level with a 114+ pattern library is the architecturally correct approach. Building it as a separate mode the parser recognizes — rather than a post-processing step or a runtime GPT call — means it can be deterministic and testable. That's the right instinct even if the execution has gaps.
-
----
-
-## The Critiques
-
-### Critique 1: The Self-Sustaining Claims Are Overstated
-
-**What's claimed:**
-> Programs monitor, heal, optimize, and evolve themselves.
-
-**What `monitor`, `heal`, `optimize`, `evolve` can actually do:**
-A program cannot rewrite its own logic. It can detect an error, log it, retry with a different strategy, or call GPT to suggest a fix and then evaluate that suggestion. That is valuable — but it is error handling with an AI fallback, not self-sustaining behavior.
-
-The terminology creates a trust problem. When a developer uses a `heal` block expecting the program to recover from a bug autonomously, and instead gets a logged suggestion that requires manual intervention, the language has failed its own marketing. The feature is real and useful — the framing oversells it.
-
-**Recommendation for the agent:** Either reframe the language around what these blocks actually guarantee (error detection, retry logic, AI-assisted diagnostics) or build out a concrete spec for what each block type contractually does and does not do. The current gap between claim and behavior is the single biggest credibility risk.
+**Recommendation:** Stop syncing the count. Run CI via the `.github/workflows` that already exists and use the CI badge. Rewrite 20 of the existing tests to be correctness assertions rather than shape checks. Twenty good tests are worth more than two thousand shape tests.
 
 ---
 
-### Critique 2: English Mode Has Unpredictable Failure Modes
+### Critique 2: English Mode Determinism — Confirmed, Sharpened
 
-**What's claimed:**
-> Write code in plain English (114+ patterns)
+The `ai-resolver.js` confirms the two-layer design. The key issue from the last review is confirmed:
 
-**The problem:**
-```
-get the user profile from the database
-if the user is not verified
-  send an email to the user
-show the dashboard
-```
+When Layer A (pattern matching) fails and Layer B (AI) is called, compilation is non-deterministic. Two runs of the same `.lume` file with an English phrase that doesn't match any of the 114+ patterns can produce different JavaScript.
 
-"The database" — which one? Which ORM? Which table name? "Send an email" — which email provider? SMTP? SendGrid? What credentials?
+**What's changed:** The graceful degradation is better than expected. When no API key is present, `callAI()` returns a no-op. That's good for developer experience. But it means English Mode silently produces incomplete output — a phrase that doesn't match falls through without an error. The developer doesn't know their line wasn't compiled.
 
-With 114 patterns, a lot of common cases are covered. But the failure modes are silent and unpredictable. When an English phrase doesn't match any pattern, what happens? If it falls through to a GPT call for interpretation, compilation is no longer deterministic — two runs of the same source file can produce different JavaScript output depending on model response variability. That is not a language, that is a prompt with a build step.
-
-**What's missing:**
-- A documented fallback contract: "if a phrase matches no pattern, the compiler does X"
-- A way to see which pattern matched (or didn't match) for a given English line — right now this is a black box to the developer
-- A `lume explain-match my-file.lume` command that shows pattern resolution so developers can debug why their English phrase compiled to unexpected JavaScript
-
-**Recommendation for the agent:** The English Mode needs a determinism guarantee. Either it matches a pattern and produces predictable output, or it fails loudly with a helpful error telling the developer what to write instead. Silent GPT fallback during compilation is dangerous.
+**What's still missing:**
+- A way to see which pattern matched (or didn't) for each line
+- A loud failure when a phrase hits Layer B — at minimum a warning: "Line 7 required AI resolution — output may not be deterministic"
+- A `--strict-english` flag that disables Layer B and fails loudly on any unmatched phrase
 
 ---
 
-### Critique 3: No Cost Model in the Language Itself
+### Critique 3: No Cost Model — Unchanged
 
-**What's claimed:**
-> `ask`, `think`, `generate` are keywords — no SDK needed
+Nothing has changed here. Every `ask`, `think`, and `generate` keyword call costs API money. There is still no `budget` keyword, no cost estimator, no circuit breaker, no runtime spend limit.
 
-**The problem:**
-Every `ask gpt4` call costs real money. A loop that calls `ask gpt4` 1,000 times costs roughly $15 in API fees. The language gives the developer no way to reason about or control this from within a Lume program.
+The deploy engine adds more AI calls to the language surface (deploy monitoring could use AI to analyze failure patterns). The problem compounds as the language grows.
 
-There is no:
-- Budget keyword (`with budget $5`)
-- Cache primitive (if the same `ask` is called twice with identical input, it should serve from cache)
-- Rate limiting built into the runtime
-- Cost estimation in the CLI (`lume estimate my-file.lume` — "this program will make approximately N AI calls")
-- Graceful degradation when API limits are hit
-
-**Why this matters:** This is the killer objection enterprise developers will raise immediately. "I can't ship a language where a runaway loop costs me $500 in OpenAI fees with no circuit breaker."
-
-**Recommendation for the agent:** Add a `budget` keyword to the language spec and implement a soft cost ceiling in the runtime. Even a simple token counter that throws a catchable `BudgetExceeded` error would go a long way. A `lume estimate` CLI command would make the language credible for production use.
+**Recommendation:** `lume estimate my-file.lume` — prints the expected number of AI calls and their estimated cost at current API rates. One CLI command, one middleware function in the runtime that intercepts AI calls and counts them. This is the single feature that would make enterprise developers take Lume seriously.
 
 ---
 
-### Critique 4: The Type System Has No Checker
+### Critique 4: The Type System Still Has No Checker — Unchanged
 
-**What exists:**
-```
-let name: text = "World"
-let count: number = 42
-let result: maybe text = null
+Type annotations exist. No type checker exists. The `ask` keyword returns an untyped value at compile time. This is unchanged from the last review.
+
+The `verify` keyword (new as of the recent vertical apps) is actually a step forward — `verify that X is Y` produces runtime assertions with human-readable error messages. This is a partial substitute for static type checking. It should be leaned into.
+
+---
+
+### Critique 5: Marketing Is Now Outpacing Development
+
+**New finding:**
+
+The last 8 commits to the repo are:
+1. "5 interactive next-gen demos for lume-lang.com"
+2. "Interactive Playground, Test Dashboard, Vertical Apps to ExplorePage"
+3. "photorealistic images replace emoji on all feature cards"
+4. (and more website content)
+
+The most recent language commit was the vertical apps addition (March 16). The website has been getting commits since then.
+
+This is a pattern to watch: when a language project shifts to marketing polish while core gaps remain unresolved, it often signals the builder has run out of clear technical direction and is filling the gap with presentation work.
+
+The critical unresolved items — cost model, type checker, determinism guarantees, self-sustaining spec — haven't had commits. The animated number on the website showing "2,149" has.
+
+**Recommendation:** Decide on the next hard technical thing and do it before more website work. The language is impressive enough that a good demo will speak for itself. Photorealistic images on a feature carousel don't fix the non-determinism problem.
+
+---
+
+### Critique 6: Package Metadata Inconsistencies
+
+**New finding:**
+
+`package.json` says:
+```json
+"repository": { "url": "https://github.com/lume-lang/lume" },
+"homepage": "https://lume-lang.org",
 ```
 
-**The problem:**
-Type annotations exist syntactically. There is no evidence of a type inference or type checking pass in the compiler pipeline. Without a type checker, these annotations are documentation comments that happen to look like types — the compiler accepts them but does not enforce them.
+But:
+- The actual repo is `Cryptocreeper94-sudo/lume`, not `lume-lang/lume`
+- The website is `lume-lang.com` based on commit messages (not `.org`)
+- The npm package name is `@lume/compiler` but it hasn't been published under the `lume` npm org
 
-This is especially critical for the AI keywords. What type does `ask gpt4 "..."` return? Right now the answer is "a string, or a Result wrapping a string, depending on context." But there's no way to statically know at compile time whether a given call site is expecting a `text`, a `number`, a structured object, or a Result. The developer discovers this at runtime.
+This means anyone who finds the package on npm (if published) and tries to go to the repo or homepage will hit dead links. For an open source language trying to attract contributors, this is a friction point that signals the project identity isn't fully resolved.
 
-**What `ask` returning an untyped string means in practice:**
+**Recommendation:** Decide on the canonical identity: is it `lume-lang/lume` on GitHub (in which case, create the org and transfer the repo), or `Cryptocreeper94-sudo/lume` (in which case, update package.json)? Decide between `.com` and `.org`. Then update all references.
+
+---
+
+### Critique 7: The `lume-runtime` Import Path Is Unresolved
+
+**New finding:**
+
+The transpiler generates code that imports from `lume-runtime`:
+```js
+import { __lume_ask, __lume_think, __lume_generate } from "lume-runtime";
+import { monitor } from "lume-runtime/monitor.js";
+import { healer } from "lume-runtime/healer.js";
 ```
-let price: number = ask gpt4 "What is the price of BTC?"
-show price * 2  // This fails at runtime if GPT returns "$45,000" instead of 45000
-```
 
-The type annotation says `number` but there's nothing stopping the program from compiling and then crashing at the multiplication.
+But:
+- The package is named `@lume/compiler`, not `lume-runtime`
+- There is no `lume-runtime` package on npm (as of this review)
+- The `src/runtime/` folder has `evolver.js`, `healer.js`, `monitor.js` — but their import path in generated code is `lume-runtime/`, not a relative path
 
-**Recommendation for the agent:** A full type checker is a large undertaking, but a minimal version that (a) flags obvious mismatches and (b) requires `ask` results to be explicitly cast or validated before use would significantly improve safety. The `verify` keyword is actually a great foundation for runtime type assertions — lean into that as a lightweight substitute until a full checker is built.
+Any compiled Lume program that uses `ask`, `heal`, `monitor`, `optimize`, or `evolve` will fail at runtime with a module not found error unless `lume-runtime` is separately installed. This is a critical gap — the compiled output is not runnable without a package that doesn't yet publicly exist.
 
----
-
-### Critique 5: "Write in Any Human Language" Is a Non-Determinism Problem
-
-**What's claimed:**
-> Multilingual — Write in any human language — Spanish, Japanese, Hindi...
-
-**The reality:**
-If non-English language support is implemented by routing through GPT to translate the phrase into English before pattern matching, then the compiler's behavior is dependent on a live API call during compilation. The same Japanese source file could compile differently on two different runs. That is a fundamental language correctness problem.
-
-If it's implemented by having 114+ patterns per supported language, the maintenance surface is enormous and the feature would need separate validation for every language.
-
-**Recommendation for the agent:** Be specific about what "multilingual" actually means in practice. If it's GPT-mediated translation during compilation, say so explicitly and document the trade-offs. If it's pattern-based, document which languages are officially supported and at what pattern coverage level. "Write in any human language" implies broad and reliable support — the actual story is likely narrower.
+**Recommendation:** Either publish `lume-runtime` to npm as a companion package, or have the compiler emit relative paths to the bundled runtime. The `lume run` command likely handles this internally for direct execution, but `lume build` output is not portable without the runtime.
 
 ---
 
-### Critique 6: Self-Referential Test Count Tooling Is a Yellow Flag
+## Questions for the Agent (Updated)
 
-**Observed:**
-There is a script (`scripts/sync-test-count.js`) that runs the test suite, gets the exact count, and then updates badge counts across 17 files in 3 repos automatically. The README badge shows `2,149 passing`.
+1. When an English Mode phrase matches no Layer A pattern and falls through to Layer B, does the developer see a warning? Is there any way to know which lines required AI resolution?
 
-**The concern:**
-Automated badge synchronization can inflate perceived credibility. The test count number being mechanically synchronized across repos rather than produced by CI is the kind of thing that raises eyebrows in open source due diligence. It's not necessarily dishonest — but it creates the appearance that the count is being managed rather than naturally reported.
+2. Is `lume-runtime` published on npm? If a developer does `lume build` and tries to run the output in a fresh Node environment, does it work without additional setup?
 
-**Recommendation for the agent:** Run CI via GitHub Actions (the `.github/workflows` directory exists) and have the badge pull from the CI run status rather than a sync script. This is a credibility issue more than a technical one, but credibility matters for a language project trying to be taken seriously.
+3. What is the canonical GitHub home — `Cryptocreeper94-sudo/lume` or `lume-lang/lume`? The package.json points to the wrong place.
 
----
+4. What does the GitHub Actions CI workflow actually run? Is the 2,149 test count from CI or from the sync script?
 
-## Opportunities the Critique Doesn't Cover
+5. Are the `monitor`/`heal`/`optimize`/`evolve` blocks fully specified? Is there a document that defines what each one contractually does and does not do?
 
-These are gaps in the current feature set that are worth building regardless of the critiques above:
-
-1. **Package ecosystem** — There is no `lume add <package>` story. How do Lume programs depend on each other or on npm packages beyond `use`?
-
-2. **LSP / editor support** — No Language Server Protocol implementation means no autocomplete, no inline errors, no hover documentation in VS Code or any editor. For a language in 2026, this is table stakes.
-
-3. **The `lume create` app generator** — Scaffolding an entire full-stack app from a description is a killer feature if it works reliably. It should be the centerpiece demo, not buried in the README.
-
-4. **Debugging story** — Source maps exist (`src/sourcemap.js`), which is the right foundation. But is there a `lume debug` command? Can developers set breakpoints in `.lume` files that resolve through the source map in Node's debugger?
-
-5. **`lume explain` as a reverse mode** — Explaining any JS file in English is genuinely useful and differentiating. This deserves much more prominence.
+6. For the deploy engine: `execSync('git push', { stdio: 'inherit' })` is how the Render target pushes — but this assumes git credentials are already configured in the environment. Is there documentation on what environment setup is required for `deploy to render` to actually work?
 
 ---
 
-## Questions for the Agent
+## Priority Action List (Updated)
 
-These are specific things the reviewing agent should look into and respond to:
-
-1. What does the `heal` block actually execute when triggered? Is there a concrete spec for its behavior?
-
-2. When an English Mode phrase matches no pattern, what is the exact fallback behavior? Does it fail loudly, fall through to GPT, or produce a no-op?
-
-3. What does `ask gpt4 "..."` return at the type level? Is there a defined return type contract?
-
-4. Is the multilingual support pattern-based or GPT-mediated? What languages are officially tested?
-
-5. How are `ask` call costs surfaced to the developer? Is there any runtime cost tracking?
-
-6. Are the self-sustaining `monitor`/`heal`/`optimize`/`evolve` blocks fully implemented, partially implemented, or aspirational syntax that currently no-ops?
-
-7. What does the GitHub Actions CI workflow actually run, and does the `2,149 passing` count come from that CI run or from the sync script?
+| Priority | Action | Effort |
+|---|---|---|
+| 1 | Publish `lume-runtime` to npm (or fix compiled output paths) | Medium |
+| 2 | Add a warning when Layer B (AI) is used during compilation | Low |
+| 3 | Fix package.json repo URL and homepage | Trivial |
+| 4 | Add `lume estimate` — AI call count and cost estimate for a file | Medium |
+| 5 | Rewrite 20 shape tests into correctness assertions | Low-Medium |
+| 6 | Remove sync-test-count.js; use CI badge instead | Low |
+| 7 | Write a spec for what `heal`/`monitor`/`optimize`/`evolve` actually guarantee | Low |
+| 8 | Add `--strict-english` flag that fails on any Layer B fallback | Low |
+| 9 | Pause website work; address one hard technical gap | — |
+| 10 | Resolve canonical org/domain identity | Trivial |
 
 ---
 
-## Bottom Line for the Agent
+## Bottom Line (Updated)
 
-The real Lume — the transpiler, the lexer, the parser, the AI runtime, the CLI — is solid work and worth defending. The parts to revisit honestly are the claims that outrun the implementation: self-sustaining, multilingual, non-deterministic English compilation, and the absence of cost control for AI calls.
+Lume is a real compiler doing real work. The Layer A / Layer B intent resolver architecture is the right design. The deploy engine and vertical applications are concrete, working features. The CLI is comprehensive. This is not vaporware.
 
-The strongest version of Lume is one where every claim is precisely true and every feature has a documented contract. Right now the project is caught between a research-language identity and a production-language identity. Picking one and committing to it will make the real strengths land harder.
+The areas that need honest attention are:
+- **`lume-runtime` portability** — compiled output isn't runnable without it
+- **Test quality** — the count is a number, not a signal; the sync script makes it worse
+- **Cost model** — the single biggest objection from serious developers
+- **Marketing pacing** — the website is pulling focus from unresolved technical problems
+
+The language has earned the right to be taken seriously. The work now is to close the gaps that stop serious developers from trusting it in production.
