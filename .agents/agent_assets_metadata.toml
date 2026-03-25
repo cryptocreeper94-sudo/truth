@@ -12,3 +12,9 @@ id = "dMg1ZDflmIzzkxsRLO9vU"
 uri = "file://lume-critique-handoff.md"
 type = "text"
 title = "Lume Language — Critique & Handoff"
+
+[[outputs]]
+id = "qYtW-bs1yG7UHtrve6pp_"
+uri = "file://trustgen-trustvault-handoff.md"
+type = "text"
+title = "TrustGen + TrustVault — Review & Handoff"
