@@ -25,6 +25,30 @@ Plus entire component systems that don't exist in standalone at all (see below).
 
 ---
 
+## What's Already in the Standalone Repo — Do Not Touch
+
+Before starting, the agent should know these assets are **already in the standalone chronicles repo and do not need to be moved**. They were generated from TrustGen recipes by `scripts/generate-glbs.ts` and committed directly.
+
+### 3D GLB Assets — 85 files across 3 era folders in `public/models/`
+
+**`public/models/medieval/` — 28 files:**
+`env-med-anvil.glb`, `env-med-archery.glb`, `env-med-banner.glb`, `env-med-barrel.glb`, `env-med-bridge.glb`, `env-med-chapel.glb`, `env-med-chest.glb`, `env-med-cottage.glb`, `env-med-crate.glb`, `env-med-forge.glb`, `env-med-guardtower.glb`, `env-med-haycart.glb`, `env-med-horse.glb`, `env-med-keep.glb`, `env-med-market.glb`, `env-med-oak.glb`, `env-med-oxcart.glb`, `env-med-pine.glb`, `env-med-scarecrow.glb`, `env-med-stones.glb`, `env-med-swordstone.glb`, `env-med-tavern.glb`, `env-med-taverntable.glb`, `env-med-torch.glb`, `env-med-wagon.glb`, `env-med-wall.glb`, `env-med-weaponrack.glb`, `env-med-well.glb`
+
+**`public/models/modern/` — 30 files:**
+`env-mod-airplane.glb`, `env-mod-apartment.glb`, `env-mod-bench.glb`, `env-mod-bookshelf.glb`, `env-mod-bus.glb`, `env-mod-busstop.glb`, `env-mod-cafe.glb`, `env-mod-cafetable.glb`, `env-mod-cherry.glb`, `env-mod-desk.glb`, `env-mod-gazebo.glb`, `env-mod-grass.glb`, `env-mod-gym.glb`, `env-mod-gymequip.glb`, `env-mod-hedge.glb`, `env-mod-helicopter.glb`, `env-mod-hydrant.glb`, `env-mod-library.glb`, `env-mod-mailbox.glb`, `env-mod-mall.glb`, `env-mod-newsbox.glb`, `env-mod-oak.glb`, `env-mod-office-tower.glb`, `env-mod-planter.glb`, `env-mod-restaurant.glb`, `env-mod-sedan.glb`, `env-mod-sofa.glb`, `env-mod-streetlight.glb`, `env-mod-trashcan.glb`, `env-mod-van.glb`
+
+**`public/models/wild-west/` — 27 files:**
+`env-ww-barn.glb`, `env-ww-barrel-cactus.glb`, `env-ww-cabin.glb`, `env-ww-campfire.glb`, `env-ww-dynamite.glb`, `env-ww-fence.glb`, `env-ww-generalstore.glb`, `env-ww-handcar.glb`, `env-ww-hitchpost.glb`, `env-ww-horse.glb`, `env-ww-joshua.glb`, `env-ww-minecart.glb`, `env-ww-mining.glb`, `env-ww-pokertable.glb`, `env-ww-rocks.glb`, `env-ww-saguaro.glb`, `env-ww-saloon.glb`, `env-ww-sheriff.glb`, `env-ww-stagecoach.glb`, `env-ww-station.glb`, `env-ww-trough.glb`, `env-ww-tumbleweed.glb`, `env-ww-wagon.glb`, `env-ww-wanted.glb`, `env-ww-watertower.glb`, `env-ww-whiskey.glb`, `env-ww-windmill.glb`
+
+### Video Assets — already in `public/videos/`
+Era cinematic clips (medieval castle, wild west frontier, ancient Rome colosseum, Victorian London, ancient Egypt pyramids) are already committed in the standalone repo.
+
+**The 3D engine (`assets.tsx`) loads GLBs via `GLTFLoader` with a cache layer and automatic fallback to procedural placeholder geometry if any file is missing — so the scene will not break if a model fails to load.**
+
+The agent's job is **code only** — assets are already in place.
+
+---
+
 ## What to Extract From trust-layer
 
 All source paths are relative to `trust-layer/client/src/`.
