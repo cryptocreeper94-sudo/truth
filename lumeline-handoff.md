@@ -1,8 +1,8 @@
 # LumeLine — Fix Handoff
 
 **Repo:** Cryptocreeper94-sudo/lumeline  
-**Live app URL:** https://lumeline.bet (referenced in Lume Agent system prompt)  
-**Ecosystem subdomain:** https://lumeline.tlid.io  
+**Live app URL:** https://lumeline.bet  
+**Ecosystem subdomain:** https://lumeline.tlid.io (to be configured — not yet pointing to this app)  
 **Date:** March 26, 2026  
 **Commits:** 67  
 **Purpose:** Real-time sports odds intelligence platform tracking 47+ oddsmakers across 16+ sports. Detects line manipulation and collusion, generates ML-weighted consensus predictions, scores source accuracy, includes a full betting wallet, and has an AI voice assistant (Lume Agent). King Capper is the featured partner with a 50/50 revenue split and 5% monthly residual equity.
@@ -27,15 +27,15 @@
 
 ---
 
-## Priority 1 — Confirm Live Site Is Serving the Right App
+## Priority 1 — Subdomain Wiring (Pending)
 
-### 1.1 lumeline.tlid.io appears to serve Trust Layer Hub, not LumeLine
+### 1.1 lumeline.tlid.io subdomain not yet pointed at this app
 
-When fetching `https://lumeline.tlid.io`, the response is the Trust Layer ecosystem directory ("Explore Trust Layer — 133 features across 11 categories") — not the LumeLine sports platform.
+The production app lives at `https://lumeline.bet`. The `lumeline.tlid.io` ecosystem subdomain is not yet configured — currently serving the Trust Layer hub. This is a known pending task, not a bug.
 
-The Lume Agent system prompt explicitly states the app lives at `lumeline.bet`. If `lumeline.tlid.io` is intentionally a redirect or alias to the ecosystem hub, that's fine — but it should be documented. If it's a deployment misconfiguration, the correct repo needs to be pointed at that subdomain.
+**When ready:** Point `lumeline.tlid.io` at the same Render deployment as `lumeline.bet`. No code changes required — purely a DNS/deployment routing task.
 
-**Fix:** Confirm what URL the production LumeLine app is actually deployed to. If `lumeline.tlid.io` should serve LumeLine, redeploy. If the production URL is `lumeline.bet`, update the Agent system prompt and all internal links to use that URL consistently.
+Also confirm the Lume Agent system prompt is updated to reference `lumeline.bet` as the canonical URL if it isn't already.
 
 ---
 
@@ -288,7 +288,7 @@ Minimum test targets:
 
 | # | Issue | Severity | Status |
 |---|---|---|---|
-| 1.1 | lumeline.tlid.io serving wrong app — needs URL clarification | HIGH | OPEN |
+| 1.1 | lumeline.tlid.io subdomain not yet wired — DNS/routing task only | LOW | PENDING |
 | 2.1 | One-time DB migration running on every server boot | MEDIUM | OPEN |
 | 2.2 | SSO session token — verify it's persisted and validated | HIGH | OPEN |
 | 2.3 | 7 DB migrations — confirm all applied to production in order | HIGH | OPEN |
