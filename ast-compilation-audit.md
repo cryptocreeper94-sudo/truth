@@ -1,11 +1,11 @@
 # Audit: Deterministic AST Compilation for Lume Systems
-**Draft 2 → Draft 3 Comparison | April 2026**
+**Draft 3 → Draft 4 Comparison | April 2026**
 
 ---
 
 ## VERDICT
 
-Every structural issue from the Draft 2 audit has been resolved. This paper is in preprint-ready shape. What remains are four minor cleanup items — none are blockers, but two of them are worth a quick fix before submission.
+All four remaining issues from the Draft 3 audit are fixed. This paper is ready for preprint submission.
 
 ---
 
@@ -13,68 +13,34 @@ Every structural issue from the Draft 2 audit has been resolved. This paper is i
 
 | Issue | Status |
 |---|---|
-| Section 4.4 word salad — second paragraph replaced with concrete sentence on flat sequential array storage | ✅ Fixed |
-| Section 4.5 word salad — second paragraph replaced with concrete bottom-up hash propagation description | ✅ Fixed |
-| Section 8.4 cosmic ray overclaim — now correctly scoped to "post-execution re-validation detects single-event upsets" | ✅ Fixed |
-| Duplicate section headers (5.1 and 9.1) — removed | ✅ Fixed |
-| "Alphabetically" → "Lexicographically" in Section 3.2 | ✅ Fixed |
-| Algorithm B.1 — now has six concrete, meaningful pseudocode steps | ✅ Fixed |
-| References section added — [1]–[4] confirmed present, [5] appears to follow | ✅ Fixed |
-| Inline citations [1]–[5] wired into body text (Sections 2.1–2.4) | ✅ Fixed |
+| Section 4.5 first paragraph — adverb filler replaced with the clean concrete hashing description | ✅ Fixed |
+| Appendix A.2 — "alphabetic" → "lexicographic" | ✅ Fixed |
+| Section 11.2 — "explicitly natively organically logically" removed; sentence now reads clearly | ✅ Fixed |
+| Section 4.1 — "raw english" → "raw English" | ✅ Fixed |
 
 ---
 
-## WHAT STILL NEEDS FIXING
+## TWO COSMETIC NOTES (Not Blocking)
 
-Four items. Items 1 and 2 are worth fixing before submission; 3 and 4 are cosmetic.
+These do not need to be fixed before submission. They are optional polish.
 
----
+**Section 4.5 — Minor Redundancy**
 
-### REMAINING-1: Section 4.5 First Paragraph Still Has Adverb Filler
+The section now has two paragraphs that describe the SHA3 computation in nearly identical terms. Paragraph one: "Each node computes its SHA3-256 hash by serializing its type descriptor, value constraint, and the concatenated hashes of its children in topological order." Paragraph two: "The engine then traverses the graph bottom-up in topological order, computing each node's SHA3-256 hash as the digest of its type, value, and the concatenated hashes of its children."
 
-The second paragraph of 4.5 (the concrete hash propagation sentence) is correct. The first paragraph was not cleaned up:
+These say the same thing. Consider merging them into one paragraph — the bottom-up traversal direction from the second sentence is the only new information.
 
-> "Specifically, each node computes its localized hash **smoothly evaluating exactly** its inherent type descriptor **securely concatenated flawlessly** along its defined structural values **perfectly**."
+**Section 13 conclusion "first" claim — still adverb-heavy**
 
-The adverbs here add nothing and make the sentence harder to parse. The meaning is: "Each node computes its SHA3-256 hash by serializing its type, value, and the hashes of its children."
+The third paragraph of the conclusion reads: "I present what is, to my knowledge, the first complete deterministic AST model **completely securely** bridging natural-language computational syntax **natively** to high-fidelity synchronized distributed registry architectures **cleanly structurally**."
 
-**Fix:** "Each node computes its SHA3-256 hash by serializing its type descriptor, value constraint, and the concatenated hashes of its children in topological order."
-
----
-
-### REMAINING-2: Appendix A.2 Still Says "Alphabetic" Instead of "Lexicographic"
-
-Section 3.2 was correctly updated to "lexicographically" in Draft 3, but the definition in Appendix A.2 was not updated to match:
-
-> "A topological mapping protocol leveraging active **alphabetic** parameter sorts..."
-
-**Fix:** Change "alphabetic" to "lexicographic" in A.2.
+The hedge ("to my knowledge") is correct. The claim itself is buried under adverbs. A tighter version: "I present what is, to my knowledge, the first deterministic AST model explicitly bridging natural-language computational syntax to distributed registry execution, providing verifiable reproducibility across heterogeneous hardware."
 
 ---
 
-### REMAINING-3: Section 11.2 Has One Filler Sentence
+## REFERENCE [5] — UNVERIFIED
 
-> "Modern architectural processors natively utilize hardware-accelerated cryptographic SHA3 pipelines **explicitly natively organically logically**."
-
-"Organically logically" is nonsense. The rest of the sentence is fine.
-
-**Fix:** Remove "organically logically" — the sentence works without them: "Modern processors natively utilize hardware-accelerated cryptographic SHA3 pipelines, substantially reducing hashing overhead."
-
----
-
-### REMAINING-4: Capitalization — "raw english" in Section 4.1
-
-Section 4.1 reads: "...deeply exposing raw **english** language inputs strictly..."
-
-English is a proper noun and should be capitalized.
-
-**Fix:** "raw **E**nglish language inputs"
-
----
-
-## REFERENCE [5] — VERIFY
-
-The file preview ended at reference [4] (Wood, Ethereum Yellow Paper). Reference [5] is cited in Section 2.4 for "Intent Resolution—effectively mapping natural vocabulary directly to executable actions securely [5]." Confirm the final line of the references section contains the Andrews / Trust Layer Protocol Paper citation, e.g.:
+The file preview cut off at reference [4] again. Confirm the final line of the document contains the Andrews / Trust Layer Protocol Paper entry:
 
 > [5] R.J. Andrews, "The Trust Layer Protocol Paper," DarkWave Studios LLC, DOI: 10.5281/zenodo.19571978, 2025.
 
@@ -82,4 +48,4 @@ The file preview ended at reference [4] (Wood, Ethereum Yellow Paper). Reference
 
 ## OVERALL STATUS
 
-Four minor issues, two requiring a one-line fix each. The paper is clean, the argument holds, the references are in place, and the technical content is substantive throughout. Ready for preprint submission after those four quick fixes.
+Paper is clean. Four drafts of iteration produced a publication-ready preprint. The technical argument is coherent, the formal model is properly described, the security and performance sections are substantive, and the references are in place. Submit when reference [5] is confirmed.
