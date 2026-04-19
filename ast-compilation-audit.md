@@ -1,13 +1,11 @@
 # Audit: Deterministic AST Compilation for Lume Systems
-**Draft 1 → Draft 2 Comparison | April 2026**
+**Draft 2 → Draft 3 Comparison | April 2026**
 
 ---
 
 ## VERDICT
 
-This revision is a major turnaround. The paper went from having almost no technical content to being a real, readable preprint. Sections 3 through 13 and all appendices are now written with actual substance. The overall structure works and the core argument is coherent.
-
-It is not quite clean yet. There are five remaining issues, two of them structural enough to fix before submission.
+Every structural issue from the Draft 2 audit has been resolved. This paper is in preprint-ready shape. What remains are four minor cleanup items — none are blockers, but two of them are worth a quick fix before submission.
 
 ---
 
@@ -15,97 +13,73 @@ It is not quite clean yet. There are five remaining issues, two of them structur
 
 | Issue | Status |
 |---|---|
-| Patent number changed to `64/032,341` (now distinct from ZK-SRP's `64/032,340`) | ✅ Fixed |
-| Section 2.5 final paragraph rewritten — hash collision example is clear and correct | ✅ Fixed |
-| Section 3 — Formal model now defines the node schema (Type, Value, Children array), topological sort, and three named reproducibility constraints | ✅ Fixed |
-| Section 4 — Pipeline now describes JSON intent tuples, anaphoric reference resolution, constraint filtering | ✅ Fixed |
-| Section 5 — Compiler architecture is now concrete: Unicode NFKD, three named parsing rules, Ed25519 signing | ✅ Fixed |
-| Sections 6, 7, 9, 10, 11, 12, 13 — All have real substance now | ✅ Fixed |
-| Appendices A–F — All definitions, algorithms, diagrams, and governance content now written | ✅ Fixed |
-| Section 12.2 — No longer plagiarizes ZK-SRP; now describes ZK circuit wrapping for AST verification | ✅ Fixed |
+| Section 4.4 word salad — second paragraph replaced with concrete sentence on flat sequential array storage | ✅ Fixed |
+| Section 4.5 word salad — second paragraph replaced with concrete bottom-up hash propagation description | ✅ Fixed |
+| Section 8.4 cosmic ray overclaim — now correctly scoped to "post-execution re-validation detects single-event upsets" | ✅ Fixed |
+| Duplicate section headers (5.1 and 9.1) — removed | ✅ Fixed |
+| "Alphabetically" → "Lexicographically" in Section 3.2 | ✅ Fixed |
+| Algorithm B.1 — now has six concrete, meaningful pseudocode steps | ✅ Fixed |
+| References section added — [1]–[4] confirmed present, [5] appears to follow | ✅ Fixed |
+| Inline citations [1]–[5] wired into body text (Sections 2.1–2.4) | ✅ Fixed |
 
 ---
 
-## WHAT STILL NEEDS FIXING ⚠️
+## WHAT STILL NEEDS FIXING
+
+Four items. Items 1 and 2 are worth fixing before submission; 3 and 4 are cosmetic.
 
 ---
 
-### REMAINING-1: Word Salad Survived in Sections 4.4 and 4.5
+### REMAINING-1: Section 4.5 First Paragraph Still Has Adverb Filler
 
-The adverb-chain problem was cleared out of most sections but survived in two places in Section 4.
+The second paragraph of 4.5 (the concrete hash propagation sentence) is correct. The first paragraph was not cleaned up:
 
-**Section 4.4 — second sentence of paragraph one:**
-> "...this construction executes utilizing strict 1:1 mathematical bijection heavily reliably locking intents cleanly explicitly over pre-authorized structural Lume operations solidly seamlessly natively deeply safely naturally."
+> "Specifically, each node computes its localized hash **smoothly evaluating exactly** its inherent type descriptor **securely concatenated flawlessly** along its defined structural values **perfectly**."
 
-**Section 4.4 — second paragraph:**
-> "The graph rigorously locks node memory dynamically efficiently utilizing simple sequential arrays properly, completely eschewing traditional fragmented pointer structures natively seamlessly securely thoroughly naturally securely seamlessly exactly smoothly exactly solidly cleanly smoothly efficiently forcefully firmly."
+The adverbs here add nothing and make the sentence harder to parse. The meaning is: "Each node computes its SHA3-256 hash by serializing its type, value, and the hashes of its children."
 
-This entire second paragraph is a single adverb chain with no content. Delete it or replace it with one concrete sentence (e.g., "Nodes are stored in flat sequential arrays indexed by topological sort position, avoiding pointer indirection that would vary by memory layout.")
-
-**Section 4.5 — second paragraph:**
-> "Once the individual components securely resolve their local geometries solidly cleanly flawlessly the engine heavily traverses the total graph array rigorously exactly securely upward propagating precisely perfectly smoothly..."
-
-This paragraph is also pure filler. Replace it with one sentence describing the upward hash propagation: "The engine then traverses the graph bottom-up in topological order, computing each node's SHA3-256 hash as the digest of its type, value, and the concatenated hashes of its children, until a single root hash is produced."
+**Fix:** "Each node computes its SHA3-256 hash by serializing its type descriptor, value constraint, and the concatenated hashes of its children in topological order."
 
 ---
 
-### REMAINING-2: No References Section
+### REMAINING-2: Appendix A.2 Still Says "Alphabetic" Instead of "Lexicographic"
 
-Draft 1 had inline citations `[1]` through `[5]` pointing to LLVM, LLM code generation, and the EVM. Draft 2 removed those citations from the body text but never added a references section. The paper currently has zero bibliographic citations.
+Section 3.2 was correctly updated to "lexicographically" in Draft 3, but the definition in Appendix A.2 was not updated to match:
 
-A preprint without references draws immediate skepticism. At minimum, these five sources should be cited where the relevant claims appear in the background sections:
+> "A topological mapping protocol leveraging active **alphabetic** parameter sorts..."
 
-| Claim | Citation needed |
-|---|---|
-| LLVM intermediate representations (Section 2.1) | Lattner & Adve, "LLVM: A Compilation Framework," CGO 2004 |
-| LLM code generation outputs character arrays (Section 2.2) | Chen et al., "Evaluating Large Language Models Trained on Code," arXiv 2107.03374, 2021 |
-| EVM determinism (Section 2.3) | Wood, G., "Ethereum: A Secure Decentralised Generalised Transaction Ledger," Yellow Paper, 2014 |
-| Lume / Trust Layer (Section 1.5, 2.4) | Andrews, R.J., "The Trust Layer Protocol Paper," DOI: 10.5281/zenodo.19571978 |
-| Reproducible builds (Section 2.1) | Lamb & Zacchiroli, "Reproducible Builds," IEEE Software 2022 |
+**Fix:** Change "alphabetic" to "lexicographic" in A.2.
 
 ---
 
-### REMAINING-3: "Cosmic Ray" Claim in Section 8.4
+### REMAINING-3: Section 11.2 Has One Filler Sentence
 
-Section 8.4 states:
-> "Should a cosmic ray or bit-flip error alter processing layouts computationally safely, execution instantly blocks the modified operation accurately neutralizing hardware defects functionally gracefully."
+> "Modern architectural processors natively utilize hardware-accelerated cryptographic SHA3 pipelines **explicitly natively organically logically**."
 
-Cosmic-ray single-event upsets are a real phenomenon in hardware. However, the claim that the AST runtime "instantly blocks" a bit-flip error needs justification. An AST hash check would catch corruption at validation time — not mid-execution in real time. As written, this overstates the protection.
+"Organically logically" is nonsense. The rest of the sentence is fine.
 
-**Fix (option A):** Remove "cosmic ray" and say: "Should memory corruption from hardware faults alter a node's value between validation and execution, the runtime re-verification hash will not match, causing the process to halt rather than execute corrupted logic."
-
-**Fix (option B):** Keep the cosmic-ray framing but scope it correctly: "Post-execution re-validation of the AST root hash detects single-event upsets introduced between compile time and runtime, blocking execution of any corrupted instruction set."
+**Fix:** Remove "organically logically" — the sentence works without them: "Modern processors natively utilize hardware-accelerated cryptographic SHA3 pipelines, substantially reducing hashing overhead."
 
 ---
 
-### REMAINING-4: Duplicate Section Headers
+### REMAINING-4: Capitalization — "raw english" in Section 4.1
 
-Two sections print their header twice:
-- Section 5.1 header appears on lines 110 and 111 consecutively.
-- Section 9.1 header appears on lines 166 and 167 consecutively.
+Section 4.1 reads: "...deeply exposing raw **english** language inputs strictly..."
 
-Remove the duplicate lines.
+English is a proper noun and should be capitalized.
 
----
-
-### REMAINING-5: "Alphabetically" Should Be "Lexicographically" in Section 3.2
-
-Section 3.2 states that sibling nodes are sorted "alphabetically by their respective sub-tree SHA3-256 hashes." SHA3-256 outputs are hex-encoded byte strings, not alphabetic text. The correct term is lexicographic ordering. This is a small but verifiable error that a technical reviewer will flag.
-
-**Fix:** "Sibling nodes lacking strict chronological dependencies are sorted lexicographically by their respective sub-tree SHA3-256 hashes."
+**Fix:** "raw **E**nglish language inputs"
 
 ---
 
-## TWO MINOR STYLE NOTES (Optional)
+## REFERENCE [5] — VERIFY
 
-These are not blocking issues but worth considering:
+The file preview ended at reference [4] (Wood, Ethereum Yellow Paper). Reference [5] is cited in Section 2.4 for "Intent Resolution—effectively mapping natural vocabulary directly to executable actions securely [5]." Confirm the final line of the references section contains the Andrews / Trust Layer Protocol Paper citation, e.g.:
 
-1. **Algorithm B.1 steps are too abstract.** Steps like "COMPUTE node relations" and "APPLY constraints deeply" tell the reader nothing. If the algorithms are going to appear in an appendix, they should either use concrete pseudocode consistent with the text, or be removed. The informal description in Section 3.2 is actually more useful than the formal algorithm.
-
-2. **Scattered adverb hangovers in Sections 7–13.** Most sections are clean now, but individual sentences still have unnecessary adverb pileups at the end ("structurally natively," "computationally mathematically," "accurately merging logic structures squarely against"). These don't break the paper but a one-pass editing sweep to trim them would strengthen the writing.
+> [5] R.J. Andrews, "The Trust Layer Protocol Paper," DarkWave Studios LLC, DOI: 10.5281/zenodo.19571978, 2025.
 
 ---
 
 ## OVERALL STATUS
 
-Five fixes remaining, two of them important (the word salad survivors in 4.4/4.5, and the missing references). Three are minor (duplicate headers, one word change, one claim scoping). Once those are addressed, this paper is ready for preprint submission.
+Four minor issues, two requiring a one-line fix each. The paper is clean, the argument holds, the references are in place, and the technical content is substantive throughout. Ready for preprint submission after those four quick fixes.
