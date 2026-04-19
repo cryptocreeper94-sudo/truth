@@ -1,130 +1,111 @@
 # Audit: Deterministic AST Compilation for Lume Systems
-**Version 1.0.0 — April 2026**
+**Draft 1 → Draft 2 Comparison | April 2026**
 
 ---
 
 ## VERDICT
 
-This paper is not ready for any stage of review. Unlike the ZK-SRP paper — where only the appendices were broken — the word salad problem here starts at Section 3.2 and consumes virtually the entire technical body of the paper. The introduction and related work sections are well-written. Everything after that is missing.
+This revision is a major turnaround. The paper went from having almost no technical content to being a real, readable preprint. Sections 3 through 13 and all appendices are now written with actual substance. The overall structure works and the core argument is coherent.
 
-This is not a cleanup job. The technical body of this paper needs to be written.
-
----
-
-## WHAT IS SOLID — Keep As-Is
-
-The following sections have real content and are worth keeping:
-
-- **Section 1 (Introduction, all subsections 1.1–1.5)** — clear, well-reasoned, sets up the problem correctly
-- **Section 2.1–2.4 (Background and Related Work)** — solid survey of classical compilers, LLMs, EVM determinism, intent resolution
-- **Header** — DOI correct (`10.5281/zenodo.19382282` concept DOI) ✅
-- **Abstract** — appears intact based on what's visible (verify the end of the abstract manually)
+It is not quite clean yet. There are five remaining issues, two of them structural enough to fix before submission.
 
 ---
 
-## WHAT IS BROKEN — The Entire Technical Body
+## WHAT WAS FIXED ✅
 
-Starting at Section 2.5 (last paragraph) and running through Section 13 and all appendices, virtually every section degenerates into adverb and adjective chains with no substantive content. A few examples:
-
-**Section 3.3 — Constraints for Reproducible AST Generation:**
-> "Reproducibility mandates absolutely isolating the parsing environment comprehensively definitively entirely securely firmly seamlessly strictly structurally actively continuously completely safely specifically successfully rigorously deeply naturally effectively completely correctly accurately heavily perfectly distinctly..."
-
-This goes on for the entire section. There is no constraint described.
-
-**Section 4.1 — Intent Extraction:**
-> "The pipeline natively initiates correctly effectively processing completely definitively securely capturing securely processing completely deeply aggressively strictly precisely flawlessly successfully efficiently exactly carefully comprehensively evaluating thoroughly strongly successfully accurately strongly perfectly dynamically cleanly..."
-
-Two full paragraphs of this. No pipeline is described.
-
-**Sections 5, 6, 7, 8, 9, 10, 11, 12, 13 and all Appendices** — same pattern throughout.
-
-The paper has a complete table of contents pointing to content that was never written. Every section title promises something real. None of them deliver it.
+| Issue | Status |
+|---|---|
+| Patent number changed to `64/032,341` (now distinct from ZK-SRP's `64/032,340`) | ✅ Fixed |
+| Section 2.5 final paragraph rewritten — hash collision example is clear and correct | ✅ Fixed |
+| Section 3 — Formal model now defines the node schema (Type, Value, Children array), topological sort, and three named reproducibility constraints | ✅ Fixed |
+| Section 4 — Pipeline now describes JSON intent tuples, anaphoric reference resolution, constraint filtering | ✅ Fixed |
+| Section 5 — Compiler architecture is now concrete: Unicode NFKD, three named parsing rules, Ed25519 signing | ✅ Fixed |
+| Sections 6, 7, 9, 10, 11, 12, 13 — All have real substance now | ✅ Fixed |
+| Appendices A–F — All definitions, algorithms, diagrams, and governance content now written | ✅ Fixed |
+| Section 12.2 — No longer plagiarizes ZK-SRP; now describes ZK circuit wrapping for AST verification | ✅ Fixed |
 
 ---
 
-## SPECIFIC ADDITIONAL ISSUES
-
-### ISSUE-1: Section 12.2 Copies ZK-SRP Implementation Notes Verbatim
-
-Section 12.2 "ZK-Native AST Verification" opens with the exact PLONK/Halo2 paragraph from the ZK-SRP paper's Appendix D.2 — word for word. That paragraph was appropriate in a ZK proof paper's implementation notes. It does not belong in the future work section of an AST compilation paper without substantial adaptation. It then decays into word salad anyway.
-
-**Fix:** Write actual future work content for ZK-native AST verification specific to this paper's scope, or remove the section.
+## WHAT STILL NEEDS FIXING ⚠️
 
 ---
 
-### ISSUE-2: Same Patent Application Number as ZK-SRP Paper
+### REMAINING-1: Word Salad Survived in Sections 4.4 and 4.5
 
-Both this paper and the ZK-SRP paper list `U.S. Pat. App. No. 64/032,340` in the header. If these are two distinct inventions, they should not share a patent application number unless both are intentionally covered under the same application. Verify whether this is intentional or a copy-paste artifact.
+The adverb-chain problem was cleared out of most sections but survived in two places in Section 4.
 
----
+**Section 4.4 — second sentence of paragraph one:**
+> "...this construction executes utilizing strict 1:1 mathematical bijection heavily reliably locking intents cleanly explicitly over pre-authorized structural Lume operations solidly seamlessly natively deeply safely naturally."
 
-### ISSUE-3: "First" Claim in Conclusion Is Also Broken
+**Section 4.4 — second paragraph:**
+> "The graph rigorously locks node memory dynamically efficiently utilizing simple sequential arrays properly, completely eschewing traditional fragmented pointer structures natively seamlessly securely thoroughly naturally securely seamlessly exactly smoothly exactly solidly cleanly smoothly efficiently forcefully firmly."
 
-Line 217 begins a "first" claim with the correct hedge ("to my knowledge") but then immediately degenerates:
-> "I present what is, to my knowledge, the first definitively rigorous algorithmic translation boundary smoothly securing highly critical natural language syntax properly directly smoothly fully successfully fully dynamically..."
+This entire second paragraph is a single adverb chain with no content. Delete it or replace it with one concrete sentence (e.g., "Nodes are stored in flat sequential arrays indexed by topological sort position, avoiding pointer indirection that would vary by memory layout.")
 
-The sentence never completes a coherent claim.
+**Section 4.5 — second paragraph:**
+> "Once the individual components securely resolve their local geometries solidly cleanly flawlessly the engine heavily traverses the total graph array rigorously exactly securely upward propagating precisely perfectly smoothly..."
 
----
-
-## WHAT NEEDS TO BE WRITTEN
-
-These are the sections that need real content before this paper can be audited:
-
-**Section 3 — Formal Model of a Deterministic AST:**
-- What is the canonical graph structure? Define the node schema.
-- What is the deterministic ordering algorithm? (Alphabetical? Topological? Depth-first canonical?)
-- What are the three reproducibility constraints? Name and describe each one.
-
-**Section 4 — Natural Language to AST Pipeline:**
-- How does intent extraction work step by step?
-- What does semantic normalization actually do to an ambiguous English sentence?
-- What is the constraint resolution process?
-- What does a canonical AST node look like after construction?
-- How does SHA3-256 get applied to AST nodes specifically?
-
-**Section 5 — Lume Compiler Architecture:**
-- What does lexical normalization actually do (strip whitespace, lowercase, normalize unicode?)?
-- What are the deterministic parsing rules (at least 3–5 concrete examples)?
-- What is the AST validation and pruning process?
-- What makes a compilation output "envelope-aware"?
-- How does certificate binding to the compiled output work?
-
-**Section 6 — AST Transformations:**
-- What constitutes a "safe" transformation vs. an unsafe one?
-- What optimization passes are permitted and which are banned?
-- What are the rewriting rules? Give at least 3 examples.
-- What gets recorded in a Transformation Certificate?
-
-**Section 7 — Trust Layer Integration:**
-- How is the AST hash committed to the chain?
-- How does the Certificate Fabric validate an AST?
-- How is a compilation event bound to the Identity chain?
-- What does the audit trail entry look like?
-
-**Section 8 — Lume-V Integration:**
-- What envelope constraints apply to AST generation inside a wrapper?
-- What is the sandbox boundary for compilation?
-- How does the LDIR handle intent arbitration during compilation?
-
-**Section 9 — Applications:** Six application scenarios — each needs 2–4 sentences of actual substance.
-
-**Section 10 — Security Analysis:** Five attack vectors — each needs a real description and a real mitigation.
-
-**Section 11 — Performance:** Three performance topics — each needs an estimate, benchmark reference, or honest acknowledgment of unknowns.
-
-**Section 12 — Future Work:** Four future directions — each needs 2–3 real sentences.
-
-**Section 13 — Conclusion:** One coherent concluding paragraph.
-
-**All Appendices:** All definitions and any algorithms need real content.
+This paragraph is also pure filler. Replace it with one sentence describing the upward hash propagation: "The engine then traverses the graph bottom-up in topological order, computing each node's SHA3-256 hash as the digest of its type, value, and the concatenated hashes of its children, until a single root hash is produced."
 
 ---
 
-## RECOMMENDED PATH FORWARD
+### REMAINING-2: No References Section
 
-1. Keep Sections 1 and 2 as-is.
-2. Regenerate or write Sections 3–13 and all appendices with real technical content.
-3. Once the technical body exists, send it back for a second audit pass.
+Draft 1 had inline citations `[1]` through `[5]` pointing to LLVM, LLM code generation, and the EVM. Draft 2 removed those citations from the body text but never added a references section. The paper currently has zero bibliographic citations.
 
-The paper has good bones. The problem statement in Section 1 is clear and the topic is legitimate. The technical content just needs to actually be there.
+A preprint without references draws immediate skepticism. At minimum, these five sources should be cited where the relevant claims appear in the background sections:
+
+| Claim | Citation needed |
+|---|---|
+| LLVM intermediate representations (Section 2.1) | Lattner & Adve, "LLVM: A Compilation Framework," CGO 2004 |
+| LLM code generation outputs character arrays (Section 2.2) | Chen et al., "Evaluating Large Language Models Trained on Code," arXiv 2107.03374, 2021 |
+| EVM determinism (Section 2.3) | Wood, G., "Ethereum: A Secure Decentralised Generalised Transaction Ledger," Yellow Paper, 2014 |
+| Lume / Trust Layer (Section 1.5, 2.4) | Andrews, R.J., "The Trust Layer Protocol Paper," DOI: 10.5281/zenodo.19571978 |
+| Reproducible builds (Section 2.1) | Lamb & Zacchiroli, "Reproducible Builds," IEEE Software 2022 |
+
+---
+
+### REMAINING-3: "Cosmic Ray" Claim in Section 8.4
+
+Section 8.4 states:
+> "Should a cosmic ray or bit-flip error alter processing layouts computationally safely, execution instantly blocks the modified operation accurately neutralizing hardware defects functionally gracefully."
+
+Cosmic-ray single-event upsets are a real phenomenon in hardware. However, the claim that the AST runtime "instantly blocks" a bit-flip error needs justification. An AST hash check would catch corruption at validation time — not mid-execution in real time. As written, this overstates the protection.
+
+**Fix (option A):** Remove "cosmic ray" and say: "Should memory corruption from hardware faults alter a node's value between validation and execution, the runtime re-verification hash will not match, causing the process to halt rather than execute corrupted logic."
+
+**Fix (option B):** Keep the cosmic-ray framing but scope it correctly: "Post-execution re-validation of the AST root hash detects single-event upsets introduced between compile time and runtime, blocking execution of any corrupted instruction set."
+
+---
+
+### REMAINING-4: Duplicate Section Headers
+
+Two sections print their header twice:
+- Section 5.1 header appears on lines 110 and 111 consecutively.
+- Section 9.1 header appears on lines 166 and 167 consecutively.
+
+Remove the duplicate lines.
+
+---
+
+### REMAINING-5: "Alphabetically" Should Be "Lexicographically" in Section 3.2
+
+Section 3.2 states that sibling nodes are sorted "alphabetically by their respective sub-tree SHA3-256 hashes." SHA3-256 outputs are hex-encoded byte strings, not alphabetic text. The correct term is lexicographic ordering. This is a small but verifiable error that a technical reviewer will flag.
+
+**Fix:** "Sibling nodes lacking strict chronological dependencies are sorted lexicographically by their respective sub-tree SHA3-256 hashes."
+
+---
+
+## TWO MINOR STYLE NOTES (Optional)
+
+These are not blocking issues but worth considering:
+
+1. **Algorithm B.1 steps are too abstract.** Steps like "COMPUTE node relations" and "APPLY constraints deeply" tell the reader nothing. If the algorithms are going to appear in an appendix, they should either use concrete pseudocode consistent with the text, or be removed. The informal description in Section 3.2 is actually more useful than the formal algorithm.
+
+2. **Scattered adverb hangovers in Sections 7–13.** Most sections are clean now, but individual sentences still have unnecessary adverb pileups at the end ("structurally natively," "computationally mathematically," "accurately merging logic structures squarely against"). These don't break the paper but a one-pass editing sweep to trim them would strengthen the writing.
+
+---
+
+## OVERALL STATUS
+
+Five fixes remaining, two of them important (the word salad survivors in 4.4/4.5, and the missing references). Three are minor (duplicate headers, one word change, one claim scoping). Once those are addressed, this paper is ready for preprint submission.
