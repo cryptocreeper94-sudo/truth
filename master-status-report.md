@@ -220,15 +220,15 @@ All 10 original issues confirmed fixed. Patent number correction (→ 64/032,339
 ---
 
 ### 17. Global Deterministic Runtime Synchronization Protocols (G-DRSP)
-**Status: NEARLY READY — 2 SHOULD issues, 0 MUSTs**
+**Status: READY — all issues confirmed fixed**
 
 | ID | Severity | Issue |
 |---|---|---|
-| SHOULD-1 | SHOULD | Reference [15] Liskov-Wing LSP is in the reference list but never cited in the body — either add a sentence in §8.1/§8.3 citing [15] for behavioral substitutability, or remove [15] and renumber [16]–[21] to [15]–[20] |
-| SHOULD-2 | SHOULD | §11.3 cites [4] (RT-Healing) for "Homeostasis loops continuously adjust organism state" — should cite [8] (SOR), which defines homeostasis loops; change [4] → [8] in §11.3 |
-| CONSIDER-1 | CONSIDER | Reference [4] title uses "and" ("Healing and Drift-Stabilization") where the actual RT-Healing paper title uses "&" — update for strict title consistency if desired |
+| SHOULD-1 | FIXED | Dangling [15] Liskov-Wing LSP resolved |
+| SHOULD-2 | FIXED | §11.3 citation corrected: [4] (RT-Healing) → [8] (SOR) |
+| CONSIDER-1 | FIXED | [4] title "and" → "&" for consistency with RT-Healing canonical title |
 
-All four header DOIs correct. Patent 64/032,339 consistent in all 11 internal references, header, and footer. No early-series Trust Layer DOI split error. Synchronization Index weights (0.5/0.3/0.2) consistent across §5.1, B.1, D.2, and H.3.
+All four header DOIs correct. Patent 64/032,339 consistent in all internal references, header, and footer. No early-series Trust Layer DOI split error. Synchronization Index weights (0.5/0.3/0.2) consistent across §5.1, B.1, D.2, and H.3.
 
 ---
 
@@ -254,8 +254,8 @@ All four header DOIs correct. Patent 64/032,339 consistent in all 11 internal re
 14. DAIGS Expansions: typo "arbitation" → "arbitration" in §8.2
 15. Sandbox Guardrails: three minor adverb/duplicate fixes in C.2, C.3, §8.4
 16. RT-Healing: [6] Trust Layer year "2025" → "2026"; title → full canonical title
-17. G-DRSP: §11.3 citation [4] → [8] (RT-Healing → SOR for homeostasis definition)
-18. G-DRSP: resolve dangling [15] (remove or add body citation in §8.1/§8.3)
+~~17. G-DRSP: §11.3 citation [4] → [8]~~ — fixed
+~~18. G-DRSP: resolve dangling [15]~~ — fixed
 
 ### Optional (post-submission polish):
 - Real-Time Healing: 8 residual adverb instances
@@ -270,6 +270,7 @@ All four header DOIs correct. Patent 64/032,339 consistent in all 11 internal re
 ## Papers Genuinely Ready Now (after Trust Layer DOI fix only)
 - Proof-of-Intent
 - Dynamic Arbitration
+- G-DRSP (no DOI fix needed; all issues confirmed fixed)
 
 ## Papers Ready After 1–3 Small Fixes
 - Sandbox Guardrails (3 minor prose fixes + DOI)
@@ -279,7 +280,6 @@ All four header DOIs correct. Patent 64/032,339 consistent in all 11 internal re
 - DAIGS Expansions (one typo)
 - Quantum-Resistant Ed25519 (one citation verification)
 - AST Compilation (one citation verification)
-- G-DRSP (two SHOULD fixes: §11.3 citation swap + dangling [15] resolution)
 
 ## Papers Needing a Focused Edit Pass
 - GUPAS (3 issues: DOI, patent citations, governance authority phrasing)
