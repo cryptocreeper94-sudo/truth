@@ -283,6 +283,17 @@ All four header DOIs correct. Patent 64/032,339 consistent across all internal r
 
 ---
 
+### 22. Deterministic Organism Resource Exchange Protocols (D-OREP)
+**Status: NOT READY — 1 SHOULD issue (Volterra named without citation in §3.3)**
+
+| ID | Severity | Issue |
+|---|---|---|
+| SHOULD-1 | SHOULD | §3.3 names "Volterra" in body text without a citation bracket alongside Lotka [24] — either add [26] V. Volterra, Nature vol. 118 pp. 558–560, 1926, or remove "and Volterra" from §3.3 |
+
+All 25 references confirmed cited. All 18 internal references cited (zero dangling internals, third consecutive paper). All four header DOIs correct. Patent 64/032,339 consistent throughout. No Mayr — first clean external reference set in four papers. [24] Lotka (Elements of Physical Biology, 1925) correctly cited in §1.1 and §3.3. [25] Ostrom (Governing the Commons, 1990) correctly cited in §4.6. Lightest single-issue fix in the audit series.
+
+---
+
 ## Quick-Fix Summary (All Papers)
 
 ### MUST fix before any paper is deposited:
@@ -317,6 +328,7 @@ All four header DOIs correct. Patent 64/032,339 consistent across all internal r
 ~~26. D-OMPP: remove [19] Mayr and renumber~~ — fixed
 ~~27. D-OMSCP: resolve [19] Berg & Purcell~~ — fixed
 ~~28. D-OMSCP: remove [20] Mayr and renumber~~ — fixed
+29. D-OREP: §3.3 Volterra named without citation — add [26] Volterra or remove name from text (SHOULD-1)
 
 ### Optional (post-submission polish):
 - Real-Time Healing: 8 residual adverb instances
