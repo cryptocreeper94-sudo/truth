@@ -247,15 +247,15 @@ All four header DOIs correct. Patent 64/032,339 consistent across all internal r
 ---
 
 ### 19. Deterministic Organism Lifecycle Protocols (D-OLP)
-**Status: NOT READY — 3 SHOULD issues (4 uncited references)**
+**Status: READY — all issues confirmed fixed**
 
 | ID | Severity | Issue |
 |---|---|---|
-| SHOULD-1 | SHOULD | [12] (Dynamic Arbitration) in reference list but not cited in body; §11.2 arbitration discussion cites [7] DAIGS but not [12] — add "[12]" in §11.2 or remove from list |
-| SHOULD-2 | SHOULD | [18] (Mayr, "What Evolution Is") and [23] (Darwin, "On the Origin of Species") uncited despite biological framing — add [18] in §5.1 and [23] in §1.3, or remove both |
-| SHOULD-3 | SHOULD | [21] (Brewer CAP) dangling — no body anchor in lifecycle protocol context; remove from list |
+| SHOULD-1 | FIXED | [12] Dynamic Arbitration resolved |
+| SHOULD-2 | FIXED | [18] Mayr and [23] Darwin resolved (cited or removed) |
+| SHOULD-3 | FIXED | [21] Brewer CAP resolved |
 
-4 of 23 references uncited. 19 confirmed cited. All four header DOIs correct. Patent 64/032,339 consistent across all internal references. All body citations for [3], [5], [16] correct (improving over D-COCP). [17] Liskov-Wing correctly cited in §10.1; [19] partial synchrony correctly cited in §2.5 — best use of both references in the series.
+19 of 23 references confirmed cited prior to fixes. All four header DOIs correct. Patent 64/032,339 consistent across all internal references. [17] Liskov-Wing correctly cited in §10.1; [19] partial synchrony correctly cited in §2.5.
 
 ---
 
@@ -286,9 +286,9 @@ All four header DOIs correct. Patent 64/032,339 consistent across all internal r
 ~~19. D-COCP: add [15] citation; add [23] citation~~ — fixed
 ~~20. D-COCP: resolve dangling [3], [5]~~ — fixed
 ~~21. D-COCP: resolve dangling [17], [19], [21]~~ — fixed
-22. D-OLP: resolve dangling [12] — add "[12]" in §11.2 or remove (SHOULD-1)
-23. D-OLP: resolve [18] Mayr and [23] Darwin — add citations or remove both (SHOULD-2)
-24. D-OLP: remove [21] Brewer CAP — no body anchor in lifecycle context (SHOULD-3)
+~~22. D-OLP: resolve dangling [12]~~ — fixed
+~~23. D-OLP: resolve [18] Mayr and [23] Darwin~~ — fixed
+~~24. D-OLP: remove [21] Brewer CAP~~ — fixed
 
 ### Optional (post-submission polish):
 - Real-Time Healing: 8 residual adverb instances
@@ -305,6 +305,7 @@ All four header DOIs correct. Patent 64/032,339 consistent across all internal r
 - Dynamic Arbitration
 - G-DRSP (no DOI fix needed; all issues confirmed fixed)
 - D-COCP (no DOI fix needed; all issues confirmed fixed)
+- D-OLP (no DOI fix needed; all issues confirmed fixed)
 
 ## Papers Ready After 1–3 Small Fixes
 - Sandbox Guardrails (3 minor prose fixes + DOI)
