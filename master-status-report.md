@@ -219,6 +219,19 @@ All 10 original issues confirmed fixed. Patent number correction (→ 64/032,339
 
 ---
 
+### 17. Global Deterministic Runtime Synchronization Protocols (G-DRSP)
+**Status: NEARLY READY — 2 SHOULD issues, 0 MUSTs**
+
+| ID | Severity | Issue |
+|---|---|---|
+| SHOULD-1 | SHOULD | Reference [15] Liskov-Wing LSP is in the reference list but never cited in the body — either add a sentence in §8.1/§8.3 citing [15] for behavioral substitutability, or remove [15] and renumber [16]–[21] to [15]–[20] |
+| SHOULD-2 | SHOULD | §11.3 cites [4] (RT-Healing) for "Homeostasis loops continuously adjust organism state" — should cite [8] (SOR), which defines homeostasis loops; change [4] → [8] in §11.3 |
+| CONSIDER-1 | CONSIDER | Reference [4] title uses "and" ("Healing and Drift-Stabilization") where the actual RT-Healing paper title uses "&" — update for strict title consistency if desired |
+
+All four header DOIs correct. Patent 64/032,339 consistent in all 11 internal references, header, and footer. No early-series Trust Layer DOI split error. Synchronization Index weights (0.5/0.3/0.2) consistent across §5.1, B.1, D.2, and H.3.
+
+---
+
 ## Quick-Fix Summary (All Papers)
 
 ### MUST fix before any paper is deposited:
@@ -241,6 +254,8 @@ All 10 original issues confirmed fixed. Patent number correction (→ 64/032,339
 14. DAIGS Expansions: typo "arbitation" → "arbitration" in §8.2
 15. Sandbox Guardrails: three minor adverb/duplicate fixes in C.2, C.3, §8.4
 16. RT-Healing: [6] Trust Layer year "2025" → "2026"; title → full canonical title
+17. G-DRSP: §11.3 citation [4] → [8] (RT-Healing → SOR for homeostasis definition)
+18. G-DRSP: resolve dangling [15] (remove or add body citation in §8.1/§8.3)
 
 ### Optional (post-submission polish):
 - Real-Time Healing: 8 residual adverb instances
@@ -264,6 +279,7 @@ All 10 original issues confirmed fixed. Patent number correction (→ 64/032,339
 - DAIGS Expansions (one typo)
 - Quantum-Resistant Ed25519 (one citation verification)
 - AST Compilation (one citation verification)
+- G-DRSP (two SHOULD fixes: §11.3 citation swap + dangling [15] resolution)
 
 ## Papers Needing a Focused Edit Pass
 - GUPAS (3 issues: DOI, patent citations, governance authority phrasing)
