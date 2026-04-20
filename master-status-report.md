@@ -195,7 +195,17 @@ All 10 original issues confirmed fixed. Patent number correction (→ 64/032,339
 | ID | Severity | Issue |
 |---|---|---|
 | SHOULD-1 | SHOULD | §8.2 typo: "arbitation criteria" → "arbitration criteria" |
-| CONSIDER-1 | Optional | §2.2 vs B.2: add one sentence clarifying totality claim vs. defensive escalation |
+| CONSIDER-1 | RESOLVED by carry-forward | Global Governance §2.4 contains the exact clarifying sentence needed — import into DAIGS Expansions §2.2: *"The defensive escalation path in the arbitration algorithm serves as a safeguard against implementation errors in the comparison function, not as an acknowledgment that the formal hierarchy can produce cycles."* |
+
+---
+
+### 15. Certificate-Bound Global Governance Frameworks
+**Status: NOT READY — 1 issue outstanding, not confirmed fixed**
+
+| ID | Severity | Issue |
+|---|---|---|
+| SHOULD-1 | SHOULD | Appendix C.3: one sentence needed clarifying when conservative composition governs (AUTHORIZED vs. DENIED conflicts) vs. when Jurisdictional Priority Certificate governs (same-type verdict conflicts) — both mechanisms are invoked in the same example without explaining their interaction |
+| SOR dependency | Note | §11.3 cites HEAL as pre-authorized correction — verify HEAL terminology is consistent with whatever SOR MUST-1 resolves (subtype vs. distinct signal type) |
 
 ---
 
