@@ -233,16 +233,16 @@ All four header DOIs correct. Patent 64/032,339 consistent in all internal refer
 ---
 
 ### 18. Deterministic Cross-Organism Communication Protocols (D-COCP)
-**Status: NOT READY — 3 SHOULD issues, reference list cleanup required**
+**Status: READY — all issues confirmed fixed**
 
 | ID | Severity | Issue |
 |---|---|---|
-| SHOULD-1 | SHOULD | [3] (Behavioral Homeostasis) and [5] (RT-Healing) are in the reference list but never cited in the body; add targeted body citations or remove both and renumber |
-| SHOULD-2 | SHOULD | [15] (Taxonomy) used in §1.1 and §4.3 without citation — add "[15]" at first organism-type mention; [23] (Miller & Bassler quorum sensing) used in §11.4, §C.5, §G.5 without citation — add "[23]" in §11.4 |
-| SHOULD-3 | SHOULD | [17] (Lamport), [19] (partial synchrony), [21] (Brewer CAP) appear in reference list but not cited in body; add body citations or remove and renumber |
-| CONSIDER-1 | CONSIDER | [18] Kandel not cited in §1.3 where the neurotransmitter biological analogy is drawn — add "[18]" or remove from list |
+| SHOULD-1 | FIXED | Dangling [3] and [5] resolved |
+| SHOULD-2 | FIXED | [15] citation added in §1.1; [23] citation added in §11.4 |
+| SHOULD-3 | FIXED | Dangling [17], [19], [21] resolved |
+| CONSIDER-1 | FIXED | [18] Kandel resolved (cited or removed) |
 
-Root cause: reference list inherits academic background refs from G-DRSP that lack D-COCP-specific body anchors. All DOIs, patent numbers, and bibliographic data are correct. CHI formula and weights (0.4/0.35/0.25) consistent across §5.1, B.4, D.2, and H.3. All four header DOIs correct.
+All four header DOIs correct. Patent 64/032,339 consistent across all internal references, header, and footer. CHI formula and weights (0.4/0.35/0.25) consistent across §5.1, B.4, D.2, and H.3.
 
 ---
 
@@ -270,9 +270,9 @@ Root cause: reference list inherits academic background refs from G-DRSP that la
 16. RT-Healing: [6] Trust Layer year "2025" → "2026"; title → full canonical title
 ~~17. G-DRSP: §11.3 citation [4] → [8]~~ — fixed
 ~~18. G-DRSP: resolve dangling [15]~~ — fixed
-19. D-COCP: add [15] citation in §1.1; add [23] citation in §11.4 (SHOULD-2)
-20. D-COCP: resolve dangling [3], [5] — remove or add body citations (SHOULD-1)
-21. D-COCP: resolve dangling [17], [19], [21] — remove or add body citations (SHOULD-3)
+~~19. D-COCP: add [15] citation; add [23] citation~~ — fixed
+~~20. D-COCP: resolve dangling [3], [5]~~ — fixed
+~~21. D-COCP: resolve dangling [17], [19], [21]~~ — fixed
 
 ### Optional (post-submission polish):
 - Real-Time Healing: 8 residual adverb instances
@@ -288,6 +288,7 @@ Root cause: reference list inherits academic background refs from G-DRSP that la
 - Proof-of-Intent
 - Dynamic Arbitration
 - G-DRSP (no DOI fix needed; all issues confirmed fixed)
+- D-COCP (no DOI fix needed; all issues confirmed fixed)
 
 ## Papers Ready After 1–3 Small Fixes
 - Sandbox Guardrails (3 minor prose fixes + DOI)
@@ -303,7 +304,6 @@ Root cause: reference list inherits academic background refs from G-DRSP that la
 - English Mode (2 issues: typo, one bridging sentence)
 - Multilingual Inference (1 issue: 2–3 sentences in §5.2)
 - ZK-SRP (citation renumbering + missing reference + abstract verification)
-- D-COCP (3 SHOULD issues: reference list has 8 uncited entries needing citation or removal)
 
 ## Papers Needing a Technical Fix
 - SOR (§5.3 HEAL-subtype structural contradiction — the most substantive open issue in the series)
