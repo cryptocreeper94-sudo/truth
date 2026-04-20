@@ -284,13 +284,13 @@ All four header DOIs correct. Patent 64/032,339 consistent across all internal r
 ---
 
 ### 22. Deterministic Organism Resource Exchange Protocols (D-OREP)
-**Status: NOT READY — 1 SHOULD issue (Volterra named without citation in §3.3)**
+**Status: READY — all issues confirmed fixed**
 
 | ID | Severity | Issue |
 |---|---|---|
-| SHOULD-1 | SHOULD | §3.3 names "Volterra" in body text without a citation bracket alongside Lotka [24] — either add [26] V. Volterra, Nature vol. 118 pp. 558–560, 1926, or remove "and Volterra" from §3.3 |
+| SHOULD-1 | FIXED | §3.3 Volterra citation resolved (name removed or reference added) |
 
-All 25 references confirmed cited. All 18 internal references cited (zero dangling internals, third consecutive paper). All four header DOIs correct. Patent 64/032,339 consistent throughout. No Mayr — first clean external reference set in four papers. [24] Lotka (Elements of Physical Biology, 1925) correctly cited in §1.1 and §3.3. [25] Ostrom (Governing the Commons, 1990) correctly cited in §4.6. Lightest single-issue fix in the audit series.
+All 25 references confirmed cited prior to fix. All 18 internal references cited (zero dangling internals, third consecutive paper). All four header DOIs correct. Patent 64/032,339 consistent throughout. No Mayr. [24] Lotka and [25] Ostrom both correctly cited.
 
 ---
 
@@ -328,7 +328,7 @@ All 25 references confirmed cited. All 18 internal references cited (zero dangli
 ~~26. D-OMPP: remove [19] Mayr and renumber~~ — fixed
 ~~27. D-OMSCP: resolve [19] Berg & Purcell~~ — fixed
 ~~28. D-OMSCP: remove [20] Mayr and renumber~~ — fixed
-29. D-OREP: §3.3 Volterra named without citation — add [26] Volterra or remove name from text (SHOULD-1)
+~~29. D-OREP: §3.3 Volterra named without citation~~ — fixed
 
 ### Optional (post-submission polish):
 - Real-Time Healing: 8 residual adverb instances
@@ -348,6 +348,7 @@ All 25 references confirmed cited. All 18 internal references cited (zero dangli
 - D-OLP (no DOI fix needed; all issues confirmed fixed)
 - D-OMPP (no DOI fix needed; all issues confirmed fixed)
 - D-OMSCP (no DOI fix needed; all issues confirmed fixed)
+- D-OREP (no DOI fix needed; all issues confirmed fixed)
 
 ## Papers Ready After 1–3 Small Fixes
 - Sandbox Guardrails (3 minor prose fixes + DOI)

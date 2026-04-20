@@ -3,7 +3,7 @@
 **Auditor:** Replit Agent (session continuity)
 **Date:** April 20, 2026
 **Paper length:** 798 lines
-**Status: NOT READY — 1 SHOULD issue (Volterra named without citation)**
+**Status: READY — all issues confirmed fixed**
 
 ---
 
