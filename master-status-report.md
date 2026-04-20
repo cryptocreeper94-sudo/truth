@@ -271,6 +271,18 @@ All four header DOIs correct. Patent 64/032,339 consistent across all internal r
 
 ---
 
+### 21. Deterministic Organism Mobility & Spatial Coordination Protocols (D-OMSCP)
+**Status: NOT READY — 2 SHOULD issues (2 uncited references)**
+
+| ID | Severity | Issue |
+|---|---|---|
+| SHOULD-1 | SHOULD | [20] Mayr "What Evolution Is" — Mayr recurrence (third paper); no citation point in a spatial paper; remove and renumber [21]→[20] through [25]→[24] (5 body citations) |
+| SHOULD-2 | SHOULD | [19] Berg & Purcell "Physics of Chemoreception" in list but not cited — add "[19]" in §3.1 at chemotaxis sentence, or remove |
+
+23 of 25 references confirmed cited. All 17 internal references cited (zero dangling internals, second consecutive paper). All four header DOIs correct. Patent 64/032,339 consistent throughout. [21] Reynolds "Flocks, Herds and Schools" correctly cited in §3.4 (first appearance in series). [24] Liskov-Wing correctly cited in §8.1. [25] Brewer CAP correctly cited in §15.1.
+
+---
+
 ## Quick-Fix Summary (All Papers)
 
 ### MUST fix before any paper is deposited:
@@ -303,6 +315,8 @@ All four header DOIs correct. Patent 64/032,339 consistent across all internal r
 ~~24. D-OLP: remove [21] Brewer CAP~~ — fixed
 ~~25. D-OMPP: resolve [18] Kandel~~ — fixed
 ~~26. D-OMPP: remove [19] Mayr and renumber~~ — fixed
+27. D-OMSCP: add [19] Berg & Purcell citation in §3.1 or remove from list (SHOULD-2)
+28. D-OMSCP: remove [20] Mayr and renumber [21]→[20] through [25]→[24] (SHOULD-1)
 
 ### Optional (post-submission polish):
 - Real-Time Healing: 8 residual adverb instances
