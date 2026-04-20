@@ -1,0 +1,811 @@
+Quantum‑Resistant Ed25519 Implementations in Lume
+Post‑Quantum Cryptographic Architecture for Certificate‑Bound Deterministic Ecosystems
+Ronald “Jason” Andrews
+DarkWave Studios LLC
+Nashville, Tennessee, United States
+Version 1.0.0 — April 2026
+Patent Pending — U.S. Pat. App. No. 64/032,339
+Foundation: Lume · DOI: 10.5281/zenodo.19382282
+Preprint v1 — Submitted for early dissemination. Not peer‑reviewed.
+Abstract
+Ed25519 is the cryptographic foundation of the Lume ecosystem. Every certificate in the Trust Layer’s Certificate Fabric, every signal in the Synthetic Organism Runtime’s Signal Bus, every state commitment in the deterministic transition graph, and every governance authorization in the GUPAS framework is signed with an Ed25519 key and verified through Ed25519 signature validation [16]. The security of the entire ecosystem—identity anchoring, provenance auditing, governance enforcement, and autonomous organism certification—depends on the computational infeasibility of forging Ed25519 signatures. A sufficiently powerful quantum computer running Shor’s algorithm [20] would reduce this computational infeasibility to polynomial-time tractability, rendering every certificate, every identity, and every governance authorization in the ecosystem forgeable.
+
+I present a complete quantum-resistant cryptographic architecture for the Lume ecosystem that preserves deterministic semantics, certificate continuity, identity persistence, and governance validity throughout the transition from classical Ed25519 to post-quantum signature schemes. The architecture proceeds through three phases: Phase I (Hybrid), in which every signature operation produces a dual signature combining Ed25519 with a NIST-standardized post-quantum scheme (CRYSTALS-Dilithium [17], Falcon [18], or SPHINCS+ [19]); Phase II (PQ-Primary), in which the post-quantum signature becomes the primary verification target and the Ed25519 signature becomes a backward-compatibility fallback; and Phase III (PQ-Native), in which all new certificates, identities, and governance authorizations are issued exclusively under post-quantum signatures. The architecture integrates with Lume [1] through AST-level cryptographic operation canonicalization, with the Trust Layer [3] through certificate fabric upgrades and identity migration protocols, with Lume-V [4] through envelope-constrained cryptographic transitions, with DAIGS [5] through cognitive substrate extensions for cryptographic reasoning, with LDIR [12] through multilingual cryptographic semantic normalization, with SOR [13] through organism identity preservation, and with GUPAS [2] through governance-safe transition policies. I identify and formalize six failure modes specific to cryptographic transition—identity fragmentation, certificate invalidation, hybrid mismatch, PQ signature drift, governance misalignment, and intent inversion—each with defined detection mechanisms and corrective responses. To my knowledge, this paper presents the first complete quantum-resistant cryptographic architecture for a deterministic, certificate-bound natural-language programming ecosystem.
+
+Keywords: quantum-resistant cryptography, Ed25519, post-quantum signatures, hybrid signatures, CRYSTALS-Dilithium, Falcon, SPHINCS+, certificate migration, Lume, Trust Layer, deterministic ecosystems
+1 Introduction
+1.1 The Cryptographic Foundation of Deterministic Ecosystems
+Deterministic ecosystems require cryptographic primitives that are themselves deterministic: given the same key and the same message, the signature operation must produce the same signature, and the verification operation must produce the same verdict, across all implementations and all execution environments. Ed25519 satisfies this requirement through its deterministic nonce derivation mechanism [16], which eliminates the random nonce that introduces non-determinism in ECDSA and other signature schemes. This deterministic property is not a convenience feature; it is an architectural requirement. The Lume compiler’s canonical AST construction depends on deterministic cryptographic operations: two compilations of the same program must produce the same signed AST, which requires deterministic signature production.
+
+The cryptographic foundation extends beyond signature production to identity anchoring. Every entity in the Lume ecosystem—every user, every organism, every cell, every governance authority—is identified by an Ed25519 public key bound to an identity descriptor through a Trust Layer certificate. The entity’s identity persists across all lifecycle events (migration, quiescence, healing, evolution) because the identity key persists. Compromising the identity key compromises the entity’s identity; forging the identity key forges the entity’s identity. The security of identification is the security of Ed25519.
+
+The scale of the cryptographic dependency is significant. A typical Lume ecosystem deployment involves thousands of certificates, millions of signed signals, and continuous streams of state commitments, governance evaluations, and homeostatic interventions—each individually signed and verified. A break in Ed25519 security would not compromise a single entity or a single transaction; it would compromise the entire ecosystem simultaneously, rendering all certificates forgeable, all identities impersonable, and all governance authorizations fabricable.
+
+This paper addresses the existential risk that quantum computing poses to the Ed25519 cryptographic foundation and presents a complete architecture for transitioning the Lume ecosystem to quantum-resistant cryptography while preserving deterministic semantics, certificate continuity, identity persistence, and governance validity.
+
+1.2 Why Ed25519 Is Central to Trust Layer and Lume
+Ed25519 was selected for the Trust Layer and Lume based on four properties: deterministic signatures (eliminating nonce-related vulnerabilities and ensuring reproducible compilation), compact key sizes (32-byte public keys and 64-byte signatures, minimizing certificate and signal overhead), high verification throughput (enabling real-time signal validation in the SOR Signal Bus), and conservative security margins (128-bit security level, exceeding the 112-bit minimum recommended by NIST for post-2030 deployment). Bernstein’s original specification [16] provides a comprehensive security analysis that the Trust Layer’s design relies upon.
+
+Within Lume, Ed25519 serves as the binding mechanism between intent and execution. When the compiler resolves an English Mode directive into a canonical action, the resolved action is signed with the author’s Ed25519 key, producing an Intent Tuple whose trust binding cryptographically links the human author to the computational action. This binding is the foundation of the Proof-of-Intent mechanism [14]: if the execution outcome diverges from the declared intent, the cryptographic binding enables forensic attribution of the divergence to the specific entity that authorized the action.
+
+The Trust Layer’s hierarchical certificate chain—from the designated Ecosystem Governance Authority through organism identity certificates to cell identity certificates—is constructed entirely from Ed25519 signatures. Each link in the chain is an Ed25519 signature that one entity produces and all subsequent verifiers validate. A quantum attack on Ed25519 would not merely break one link; it would enable an attacker to forge any link at any level, constructing arbitrary certificate chains that pass all validation checks.
+
+1.3 The Quantum Threat Model
+The quantum threat to Ed25519 arises from Shor’s algorithm [20], which solves the elliptic-curve discrete logarithm problem (ECDLP) in polynomial time on a sufficiently powerful quantum computer. Ed25519 derives its security from the computational infeasibility of ECDLP on Curve25519; Shor’s algorithm reduces this infeasibility from exponential to polynomial, enabling key recovery (computing the private key from the public key) in time polynomial in the key size. A quantum adversary with access to a cryptographically relevant quantum computer (CRQC) could recover any Ed25519 private key from its published public key and forge arbitrary signatures.
+
+The timeline for CRQC availability is uncertain. Estimates range from 2030 to 2050+, depending on technological assumptions about qubit quality, error correction, and scaling. The uncertainty itself is a risk factor: ecosystems that begin quantum-resistant migration after CRQC availability are too late, because the adversary can retroactively compromise all previously issued certificates by recovering the private keys from the public keys embedded in the certificates. This retroactive vulnerability—the “harvest now, decrypt later” attack—means that quantum-resistant migration must begin before CRQC availability, not after.
+
+Grover’s algorithm [21] poses a secondary threat to the SHA3-256 hash function used for state commitments and Merkle tree construction. Grover’s algorithm provides a quadratic speedup for hash preimage search, reducing SHA3-256’s effective security from 256 bits to 128 bits. The 128-bit post-Grover security level remains well above the NIST minimum for the foreseeable future, and no architectural changes are required to maintain hash security. The quantum threat to the Lume ecosystem is concentrated on Ed25519, not on SHA3-256.
+
+1.4 Relationship to GUPAS, Lume-V, DAIGS, LDIR, and SOR
+Quantum-resistant cryptographic migration affects every ecosystem component that uses Ed25519 signatures. GUPAS [2] uses Ed25519 for governance authorization certificates; the migration must ensure that governance validity is preserved across the transition. Lume-V [4] uses Ed25519 for envelope enforcement certificates; the migration must ensure that envelope constraints remain enforceable. DAIGS [5] uses Ed25519 for cognitive evaluation certificates; the migration must ensure that cognitive substrate reasoning incorporates quantum-resistant verification. LDIR [12] uses Ed25519 for multilingual inference certificates; the migration must ensure that cross-lingual equivalence verification operates on quantum-resistant signatures. SOR [13] uses Ed25519 for organism identity, cell identity, and signal signing; the migration must ensure that organism identity persistence is maintained across the cryptographic transition.
+
+The pervasive dependency on Ed25519 means that the migration cannot be component-by-component; it must be ecosystem-wide, coordinated, and governed. A partial migration that upgrades the Trust Layer but not the SOR would create a vulnerability gap: organisms would produce classical Ed25519 signatures that the Trust Layer can no longer validate under PQ-native mode. The phased approach (Hybrid → PQ-Primary → PQ-Native) is designed to prevent such gaps by ensuring that all components transition through the same phases in the same order.
+
+1.5 Overview of Contributions
+This paper makes five primary contributions. First, I formalize the quantum threat model for the Lume ecosystem, quantifying the impact of CRQC availability on each ecosystem component. Second, I specify the hybrid signature architecture that combines Ed25519 with NIST-standardized post-quantum schemes, preserving backward compatibility while adding quantum resistance. Third, I specify the certificate migration protocol that transitions the Trust Layer’s Certificate Fabric from classical Ed25519 to quantum-resistant signatures without breaking certificate continuity or identity persistence. Fourth, I specify the governance-safe transition policies that coordinate the ecosystem-wide migration through the GUPAS governance framework. Fifth, I identify and formalize six failure modes specific to cryptographic transition.
+
+The significance of this paper lies in its demonstration that a deterministic ecosystem can transition to quantum-resistant cryptography without sacrificing determinism, governance validity, or identity persistence. The transition architecture preserves the invariants that the ecosystem depends upon—reproducible compilation, certificate-bound identity, governed autonomy, and forensic auditability—while replacing the cryptographic primitives that enforce those invariants.
+
+2 Foundations of Ed25519
+2.1 Curve25519 and Edwards Curves
+Ed25519 operates on the Edwards curve Curve25519, a twisted Edwards curve defined over the finite field Fp where p = 2255 − 19. The curve provides a group of prime order with approximately 2252 elements, yielding 126-bit security against classical attacks on the elliptic-curve discrete logarithm problem. Bernstein’s design [16] selected Curve25519 for its resistance to known side-channel attacks, its efficient arithmetic (complete addition formulas that avoid exceptional cases), and its conservative security parameter choices.
+
+The Edwards curve formulation provides performance advantages over Weierstrass formulations: the complete addition formula eliminates the need for conditional branches in point addition, reducing side-channel leakage. This property is architecturally significant for the Lume runtime, which executes cryptographic operations within the deterministic execution model. Side-channel-resistant arithmetic ensures that cryptographic operations do not introduce timing-dependent behavior that would violate deterministic semantics.
+
+Curve25519’s security against classical attacks is well-established through two decades of cryptanalysis. The best known classical attack on ECDLP is Pollard’s rho algorithm, which requires approximately 2126 group operations—computationally infeasible with current and foreseeable classical computing resources. This classical security is the foundation on which the Trust Layer’s certificate infrastructure was built, and it remains valid against all non-quantum adversaries.
+
+2.2 Deterministic Signatures
+Ed25519’s deterministic signature scheme derives the nonce from a hash of the private key and the message, rather than from a random number generator. Given the same private key and the same message, the signature algorithm produces the same signature. This determinism is essential for the Lume ecosystem: the compiler produces signed canonical ASTs as part of the compilation process, and two compilations of the same source must produce the same signed output. A non-deterministic signature scheme would produce different signatures for the same message, breaking the canonicalization invariant that ensures reproducible compilation.
+
+Deterministic signatures also enable verification of compilation correctness. A governance auditor can recompile a source program and verify that the resulting signed AST matches the previously committed signed AST, confirming that the compilation was performed correctly and that the source program is the authentic source of the committed AST. This compilation verification depends on deterministic signatures: if two correct compilations could produce different signatures, the auditor could not distinguish a correctly recompiled AST from a tampered AST.
+
+The deterministic nonce derivation also eliminates a significant class of implementation vulnerabilities. In non-deterministic signature schemes (such as ECDSA with random nonces), a flawed random number generator can leak the private key through the nonces. The Sony PlayStation 3 code-signing key leak (2010) and the Android wallet vulnerability (2013) both resulted from flawed random nonce generation. Ed25519’s deterministic nonce derivation is immune to these attacks by construction.
+
+2.3 Identity Anchoring
+Identity anchoring in the Lume ecosystem binds an entity’s behavioral identity to an Ed25519 key pair. The entity’s public key serves as the identity anchor: all certificates, signatures, and authorizations issued by the entity are verifiable through the public key. The entity’s private key serves as the identity proof: possession of the private key is equivalent to possession of the identity. This anchoring model is simple, verifiable, and deterministic.
+
+Identity anchoring through Ed25519 provides three critical properties: unforgeable attribution (no entity can produce a valid signature under another entity’s key without possessing the private key), persistent identity (the key pair persists across all entity lifecycle events), and hierarchical delegation (an entity can issue subordinate certificates that chain to its key, enabling identity delegation without key sharing). These properties are the foundation of the Trust Layer’s hierarchical certificate model.
+
+Quantum-resistant identity anchoring must preserve these three properties while replacing the Ed25519 key pair with a quantum-resistant key pair. The replacement must be transparent to the ecosystem’s governance, auditing, and certification infrastructure: an entity’s quantum-resistant identity must be as attributable, as persistent, and as delegable as the entity’s classical Ed25519 identity.
+
+2.4 Certificate-Bound Execution
+Certificate-bound execution ensures that every computational action in the Lume ecosystem is authorized by a valid certificate chain. The execution runtime verifies the certificate chain before executing each action: the action’s certificate must chain to the executing entity’s identity certificate, which must chain to the organism’s identity certificate, which must chain to the designated Ecosystem Governance Authority. Each link in the chain is an Ed25519 signature that must be verified.
+
+Certificate-bound execution in the quantum-resistant architecture must maintain the same verification semantics while operating on hybrid or post-quantum signatures. The verification pipeline must accept classical Ed25519 certificates (for backward compatibility during Phase I), hybrid certificates (containing both classical and post-quantum signatures during Phase I and Phase II), and PQ-native certificates (containing only post-quantum signatures during Phase III). The pipeline must produce the same verification verdict regardless of the certificate format, ensuring that certificate-bound execution semantics are preserved across the transition.
+
+The transition from classical to quantum-resistant certificate-bound execution must be atomic at the policy level: all components within a governance domain must transition to the same phase simultaneously. A domain that has some components in Phase I and others in Phase III would have incompatible certificate formats, creating verification failures that would halt execution.
+
+2.5 Ed25519 Limitations in a Post-Quantum World
+Ed25519’s security is based entirely on the hardness of the ECDLP on Curve25519. Shor’s algorithm reduces ECDLP to polynomial time on a quantum computer, completely eliminating Ed25519’s security guarantee against quantum adversaries. Unlike symmetric cryptographic primitives (which retain partial security against quantum attacks through Grover’s quadratic speedup), public-key cryptographic primitives based on ECDLP or integer factorization are completely broken by Shor’s algorithm.
+
+The complete break means that quantum-resistant alternatives cannot be incremental improvements to Ed25519; they must be entirely different mathematical constructions that resist quantum algorithms. The NIST Post-Quantum Cryptography Standardization process [22] has identified three families of post-quantum signature schemes: lattice-based (CRYSTALS-Dilithium [17], Falcon [18]), hash-based (SPHINCS+ [19]), and code-based (none standardized for signatures). Each family provides different performance, key size, and security tradeoffs.
+
+The limitation of Ed25519 in a post-quantum world is not theoretical; it is a concrete, quantifiable vulnerability. The Lume ecosystem’s security depends on the assumption that no adversary can forge an Ed25519 signature in less than approximately 2126 group operations. A CRQC running Shor’s algorithm would require approximately 210–215 logical qubit operations (depending on implementation efficiency), reducing the security from exponential to trivially breakable. The quantum-resistant architecture must replace this assumption with one that remains valid against quantum adversaries.
+
+3 Quantum Threat Model
+3.1 Shor’s Algorithm
+Shor’s algorithm [20] solves the integer factorization problem and the discrete logarithm problem (including ECDLP) in polynomial time on a quantum computer. For Ed25519, Shor’s algorithm would compute the private scalar from the public point by solving the ECDLP on Curve25519. The algorithm requires a quantum computer with approximately 2n + 3 logical qubits (where n is the bit-length of the group order) and runs in polynomial time with quantum Fourier transform operations.
+
+For Curve25519 (n ≈ 252), Shor’s algorithm requires approximately 507 logical qubits and a polynomial number of quantum gates. However, logical qubits must be implemented using many physical qubits to support quantum error correction; current estimates suggest that each logical qubit requires 1,000–10,000 physical qubits, depending on the error rate. A CRQC capable of breaking Ed25519 would therefore require approximately 500,000–5,000,000 physical qubits—beyond current capabilities but within the range of projected capabilities for 2035–2050.
+
+The polynomial runtime of Shor’s algorithm means that key recovery is not merely theoretically possible but practically efficient. A CRQC capable of implementing Shor’s algorithm for Curve25519 would recover an Ed25519 private key in seconds to minutes, not years. This efficiency enables mass key recovery: an adversary with CRQC access could recover all Ed25519 private keys in the ecosystem, compromising all identities simultaneously.
+
+3.2 Grover’s Algorithm
+Grover’s algorithm [21] provides a quadratic speedup for unstructured search problems, including hash preimage search and symmetric key search. For SHA3-256 (used in the Lume ecosystem for state commitments and Merkle tree construction), Grover’s algorithm reduces the effective security from 256 bits to 128 bits. The 128-bit post-Grover security level exceeds the NIST minimum of 112 bits for post-2030 deployment and is generally considered sufficient for the foreseeable future.
+
+Grover’s algorithm also affects the brute-force search component of other attacks but does not provide the polynomial-time breaks that Shor’s algorithm provides for ECDLP. The practical impact on the Lume ecosystem is limited: SHA3-256 remains secure against quantum attacks (with reduced but still sufficient security margins), and no changes to the hash function infrastructure are required. The quantum threat to the Lume ecosystem is concentrated exclusively on the Ed25519 signature scheme.
+
+The architectural decision to use SHA3-256 (with 256-bit output) rather than SHA-256 (with 256-bit output but based on a different construction) provides an additional safety margin. SHA3’s sponge construction has been analyzed for quantum resistance and provides security margins that are more clearly understood than SHA-256’s Merkle-Damgård construction in a quantum context. The choice of SHA3-256 was made during the Lume ecosystem’s initial design with post-quantum security considerations in mind.
+
+3.3 Impact on Elliptic-Curve Cryptography
+The impact of quantum computing on elliptic-curve cryptography is total: all curve-based signature schemes (ECDSA, EdDSA, Ed25519, Ed448) are vulnerable to Shor’s algorithm. The vulnerability is inherent to the mathematical structure of elliptic-curve cryptography, not to any specific implementation. No parameter change (larger key sizes, different curves, different curve families) can restore security against quantum attacks, because Shor’s algorithm’s polynomial runtime scales with the key size, maintaining its advantage regardless of parameter choices.
+
+This total impact distinguishes elliptic-curve cryptography from symmetric cryptography, where quantum attacks provide only quadratic speedups. Symmetric key sizes can be doubled to restore pre-quantum security margins (AES-128 becomes AES-256); elliptic-curve key sizes cannot be increased to restore security because Shor’s algorithm’s advantage is super-polynomial. The only defense against quantum attacks on elliptic-curve cryptography is replacement with post-quantum alternatives based on different mathematical structures.
+
+The replacement must preserve the properties that elliptic-curve cryptography provides: small key sizes, fast verification, deterministic signatures, and conservative security margins. Post-quantum signature schemes offer different tradeoff profiles: lattice-based schemes provide fast operations but larger keys and signatures; hash-based schemes provide small verification proofs but slower signing. The hybrid architecture enables the ecosystem to evaluate these tradeoffs during the transition period before committing to a single post-quantum scheme.
+
+3.4 Impact on Deterministic Ecosystems
+The impact on deterministic ecosystems is amplified by the pervasive dependency on Ed25519. In a conventional software system, a cryptographic break affects authentication and authorization; the system’s functionality continues without cryptographic protection. In the Lume ecosystem, a cryptographic break affects execution itself: certificate-bound execution cannot proceed without valid certificates, and every certificate depends on Ed25519 signatures. A quantum attack on Ed25519 would not merely weaken the ecosystem’s security; it would enable an adversary to fabricate arbitrary certificate chains, authorize arbitrary actions, and forge arbitrary identities.
+
+The deterministic replay capability that the ecosystem depends upon for forensic analysis is also compromised by a quantum attack. Deterministic replay requires that the replayed execution produce the same certificates as the original execution; if the original certificates were signed with Ed25519 and the adversary can forge Ed25519 signatures, the adversary can fabricate false certificates that alter the replayed execution’s forensic history.
+
+The synthetic organism identity model is particularly vulnerable. An organism’s identity persists across its entire lifecycle, which may span years or decades. An adversary who records the organism’s public key (available in the Certificate Fabric) and later acquires CRQC access can retroactively recover the organism’s private key and impersonate the organism, forging signals, state commitments, and governance authorizations under the organism’s identity.
+
+3.5 Timeline Uncertainty and Risk Modeling
+The CRQC availability timeline is uncertain, with credible estimates ranging from 2030 (optimistic, assuming rapid progress in qubit quality and error correction) to 2050+ (conservative, assuming significant engineering challenges remain). The Lume ecosystem’s cryptographic architecture must account for this uncertainty by beginning the transition before the earliest credible CRQC date and completing it before the latest credible date.
+
+The “harvest now, decrypt later” threat model compounds the timeline uncertainty. An adversary who records Ed25519-signed certificates today can retroactively forge those certificates when CRQC becomes available. This means that certificates issued today are vulnerable to quantum attack at any future date when CRQC becomes available. The only defense against this retroactive vulnerability is to issue certificates under quantum-resistant signatures, which is the purpose of the hybrid phase.
+
+The phased transition architecture addresses timeline uncertainty by providing security against quantum attacks at every phase. Phase I (Hybrid) provides quantum resistance through the post-quantum component of the dual signature, even if the Ed25519 component is compromised. Phase II (PQ-Primary) reduces dependence on Ed25519 to a backward-compatibility fallback. Phase III (PQ-Native) eliminates Ed25519 entirely, providing full quantum resistance. The phases can be executed at any pace, allowing the ecosystem to accelerate or decelerate the transition based on updated CRQC timeline estimates.
+
+4 Requirements for Quantum-Resistant Ed25519
+4.1 Backward Compatibility
+Backward compatibility requires that quantum-resistant certificates, signatures, and identities are usable by ecosystem components that have not yet been upgraded to support post-quantum cryptography. During Phase I, hybrid certificates must be verifiable by components that understand only classical Ed25519 (by ignoring the post-quantum component) and by components that understand hybrid verification (by verifying both components). This dual-readability ensures that the upgrade can proceed incrementally without requiring simultaneous upgrade of all components.
+
+Backward compatibility also requires that existing certificates remain valid during the transition. An organism certified under classical Ed25519 must not require re-certification during Phase I; its classical certificate must remain valid and verifiable through the Phase I verification pipeline. Re-certification under hybrid or post-quantum signatures occurs during the scheduled migration window, not as an emergency re-issuance.
+
+The backward compatibility requirement constrains the certificate format: hybrid certificates must include both classical and post-quantum signature fields, and the classical field must be structurally identical to a classical Ed25519 certificate. This structural compatibility enables legacy verification code to read the classical field without modification, even if the code has no awareness of the post-quantum field.
+
+4.2 Deterministic Semantics
+Deterministic semantics require that quantum-resistant signature operations produce the same output for the same input across all implementations and all execution environments. CRYSTALS-Dilithium [17] provides deterministic signatures by default (the nonce is derived from the secret key and message hash). Falcon [18] uses a probabilistic signing algorithm that requires a random number generator; deterministic operation requires a derandomization wrapper that derives the randomness from the secret key and message hash. SPHINCS+ [19] can be configured for deterministic operation through its deterministic variant (SPHINCS+-simple with deterministic message randomization).
+
+The deterministic semantics requirement eliminates post-quantum schemes that are inherently non-deterministic and cannot be derandomized without security loss. The Lume ecosystem’s canonicalization invariant—two compilations of the same source must produce the same signed output—is non-negotiable, and any post-quantum scheme that violates this invariant is architecturally incompatible regardless of its quantum-resistance properties.
+
+Deterministic semantics extend to the hybrid signature operation: the combination of the classical Ed25519 signature and the post-quantum signature must itself be deterministic. Given the same key pairs (classical and post-quantum) and the same message, the hybrid signature operation must produce the same hybrid signature. This is achieved by applying both deterministic signature algorithms to the same message and concatenating the results in a canonical order.
+
+4.3 Certificate Continuity
+Certificate continuity requires that the transition from classical to quantum-resistant cryptography does not invalidate the ecosystem’s certificate history. The Certificate Fabric’s Merkle tree contains all historically issued certificates, and these certificates must remain valid within their historical context. A certificate issued under classical Ed25519 in 2025 must remain verifiable in 2035 under the Phase III PQ-Native verification pipeline, even though the certificate does not contain a post-quantum signature.
+
+Certificate continuity is achieved through versioned verification: each certificate includes a version field that specifies its cryptographic format (classical, hybrid, or PQ-native), and the verification pipeline selects the appropriate verification algorithm based on the version. Classical certificates are verified with Ed25519; hybrid certificates are verified with both Ed25519 and the post-quantum scheme; PQ-native certificates are verified with the post-quantum scheme alone. The pipeline accepts all versions, providing continuous access to the ecosystem’s complete certificate history.
+
+Certificate continuity also requires that certificate chains spanning multiple cryptographic eras remain verifiable. A chain that includes a classical root certificate, a hybrid intermediate certificate, and a PQ-native leaf certificate must be verifiable by applying the appropriate verification algorithm to each link in the chain. The chain validation logic is enhanced to support heterogeneous chains during the transition period.
+
+4.4 Identity Preservation
+Identity preservation requires that an entity’s identity survives the cryptographic transition. An entity identified by Ed25519 public key Kclassical must remain the same entity after migration to post-quantum key KPQ. Identity preservation is implemented through an identity migration certificate: a certificate signed by Kclassical that declares KPQ as the entity’s successor key. The Trust Layer validates the migration certificate and binds KPQ to the entity’s identity descriptor, maintaining the entity’s identity across the key transition.
+
+The identity migration certificate must be issued while Kclassical is still valid (before quantum computers can forge Kclassical signatures). This timing constraint motivates the early initiation of Phase I: entities must issue identity migration certificates before CRQC availability, using their classical keys to authorize the migration to post-quantum keys. Entities that delay migration past CRQC availability cannot issue valid migration certificates (because an adversary could forge the migration certificate) and must undergo a more expensive identity re-establishment process.
+
+Identity preservation extends to organisms, cells, and governance authorities. An organism migrating from Kclassical to KPQ must also migrate its cells’ identities, updating each cell’s certificate to chain to the organism’s new KPQ. This cascading migration is coordinated through the organism’s lifecycle management system and is executed as a governed action under GUPAS oversight.
+
+4.5 Low-Latency Verification
+Low-latency verification is essential for the SOR Signal Bus, which validates Ed25519 signatures on every signal in real time. The Signal Bus processes thousands of signals per second, and each signal requires signature verification before delivery. The post-quantum signature verification must not increase signal processing latency beyond acceptable limits (sub-millisecond for single-node deployments, single-digit millisecond for distributed deployments).
+
+CRYSTALS-Dilithium verification is approximately 10–50× slower than Ed25519 verification, depending on the security level. Falcon verification is approximately 5–20× slower. SPHINCS+ verification is approximately 100–500× slower. These performance differences constrain the choice of post-quantum scheme for high-throughput components: SPHINCS+ is unsuitable for the Signal Bus due to its verification latency, while Dilithium and Falcon are viable with performance optimization.
+
+The hybrid phase doubles the verification workload (both Ed25519 and post-quantum signatures must be verified), but the total verification time remains within acceptable limits for Dilithium and Falcon hybrids. The PQ-Primary and PQ-Native phases eliminate the Ed25519 verification step, reducing the workload to a single post-quantum verification per signal.
+
+4.6 Governance-Safe Transitions
+Governance-safe transitions require that the cryptographic migration is governed through the GUPAS framework, preventing unauthorized or premature transitions that could compromise ecosystem security. The transition is implemented as a governed action: each phase advancement (Classical → Hybrid → PQ-Primary → PQ-Native) requires a governance authorization from the designated Ecosystem Governance Authority.
+
+Governance-safe transitions also require rollback capability. If a post-quantum scheme is discovered to have a vulnerability (a plausible risk given the relative immaturity of post-quantum cryptography compared to Ed25519), the ecosystem must be able to roll back to the previous phase without data loss or identity disruption. Rollback is supported by the hybrid architecture: during Phase I, both classical and post-quantum signatures are available, and rolling back to classical-only verification requires only a policy change, not a certificate re-issuance.
+
+The governance framework tracks the migration status of each ecosystem component, ensuring that all components within a governance domain are in the same phase. Phase advancement for a governance domain requires certification that all components in the domain are ready for the new phase. This coordination prevents the hybrid mismatch failure mode, in which components in different phases cannot verify each other’s certificates.
+
+5 Hybrid Ed25519 Constructions
+5.1 Ed25519 + Dilithium
+The Ed25519 + CRYSTALS-Dilithium hybrid construction produces a dual signature that combines a classical Ed25519 signature with a CRYSTALS-Dilithium signature over the same message. Dilithium [17] is a lattice-based signature scheme standardized by NIST in FIPS 204, providing security based on the hardness of the Module Learning with Errors (MLWE) problem. Dilithium provides deterministic signatures at all security levels, making it architecturally compatible with the Lume ecosystem’s deterministic requirement.
+
+The Ed25519 + Dilithium hybrid is the recommended default for most ecosystem components due to its balance of security, performance, and determinism. Dilithium verification at security level 2 (approximately equivalent to 128-bit classical security) requires approximately 0.5–1.0 milliseconds on modern hardware, and Dilithium signatures are 2,420 bytes (compared to Ed25519’s 64 bytes). The signature size increase is significant but manageable for certificate operations (which occur at ceremony frequency, not at signal frequency).
+
+For the SOR Signal Bus, where verification throughput is critical, the Ed25519 + Dilithium hybrid is optimized through batch verification: multiple Dilithium signatures are verified simultaneously using a combined verification equation, amortizing the per-signature cost. Batch verification reduces the average per-signal Dilithium verification time to approximately 0.1–0.3 milliseconds, within acceptable limits for sub-millisecond signal processing.
+
+5.2 Ed25519 + Falcon
+The Ed25519 + Falcon hybrid construction combines Ed25519 with Falcon [18], a lattice-based signature scheme based on NTRU lattices, standardized by NIST in FIPS 206. Falcon provides the smallest signature sizes among NIST-standardized post-quantum signature schemes (666 bytes at security level 1), making it attractive for bandwidth-constrained applications. However, Falcon’s signing algorithm uses Gaussian sampling, which is inherently probabilistic.
+
+Falcon’s probabilistic signing requires a derandomization wrapper for use in the Lume ecosystem. The wrapper replaces Falcon’s random sampling with deterministic sampling derived from the secret key and message hash, following the approach specified in the NIST Falcon standard’s deterministic variant. The derandomized Falcon produces the same signature for the same key and message, satisfying the ecosystem’s deterministic semantics requirement.
+
+The Ed25519 + Falcon hybrid is recommended for bandwidth-constrained components (inter-node communication in distributed organisms, cross-domain signals) where signature size is a significant factor. Falcon’s smaller signatures reduce the overhead of dual-signature hybrid certificates, partially offsetting the signature size increase inherent in the hybrid approach.
+
+5.3 Ed25519 + SPHINCS+
+The Ed25519 + SPHINCS+ hybrid construction combines Ed25519 with SPHINCS+ [19], a hash-based signature scheme standardized by NIST in FIPS 205. SPHINCS+ provides security based solely on the hash function’s preimage resistance, making it the most conservative post-quantum choice: its security depends on no mathematical structure that could be vulnerable to future algorithmic advances. SPHINCS+ signatures are large (7,856 bytes at security level 1) and verification is slow (approximately 5–10 milliseconds).
+
+The Ed25519 + SPHINCS+ hybrid is recommended for high-assurance, low-frequency operations where maximum security confidence outweighs performance considerations: ecosystem governance authority certificates, organism creation certificates, and governance policy certificates. These certificates are issued infrequently (ceremony-level operations) and verified infrequently (only during certificate chain validation, not during real-time signal processing).
+
+SPHINCS+ is not suitable for high-throughput components (the SOR Signal Bus, real-time homeostasis monitoring) due to its verification latency. The architecture allows component-specific scheme selection: the ecosystem governance authority’s root certificate uses Ed25519 + SPHINCS+ for maximum assurance, while organism-level certificates and signal-level signatures use Ed25519 + Dilithium for performance.
+
+5.4 Hybrid Certificate Formats
+Hybrid certificates extend the classical certificate format with a post-quantum signature field. The certificate structure includes: version (indicating the cryptographic era: classical, hybrid, or PQ-native), identity descriptor (name, type, version, governance profile), classical public key (Ed25519 public key), classical signature (Ed25519 signature over the identity descriptor), post-quantum public key (Dilithium/Falcon/SPHINCS+ public key), post-quantum signature (Dilithium/Falcon/SPHINCS+ signature over the identity descriptor), and validity period.
+
+The hybrid certificate format is designed for dual-readability: legacy components that understand only classical certificates can read the version field, the identity descriptor, the classical public key, and the classical signature, ignoring the post-quantum fields. Upgraded components read all fields and verify both signatures. This dual-readability enables incremental deployment without requiring simultaneous upgrade of all components.
+
+The certificate format includes a scheme identifier field that specifies the post-quantum scheme used (Dilithium, Falcon, or SPHINCS+). This field enables format-agnostic verification: the verification pipeline reads the scheme identifier and selects the appropriate post-quantum verification algorithm. The format supports future scheme additions without format changes, accommodating the possibility that new post-quantum schemes will be standardized as the field matures.
+
+5.5 Hybrid Verification Pipelines
+The hybrid verification pipeline performs two independent verification operations for each hybrid certificate: Ed25519 signature verification and post-quantum signature verification. Both verifications must succeed for the certificate to be accepted. This dual-verification requirement ensures that the certificate is valid under both classical and post-quantum assumptions, providing security against both classical and quantum adversaries.
+
+The pipeline’s dual-verification requirement means that a compromise of either scheme alone does not compromise the hybrid certificate. If Ed25519 is broken (by a quantum attack), the Dilithium signature remains valid, and an adversary cannot forge a hybrid certificate without also forging the Dilithium signature. If Dilithium is broken (by a future algorithmic advance), the Ed25519 signature remains valid, and the adversary cannot forge a hybrid certificate without also forging the Ed25519 signature. This dual-security property is the primary benefit of the hybrid approach.
+
+The pipeline is optimized for common-case performance through parallelized verification: the Ed25519 and post-quantum verifications are performed simultaneously on separate processing threads, and the pipeline accepts the certificate when both verifications complete successfully. This parallelization reduces the hybrid verification latency to the maximum of the two individual verification latencies, rather than their sum.
+
+5.6 Hybrid Governance Rules
+Hybrid governance rules specify the policies that govern the hybrid phase of the cryptographic transition. The primary rule is phase consistency: all components within a governance domain must be in the same phase. Phase advancement requires governance authorization: the designated Ecosystem Governance Authority must certify that all components are ready for the new phase before authorizing the advancement. Phase rollback is permitted: if a post-quantum scheme vulnerability is discovered, the governance authority can authorize rollback to the previous phase.
+
+Hybrid governance rules also specify the acceptable post-quantum scheme combinations. The governance authority declares which post-quantum schemes are approved for use within the governance domain (Dilithium, Falcon, SPHINCS+, or a combination). Components must use only approved schemes, preventing the deployment of unapproved or experimental post-quantum schemes that may have undiscovered vulnerabilities.
+
+The governance rules include a migration deadline: the governance authority declares the latest acceptable date for completing Phase I deployment. Components that have not deployed hybrid signatures by the deadline are quarantined (restricted from issuing new certificates) until they complete the deployment. This deadline enforcement prevents indefinite procrastination that would leave the ecosystem vulnerable to quantum attacks.
+
+6 Full Post-Quantum Ed25519 Analogues
+6.1 PQ-EdDSA Variants
+PQ-EdDSA variants are post-quantum signature schemes that preserve the operational semantics of Ed25519 (deterministic signatures, compact verification, key-message binding) while replacing the elliptic-curve mathematics with post-quantum-resistant mathematics. The Lume ecosystem defines PQ-EdDSA as an operational interface rather than a specific mathematical construction: any post-quantum scheme that satisfies the PQ-EdDSA interface requirements (deterministic signing, sub-millisecond verification, key-message binding, certificate-compatible key and signature sizes) qualifies as a PQ-EdDSA variant.
+
+CRYSTALS-Dilithium at security level 2 is the primary PQ-EdDSA variant for the Lume ecosystem. Dilithium provides deterministic signatures by default, sub-millisecond verification with batch optimization, strong key-message binding through its internal commitment structure, and certificate-compatible key sizes (1,312-byte public keys, 2,420-byte signatures). Dilithium’s NIST standardization (FIPS 204) provides the regulatory acceptance that the ecosystem requires for deployment in regulated industries.
+
+Falcon at security level 1 (with the deterministic variant) is the secondary PQ-EdDSA variant, recommended for bandwidth-constrained deployments. SPHINCS+ is classified as a PQ-EdDSA-compatible scheme (rather than a PQ-EdDSA variant) because its verification latency exceeds the sub-millisecond requirement for Signal Bus operations, limiting its use to ceremony-level operations.
+
+6.2 PQ-Friendly Curve Analogues
+Curve25519’s role in Ed25519 is to provide the algebraic group in which the discrete logarithm problem is hard. Post-quantum analogues replace this algebraic group with a mathematical structure in which the associated hard problem resists quantum attacks. For Dilithium, the analogous structure is the Module Learning with Errors (MLWE) lattice. For Falcon, the analogous structure is the NTRU lattice. For SPHINCS+, the analogous structure is the hash function’s preimage space.
+
+The PQ-friendly curve analogue concept is an abstraction layer that enables the Lume ecosystem to reason about post-quantum signature schemes using the same vocabulary as classical Ed25519. The “curve” (algebraic group) provides the key generation function, the “scalar multiplication” (group operation) provides the signing function, and the “point verification” (group equation) provides the verification function. These abstractions map naturally to lattice-based and hash-based constructions, enabling the ecosystem’s cryptographic infrastructure to be expressed in scheme-agnostic terms.
+
+The abstraction layer also enables scheme agility: if a deployed post-quantum scheme is found to have a vulnerability, the ecosystem can switch to an alternative scheme by instantiating the PQ-friendly curve analogue with the alternative’s mathematical structure. This scheme agility is essential given the relative immaturity of post-quantum cryptography and the possibility that currently standardized schemes may be broken by future algorithmic advances.
+
+6.3 PQ Signature Determinism
+Post-quantum signature determinism is a hard requirement for the Lume ecosystem. Dilithium’s deterministic mode derives all randomness from the secret key and message hash, producing the same signature for the same key-message pair across all executions. Falcon’s deterministic variant replaces the Gaussian sampler’s random seed with a deterministic seed derived from the secret key and message hash. SPHINCS+’s deterministic variant uses deterministic message randomization.
+
+PQ signature determinism must be verified at the implementation level: the Lume runtime includes a determinism verification test that signs the same message with the same key multiple times and confirms that all signatures are identical. This test is executed at runtime startup and at configurable intervals during execution, detecting non-deterministic implementations before they can corrupt the canonicalization invariant.
+
+The determinism verification test also detects implementation bugs that could produce implementation-specific signatures (deterministic but different across implementations). Two implementations of the same post-quantum scheme must produce the same signature for the same key and message; implementation-specific determinism is insufficient. The ecosystem publishes reference signatures (known-answer tests) for each approved post-quantum scheme, and implementations must match the reference signatures to be certified for ecosystem use.
+
+6.4 PQ Identity Anchoring
+PQ identity anchoring replaces the Ed25519 key pair with a post-quantum key pair as the entity’s identity anchor. The post-quantum public key serves as the new identity anchor, and the post-quantum private key serves as the new identity proof. The transition from Ed25519 anchoring to PQ anchoring is mediated by the identity migration certificate (§4.4), which cryptographically links the classical identity to the post-quantum identity.
+
+PQ identity anchoring must preserve the three properties of classical identity anchoring: unforgeable attribution (no entity can produce a valid post-quantum signature without possessing the post-quantum private key), persistent identity (the post-quantum key pair persists across lifecycle events), and hierarchical delegation (the entity can issue subordinate certificates under its post-quantum key). All three NIST-standardized post-quantum schemes provide these properties.
+
+PQ identity anchoring introduces a new property: key size awareness. Post-quantum public keys are significantly larger than Ed25519 public keys (Dilithium: 1,312 bytes vs. Ed25519: 32 bytes). This size increase affects certificate storage, signal payload overhead, and Certificate Fabric Merkle tree construction. The architecture accounts for the size increase through compressed key representations, key caching, and lazy key resolution (loading the full key only when verification is required).
+
+6.5 PQ Certificate Formats
+PQ-native certificate formats eliminate the classical Ed25519 fields, containing only post-quantum cryptographic material. The certificate structure includes: version (PQ-native), identity descriptor, post-quantum public key, post-quantum signature, scheme identifier, validity period, and migration history (a reference to the identity migration certificate that authorized the transition from classical to PQ-native identity). The migration history enables backward traceability: an investigator can trace a PQ-native identity back to its classical Ed25519 origin through the migration certificate chain.
+
+PQ-native certificates are smaller than hybrid certificates (which contain both classical and post-quantum fields) but larger than classical certificates (due to the larger post-quantum keys and signatures). The net certificate size increase from classical to PQ-native is approximately 40× for Dilithium, 20× for Falcon, and 250× for SPHINCS+. These size increases are significant for high-volume certificate operations but manageable with the storage and bandwidth capacities of modern infrastructure.
+
+The PQ-native certificate format is designed for long-term stability: it does not include Ed25519 fields or backward-compatibility provisions, simplifying verification logic and reducing attack surface. Components operating in Phase III verify only the post-quantum signature, eliminating the dual-verification overhead of the hybrid phase.
+
+7 Integration with Lume
+7.1 AST Determinism for Cryptographic Operations
+Cryptographic operations in Lume programs are compiled into canonical AST nodes that specify the signature scheme (Ed25519, hybrid, or PQ-native), the key reference (a certificate identifier that resolves to the appropriate key), and the message binding (the AST subtree that constitutes the signed content). The canonical AST representation ensures that cryptographic operations are deterministic at the AST level: two compilations of the same program produce the same cryptographic AST nodes, which invoke the same deterministic signature algorithms.
+
+AST-level cryptographic canonicalization extends to the hybrid phase: a hybrid signature AST node specifies both the Ed25519 key reference and the post-quantum key reference, and the signature algorithm produces both signatures in a canonical order. The canonicalization rules ensure that the hybrid AST node is structurally identical across compilations, maintaining the canonicalization invariant.
+
+The transition between cryptographic phases is reflected in the AST through compiler configuration: the compiler’s cryptographic mode (classical, hybrid, or PQ-native) determines which AST nodes are generated for cryptographic operations. A Phase I compiler generates hybrid AST nodes; a Phase III compiler generates PQ-native AST nodes. The mode is a compiler parameter, not a source-level construct, ensuring that application code does not need to be modified during the cryptographic transition.
+
+7.2 Grammar Constraints for Signature Usage
+Lume’s grammar constrains the usage of cryptographic operations to prevent misuse. Signature operations can only be applied to data that the signing entity is authorized to sign (per the entity’s capability certificates). Verification operations can only be applied to data that includes a valid certificate chain. These grammar-level constraints prevent a class of implementation errors where developers sign data with the wrong key or verify signatures without validating the certificate chain.
+
+Grammar constraints extend to hybrid signatures: the grammar requires that hybrid signature operations specify both the classical and post-quantum key references, preventing partial signatures that would fail hybrid verification. The grammar also enforces scheme consistency: a hybrid signature must use the post-quantum scheme that is approved for the signing entity’s governance domain.
+
+The grammar constraints are enforced at compile time, not at runtime. The compiler validates that all cryptographic operations satisfy the grammar constraints before producing the canonical AST. This compile-time enforcement ensures that runtime cryptographic operations are always well-formed, eliminating a class of runtime errors that could produce invalid signatures or incomplete verifications.
+
+7.3 Runtime Compatibility
+The Lume runtime provides cryptographic services through a modular provider interface. The classical provider implements Ed25519 signing and verification. The hybrid provider implements dual signing (Ed25519 + post-quantum) and dual verification. The PQ-native provider implements post-quantum signing and verification exclusively. The active provider is selected based on the runtime’s cryptographic mode, which is configured at startup and synchronized with the governance domain’s current phase.
+
+Runtime compatibility requires that all three providers produce consistent verification verdicts for certificates within their supported format. The hybrid provider accepts and verifies classical, hybrid, and PQ-native certificates. The PQ-native provider accepts PQ-native certificates and hybrid certificates (verifying only the PQ component). The classical provider accepts only classical certificates. This format compatibility matrix ensures that the runtime can process the ecosystem’s heterogeneous certificate inventory during the transition period.
+
+The runtime includes a provider self-test that verifies determinism, correctness, and format compatibility at startup. The self-test includes known-answer tests for each supported scheme, determinism verification (signing the same message twice and comparing signatures), and format compatibility tests (verifying certificates in each supported format). The self-test prevents deployment of incorrectly configured or buggy cryptographic providers.
+
+7.4 Canonicalization Rules
+Canonicalization rules for quantum-resistant cryptographic operations ensure that hybrid and PQ-native signatures are produced in a standard canonical form. The hybrid signature canonical form specifies the Ed25519 signature first, followed by the post-quantum signature, with a scheme identifier separating them. This fixed ordering ensures that two implementations producing the same classical and post-quantum signatures produce the same hybrid signature.
+
+Canonicalization rules for certificate formats specify the field ordering, the encoding format (DER for classical fields, a PQ-specific encoding for post-quantum fields), and the hash algorithm for the signed content. These rules ensure that two certificates with the same content produce the same byte-level representation, enabling hash comparison for certificate equivalence testing.
+
+The canonicalization rules are co-versioned with the Lume compiler and the cryptographic provider. Version changes to any component require simultaneous updates to all co-versioned components, preventing version skew that could produce incompatible canonical forms. This co-versioning is enforced through the Trust Layer certification process.
+
+8 Integration with Trust Layer
+8.1 Certificate Fabric Upgrades
+The Certificate Fabric’s Merkle tree must accommodate larger certificate sizes (due to post-quantum keys and signatures) and heterogeneous certificate formats (classical, hybrid, and PQ-native). The Merkle tree’s leaf hash computation is updated to hash the full certificate (including post-quantum fields) rather than only the classical fields. This update ensures that post-quantum signature tampering is detected by the Merkle tree integrity check.
+
+The Certificate Fabric’s storage requirements increase significantly during the transition: hybrid certificates are approximately 2× larger than classical certificates (containing both classical and post-quantum fields), and PQ-native certificates are approximately 40–250× larger (depending on the post-quantum scheme). The storage architecture is updated with a tiered storage model: recent certificates are stored in memory for fast access, historical certificates are stored on disk with lazy loading, and archived certificates are stored in compressed format.
+
+The Merkle tree root signing transitions through the same phases as individual certificates: the root is signed with Ed25519 in the classical phase, with Ed25519 + PQ in the hybrid phase, and with PQ-only in the PQ-native phase. The root signature is the ultimate integrity guarantee for the Certificate Fabric, and its quantum resistance is the highest-priority migration target.
+
+8.2 Identity Migration
+Identity migration is the process of transitioning an entity’s identity from a classical Ed25519 key pair to a post-quantum key pair while preserving the entity’s identity descriptor, governance profile, and certificate history. The migration is implemented through a four-step protocol: key generation (the entity generates a new post-quantum key pair), certification (the entity issues an identity migration certificate signed with the classical key, binding the post-quantum key to the entity’s identity descriptor), verification (the Trust Layer verifies the migration certificate and registers the post-quantum key as the entity’s new identity anchor), and propagation (the identity update is propagated to all ecosystem participants through the Certificate Fabric).
+
+Identity migration is irreversible: once the post-quantum key is registered as the entity’s identity anchor, the classical key becomes a historical artifact. The irreversibility is enforced by the Certificate Fabric, which records the migration event and rejects subsequent signature operations under the classical key. This irreversibility prevents the “dual identity” attack, where an adversary maintains both classical and post-quantum identities and selectively uses one or the other depending on the verification context.
+
+Identity migration for organisms requires cascading updates: the organism’s identity migration triggers cell identity migrations for all cells within the organism. The cascading migration is coordinated by the organism’s lifecycle management system and is executed as a single governed action, ensuring that all cells transition simultaneously. During the migration, the organism is quiesced (signal processing is suspended) to prevent signals signed with the old keys from being processed after the new keys are registered.
+
+8.3 Provenance and Auditability
+Provenance and auditability in the quantum-resistant architecture require that the complete certificate history—including classical certificates, migration certificates, hybrid certificates, and PQ-native certificates—is preserved and accessible. An investigator must be able to trace an entity’s identity from its current PQ-native key back through its migration certificate to its original classical Ed25519 key, and from the classical key to all certificates and signatures issued under that key.
+
+The Certificate Fabric’s versioned verification pipeline (§4.3) enables historical provenance: classical certificates issued before the transition are verifiable using the classical verification algorithm, even after the ecosystem has transitioned to PQ-native mode. The verification pipeline never deletes or invalidates historically valid certificates; it preserves the complete certificate history for forensic access.
+
+Auditability extends to the migration process itself. Each identity migration certificate records the migration timestamp, the classical key hash, the post-quantum key hash, and the governance authorization that approved the migration. This migration audit trail enables forensic reconstruction of the transition process, identifying when each entity migrated, what governance authority approved the migration, and what post-quantum scheme was selected.
+
+8.4 Governance Constraints
+Governance constraints on the cryptographic transition are enforced through the GUPAS governance framework [2]. The transition is treated as a governed action: each phase advancement requires an Intent Tuple that declares the transition intent, a governance evaluation that verifies the transition against policy constraints, and an authorization certificate that records the governance authority’s approval.
+
+Governance constraints include scheme approval (only NIST-standardized post-quantum schemes may be deployed), phase synchronization (all components in a governance domain must be in the same phase), migration deadline enforcement (components must complete Phase I deployment by the declared deadline), and rollback authorization (rollback to a previous phase requires governance approval). These constraints prevent ad-hoc, uncoordinated, or unauthorized cryptographic transitions.
+
+The governance framework also monitors the migration status of each entity, tracking which entities have migrated their identities, which entities have deployed hybrid certificates, and which entities remain on classical Ed25519. The migration status report enables the governance authority to assess the ecosystem’s quantum-readiness and to identify entities that require migration assistance or enforcement.
+
+9 Integration with Lume-V
+9.1 Envelope Constraints on Cryptographic Transitions
+Lume-V [4] enforces envelope constraints on cryptographic transitions, preventing entities from exceeding their authorized cryptographic capabilities. An entity’s envelope specifies its approved post-quantum schemes, its maximum key sizes, and its permitted transition phases. The Lume-V wrapper validates cryptographic operations against the entity’s envelope, rejecting operations that use unapproved schemes or exceed authorized key sizes.
+
+Envelope constraints prevent unauthorized scheme deployment: an entity that is authorized for Dilithium cannot deploy Falcon or SPHINCS+ without governance approval and envelope update. This constraint ensures that all deployed post-quantum schemes have been reviewed and approved for the entity’s operational context.
+
+Envelope constraints also prevent premature transition: an entity whose governance domain is in Phase I cannot issue PQ-native certificates (which require Phase III). The Lume-V wrapper validates the entity’s current phase against the certificate format and rejects certificates that are inconsistent with the phase.
+
+9.2 Intent Arbitration
+Lume-V participates in intent arbitration for cryptographic operations by providing envelope information that constrains the arbitration candidate set. When an entity’s cognitive substrate generates multiple candidate cryptographic configurations (different post-quantum schemes, different security levels), the envelope filter eliminates candidates that violate the entity’s envelope constraints (unapproved schemes, excessive key sizes, phase-inconsistent formats).
+
+Intent arbitration for cryptographic transitions uses the standard priority hierarchy (safety, specificity, canonical precedence, envelope safety) extended with cryptographic-specific criteria: quantum-resistance level (higher resistance is preferred), verification latency (lower latency is preferred), and scheme maturity (more extensively analyzed schemes are preferred). These criteria produce deterministic scheme selection for entities that support multiple approved schemes.
+
+Arbitration certificates for cryptographic transitions record the candidate schemes, the evaluation criteria, the selected scheme, and the governance evaluation result. These certificates feed the Evolver’s pattern database, enabling it to recommend scheme selections based on operational experience across the ecosystem.
+
+9.3 Safety Boundaries
+Safety boundaries for cryptographic transitions define absolute limits that cannot be overridden by governance: minimum post-quantum security level (at least 128-bit classical equivalent), mandatory determinism verification (all post-quantum implementations must pass the determinism self-test), and mandatory known-answer test compliance (all implementations must match the published reference signatures). These safety boundaries are hard-coded into the Lume-V wrapper and cannot be modified through governance policies.
+
+Safety boundaries also include a minimum forward-security requirement: during Phase I, every new certificate must include a post-quantum signature in addition to the Ed25519 signature. This requirement ensures that the “harvest now, decrypt later” attack is mitigated for all new certificates, even if some entities have not yet migrated their identities.
+
+Safety boundary violations trigger immediate corrective action: the violating entity’s cryptographic operations are suspended, the violation is recorded as a SAFETY_VIOLATION certificate, and the governance authority is notified. These violations are never subject to homeostatic correction; they require governance-level intervention.
+
+9.4 Runtime Enforcement
+Lume-V runtime enforcement for cryptographic operations intercepts all signing and verification calls, validating each against the entity’s cryptographic envelope. The wrapper verifies that the signing key is authorized for the current phase, that the signature scheme matches the approved scheme for the entity’s governance domain, and that the signature output passes the determinism self-test.
+
+Runtime enforcement is transparent to the application: the entity’s program invokes a generic signing function, and the Lume-V wrapper routes the call to the appropriate cryptographic provider based on the current phase and the entity’s envelope. This transparency enables application code to be phase-agnostic: the same application code works in the classical, hybrid, and PQ-native phases without modification.
+
+Runtime enforcement data feeds the homeostasis system with cryptographic operational metrics: signing latency, verification latency, key generation time, and failure rates. The homeostasis system uses these metrics to detect cryptographic performance degradation and to trigger corrective actions (scheme switching, batch size adjustment, resource reallocation).
+
+10 Integration with DAIGS
+10.1 Cognitive Substrate Extensions
+The DAIGS cognitive substrate [5] is extended with cryptographic awareness: the ability to reason about cryptographic scheme properties, evaluate quantum-resistance levels, and recommend cryptographic configurations. The Cryptographic Awareness Module evaluates the entity’s current cryptographic configuration against the quantum threat model, producing a quantum-readiness score (0.0–1.0) and a detailed readiness report.
+
+The readiness report identifies vulnerabilities: entities that have not migrated their identities, certificates that are approaching their quantum-safety window (the period before CRQC availability during which hybrid certificates provide quantum resistance), and components that use unapproved post-quantum schemes. The cognitive substrate uses the readiness report to prioritize migration actions and recommend scheme selections.
+
+The Cryptographic Awareness Module operates within the governance constraints: it recommends configurations that are within the entity’s approved scheme set and within the entity’s envelope constraints. Recommendations that require governance approval (new scheme deployments, phase advancements) are escalated to the governance authority through the standard governance pipeline.
+
+10.2 Arbitration Extensions
+DAIGS arbitration is extended to handle cryptographic conflicts: situations where multiple entities within an organism or ecosystem use different post-quantum schemes. The arbitration engine resolves scheme conflicts through the standard priority hierarchy, with the addition of interoperability preference (the scheme that is compatible with the most entities is preferred) and performance preference (the scheme with the lowest verification latency is preferred).
+
+Cryptographic arbitration is particularly relevant for cross-domain interactions, where organisms from different governance domains may use different approved post-quantum schemes. The arbitration engine determines the common scheme set (schemes approved in both domains) and selects the optimal common scheme for cross-domain communication.
+
+Arbitration certificates for cryptographic conflicts record the competing schemes, the interoperability analysis, and the selected scheme. These certificates provide the documentation necessary for cross-domain governance review and for the Evolver’s scheme-selection pattern learning.
+
+10.3 Multi-Agent Cryptographic Coordination
+Multi-agent cryptographic coordination enables multiple organisms to synchronize their cryptographic transitions. When organisms from the same governance domain advance from Phase I to Phase II, the advancement must be coordinated: all organisms must deploy PQ-primary verification simultaneously, preventing verification failures during the transition.
+
+Coordination is implemented through the DAIGS multi-agent framework: the governance authority broadcasts a phase-advancement signal, each organism acknowledges readiness (confirming that all cells have deployed the required cryptographic capabilities), and the governance authority certifies the collective advancement. The advancement becomes effective when the certification is committed to the Certificate Fabric.
+
+The coordination protocol is fault-tolerant: if an organism cannot acknowledge readiness (due to cell failure, communication problems, or missing cryptographic capabilities), the advancement is delayed for that organism while other ready organisms proceed. The delayed organism continues operating in the current phase until the issue is resolved and readiness is acknowledged.
+
+10.4 Distributed Reasoning
+Distributed reasoning about cryptographic transitions enables the cognitive substrate to evaluate quantum-readiness across multiple execution nodes. The distributed evaluation aggregates node-level readiness scores into an ecosystem-level readiness score, identifying nodes that are lagging in migration and recommending prioritized migration schedules.
+
+Distributed reasoning for cryptographic transitions follows the CES cognitive specialization model [10]: a node hosting the Cryptographic Awareness Module performs the readiness evaluation, a node hosting the Migration Planner generates migration schedules, and a node hosting the Compliance Monitor tracks migration progress. The nodes synchronize through certified state deltas, ensuring consistent quantum-readiness assessments across the ecosystem.
+
+Distributed cryptographic reasoning must itself be cryptographically secure: the certified state deltas exchanged between cognitive nodes are signed with phase-appropriate signatures (hybrid during Phase I, PQ-native during Phase III). The reasoning infrastructure is a participant in the cryptographic transition, not merely an observer of it.
+
+11 Integration with LDIR
+11.1 Multilingual Cryptographic Semantics
+LDIR Expansions [12] require that cryptographic operations are expressible in all supported natural languages. A Japanese-language directive that specifies “sign this document with the organization’s quantum-resistant key” must resolve to the same cryptographic operation as the equivalent English-language directive. The LDIR normalization modules are extended with cryptographic vocabulary that maps language-specific cryptographic terms to canonical operation identifiers.
+
+Multilingual cryptographic semantics are particularly important for governance directives. A governance authority issuing a phase-advancement directive in Mandarin must produce the same governance action as the equivalent directive in English. The LDIR Universal Intent Schema (UIS) includes cryptographic operation fields that capture the intended cryptographic action in language-independent form.
+
+The multilingual cryptographic vocabulary includes terms for key generation, signing, verification, migration, certificate issuance, and phase advancement. Each term is mapped to a canonical operation identifier through the LDIR normalization pipeline, ensuring deterministic resolution regardless of the source language.
+
+11.2 Cross-Lingual Certificate Equivalence
+Cross-lingual certificate equivalence ensures that certificates issued through multilingual compilation pipelines are semantically equivalent regardless of the source language. A certificate compiled from a Japanese-language governance directive must be verifiable by an entity that compiled its verification logic from an English-language specification. The equivalence is guaranteed by the canonical certificate format: all certificates, regardless of compilation language, produce the same binary representation.
+
+Cross-lingual certificate equivalence extends to hybrid and PQ-native certificates. The certificate format is language-independent by construction: it specifies binary fields (keys, signatures, scheme identifiers) that are identical regardless of the source language. The only language-dependent aspect is the human-readable identity descriptor, which may include names in different scripts; the descriptor is canonicalized through Unicode normalization before hashing.
+
+The EQUIVALENCE certificate mechanism verifies cross-lingual certificate equivalence by comparing the SHA3-256 hashes of certificates compiled from semantically equivalent directives in different languages. A hash match confirms equivalence; a hash mismatch triggers investigation to identify the normalization discrepancy.
+
+11.3 PQ Signature Normalization
+PQ signature normalization ensures that post-quantum signatures produced by different implementations are byte-identical for the same key and message. Normalization rules specify the encoding format for each post-quantum scheme: Dilithium signatures are encoded in the NIST-specified binary format, Falcon signatures are encoded in the compressed format specified by the Falcon standard, and SPHINCS+ signatures are encoded in the SPHINCS+-simple format.
+
+Normalization extends to key encoding: post-quantum public keys are encoded in the NIST-specified binary format, with no implementation-specific padding or alignment. The normalized encoding ensures that two implementations producing the same mathematical key produce the same byte-level representation, enabling hash comparison for key equivalence testing.
+
+PQ signature normalization is verified through the known-answer test mechanism: the ecosystem publishes reference key-message-signature triples for each approved scheme, and implementations must produce byte-identical signatures for the reference inputs. Implementations that produce correct but non-normalized signatures are rejected during the certification process.
+
+11.4 Global Inference
+Global inference for cryptographic transitions enables organisms to reason about quantum-readiness across multinational deployments. An organism operating in multiple jurisdictions must comply with each jurisdiction’s cryptographic requirements: some jurisdictions may mandate specific post-quantum schemes, others may prohibit certain schemes, and others may require minimum security levels. The global inference engine evaluates the jurisdiction-specific requirements and produces a cryptographic configuration that satisfies all applicable constraints.
+
+Global inference for cryptographic governance addresses the challenge of scheme harmonization: different jurisdictions may approve different post-quantum schemes, creating interoperability challenges for multinational deployments. The inference engine identifies the common scheme set (schemes approved in all relevant jurisdictions) and recommends the optimal common scheme for multinational operations.
+
+The global inference capability is essential for multinational organism deployments where quantum-readiness varies across jurisdictions. An organism operating in a jurisdiction with aggressive quantum-readiness requirements (Phase III by 2030) and a jurisdiction with conservative requirements (Phase I by 2035) must satisfy both timelines, deploying PQ-native capabilities in the aggressive jurisdiction while maintaining hybrid capabilities in the conservative jurisdiction.
+
+12 Failure Modes in Cryptographic Transition
+12.1 Identity Fragmentation
+Identity fragmentation occurs when an entity’s classical and post-quantum identities become dissociated. The entity possesses certificates under both Kclassical and KPQ, but the migration certificate linking them is missing, expired, or corrupted. The entity appears as two separate entities to the verification pipeline, and certificates issued under one key are not attributable to the other.
+
+Identity fragmentation is detected by the Certificate Fabric’s integrity checker, which verifies that every post-quantum identity has a valid migration certificate linking it to a classical identity. Fragmented identities are flagged for governance intervention. The corrective action is to re-issue the migration certificate (if the classical key is still available) or to undergo identity re-establishment (if the classical key has been decommissioned).
+
+Prevention of identity fragmentation requires that migration certificates are preserved in the Certificate Fabric indefinitely, with the same retention guarantees as identity certificates. The migration certificate is the permanent record of the classical-to-PQ identity binding and must never be deleted, expired, or archived to inaccessible storage.
+
+12.2 Certificate Invalidation
+Certificate invalidation occurs when a valid certificate becomes unverifiable due to a cryptographic transition event. Common causes include phase mismatch (a classical certificate presented to a PQ-native verifier that does not support classical verification), scheme incompatibility (a Dilithium certificate presented to a verifier that supports only Falcon), and version mismatch (a Phase II certificate format presented to a Phase I verifier).
+
+Certificate invalidation is mitigated by the versioned verification pipeline, which supports all certificate formats across all phases. However, if the versioned pipeline is not properly configured, or if a component deploys an incomplete cryptographic provider, certificate invalidation can occur. The mitigation is the provider self-test, which verifies format compatibility at startup.
+
+Certificate invalidation in high-throughput contexts (the SOR Signal Bus) can cause cascading failures: unverifiable signals are rejected, causing state divergence between cells, triggering homeostatic corrections, and potentially causing organism fragmentation. The architecture mitigates this cascade through graceful degradation: if a signal’s certificate is unverifiable, the signal is quarantined rather than rejected, and the homeostasis system is notified to investigate the verification failure.
+
+12.3 Hybrid Mismatch
+Hybrid mismatch occurs when the Ed25519 component and the post-quantum component of a hybrid signature are inconsistent: the Ed25519 signature is valid but the post-quantum signature is invalid, or vice versa. This inconsistency indicates either a signing error (the entity signed the message with the wrong post-quantum key) or a targeted attack (an adversary modified one component of the hybrid signature).
+
+Hybrid mismatch is detected by the dual-verification requirement: both components must be valid for the hybrid certificate to be accepted. A mismatch triggers a HYBRID_MISMATCH alert and the certificate is rejected. The alert includes diagnostic information: which component failed, what error the verification produced, and what key was expected.
+
+Prevention of hybrid mismatch requires that the hybrid signing operation be atomic: both signatures are produced in a single operation from the same message and the same key pair set. The Lume runtime enforces this atomicity through the hybrid cryptographic provider, which controls the signing sequence and prevents partial or inconsistent signing.
+
+12.4 PQ Signature Drift
+PQ signature drift occurs when different implementations of the same post-quantum scheme produce different signatures for the same key and message. Drift violates the deterministic semantics requirement and breaks the canonicalization invariant. Causes include implementation bugs, different versions of the scheme specification, and non-canonical encoding of signature components.
+
+PQ signature drift is detected by the determinism self-test and the known-answer test mechanism. Implementations that produce signatures inconsistent with the reference signatures are flagged as non-compliant and are rejected by the certification process. Drift detected at runtime triggers an immediate suspension of the non-compliant implementation’s cryptographic operations.
+
+Prevention of PQ signature drift requires strict implementation conformance testing. The ecosystem publishes a comprehensive test suite for each approved post-quantum scheme, including known-answer tests, edge-case tests, and cross-implementation consistency tests. All implementations must pass the full test suite before deployment.
+
+12.5 Governance Misalignment
+Governance misalignment occurs when components within a governance domain are in different cryptographic phases. A component in Phase III (PQ-native) cannot verify certificates from a component in Phase I (hybrid with classical fallback) that presents a classical-only certificate. The misalignment causes verification failures that disrupt inter-component communication.
+
+Governance misalignment is prevented by the phase synchronization requirement: all components within a governance domain must be in the same phase. The governance authority tracks component-level phase status and coordinates phase advancement to ensure synchronization. Components that fail to advance are quarantined until they comply.
+
+Governance misalignment across domains (different governance domains in different phases) is handled by the cross-domain interoperability protocol, which negotiates the common phase (the minimum of the two domains’ phases) for cross-domain communication. This negotiation ensures that cross-domain communication uses certificate formats that both domains can verify.
+
+12.6 Intent Inversion
+Intent inversion in cryptographic transitions occurs when a migration action produces the opposite of the intended result: an entity intends to migrate to a stronger post-quantum scheme but the migration actually deploys a weaker scheme, or an entity intends to advance to Phase II but the action actually rolls back to Phase I. Causes include configuration errors in the migration parameters and logic errors in the migration automation.
+
+Intent inversion is detected through the Proof-of-Intent mechanism [14], which compares the declared intent (migrate to Dilithium Level 3) against the actual outcome (deployed Dilithium Level 2). A mismatch triggers an INTENT_INVERSION alert and the migration is rolled back to the pre-migration state.
+
+Prevention of intent inversion requires explicit intent verification before migration execution: the migration system displays the intended migration parameters to the authorizing governance authority for confirmation before executing the migration. This human-in-the-loop verification step catches configuration errors before they produce intent-inverted migrations.
+
+13 Applications
+13.1 Autonomous Software Identity
+Quantum-resistant autonomous software identity ensures that autonomous software entities (programs, services, agents) maintain unforgeable identities against quantum adversaries. In the post-quantum Lume ecosystem, every autonomous software entity possesses a PQ-EdDSA key pair that anchors its identity in the Certificate Fabric, certifies its actions through the governance framework, and enables forensic attribution of its behavior.
+
+PQ identity for autonomous software is essential for long-lived entities whose operational lifetime may exceed the CRQC availability timeline. A service deployed in 2026 with a classical Ed25519 identity would be impersonable by 2040 if CRQC becomes available; the same service deployed with a PQ-EdDSA identity remains secure regardless of CRQC availability.
+
+The application of PQ identity to autonomous software demonstrates the practical value of the quantum-resistant architecture: it provides concrete, quantifiable security improvements for deployed systems without requiring changes to the systems’ functional behavior.
+
+13.2 Synthetic Organism Identity
+Synthetic organism identity in the SOR [13] is directly affected by the quantum threat, because organism identities persist across the organism’s entire lifecycle. A Type-4 organism that evolves over a decade-long operational period requires an identity that remains secure throughout. PQ identity anchoring provides this decade-scale security by basing organism identity on post-quantum key pairs that resist quantum attacks regardless of CRQC availability.
+
+PQ organism identity requires cascading cell identity migration: when an organism migrates its identity from Kclassical to KPQ, all cells within the organism must also migrate their identities. The cascading migration is coordinated through the SOR’s cell-signal-homeostasis infrastructure, with the homeostasis system monitoring the migration’s progress and ensuring that all cells complete the transition.
+
+The migration of organism identity demonstrates the integration between the quantum-resistant architecture and the SOR: the cryptographic transition leverages the organism’s existing lifecycle management infrastructure (quiescence, reactivation, signal coordination) to implement the identity migration without introducing new coordination mechanisms.
+
+13.3 Cyber-Physical Governance
+Quantum-resistant cyber-physical governance ensures that control decisions for physical systems (buildings, infrastructure, industrial processes) are authorized by unforgeable certificates. A governance authorization for an HVAC adjustment must not be forgeable by a quantum adversary; otherwise, an adversary could forge authorizations that manipulate physical systems with potentially dangerous consequences.
+
+Cyber-physical governance is a high-assurance application where the Ed25519 + SPHINCS+ hybrid is recommended. SPHINCS+’s hash-based security provides the conservative security margins appropriate for safety-critical physical systems, and the low frequency of governance authorization operations (compared to SOR signal processing) makes SPHINCS+’s higher verification latency acceptable.
+
+The application of quantum-resistant cryptography to cyber-physical governance illustrates the architecture’s ability to accommodate heterogeneous security requirements: high-assurance components use conservative schemes (SPHINCS+) while high-throughput components use performant schemes (Dilithium), within the same governance framework.
+
+13.4 Multi-Agent Arbitration
+Multi-agent arbitration under quantum-resistant cryptography ensures that arbitration certificates—the records of how conflicts between agents are resolved—are unforgeable by quantum adversaries. An adversary who can forge arbitration certificates can retroactively alter the interpretation of conflict resolutions, creating false precedents that influence future arbitration decisions.
+
+PQ arbitration certificates provide long-term integrity for the ecosystem’s arbitration history, ensuring that historical arbitration records remain trustworthy regardless of future quantum computing capabilities. This integrity is essential for the Evolver’s pattern-learning mechanism, which relies on the authenticity of historical arbitration records to recommend policy refinements.
+
+Multi-agent arbitration in the quantum-resistant architecture operates identically to classical arbitration, with the cryptographic provider transparently handling the PQ signature operations. This transparency demonstrates the architecture’s goal of minimizing the impact of the cryptographic transition on application-level behavior.
+
+13.5 Distributed Cognition
+Distributed cognition under quantum-resistant cryptography ensures that certified state deltas—the synchronization messages between distributed cognitive modules—are unforgeable by quantum adversaries. An adversary who can forge state deltas can manipulate the cognitive substrate’s reasoning by injecting false state information.
+
+PQ-signed state deltas provide integrity guarantees for distributed cognition that survive quantum attacks. The cognitive substrate’s evaluation functions operate on authenticated state data, and the authentication remains valid regardless of CRQC availability. This guarantee is essential for long-lived distributed organisms whose cognitive modules may operate for years or decades.
+
+The performance impact of PQ signatures on distributed cognition is managed through batch verification and lazy verification strategies. Batch verification amortizes the PQ verification cost across multiple state deltas. Lazy verification defers full PQ verification to a background thread, performing immediate verification with a lighter-weight integrity check (SHA3-256 hash verification) and confirming the PQ signature asynchronously.
+
+13.6 Deterministic Debugging and Recovery
+Deterministic debugging and recovery in the quantum-resistant architecture require that all certificates, signatures, and state commitments in the forensic record are verifiable using the appropriate cryptographic provider. The versioned verification pipeline ensures that classical, hybrid, and PQ-native certificates are all verifiable, enabling forensic analysis that spans the entire cryptographic transition history.
+
+Recovery in the quantum-resistant architecture uses PQ-signed checkpoints to ensure that recovered state is authentic and untampered. The recovery protocol verifies the PQ signature on each checkpoint before loading it, preventing an adversary from injecting forged checkpoints into the recovery process.
+
+The deterministic replay capability is enhanced by PQ signatures: replayed executions produce PQ-signed certificates that provide stronger authenticity guarantees than classical Ed25519-signed certificates. This enhanced authenticity is valuable for regulatory compliance in domains that require long-term forensic integrity.
+
+14 Security Analysis
+14.1 PQ Tampering Resistance
+PQ tampering resistance is provided by the post-quantum signature’s unforgeability under chosen-message attacks (EUF-CMA). Dilithium’s EUF-CMA security is proven under the MLWE assumption [17]. Falcon’s EUF-CMA security is proven under the NTRU assumption [18]. SPHINCS+’s EUF-CMA security is proven under the hash function’s second-preimage resistance [19]. These security proofs remain valid against quantum adversaries.
+
+PQ tampering resistance extends to the Certificate Fabric’s Merkle tree. The tree’s hash construction uses SHA3-256, which provides 128-bit security against quantum preimage attacks (Grover’s algorithm). The combination of PQ-resistant signatures and quantum-resistant hashing provides comprehensive tampering resistance for the Certificate Fabric.
+
+The defense-in-depth approach—PQ signatures for certificate integrity, SHA3-256 hashing for Merkle tree integrity, and governance-enforced key management—provides multiple independent tamper-detection mechanisms. An attacker must compromise all three layers simultaneously to tamper with the Certificate Fabric undetected.
+
+14.2 Identity Forgery Resistance
+Identity forgery resistance in the quantum-resistant architecture is provided by the post-quantum scheme’s key-recovery resistance. For Dilithium, key recovery requires solving the MLWE problem, which is conjectured to be quantum-hard. For Falcon, key recovery requires solving the NTRU shortest-vector problem, which is also conjectured to be quantum-hard. For SPHINCS+, key recovery requires finding hash preimages, which is quantum-hard under standard assumptions.
+
+Identity forgery resistance is verified through the security level certification: each post-quantum implementation must provide security at least equivalent to 128-bit classical security (NIST security level 1) against quantum adversaries. Higher security levels (level 3 or level 5) are available for high-assurance applications and can be mandated by the governance authority.
+
+The identity migration certificate provides an additional forgery resistance layer: even if an adversary recovers a classical Ed25519 key (after CRQC availability), the adversary cannot use it to forge a new identity migration certificate (because the migration window has closed and new migration certificates are rejected by the Certificate Fabric).
+
+14.3 Certificate Forgery Resistance
+Certificate forgery resistance inherits from the post-quantum scheme’s EUF-CMA security and the Certificate Fabric’s Merkle tree integrity. Forging a PQ-native certificate requires producing a valid post-quantum signature without possessing the private key, which is computationally infeasible under the security assumptions of the selected post-quantum scheme.
+
+Hybrid certificate forgery requires forging both the Ed25519 component and the post-quantum component simultaneously. Even if the Ed25519 component is broken by a quantum attack, the post-quantum component remains valid, and the adversary cannot forge the hybrid certificate. This dual-forgery requirement provides security against both classical and quantum adversaries.
+
+The Certificate Fabric’s Merkle tree provides structural forgery resistance: inserting a forged certificate into the tree changes the tree root, invalidating the governance authority’s signature on the root. This structural check detects certificate insertion attacks regardless of the signature scheme used.
+
+14.4 Replay Attack Mitigation
+Replay attack mitigation in the quantum-resistant architecture uses the same mechanisms as the classical architecture: monotonic timestamps for signals, nonce-based state commitments, and duplicate detection in the Signal Bus. These mechanisms are independent of the signature scheme and remain effective against quantum adversaries.
+
+The quantum-resistant architecture adds a migration-specific replay attack mitigation: migration certificates include a validity window that specifies the time period during which the migration is valid. A migration certificate presented outside its validity window is rejected, preventing retroactive replay of expired migration certificates.
+
+Cross-phase replay attacks (replaying a Phase I certificate in a Phase III context) are mitigated by the versioned verification pipeline. A Phase III verifier accepts Phase I certificates only for historical verification (backward compatibility) and rejects them for new authorization. This distinction prevents an adversary from using old, potentially compromised classical certificates for new operations.
+
+14.5 Governance Abuse Prevention
+Governance abuse prevention for cryptographic transitions extends the canonical GUPAS governance abuse prevention with transition-specific protections. The primary governance abuse vector for cryptographic transitions is premature phase rollback: a malicious governance authority rolls back from Phase II to Phase I, re-enabling classical-only verification and allowing quantum-compromised classical certificates to be accepted.
+
+Premature rollback is mitigated by the multi-signature requirement for phase changes: phase advancement and rollback both require signatures from multiple governance authorities, preventing unilateral phase manipulation. The rollback authorization additionally requires a documented justification (such as a specific post-quantum scheme vulnerability announcement), which is recorded in the Certificate Fabric for audit purposes.
+
+The governance monitoring system tracks phase-change patterns, flagging anomalous changes (frequent rollbacks, rapid phase oscillation, unauthorized scheme changes) for collective governance review. This automated monitoring provides continuous oversight of the cryptographic transition process.
+
+15 Performance Considerations
+15.1 PQ Verification Overhead
+PQ verification overhead varies by scheme: Dilithium verification is approximately 10–50× slower than Ed25519, Falcon verification is approximately 5–20× slower, and SPHINCS+ verification is approximately 100–500× slower. For the SOR Signal Bus (requiring sub-millisecond verification), Dilithium with batch verification optimization provides acceptable performance (0.1–0.3 milliseconds per signal in batch mode).
+
+For certificate chain verification (where multiple signatures must be verified sequentially), the total verification time scales linearly with the chain length. A typical certificate chain of 3–5 links requires 1.5–5.0 milliseconds for Dilithium verification, compared to 0.1–0.3 milliseconds for Ed25519 verification. This increase is acceptable for certificate validation operations, which occur at entity lifecycle events rather than at signal processing frequency.
+
+PQ verification overhead is bounded by the organism’s governance profile, which specifies the maximum cryptographic resource allocation. The Lume-V wrapper enforces this allocation, ensuring that cryptographic verification does not consume resources beyond the declared limit.
+
+15.2 Hybrid Signature Latency
+Hybrid signature latency includes the time for both Ed25519 signing and post-quantum signing. With parallelized hybrid signing, the total latency is the maximum of the two individual latencies, not their sum. For Ed25519 + Dilithium, the hybrid signing latency is approximately 1–3 milliseconds (dominated by Dilithium signing). For Ed25519 + Falcon, the latency is approximately 5–15 milliseconds (dominated by Falcon’s Gaussian sampling, even in deterministic mode). For Ed25519 + SPHINCS+, the latency is approximately 50–200 milliseconds (dominated by SPHINCS+ signing).
+
+Hybrid verification latency follows the same pattern: with parallelized verification, the total latency is the maximum of the two individual verifications. Dilithium hybrid verification is approximately 0.5–1.5 milliseconds. Falcon hybrid verification is approximately 0.3–1.0 milliseconds (Falcon has faster verification than signing). SPHINCS+ hybrid verification is approximately 5–10 milliseconds.
+
+These latencies constrain the hybrid scheme selection for real-time components. The SOR Signal Bus uses Dilithium hybrids for optimal verification throughput. Certificate ceremonies use SPHINCS+ hybrids for maximum assurance. The architecture’s component-specific scheme selection enables each component to optimize its performance-security tradeoff.
+
+15.3 Distributed Cognition Cost
+Distributed cognition cost in the quantum-resistant architecture includes the overhead of PQ-signing state deltas and PQ-verifying received deltas. For Dilithium, the per-delta signature overhead is approximately 1–3 milliseconds (signing) and 0.5–1.0 milliseconds (verification). For a cognitive module exchanging 100 deltas per second, the total cryptographic overhead is approximately 150–400 milliseconds per second, or 15–40% of a single processing core.
+
+The distributed cognition cost is managed through batch processing: multiple small deltas are aggregated into larger batches that are signed and verified as single units. Batch processing reduces the per-delta cryptographic overhead by amortizing the fixed costs of signature generation and verification across multiple deltas.
+
+The cognitive overhead of PQ-aware reasoning (evaluating quantum-readiness, recommending schemes, planning migrations) is approximately 1–3% of the cognitive substrate’s total processing budget. This overhead is modest and is offset by the security benefits of proactive quantum-readiness management.
+
+16 Future Work
+16.1 Cross-Vertical PQ Unification
+Future work will develop a unified post-quantum cryptographic configuration that applies across all DAIGS domain verticals. Currently, each vertical may approve different post-quantum schemes based on its domain-specific requirements. Future work will identify a minimal common scheme set that satisfies all verticals’ requirements, simplifying cross-vertical interoperability and reducing the complexity of multi-vertical governance.
+
+Cross-vertical PQ unification requires balancing the most stringent security requirements (from verticals handling classified or highly sensitive data) against the most demanding performance requirements (from verticals requiring real-time signal processing). The unification framework will specify per-vertical scheme profiles within a single governance structure.
+
+The long-term vision is an ecosystem where all verticals use the same post-quantum scheme at the same security level, eliminating cross-vertical interoperability challenges entirely.
+
+16.2 ZK-Native PQ Verification
+Future work will integrate zero-knowledge proof systems with post-quantum signature verification, enabling entities to prove that they possess a valid PQ signature without revealing the signature itself. This privacy-preserving verification is valuable for applications where the signature contains sensitive information (such as the signer’s identity in anonymous governance voting).
+
+ZK-native PQ verification requires proof circuits for post-quantum signature verification algorithms. Designing efficient proof circuits for lattice-based verification (Dilithium, Falcon) is a significant cryptographic engineering challenge due to the complexity of lattice arithmetic in ZK proof systems.
+
+To my knowledge, the successful implementation of ZK-native PQ verification for a deterministic ecosystem would represent the first integration of zero-knowledge proofs with post-quantum signatures in a governed, certificate-bound computational framework.
+
+16.3 Autonomous Organism PQ Identity
+Future work will enable Type-4 and Type-5 organisms to manage their own cryptographic transitions autonomously, selecting post-quantum schemes, scheduling identity migrations, and coordinating cell-level transitions without human governance intervention. Autonomous PQ identity management requires cognitive substrate extensions that evaluate quantum threat models and recommend cryptographic configurations.
+
+Autonomous PQ identity management is constrained by the governance framework: organisms can select schemes and schedule migrations only within their approved governance profiles. The governance authority retains authority over scheme approval, phase advancement, and migration deadline enforcement.
+
+The goal is to enable large-scale organism ecosystems (hundreds or thousands of organisms) to manage their cryptographic transitions efficiently without requiring individual governance attention for each organism’s migration.
+
+16.4 Global PQ Governance
+Future work will develop international standards for post-quantum cryptographic governance in deterministic ecosystems. These standards will specify minimum post-quantum security levels, mandatory transition timelines, and interoperability requirements for cross-jurisdictional deployments.
+
+Global PQ governance requires harmonization across national cryptographic standards. Different nations may standardize different post-quantum schemes or require different security levels. Future work will develop jurisdictional composition rules that deterministically resolve conflicts between national cryptographic requirements.
+
+The long-term objective is a globally recognized PQ governance standard that enables regulatory authorities in any jurisdiction to evaluate the quantum-readiness of Lume ecosystem deployments against internationally agreed criteria.
+
+17 Conclusion
+The quantum-resistant cryptographic architecture presented in this paper addresses the existential risk that quantum computing poses to the Lume ecosystem’s Ed25519 cryptographic foundation. The architecture proceeds through three phases—Hybrid, PQ-Primary, and PQ-Native—providing continuous quantum resistance from Phase I deployment through Phase III completion. The hybrid phase provides dual security against both classical and quantum adversaries, the PQ-Primary phase reduces dependence on Ed25519 to a backward-compatibility fallback, and the PQ-Native phase eliminates classical cryptography entirely.
+
+The architecture preserves the invariants that the Lume ecosystem depends upon. Deterministic semantics are maintained through deterministic post-quantum signature schemes (Dilithium’s native determinism, Falcon’s and SPHINCS+’s deterministic variants). Certificate continuity is maintained through versioned verification pipelines that accept classical, hybrid, and PQ-native certificates. Identity persistence is maintained through identity migration certificates that cryptographically link classical and post-quantum identities. Governance validity is maintained through GUPAS-governed phase transitions that prevent unauthorized or premature cryptographic changes.
+
+The integration architecture connects the quantum-resistant cryptographic infrastructure to every ecosystem component: the Lume compiler (through AST-level cryptographic canonicalization), the Trust Layer (through certificate fabric upgrades and identity migration), Lume-V (through envelope-constrained cryptographic transitions), DAIGS (through cryptographic awareness extensions for cognitive reasoning), LDIR (through multilingual cryptographic semantic normalization), SOR (through organism identity migration and cell identity cascading), and GUPAS (through governance-safe transition policies).
+
+The six failure modes identified in this paper—identity fragmentation, certificate invalidation, hybrid mismatch, PQ signature drift, governance misalignment, and intent inversion—provide the diagnostic framework for maintaining cryptographic integrity throughout the transition. Each failure mode has a defined detection mechanism, a defined corrective response, and a defined prevention strategy.
+
+To my knowledge, this paper presents the first complete quantum-resistant cryptographic architecture for a deterministic, certificate-bound natural-language programming ecosystem. The architecture demonstrates that quantum-resistant migration is compatible with deterministic semantics, governance validity, and identity persistence, providing a practical path from classical Ed25519 to post-quantum cryptography without sacrificing the properties that make the Lume ecosystem trustworthy.
+
+Appendix A — Definitions
+A.1 Ed25519
+A deterministic digital signature scheme operating on the Edwards curve Curve25519, providing 126-bit classical security against the elliptic-curve discrete logarithm problem. Specified by Bernstein et al. [16]. Used throughout the Lume ecosystem for identity anchoring, certificate signing, signal authentication, and state commitment verification.
+
+A.2 Curve25519
+A twisted Edwards curve defined over Fp where p = 2255 − 19, providing a group of prime order with approximately 2252 elements. Selected for its resistance to side-channel attacks, efficient arithmetic, and conservative security margins.
+
+A.3 PQ Signature
+A digital signature scheme whose security is conjectured to resist attacks by quantum computers. The Lume ecosystem supports three NIST-standardized PQ signature schemes: CRYSTALS-Dilithium [17] (lattice-based, FIPS 204), Falcon [18] (lattice-based, FIPS 206), and SPHINCS+ [19] (hash-based, FIPS 205).
+
+A.4 Hybrid Signature
+A dual signature that combines a classical Ed25519 signature with a post-quantum signature over the same message. Both signatures must verify for the hybrid signature to be accepted. The hybrid construction provides security against both classical and quantum adversaries: a break of either scheme alone does not compromise the hybrid signature.
+
+A.5 Certificate Fabric
+The directed acyclic graph of cryptographically signed trust assertions in the Trust Layer. In the quantum-resistant architecture, the Certificate Fabric stores classical, hybrid, and PQ-native certificates in a unified Merkle tree structure. The Fabric provides the forensic infrastructure for identity tracking, provenance auditing, and migration history.
+
+A.6 Deterministic Transition Graph
+A directed graph representing an entity’s cryptographic state evolution, where each node is a cryptographic configuration (classical, hybrid, or PQ-native) and each edge is a governed transition (phase advancement, identity migration, or rollback). The graph is deterministic and recorded in the Certificate Fabric.
+
+A.7 Identity Anchor
+The cryptographic key pair that binds an entity’s behavioral identity to a verifiable credential. In the classical architecture, the identity anchor is an Ed25519 key pair. In the PQ-native architecture, the identity anchor is a post-quantum key pair. The transition between anchors is mediated by an identity migration certificate.
+
+A.8 Governance Envelope
+The set of constraints that govern an entity’s cryptographic capabilities: approved post-quantum schemes, permitted transition phases, maximum key sizes, and migration deadlines. The governance envelope is enforced by the Lume-V wrapper and cannot be modified without governance authorization.
+
+Appendix B — Algorithms
+B.1 Hybrid Signature Algorithm
+Algorithm HybridSign:
+Input: Message M, ClassicalKeyPair (sk_ed, pk_ed), PQKeyPair (sk_pq, pk_pq)
+Output: HybridSignature HS, SignatureCertificate
+
+ 1: COMPUTE sig_ed = Ed25519.Sign(sk_ed, M)
+ 2: COMPUTE sig_pq = PQ.Sign(sk_pq, M)    // Deterministic mode
+ 3: VERIFY Ed25519.Verify(pk_ed, M, sig_ed) == TRUE
+ 4: VERIFY PQ.Verify(pk_pq, M, sig_pq) == TRUE
+ 5: IF either verification fails: ABORT, LOG internal error
+ 6: CONSTRUCT HS = (scheme_id, sig_ed, sig_pq)
+ 7: COMPUTE hash = SHA3-256(HS)
+ 8: EMIT SignatureCertificate (signer_id, hash, scheme_id, timestamp)
+ 9: RETURN (HS, SignatureCertificate)
+
+Algorithm HybridVerify:
+Input: Message M, HybridSignature HS, ClassicalPubKey pk_ed, PQPubKey pk_pq
+Output: VerificationResult (ACCEPT or REJECT)
+
+ 1: PARSE HS into (scheme_id, sig_ed, sig_pq)
+ 2: VERIFY v_ed = Ed25519.Verify(pk_ed, M, sig_ed)
+ 3: VERIFY v_pq = PQ.Verify(pk_pq, M, sig_pq)
+ 4: IF v_ed AND v_pq: RETURN ACCEPT
+ 5: IF v_ed XOR v_pq: EMIT HYBRID_MISMATCH alert, RETURN REJECT
+ 6: ELSE: RETURN REJECT
+B.2 PQ Signature Verification Algorithm
+Algorithm PQVerify:
+Input: Message M, PQSignature sig, PQPubKey pk, SchemeID scheme
+Output: VerificationResult, VerificationCertificate
+
+ 1: SELECT verifier based on scheme:
+ 2:    "dilithium": verifier = Dilithium.Verify
+ 3:    "falcon": verifier = Falcon.Verify
+ 4:    "sphincs+": verifier = SPHINCS_Plus.Verify
+ 5: VERIFY result = verifier(pk, M, sig)
+ 6: IF result == FALSE: RETURN (REJECT, null)
+ 7: COMPUTE sig_hash = SHA3-256(sig)
+ 8: EMIT VerificationCertificate (verifier_id, sig_hash, scheme, timestamp)
+ 9: RETURN (ACCEPT, VerificationCertificate)
+B.3 Certificate Migration Algorithm
+Algorithm CertificateMigration:
+Input: ClassicalCert C_ed, PQKeyPair (sk_pq, pk_pq), GovernanceAuth G
+Output: HybridCert C_hybrid, MigrationCertificate
+
+ 1: VERIFY G authorizes migration for C_ed.entity_id
+ 2: IF unauthorized: REJECT, LOG denial
+ 3: VERIFY C_ed is valid and not revoked
+ 4: IF invalid: REJECT, LOG invalid-source
+ 5: CONSTRUCT identity_desc = C_ed.identity_descriptor
+ 6: COMPUTE sig_ed = Ed25519.Sign(C_ed.sk_ed, identity_desc)
+ 7: COMPUTE sig_pq = PQ.Sign(sk_pq, identity_desc)
+ 8: CONSTRUCT C_hybrid = (version="hybrid", identity_desc,
+      pk_ed=C_ed.pk_ed, sig_ed, pk_pq, sig_pq, validity)
+ 9: CONSTRUCT MigrationCertificate:
+10:    entity_id, SHA3-256(C_ed), SHA3-256(C_hybrid),
+11:    migration_timestamp, governance_auth=G.id
+12: SIGN MigrationCertificate with both sk_ed and sk_pq
+13: COMMIT C_hybrid and MigrationCertificate to Certificate Fabric
+14: RETURN (C_hybrid, MigrationCertificate)
+B.4 Identity Preservation Algorithm
+Algorithm IdentityPreservation:
+Input: Entity E, ClassicalKey (sk_ed, pk_ed), PQKey (sk_pq, pk_pq)
+Output: PreservedIdentity, PreservationCertificate
+
+ 1: VERIFY E.current_identity == pk_ed
+ 2: CONSTRUCT migration_claim = (E.id, pk_ed, pk_pq, timestamp)
+ 3: SIGN claim_sig_ed = Ed25519.Sign(sk_ed, migration_claim)
+ 4: SIGN claim_sig_pq = PQ.Sign(sk_pq, migration_claim)
+ 5: CONSTRUCT PreservationCertificate:
+ 6:    entity_id=E.id, classical_key_hash=SHA3-256(pk_ed),
+ 7:    pq_key_hash=SHA3-256(pk_pq), claim_sig_ed, claim_sig_pq,
+ 8:    governance_auth, timestamp
+ 9: COMMIT PreservationCertificate to Certificate Fabric
+10: UPDATE E.current_identity = pk_pq
+11: UPDATE E.identity_history.APPEND(pk_ed)
+12: RETURN (PreservedIdentity, PreservationCertificate)
+Appendix C — Diagram Descriptions
+C.1 Hybrid Certificate Diagram
+(Illustrative) A certificate structure diagram showing a hybrid certificate with seven fields arranged vertically. Field 1: “Version: HYBRID” (indicating the certificate era). Field 2: “Identity Descriptor” (entity name, type, governance profile). Field 3: “Classical Public Key” (32-byte Ed25519 key). Field 4: “Classical Signature” (64-byte Ed25519 signature over the identity descriptor). Field 5: “PQ Scheme ID” (Dilithium/Falcon/SPHINCS+). Field 6: “PQ Public Key” (1,312-byte Dilithium key or 897-byte Falcon key or 32-byte SPHINCS+ key). Field 7: “PQ Signature” (2,420-byte Dilithium signature or 666-byte Falcon signature or 7,856-byte SPHINCS+ signature). The classical fields (3–4) are highlighted as “readable by legacy verifiers” and the PQ fields (5–7) are highlighted as “required for hybrid verification.”
+
+C.2 PQ Verification Pipeline
+(Illustrative) A decision-tree diagram showing the verification pipeline for certificates of different formats. The root node reads the certificate’s version field. If “CLASSICAL”: the pipeline performs Ed25519 verification only. If “HYBRID”: the pipeline forks into two parallel paths—Ed25519 verification and PQ verification—and accepts the certificate only if both verifications succeed. If “PQ-NATIVE”: the pipeline performs PQ verification only. Each verification path includes a scheme-selection step that reads the PQ Scheme ID and selects the appropriate verification algorithm. All paths converge at a final ACCEPT/REJECT decision node.
+
+C.3 Certificate Fabric Integration
+(Illustrative) A Merkle tree diagram showing the Certificate Fabric after quantum-resistant migration. Leaf nodes are certificates of mixed formats: some classical (white), some hybrid (gray), some PQ-native (dark). The tree’s hash computation uses SHA3-256 on the full certificate content (including PQ fields). The root hash is signed with a hybrid signature (Ed25519 + PQ) during Phase I and with a PQ-only signature during Phase III. A timeline below the tree shows the three phases and indicates which certificate formats are issued during each phase.
+
+C.4 Identity Migration Flow
+(Illustrative) A sequence diagram showing the identity migration process. Actor 1: the entity requesting migration. Actor 2: the Trust Layer. Actor 3: the Governance Authority. The entity generates a PQ key pair and sends a migration request to the Trust Layer. The Trust Layer requests governance authorization from the Governance Authority. The Governance Authority evaluates the request and issues an authorization certificate. The Trust Layer constructs the hybrid certificate and the migration certificate, commits both to the Certificate Fabric, and updates the entity’s identity anchor. The entity receives confirmation and begins using the new PQ key for all subsequent operations.
+
+Appendix D — Implementation Notes
+D.1 Curve Primitives
+The Lume runtime’s Ed25519 implementation uses the libsodium library’s Ed25519 functions, which provide constant-time operations, deterministic nonce derivation, and resistance to timing side-channel attacks. The implementation is compiled through the Lume compiler and operates under the same deterministic guarantees as user-authored programs.
+
+D.2 PQ Signature Primitives
+Post-quantum signature primitives are implemented through NIST-compliant reference implementations: Dilithium uses the CRYSTALS-Dilithium reference implementation (version 3.1), Falcon uses the Falcon reference implementation (version 1.2 with deterministic variant), and SPHINCS+ uses the SPHINCS+ reference implementation (sphincs-sha2-128f-simple with deterministic message randomization). All implementations are configured for deterministic operation and pass the ecosystem’s known-answer tests.
+
+D.3 Integration with Lume Runtime
+The cryptographic provider is integrated with the Lume runtime through the crypto.sign(message, key_ref) API, which dispatches to the appropriate provider (classical, hybrid, or PQ-native) based on the runtime’s current cryptographic mode. The API is scheme-agnostic: application code uses the same function regardless of the active scheme. The provider self-test is invoked at runtime startup through the crypto.self_test() API.
+
+D.4 Trust Layer Hooks
+The Trust Layer hooks for cryptographic transitions include: issue_migration_cert(entity_id, classical_key, pq_key) for identity migration, upgrade_cert(cert_id, pq_signature) for certificate upgrade from classical to hybrid, validate_phase(component_id, target_phase) for phase advancement readiness verification, and rollback_phase(domain_id, target_phase, justification) for phase rollback authorization.
+
+D.5 Lume-V Wrapper Requirements
+The Lume-V wrapper for cryptographic operations monitors signing latency, verification latency, key generation time, and signature size. The wrapper enforces the entity’s cryptographic envelope: approved schemes, maximum key sizes, and permitted phases. Envelope violations trigger SAFETY_VIOLATION certificates. The wrapper reports cryptographic operational metrics to the homeostasis engine for performance monitoring.
+
+Appendix E — Governance & Compliance
+E.1 Who Can Migrate Identities
+Identity migration is restricted to entities possessing valid identity certificates with the IDENTITY_MIGRATE capability. The capability is granted by the designated Ecosystem Governance Authority through the standard capability delegation process. The capability specification includes the approved post-quantum schemes for the entity and the migration deadline by which the entity must complete migration.
+
+The governance authority reviews each migration request, evaluating the PQ key pair’s compliance with the approved scheme and security level. Migrations using unapproved schemes or insufficient security levels are rejected. Approved migrations receive a migration authorization certificate that is required by the Trust Layer before processing the migration.
+
+E.2 How PQ Transitions Are Governed
+PQ transitions are governed through the GUPAS six-layer governance architecture applied to cryptographic phase changes. Phase advancement follows the intent-evaluation-authorization-execution-verification-certification cycle. The intent declares the target phase; the evaluation verifies component readiness; the authorization certifies the advancement; the execution updates the cryptographic providers; the verification confirms successful deployment; the certification records the phase status in the Certificate Fabric.
+
+Phase rollback follows the same governance cycle with an additional justification requirement: the governance authority must document the specific vulnerability or operational issue that motivates the rollback. The justification is recorded in the Certificate Fabric for audit purposes.
+
+E.3 Safety Rules
+Cryptographic safety rules extend the LDIR Tier 4 safety rules with transition-specific constraints: PQ-01 (All new certificates must include PQ signatures during Phase I and beyond), PQ-02 (All PQ implementations must pass the determinism self-test before deployment), PQ-03 (Identity migration certificates must be issued before CRQC-estimated availability), PQ-04 (Phase rollback requires documented justification and multi-signature authorization), and PQ-05 (All PQ implementations must match published known-answer tests). These rules are enforced at the runtime level.
+
+E.4 Interaction with Proof-of-Intent
+Cryptographic transition actions are subject to the Proof-of-Intent mechanism [14]. Each migration action produces an Intent Tuple (declaring the intended migration target) and an execution outcome (recording the actual migration result). The Proof-of-Intent mechanism verifies consistency between the two, detecting migration errors (wrong scheme deployed) and intent inversions (weaker scheme deployed instead of stronger).
+
+The Proof-of-Intent mechanism is enhanced for cryptographic transitions with a pre-execution verification step: the migration system computes and displays the expected outcome before executing the migration, enabling the authorizing governance authority to verify the outcome in advance. This pre-verification catches configuration errors before they produce incorrect migrations.
+
+Appendix F — Extended Examples
+F.1 Example Hybrid Certificate
+A logistics organism in the Lume ecosystem migrates its identity from Ed25519 to a hybrid Ed25519 + Dilithium configuration. The organism generates a Dilithium Level 2 key pair. The Trust Layer issues a hybrid certificate containing: version=“HYBRID,” identity_descriptor=“LogisticsOrganism-Alpha, Type-3, v2.1,” classical_pk (32 bytes), classical_sig (64 bytes), pq_scheme=“dilithium-level2,” pq_pk (1,312 bytes), pq_sig (2,420 bytes). The total certificate size is approximately 3,860 bytes, compared to 128 bytes for the classical certificate. A legacy verifier reads the classical fields and validates the Ed25519 signature. An upgraded verifier reads all fields and validates both signatures.
+
+F.2 Example PQ Signature
+A cell within the logistics organism emits a COMPUTE signal to the routing cell. The cell signs the signal with its Dilithium Level 2 key. The signature operation takes approximately 1.2 milliseconds. The signature is 2,420 bytes, appended to the signal’s 256-byte payload, producing a total signal size of approximately 2,700 bytes. The Signal Bus verifies the Dilithium signature in approximately 0.4 milliseconds using batch verification (processing 10 signals simultaneously). The verification produces a VerificationCertificate that is committed to the Certificate Fabric.
+
+F.3 Example Identity Migration
+The logistics organism’s governance authority initiates a Phase I deployment. The organism quiesces all cells, generates Dilithium key pairs for the organism and each cell, issues hybrid certificates for all entities, and reactivates the cells. The migration takes approximately 15 seconds for an organism with 30 cells. The migration produces a MigrationCertificate for the organism and 30 MigrationCertificates for the cells, all committed to the Certificate Fabric. Post-migration, all signals are signed with hybrid signatures (Ed25519 + Dilithium), and all verifications validate both signature components.
+
+Appendix G — Threat Models
+G.1 Quantum Adversaries
+A quantum adversary possessing CRQC access records a target organism’s Ed25519 public key from the Certificate Fabric and applies Shor’s algorithm to recover the private key. With the private key, the adversary can forge signals, state commitments, and governance authorizations under the organism’s identity. The hybrid architecture mitigates this attack: even after recovering the Ed25519 key, the adversary cannot forge the Dilithium component of hybrid signatures without also breaking Dilithium (which requires solving MLWE, conjectured to be quantum-hard).
+
+The “harvest now, decrypt later” variant of this attack is mitigated by Phase I’s mandatory hybrid signatures for all new certificates. Certificates issued during Phase I include PQ signatures that provide quantum resistance even if the Ed25519 component is later compromised.
+
+G.2 Hybrid Mismatch Attacks
+An adversary manipulates the signing process to produce a hybrid signature where the Ed25519 component signs message M but the Dilithium component signs message M′ (a different message). The dual-verification check detects this attack: verifying the Ed25519 signature against M succeeds, but verifying the Dilithium signature against M fails (because the Dilithium signature covers M′, not M). The mismatch triggers a HYBRID_MISMATCH alert.
+
+This attack is prevented by the atomic hybrid signing operation in the Lume runtime, which ensures that both signatures cover the same message. The attack is only possible if the signing implementation is compromised, which is mitigated by the provider self-test and the known-answer test compliance requirement.
+
+G.3 Governance Manipulation
+An attacker with governance authority premature rolls back from Phase II to Phase I, re-enabling Ed25519-only verification for entities that present classical-only certificates. This rollback could allow quantum-compromised Ed25519 certificates to be accepted. The attack is mitigated by the multi-signature requirement for phase rollback, the documented justification requirement, and the governance monitoring system that flags anomalous phase changes.
+
+Escalated governance manipulation (an attacker compromising multiple governance authorities to satisfy the multi-signature requirement) is mitigated by the geographic and organizational diversity requirement for governance authority selection. The governance authorities are selected from different organizations, different jurisdictions, and different geographic regions, making coordinated compromise difficult.
+
+Appendix H — Formal Notation
+H.1 Signature Notation
+A classical signature is denoted σed = Ed25519.Sign(sked, M), where sked is the Ed25519 secret key and M is the message. A PQ signature is denoted σpq = PQ.Sign(skpq, M), where skpq is the post-quantum secret key. A hybrid signature is denoted σhybrid = (σed, σpq). Verification: Ed25519.Verify(pked, M, σed) ∈ {TRUE, FALSE} and PQ.Verify(pkpq, M, σpq) ∈ {TRUE, FALSE}. Hybrid verification: HybridVerify(M, σhybrid) = Ed25519.Verify(…) ∧ PQ.Verify(…).
+
+H.2 PQ Equations
+For CRYSTALS-Dilithium at security level κ: the public key is pk = (ρ, t1) where ρ is a random seed and t1 is the high-order bits of A · s1 + s2 for matrix A ∈ Rqk×l and secret vectors s1, s2. The signature is σ = (c̃, z, h) where c̃ is a challenge hash, z = y + c · s1 is the response vector, and h is the hint for high-order reconstruction. Verification checks: ‖z‖∞ < γ1 − β and HighBits(A · z − c · t1 · 2d) = w1.
+
+H.3 Certificate Rules
+A certificate Cert = (version, desc, pk, σ, validity) is valid if: Verify(pkissuer, desc, σ) = TRUE and now ∈ validity. A hybrid certificate Certhybrid = (version, desc, pked, σed, pkpq, σpq, validity) is valid if: Ed25519.Verify(pked,issuer, desc, σed) = TRUE and PQ.Verify(pkpq,issuer, desc, σpq) = TRUE and now ∈ validity. Certificate chain validity: a chain Cert1 → Cert2 → … → Certn is valid if each Certi is individually valid and Certi.pkissuer = Certi-1.pk for all i > 1. The chain root Cert1 must be issued by the designated Ecosystem Governance Authority.
+
+References
+[1] R. J. Andrews, "LUME: Eliminating Cognitive Distance — A Deterministic Natural-Language Programming Language with Intent-Resolving Compilation, Voice Input, Certified Security, and Synthetic Organism Runtime," Zenodo, 2026. DOI: 10.5281/zenodo.19382282
+
+[2] R. J. Andrews, "The Grand Unified Protocol for Autonomous Software (GUPAS): Deterministic Governance of Self-Directing Systems Across Trust-Bound Ecosystems," DarkWave Studios LLC, 2026. U.S. Pat. App. No. 64/032,339.
+
+[3] R. J. Andrews, "The Trust Layer: A Deterministic Correctness Substrate for Autonomous Systems with Proof-of-Intent," Zenodo, 2026. DOI: 10.5281/zenodo.19560674
+
+[4] R. J. Andrews, "Lume-V: Deterministic Verification Wrappers for Non-Native Code in Trust-Bound Ecosystems," Zenodo, 2026. DOI: 10.5281/zenodo.19645097
+
+[5] R. J. Andrews, "DAIGS: Deterministic AI and Guided Subsystems — A Master Taxonomy for Autonomous Intelligence," Zenodo, 2026. DOI: 10.5281/zenodo.19491784
+
+[6] R. J. Andrews, "Deterministic AST Compilation for Lume Systems: Canonical Intent Representation Through Ordered Construction and Cryptographic Binding," DarkWave Studios LLC, 2026. U.S. Pat. App. No. 64/032,339.
+
+[7] R. J. Andrews, "Behavioral Homeostasis in Type-4 Synthetic Organisms: Deterministic Self-Regulation Under Certificate-Bound Governance," DarkWave Studios LLC, 2026. U.S. Pat. App. No. 64/032,339.
+
+[8] R. J. Andrews, "Zero-Knowledge State Reversal Protocols: Deterministic Rollback Without State Disclosure," DarkWave Studios LLC, 2026. U.S. Pat. App. No. 64/032,339.
+
+[9] R. J. Andrews, "Taxonomy of Synthetic Organisms (Types 0–5): A Classification Framework for Deterministic Autonomous Constructs," DarkWave Studios LLC, 2026. U.S. Pat. App. No. 64/032,339.
+
+[10] R. J. Andrews, "Lume Doctrine Expansion Subsystems: A Structured Architecture for Extending Deterministic Natural-Language Programming Beyond Canonical Boundaries," DarkWave Studios LLC, 2026. U.S. Pat. App. No. 64/032,339.
+
+[11] R. J. Andrews, "English Mode Intent Resolution at Compile Time: Deterministic Natural-Language Compilation Through Structured Semantic Grounding and Certificate-Anchored Finalization," DarkWave Studios LLC, 2026. U.S. Pat. App. No. 64/032,339.
+
+[12] R. J. Andrews, "Multilingual Inference Through LDIR Expansions: Deterministic Cross-Lingual Intent Resolution for Certificate-Anchored Natural-Language Ecosystems," DarkWave Studios LLC, 2026. U.S. Pat. App. No. 64/032,339.
+
+[13] R. J. Andrews, "SOR: Cell / Signal / Homeostasis Analogues — Deterministic Biological Computation Models for Certificate-Bound Synthetic Organisms," DarkWave Studios LLC, 2026. U.S. Pat. App. No. 64/032,339.
+
+[14] R. J. Andrews, "Proof-of-Intent: Trust Layer Consensus Mechanisms for Deterministic Autonomous Governance," DarkWave Studios LLC, 2026. U.S. Pat. App. No. 64/032,339.
+
+[15] R. J. Andrews, "LDIR: Lume Deterministic Inference Relay," DarkWave Studios LLC, 2026. U.S. Pat. App. No. 64/032,339.
+
+[16] D. J. Bernstein, N. Duif, T. Lange, P. Schwabe, and B. Yang, "High-speed high-security signatures," Journal of Cryptographic Engineering, vol. 2, no. 2, pp. 77–89, 2012.
+
+[17] L. Ducas et al., "CRYSTALS-Dilithium: A Lattice-Based Digital Signature Scheme," IACR Transactions on Cryptographic Hardware and Embedded Systems, vol. 2018, no. 1, pp. 238–268, 2018. NIST FIPS 204.
+
+[18] P.-A. Fouque et al., "Falcon: Fast-Fourier Lattice-based Compact Signatures over NTRU," NIST PQC Submission, 2020. NIST FIPS 206.
+
+[19] D. J. Bernstein et al., "SPHINCS+: Stateless Hash-Based Signatures," NIST PQC Submission, 2020. NIST FIPS 205.
+
+[20] P. W. Shor, "Polynomial-Time Algorithms for Prime Factorization and Discrete Logarithms on a Quantum Computer," SIAM Journal on Computing, vol. 26, no. 5, pp. 1484–1509, 1997.
+
+[21] L. K. Grover, "A Fast Quantum Mechanical Algorithm for Database Search," Proceedings of the 28th Annual ACM Symposium on Theory of Computing, pp. 212–219, 1996.
+
+[22] NIST, "Post-Quantum Cryptography Standardization," National Institute of Standards and Technology, 2024. Available: https://csrc.nist.gov/projects/post-quantum-cryptography
+
+This paper discloses only the architecture and conceptual framework of Quantum-Resistant Ed25519 Implementations in Lume. No implementation details, source code, or proprietary algorithms are included. All examples use synthetic scenarios.
+Patent Pending — U.S. Pat. App. No. 64/032,339 — "Quantum-Resistant Ed25519 Implementations in Lume." Filed April 2026.
+© 2026 DarkWave Studios LLC. All rights reserved.
+Correspondence: Ronald “Jason” Andrews, DarkWave Studios LLC, Nashville, TN. Email: team@dwsc.io
+ORCID: 0009-0007-5214-649X
+Website: lume-lang.org · GitHub: github.com/cryptocreeper94-sudo
+Repository: github.com/cryptocreeper94-sudo/lume
+This preprint has not undergone peer review. It is submitted for early dissemination and to establish priority of invention.
