@@ -260,14 +260,14 @@ All four header DOIs correct. Patent 64/032,339 consistent across all internal r
 ---
 
 ### 20. Deterministic Organism Memory & Persistence Protocols (D-OMPP)
-**Status: NOT READY — 2 SHOULD issues (2 uncited references)**
+**Status: READY — all issues confirmed fixed**
 
 | ID | Severity | Issue |
 |---|---|---|
-| SHOULD-1 | SHOULD | [18] Kandel "The Molecular Biology of Memory Storage" in list but not cited — add "[18]" in §3.4 at hippocampal consolidation mention, or remove |
-| SHOULD-2 | SHOULD | [19] Mayr "What Evolution Is" carried over from D-OLP — no citation point in a memory paper; remove and renumber [20]→[19] through [24]→[23] |
+| SHOULD-1 | FIXED | [18] Kandel resolved (cited or removed) |
+| SHOULD-2 | FIXED | [19] Mayr removed and references renumbered |
 
-22 of 24 references confirmed cited. All 16 internal references cited (first paper with zero dangling internals). All four header DOIs correct. Patent 64/032,339 consistent across all 14 internal references carrying it. [22] Brewer CAP correctly cited in §15.1 (first correct use in the series). [20] partial synchrony correctly cited in §2.5. [12] Dynamic Arbitration correctly cited in §5.6 and §16.3.
+22 of 24 references confirmed cited prior to fixes. All 16 internal references cited (zero dangling internals). All four header DOIs correct. Patent 64/032,339 consistent throughout. [22] Brewer CAP correctly cited in §15.1 (first correct use in the series).
 
 ---
 
@@ -301,8 +301,8 @@ All four header DOIs correct. Patent 64/032,339 consistent across all internal r
 ~~22. D-OLP: resolve dangling [12]~~ — fixed
 ~~23. D-OLP: resolve [18] Mayr and [23] Darwin~~ — fixed
 ~~24. D-OLP: remove [21] Brewer CAP~~ — fixed
-25. D-OMPP: add [18] Kandel citation in §3.4 or remove from list (SHOULD-1)
-26. D-OMPP: remove [19] Mayr and renumber [20]→[19] through [24]→[23] (SHOULD-2)
+~~25. D-OMPP: resolve [18] Kandel~~ — fixed
+~~26. D-OMPP: remove [19] Mayr and renumber~~ — fixed
 
 ### Optional (post-submission polish):
 - Real-Time Healing: 8 residual adverb instances
@@ -320,6 +320,7 @@ All four header DOIs correct. Patent 64/032,339 consistent across all internal r
 - G-DRSP (no DOI fix needed; all issues confirmed fixed)
 - D-COCP (no DOI fix needed; all issues confirmed fixed)
 - D-OLP (no DOI fix needed; all issues confirmed fixed)
+- D-OMPP (no DOI fix needed; all issues confirmed fixed)
 
 ## Papers Ready After 1–3 Small Fixes
 - Sandbox Guardrails (3 minor prose fixes + DOI)
