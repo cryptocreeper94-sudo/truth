@@ -316,6 +316,17 @@ New external references: [26] C. Darwin, "On the Origin of Species by Means of N
 
 ---
 
+### 25. Deterministic Organism Extinction & Recovery Protocols (D-OERP)
+**Status: READY — zero issues found**
+
+No issues at any severity level. All 28 references confirmed cited (21 internal + 7 external). All 21 internal references cited (zero dangling internals, sixth consecutive paper). All four header DOIs correct. Patent 64/032,339 consistent throughout. No Mayr. Third consecutive paper to clear with zero issues.
+
+New external references: [27] D. M. Raup, "Extinction: Bad Genes or Bad Luck?" W. W. Norton, 1991 — cited §1.3 for mass extinction dynamics that reshape entire ecosystems; [28] C. S. Holling, "Resilience and Stability of Ecological Systems," Annual Review of Ecology and Systematics, vol. 4, pp. 1–23, 1973 — cited §1.1 for ecological resilience principles informing the recovery framework. Raup and Holling together cover the two halves of D-OERP's dual-pipeline architecture: Raup for extinction dynamics, Holling for resilience and recovery. Both first appearances in series.
+
+[21] D-OEAP correctly added as first internal appearance; cited in five distinct functional contexts: recovery primitive (§3.1), contested extinction remediation (§6.2), mass recovery fitness recalibration (§7.6), proactive intervention (§11.1), and resurrection integration (§18.3).
+
+---
+
 ## Quick-Fix Summary (All Papers)
 
 ### MUST fix before any paper is deposited:
@@ -373,6 +384,7 @@ New external references: [26] C. Darwin, "On the Origin of Species by Means of N
 - D-OREP (no DOI fix needed; all issues confirmed fixed)
 - D-OCRP (no DOI fix needed; zero issues — first perfect paper in series)
 - D-OEAP (no DOI fix needed; zero issues — second consecutive perfect paper)
+- D-OERP (no DOI fix needed; zero issues — third consecutive perfect paper)
 
 ## Papers Ready After 1–3 Small Fixes
 - Sandbox Guardrails (3 minor prose fixes + DOI)
