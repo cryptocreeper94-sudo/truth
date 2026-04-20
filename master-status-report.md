@@ -246,6 +246,19 @@ All four header DOIs correct. Patent 64/032,339 consistent across all internal r
 
 ---
 
+### 19. Deterministic Organism Lifecycle Protocols (D-OLP)
+**Status: NOT READY — 3 SHOULD issues (4 uncited references)**
+
+| ID | Severity | Issue |
+|---|---|---|
+| SHOULD-1 | SHOULD | [12] (Dynamic Arbitration) in reference list but not cited in body; §11.2 arbitration discussion cites [7] DAIGS but not [12] — add "[12]" in §11.2 or remove from list |
+| SHOULD-2 | SHOULD | [18] (Mayr, "What Evolution Is") and [23] (Darwin, "On the Origin of Species") uncited despite biological framing — add [18] in §5.1 and [23] in §1.3, or remove both |
+| SHOULD-3 | SHOULD | [21] (Brewer CAP) dangling — no body anchor in lifecycle protocol context; remove from list |
+
+4 of 23 references uncited. 19 confirmed cited. All four header DOIs correct. Patent 64/032,339 consistent across all internal references. All body citations for [3], [5], [16] correct (improving over D-COCP). [17] Liskov-Wing correctly cited in §10.1; [19] partial synchrony correctly cited in §2.5 — best use of both references in the series.
+
+---
+
 ## Quick-Fix Summary (All Papers)
 
 ### MUST fix before any paper is deposited:
@@ -273,6 +286,9 @@ All four header DOIs correct. Patent 64/032,339 consistent across all internal r
 ~~19. D-COCP: add [15] citation; add [23] citation~~ — fixed
 ~~20. D-COCP: resolve dangling [3], [5]~~ — fixed
 ~~21. D-COCP: resolve dangling [17], [19], [21]~~ — fixed
+22. D-OLP: resolve dangling [12] — add "[12]" in §11.2 or remove (SHOULD-1)
+23. D-OLP: resolve [18] Mayr and [23] Darwin — add citations or remove both (SHOULD-2)
+24. D-OLP: remove [21] Brewer CAP — no body anchor in lifecycle context (SHOULD-3)
 
 ### Optional (post-submission polish):
 - Real-Time Healing: 8 residual adverb instances
