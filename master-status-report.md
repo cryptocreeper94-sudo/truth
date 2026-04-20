@@ -209,6 +209,16 @@ All 10 original issues confirmed fixed. Patent number correction (→ 64/032,339
 
 ---
 
+### 16. Deterministic Healing & Drift-Stabilization in Multi-Agent Systems (RT-Healing)
+**Status: NOT READY — 1 MUST issue outstanding**
+
+| ID | Severity | Issue |
+|---|---|---|
+| MUST-1 | MUST | Reference [4] is a self-citation: the paper lists its own title ("Deterministic Healing & Drift-Stabilization in Multi-Agent Systems") as a reference and [4] is never cited in the body. Delete [4]; renumber all subsequent body-text citations [5]→[4] through [22]→[21] (work in descending order to avoid double-decrement). |
+| SHOULD-1 | SHOULD | Reference [6] Trust Layer: year "2025" → "2026"; title "The Trust Layer Protocol Paper" → "The Trust Layer: A Deterministic Correctness Substrate for Autonomous Systems with Proof-of-Intent" |
+
+---
+
 ## Quick-Fix Summary (All Papers)
 
 ### MUST fix before any paper is deposited:
@@ -218,6 +228,7 @@ All 10 original issues confirmed fixed. Patent number correction (→ 64/032,339
 4. ZK-SRP: verify abstract fragment fix and "Turing-complete" removal
 5. GUPAS: Lume DOI 19612948 → 19382282
 6. SOR: resolve §5.3 HEAL-subtype contradiction
+7. RT-Healing: delete self-citation [4]; renumber body citations [5]→[4] through [22]→[21] (descending order)
 
 ### SHOULD fix (strong recommendation before deposit):
 7. GUPAS: add patent numbers to companion citations [5][6][7][8][11]
@@ -229,6 +240,7 @@ All 10 original issues confirmed fixed. Patent number correction (→ 64/032,339
 13. Quantum-Resistant: verify [15] body-text citation in §11
 14. DAIGS Expansions: typo "arbitation" → "arbitration" in §8.2
 15. Sandbox Guardrails: three minor adverb/duplicate fixes in C.2, C.3, §8.4
+16. RT-Healing: [6] Trust Layer year "2025" → "2026"; title → full canonical title
 
 ### Optional (post-submission polish):
 - Real-Time Healing: 8 residual adverb instances
