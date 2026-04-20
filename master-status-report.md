@@ -259,6 +259,18 @@ All four header DOIs correct. Patent 64/032,339 consistent across all internal r
 
 ---
 
+### 20. Deterministic Organism Memory & Persistence Protocols (D-OMPP)
+**Status: NOT READY — 2 SHOULD issues (2 uncited references)**
+
+| ID | Severity | Issue |
+|---|---|---|
+| SHOULD-1 | SHOULD | [18] Kandel "The Molecular Biology of Memory Storage" in list but not cited — add "[18]" in §3.4 at hippocampal consolidation mention, or remove |
+| SHOULD-2 | SHOULD | [19] Mayr "What Evolution Is" carried over from D-OLP — no citation point in a memory paper; remove and renumber [20]→[19] through [24]→[23] |
+
+22 of 24 references confirmed cited. All 16 internal references cited (first paper with zero dangling internals). All four header DOIs correct. Patent 64/032,339 consistent across all 14 internal references carrying it. [22] Brewer CAP correctly cited in §15.1 (first correct use in the series). [20] partial synchrony correctly cited in §2.5. [12] Dynamic Arbitration correctly cited in §5.6 and §16.3.
+
+---
+
 ## Quick-Fix Summary (All Papers)
 
 ### MUST fix before any paper is deposited:
@@ -289,6 +301,8 @@ All four header DOIs correct. Patent 64/032,339 consistent across all internal r
 ~~22. D-OLP: resolve dangling [12]~~ — fixed
 ~~23. D-OLP: resolve [18] Mayr and [23] Darwin~~ — fixed
 ~~24. D-OLP: remove [21] Brewer CAP~~ — fixed
+25. D-OMPP: add [18] Kandel citation in §3.4 or remove from list (SHOULD-1)
+26. D-OMPP: remove [19] Mayr and renumber [20]→[19] through [24]→[23] (SHOULD-2)
 
 ### Optional (post-submission polish):
 - Real-Time Healing: 8 residual adverb instances
