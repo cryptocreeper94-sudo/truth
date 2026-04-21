@@ -427,3 +427,32 @@ New external references: [29] A. Smith, "An Inquiry into the Nature and Causes o
 
 ## Papers Needing a Technical Fix
 - SOR (§5.3 HEAL-subtype structural contradiction — the most substantive open issue in the series)
+
+---
+
+## Canon² Non-Protocol Artifacts
+
+### Deterministic Dissolution (philosophy book, 197 pp, 42 chapters / 13 layers)
+**Status: READY FOR CANON² DEPOSIT pending 1 MUST-FIX**
+**Audit file:** `deterministic-dissolution-audit.md`
+**Scope:** Full intellectual audit (per user request) — not the protocol-paper checklist.
+
+| ID | Severity | Issue |
+|---|---|---|
+| MUST-1 | MUST | Bibliography Trust Layer entry conflicts with canonical citation. Book lists DOI **10.5281/zenodo.19430898** with title *"Certified-at-Birth Deterministic Consensus"*; canonical is **10.5281/zenodo.19560674** with title *"A Deterministic Correctness Substrate for Autonomous Systems with Proof-of-Intent."* Either reconcile to canonical, or confirm 19430898 is a separately deposited companion paper and document it. |
+| SHOULD-1 | SHOULD | Add "principal sources only" disclaimer at head of Bibliography (~10 substantive in-text references not catalogued: Saussure, Derrida, Heisenberg, Hofstadter, Everett/Pirahã, Winawer/siniy-goluboy, etc.) |
+| SHOULD-2 | SHOULD | Preface: one sentence acknowledging that later layers compress (Locality, Temporality, Ontology, etc. are 2-chapter layers vs. 5-chapter early layers) |
+| SHOULD-3 | SHOULD | Appendix B: dependency entries for D23 (Continuity) and D25 (Adjacency) simplify what the body actually claims. Either expand table or add "primary dependencies only" note |
+| SHOULD-4 | SHOULD | Ch 40 epitaph "the trap fires for the last time" — reword to "the dyadic trap fires for the last time" (Ch 41 title is itself a Negation-Trap-shaped construction) |
+| OPTIONAL | Optional | Preface "42 is structurally inevitable" claim — soften to "decomposed at this resolution, produces forty-two steps" or accept the rhetorical strength as intentional |
+
+**Strengths verified end-to-end:**
+- 42 doctrines present, contiguous, no gaps
+- 13-layer organization holds (with caveat that layer 13 is "Terminal," a structural-meta designation)
+- Dependency DAG (Appendix C) self-consistent for all 13 *primary* doctrines (body matches table)
+- Negation Trap pattern fires at every predicted location (12 instances, Ch 2–40)
+- Late-chapter thinning is real: Ch 40 ≈ 24 lines, fulfilling preface promise
+- Self-consuming closure (Ch 41 dissolves dependency chain; Ch 42 dissolves dissolution; Appendix C closes with self-undermining note) — Wittgenstein-ladder move executed cleanly
+- Engineering grounding via Lume / Trust Layer references is consistent with canonical protocol terminology throughout (only conflict is the DOI)
+
+**This is the second-most-public surface in the Andrews corpus after the protocol papers. The MUST-1 DOI fix is the same Trust Layer thread already on the protocol-corpus MUST list — the book either resolves or extends that thread.**
