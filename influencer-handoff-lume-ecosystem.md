@@ -30,9 +30,9 @@ Self-healing. Self-monitoring. Self-evolving. Already live. Already tested. 2,16
 
 ---
 
-**TRUST LAYER** → dwtl.io
+**DWTL** → dwtl.io
 
-The identity and governance substrate the entire ecosystem runs on. Every agent, every certificate, every cross-system interaction runs through the Trust Layer. This is what makes it deterministic — not just fast, not just smart, but provably consistent.
+The main blockchain home for the entire ecosystem. This is where the Trust Layer lives on-chain — where the Signal token presale is running, where the economic infrastructure of the DarkWave network is anchored. Every agent, every certificate, every cross-system interaction settles here. Deterministic by design. Verifiable by construction.
 
 The Signal token presale is live right now at **$0.001** before TGE. TGE price: $0.01. That's a 10× window. If you're early on this ecosystem, this is the entry point: dwtl.io/presale
 
@@ -80,7 +80,7 @@ The full ecosystem right now:
 
 🌐 lume-lang.org — The language
 🏢 darkwavestudios.io — The studio
-🔐 dwtl.io — Trust Layer + Signal presale ($0.001 now / $0.01 at TGE)
+🔗 dwtl.io — Blockchain home + Signal presale ($0.001 now / $0.01 at TGE)
 🪪 tlid.io — Trust Layer ID
 🛡️ trustshield.tech — Security certification
 ⚡ Axiom — Coming soon
