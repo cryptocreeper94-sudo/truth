@@ -6,13 +6,16 @@
 
 ## Canonical Reference Values (Source of Truth)
 
-| Item | Canonical Value |
-|---|---|
-| Lume DOI | 10.5281/zenodo.19382282 |
-| Trust Layer DOI | 10.5281/zenodo.19560674 |
-| Lume-V DOI | 10.5281/zenodo.19645097 |
-| DAIGS DOI | 10.5281/zenodo.19491784 |
-| Patent number (all papers) | 64/032,339 |
+| Item | Canonical Value | Source |
+|---|---|---|
+| Lume DOI | 10.5281/zenodo.19382282 | Multiple later papers |
+| Trust Layer DOI | 10.5281/zenodo.19560674 | Multiple later papers |
+| Lume-V DOI | 10.5281/zenodo.19645097 | Multiple later papers |
+| DAIGS DOI | 10.5281/zenodo.19491784 | Multiple later papers |
+| **Deterministic Dissolution (P-SDSP) DOI** | **10.5281/zenodo.15065493** | AXIOM-SPEC-SE-2026-0423 |
+| Patent number (all papers) | 64/032,339 | User-confirmed |
+
+**Phantom DOI 19430898:** This value is NOT canonical for any paper. It has appeared incorrectly in two documents: the Dissolution book bibliography (as Trust Layer) and the DDA whitepaper References [2] (as Lume). Both must be corrected to their respective canonical DOIs above.
 
 ---
 
@@ -456,3 +459,61 @@ New external references: [29] A. Smith, "An Inquiry into the Nature and Causes o
 - Engineering grounding via Lume / Trust Layer references is consistent with canonical protocol terminology throughout (only conflict is the DOI)
 
 **This is the second-most-public surface in the Andrews corpus after the protocol papers. The MUST-1 DOI fix is the same Trust Layer thread already on the protocol-corpus MUST list — the book either resolves or extends that thread.**
+
+---
+
+## Axiom (DDA) Artifacts
+
+**Audit files:** `axiom-dda-full-audit.md`, `axiom-dda-whitepaper-audit.md`, `axiom-safety-spec-audit.md`
+
+Three documents audited in this cycle:
+1. **Axiom GitHub repo (v0.1.0)** — README, all 6 module layers, LDIR, DPCL, orchestrator, tests, package.json
+2. **DDA whitepaper** (DDA-WP-2026-0422 v1.0.0-DRAFT) — 721 lines
+3. **Safety Envelope Spec** (AXIOM-SPEC-SE-2026-0423) — 290 lines, status: CANONICAL SPEC-READY
+
+### Overall Architecture Assessment
+
+The 42-module pipeline is real code. HALT/GATE_REQUEST/PROCEED discipline is rigorous. DPCL 5-stage pipeline is cleanly implemented. Three of four new Lume constructs (`prebound:`, `void_guard:`, `pre_void:`) are implemented. Audit ledger chain is real. SHA-256 used throughout (intentional deviation from SHA3-256 in protocol papers). Architecture is sound.
+
+### Open Items by Document
+
+**Repo (axiom-dda-full-audit.md):**
+
+| ID | Severity | Issue |
+|---|---|---|
+| M-1 | MUST | Patent number in README: 63/791,662 → 64/032,339 |
+| M-2 | MUST | LDIR has 17 rules, not 31 — DOMAIN_RULES block empty; need 14 domain rules (or correct docs to 17 until built) |
+| M-3 | RESOLVED by whitepaper §2 | Doctrine numbering mismatch — whitepaper §2 provides the canonical mapping table |
+| S-1 | SHOULD | SHA-256 vs SHA3-256 — document the intentional deviation |
+| S-2 | SHOULD | corpus.js comment says 200 base cases; spec/results table says 240 — fix corpus.js comment |
+| S-3 | SHOULD | Adversarial count: test runner name says 500, spec/results table says 450 — pick one |
+| S-4 | SHOULD | Patent claims doc missing application number 64/032,339 |
+| S-5 | SHOULD | `openai` and `elevenlabs` missing from package.json optional dependencies |
+| S-6 | SHOULD | Canon/Canon² descriptions — resolve naming vs. Zenodo community structure |
+
+**Whitepaper (axiom-dda-whitepaper-audit.md):**
+
+| ID | Severity | Issue |
+|---|---|---|
+| W-1 | MUST | Lume DOI in §1.3 and References [2]: 19430898 → 10.5281/zenodo.19382282 |
+| W-2 | SHOULD | Pipeline diagram §3: M31/M32 order reversed vs. orchestrator — pick one and align |
+| W-3 | SHOULD | V&V plan says "10,000 cases × 2 runs"; code does "240 cases × 50 runs = 12,000 executions" — update to match code |
+| W-4 | SHOULD | LDIR Glossary says 31 rules; code has 17 — same as M-2 above |
+| W-5 | SHOULD | Canon/Canon² paper counts need explicit reconciliation with Zenodo community structure |
+| W-6 | SHOULD | `meta:` construct specified in §5.1 but not yet implemented in M12 |
+
+**Safety Spec (axiom-safety-spec-audit.md):**
+
+| ID | Severity | Issue |
+|---|---|---|
+| SS-1 | VERIFY | M39/M40 void_guard threshold: spec says 0.10 — confirm in code |
+| SS-2 | SHOULD | corpus.js comment outdated — same as S-2 above |
+| SS-3 | SHOULD | Adversarial count 450 vs 500 — same as S-3 above |
+
+### New Information from Safety Spec
+
+- **Dissolution DOI confirmed:** 10.5281/zenodo.15065493 (added to canonical table above)
+- **Test count authority:** 12,000 (240 × 50) is canonical for determinism corpus; 450 is canonical for adversarial suite — spec and README results table are authoritative over corpus.js comment and test runner name
+- **Safety envelope execution order** definitively resolved: M38 (pre-pipeline), M35, M36, M37, M39, M40, M41, M42 (post-pipeline Layer 6)
+- **Return type invariants** formally specified: `prebound:` / `void_guard:` never return GATE_REQUEST; `pre_void:` never returns HALT
+- **D-DDA-01 domain rule** cited in spec — if this rule doesn't exist in rulebook.js DOMAIN_RULES, it needs to be added (also fulfills part of the 14 missing domain rules required to reach 31)
