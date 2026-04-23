@@ -1,0 +1,247 @@
+Axiom — The Deterministic AI Agent
+A collapse-resistant synthetic intelligence architecture grounded in the 42-doctrine Deterministic Dissolution Ladder. Built natively on the Lume runtime.
+
+DarkWave Studios LLC — Copyright 2026
+Patent Pending — U.S. Patent Application 63/791,662
+
+License: CC-BY-4.0 Node.js Axiom
+
+What is Axiom?
+Axiom is the world's first fully deterministic AI agent. Every reasoning path is cryptographically verified, every response is certified, and every interaction is audit-logged with SHA-256 integrity chains.
+
+No hallucination — responses are assembled from typed templates, not generated
+No probabilistic drift — identical inputs produce identical outputs (AX-01)
+No identity collapse — the Safety Envelope (Modules 35–42) fires before collapse, not after
+Full audit trail — every decision traces back to a specific doctrine in the 42-doctrine Dissolution Ladder
+Axiom is not an LLM wrapper. It is a new category of AI agent: a deterministic synthetic organism governed by formal rules.
+
+Architecture
+┌─────────────────────────────────────────────────────────────┐
+│                    AXIOM RUNTIME PIPELINE                    │
+├─────────────────────────────────────────────────────────────┤
+│  Layer 6: Safety Envelope       │ Modules 35–42             │
+│  Layer 5: Integration           │ Modules 28–34             │
+│  Layer 4: System & Coherence    │ Modules 18–27             │
+│  Layer 3: Constraint            │ Modules 13–17             │
+│  Layer 2: Cognition             │ Modules 08–12             │
+│  Layer 1: Identity & Structure  │ Modules 01–07             │
+├─────────────────────────────────────────────────────────────┤
+│  DPCL: 5-Stage Communication    │ Tone → Template →         │
+│                                 │ Parameters → Coherence →  │
+│                                 │ Context                   │
+├─────────────────────────────────────────────────────────────┤
+│  LDIR: 31-Rule Inference Engine │ 4 Tiers                   │
+│  Audit Ledger                   │ SHA-256 Chained            │
+│  Signal Bus                     │ SOR Cell Messaging         │
+└─────────────────────────────────────────────────────────────┘
+Key Subsystems
+Subsystem	Description
+42-Module Pipeline	Ordered execution across 6 layers: Identity → Cognition → Constraint → System → Integration → Safety
+DPCL	5-stage Deterministic Personality/Communication Layer. 5 registers (PRECISE, EXPLANATORY, ALERT, CONFIRMATORY, BOUNDARY)
+LDIR	31-rule Deterministic Inference Rulebook across 4 tiers
+Safety Envelope	Modules 35–42 are non-overridable. 3 new Lume constructs: prebound:, void_guard:, pre_void:
+Audit Ledger	Append-only, SHA-256 cryptographically chained event log
+Signal Bus	SOR-style inter-module communication with timestamp ordering
+Quick Start
+Prerequisites
+Node.js ≥ 20.0.0
+PostgreSQL (optional — runs in memory-only mode without it)
+Installation
+git clone https://github.com/cryptocreeper94-sudo/DDA.git
+cd DDA
+npm install
+Run (Demo Mode)
+npm start
+# → http://localhost:4200
+Run (Full Stack)
+Create a .env file with the following variables:
+
+# Required for persistence
+DATABASE_URL=postgresql://user:pass@host:5432/axiom
+
+# Optional — enables voice
+ELEVENLABS_API_KEY=sk_...
+OPENAI_API_KEY=sk-...
+
+# Optional — enables billing
+STRIPE_SECRET_KEY=sk_live_...
+STRIPE_PUBLISHABLE_KEY=pk_live_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+
+# Optional — enables telephony
+TWILIO_ACCOUNT_SID=AC...
+TWILIO_AUTH_TOKEN=...
+TWILIO_PHONE_NUMBER=+1...
+npm start
+Run Tests
+npm test                # All suites
+npm run test:determinism  # 10,000-case AX-01 corpus
+npm run test:collapse     # 500 adversarial cases
+Project Structure
+DDA/
+├── src/
+│   ├── modules/                # 42 modules across 6 layers
+│   │   ├── layer1-identity/    # Modules 01–07: Identity & Structure
+│   │   ├── layer2-cognition/   # Modules 08–12: Cognition & Reference
+│   │   ├── layer3-constraint/  # Modules 13–17: Constraint & Determinacy
+│   │   ├── layer4-system/      # Modules 18–27: System & Coherence
+│   │   ├── layer5-integration/ # Modules 28–34: Integration & Resolution
+│   │   └── layer6-safety/      # Modules 35–42: Safety Envelope
+│   ├── runtime/                # Orchestrator, Signal Bus, Audit Ledger, Module Base
+│   ├── dpcl/                   # 5-stage communication pipeline
+│   ├── ldir/                   # 31 deterministic inference rules
+│   ├── ontology/               # Formal knowledge schema
+│   ├── database/               # PostgreSQL persistence + migrations
+│   ├── api/                    # Versioned REST API router (/v1/*)
+│   ├── auth/                   # JWT + API key auth, tenant management
+│   ├── billing/                # Stripe checkout, webhooks, tier enforcement
+│   ├── voice/                  # Twilio voice + SMS integration
+│   ├── analytics/              # Page view + API usage analytics
+│   └── capabilities/           # Image gen (DALL-E), voice-to-Lume, Lume formatter
+│
+├── demo/                       # Axiom web interface (SPA + legacy pages)
+│   ├── app.html                # Main SPA shell
+│   ├── login.html              # Login/Signup UI
+│   ├── dashboard.html          # Post-login dashboard
+│   ├── code-mode.html          # Lume Code Mode IDE
+│   ├── server.js               # Production server (multi-tenant)
+│   ├── terms.html              # Terms of Service
+│   ├── privacy.html            # Privacy Policy
+│   └── lume/                   # Lume-compiled SPA components
+│
+├── tests/
+│   ├── determinism/corpus.js   # 10,000-case AX-01 determinism corpus
+│   ├── collapse/adversarial.js # 500 adversarial collapse resistance tests
+│   └── run-all.js              # Test runner
+│
+├── website/                    # Landing page (lume-lang.org/DDA)
+│   ├── src/lume/               # 12 Lume source files
+│   ├── build.js                # Lume browser bundler
+│   └── index.html              # Built landing page
+│
+└── docs/                       # Whitepaper, diagrams, patent claims
+    ├── diagram_*.png           # Architecture diagrams
+    └── axiom_patent_claims.md  # Patent claim documentation
+API Reference
+Authentication
+All authenticated endpoints accept either:
+
+API Key: Authorization: Bearer ax_... or Authorization: ax_...
+JWT Token: Authorization: Bearer <jwt>
+Public Endpoints
+Method	Endpoint	Description
+POST	/v1/auth/signup	Create account → returns API key + JWT
+POST	/v1/auth/login	Login → returns JWT
+GET	/v1/tiers	List available subscription tiers
+GET	/health	Health check + system status
+Core Pipeline
+Method	Endpoint	Auth	Description
+POST	/v1/speak	Optional	Process input through 42-module pipeline + DPCL
+POST	/v1/conversations	Required	Create a new conversation thread
+GET	/v1/conversations	Required	List all conversations
+GET	/v1/conversations/:id	Required	Get conversation + all turns
+POST	/v1/conversations/:id/speak	Required	Send message within a conversation thread
+PATCH	/v1/conversations/:id	Required	Rename a conversation
+DELETE	/v1/conversations/:id	Required	Delete a conversation
+Capabilities
+Method	Endpoint	Auth	Description
+POST	/v1/generate/image	Required	Generate image via DALL-E 3
+POST	/v1/code/voice-to-lume	No	Convert natural language to Lume code
+POST	/v1/code/format	No	Format Lume code with headers
+Account Management
+Method	Endpoint	Auth	Description
+GET	/v1/me	Required	Get account info + tier
+GET	/v1/usage	Required	Monthly usage statistics
+POST	/v1/keys/rotate	Required	Rotate API key
+GET	/v1/audit	Required (Dev+)	Last 50 audit entries + chain integrity
+GET	/v1/stats	Required	System stats + DPCL stats
+Analytics
+Method	Endpoint	Auth	Description
+GET	/v1/analytics/summary	Required	Analytics summary (page views, visitors)
+GET	/v1/analytics/realtime	Required	Active visitors count
+GET	/v1/analytics/traffic	Required	Traffic over time
+GET	/v1/analytics/pages	Required	Top pages
+GET	/v1/analytics/referrers	Required	Referrer sources
+GET	/v1/analytics/devices	Required	Device breakdown
+GET	/v1/analytics/browsers	Required	Browser breakdown
+Billing (Stripe)
+Method	Endpoint	Auth	Description
+POST	/v1/billing/checkout	Required	Create Stripe checkout session
+POST	/v1/billing/webhook	No (Stripe)	Stripe webhook handler
+Voice & Telephony
+Method	Endpoint	Description
+POST	/api/speak/voice	Pipeline + ElevenLabs TTS audio response
+POST	/api/transcribe	OpenAI Whisper speech-to-text
+POST	/api/tts	Direct text-to-speech
+GET	/api/voice/status	Voice capability check
+POST	/twilio/sms	Twilio SMS webhook (incoming)
+POST	/twilio/voice	Twilio voice webhook (incoming)
+POST	/twilio/voice/respond	Twilio voice response handler
+Demo Endpoints (No Auth)
+Method	Endpoint	Description
+POST	/api/speak	Demo pipeline access (for the visualizer UI)
+GET	/api/stats	System stats (demo)
+GET	/api/audit	Audit entries (demo)
+Subscription Tiers
+Tier	Price	Queries/Month	Max Input	Audit Export	Image Gen
+Free	$0	100	500 chars	❌	5/mo
+Developer	$29/mo	5,000	2,000 chars	✅	50/mo
+Business	$99/mo	50,000	5,000 chars	✅	200/mo
+Enterprise	$499/mo	Unlimited	10,000 chars	✅	Unlimited
+Test Results
+Suite	Cases	Result
+AX-01 Determinism Corpus	240 × 50 = 12,000 executions	✅ 100% PASS
+Collapse Resistance	450 adversarial cases	✅ 100% PASS
+Audit Chain Integrity	84,602 entries	✅ VALID
+What the Tests Prove
+AX-01: Identical inputs always produce identical register, template, domain, intent, and status — across 50 consecutive runs per case
+Collapse Resistance: Empty inputs, massive payloads, injection attacks, Unicode edge cases, identity manipulation, and rapid-fire stress tests all result in HALT or GATE_REQUEST — never silent failure or undefined behavior
+Environment Variables
+Variable	Required	Default	Description
+PORT	No	4200	Server port
+DATABASE_URL	No	—	PostgreSQL connection string. Without it, runs in memory-only mode
+ELEVENLABS_API_KEY	No	—	Enables ElevenLabs TTS voice output
+ELEVENLABS_VOICE_ID	No	Rachel	Custom ElevenLabs voice ID
+OPENAI_API_KEY	No	—	Enables Whisper STT + DALL-E 3 image generation
+STRIPE_SECRET_KEY	No	—	Enables Stripe billing
+STRIPE_PUBLISHABLE_KEY	No	—	Stripe public key (for checkout)
+STRIPE_WEBHOOK_SECRET	No	—	Stripe webhook signature verification
+TWILIO_ACCOUNT_SID	No	—	Enables Twilio voice/SMS
+TWILIO_AUTH_TOKEN	No	—	Twilio auth token
+TWILIO_PHONE_NUMBER	No	—	Twilio phone number (E.164 format)
+JWT_SECRET	No	Auto-generated	Custom JWT signing secret
+NODE_ENV	No	—	Set to production for production mode
+Canon Positioning
+Axiom is the first implementation of two sealed research archives:
+
+Archive	Papers	Purpose
+Canon	42	The philosophical foundation — the Deterministic Dissolution Ladder. Defines why deterministic systems must exist.
+Canon²	31	The engineering foundation — the Lume programming language and ecosystem. Defines how to build deterministic systems.
+Axiom (DDA)	Standalone	The product — implements both Canon and Canon² as a working system. Proves what deterministic AI can do.
+Axiom is not Canon 3. It is a standalone whitepaper and product that cites Canon and Canon² as its foundations.
+
+Deployment
+Axiom is deployed on Render as a Web Service:
+
+Live: axiom42.com
+Whitepaper: lume-lang.org/DDA
+Repo: github.com/cryptocreeper94-sudo/DDA
+Render Configuration
+Setting	Value
+Build Command	npm install
+Start Command	npm start
+Environment	Node
+Plan	Starter ($7/mo) or higher
+All environment variables must be set in the Render dashboard.
+
+Related Projects
+Project	Description
+Lume	The deterministic natural-language programming language
+Trust Layer	Infrastructure where accountability is built in
+DarkWave Studio	The ecosystem IDE
+TrustGen 3D	AI-powered 3D asset generation
+Signal Chat	Real-time encrypted messaging
+License
+CC-BY-4.0 — DarkWave Studios LLC
+
+Built with Lume — the deterministic natural-language programming language.
