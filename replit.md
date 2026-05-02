@@ -16,6 +16,46 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - **API codegen**: Orval (from OpenAPI spec)
 - **Build**: esbuild (CJS bundle)
 
+## AXIOM Engine Knowledge Packs
+
+**Project:** Trust Layer Ecosystem — Lume Knowledge Pack Generation
+**Author:** Jason Andrews, DarkWave Studios LLC
+**ORCID:** 0009-0007-5214-649X | **Contact:** team@dwsc.io
+**DOIs:** Lume=19382282, Trust Layer=19560674, DAIGS=19491784, Lume-V=19645097, Lume-X=19443968
+**Patent:** 64/032,339
+
+All packs live in `knowledge_packs/` and follow the strict 7-component format:
+Purpose · Scope · Structure · Core Concepts (20–50) · Patterns (10–30) · Anti-Patterns (5–15) · Facts (30–100)
+
+All 10 invariants are satisfied in every pack: Determinism, Identity Primacy, Safety Dominance, Governance Supremacy, Physical Realism, Domain Integrity, Abstraction Coherence, Semantic Graph Consistency, Ontology Alignment, Safety-First Failure.
+
+### Tier Status
+
+| Tier | Packs | Status |
+|------|-------|--------|
+| T1 (10 packs) | Core foundational domains | ✅ Complete |
+| T2 (10 packs) | Applied/engineering domains | ✅ Complete |
+| T3 (10 packs) | Wild-domain variety | ✅ Complete |
+
+### Tier 3 Packs (AXIOM-KP-T3-001 through T3-010)
+
+| ID | Domain | File |
+|----|--------|------|
+| T3-001 | Cryptography & Information Security | `cryptography_information_security_knowledge_pack.md` |
+| T3-002 | Neuroscience & Brain Science | `neuroscience_brain_science_knowledge_pack.md` |
+| T3-003 | Economics & Behavioral Finance | `economics_behavioral_finance_knowledge_pack.md` |
+| T3-004 | Philosophy & Logic | `philosophy_logic_knowledge_pack.md` |
+| T3-005 | Music Theory & Acoustics | `music_theory_acoustics_knowledge_pack.md` |
+| T3-006 | Culinary Science & Food Technology | `culinary_science_food_technology_knowledge_pack.md` |
+| T3-007 | Sports Science & Biomechanics | `sports_science_biomechanics_knowledge_pack.md` |
+| T3-008 | Environmental Engineering & Sustainability | `environmental_engineering_sustainability_knowledge_pack.md` |
+| T3-009 | Cognitive Psychology & Decision Science | `cognitive_psychology_decision_science_knowledge_pack.md` |
+| T3-010 | Game Theory & Systems Thinking | `game_theory_systems_thinking_knowledge_pack.md` |
+
+**Total packs in `knowledge_packs/`:** 30 (includes T1, T2, T3)
+
+---
+
 ## Structure
 
 ```text
