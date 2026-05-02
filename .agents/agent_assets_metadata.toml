@@ -18,3 +18,9 @@ id = "qYtW-bs1yG7UHtrve6pp_"
 uri = "file://trustgen-trustvault-handoff.md"
 type = "text"
 title = "TrustGen + TrustVault — Review & Handoff"
+
+[[outputs]]
+id = "Htmr-Nj15rcJp533u5gmJ"
+uri = "file://meridian-book-final.md"
+type = "text"
+title = "The Routed World — Complete Assembled Manuscript"
