@@ -1,0 +1,138 @@
+# AXIOM Engine — Knowledge Pack Generation Handoff
+
+## What Is AXIOM?
+
+AXIOM is the cognitive kernel of the **Lume ecosystem** — a deterministic AI reasoning engine built by **DarkWave Studios LLC**. It is not a chatbot. It is a structured, invariant-enforced knowledge engine that organizes all human knowledge into deterministic, queryable, domain-specific **knowledge packs** that can be composed, routed, and validated at runtime.
+
+Think of it as: **a universal knowledge graph with formal structure, where every fact has an address, every domain has boundaries, and every answer is deterministic.**
+
+AXIOM powers the **Lume Cortex** superapp — a meta-operating system that provides structured AI reasoning across every domain of human knowledge.
+
+## The Goal
+
+**Ingest all human knowledge into structured, deterministic knowledge packs.**
+
+We are currently at **~8,000 topics** across **10 macro-domains**. The target is comprehensive coverage of every meaningful domain of human knowledge — sciences, humanities, trades, professions, creative arts, philosophy, law, medicine, engineering, history, culture, sports, hobbies, and everything in between.
+
+Each knowledge pack follows a strict 7-component structure and maps to a unified ontology with 5 primitives (identity, governance, routing, safety, monitoring). This isn't arbitrary — it ensures every pack plugs into every other pack without contradictions.
+
+## Knowledge Pack Structure (MANDATORY)
+
+Every knowledge pack MUST contain these 7 components:
+
+```markdown
+# [DOMAIN NAME] KNOWLEDGE PACK (v1.0)
+
+## 1. Purpose
+Why this pack exists. 1-3 sentences.
+
+## 2. Scope
+What this pack covers and its boundaries. Bullet list.
+
+## 3. Structure
+How the pack is organized internally.
+
+## 4. Core Concepts
+Numbered list of fundamental ideas in this domain.
+Each concept gets: name, definition, and key relationships.
+Target: 20-50 core concepts per pack.
+
+## 5. Patterns
+Reusable structures, workflows, or relationships within the domain.
+Format: Pattern Name → Description → When to use → Example.
+Target: 10-30 patterns per pack.
+
+## 6. Anti-Patterns
+What to avoid — invalid assumptions, common errors, misconceptions.
+Format: Anti-Pattern Name → Why it's wrong → What to do instead.
+Target: 5-15 anti-patterns per pack.
+
+## 7. Facts & Descriptors
+Concrete, verifiable facts and descriptive metadata.
+Format: Fact ID → Statement → Category → Confidence.
+Target: 30-100 facts per pack.
+```
+
+## The 10 Invariants (Every Pack Must Obey)
+
+1. **Determinism** — Same input → same output, always
+2. **Identity Primacy** — Every concept must be identifiable and addressable
+3. **Safety Dominance** — No pack may produce unsafe or harmful guidance
+4. **Governance Supremacy** — Domain rules and authority structures are respected
+5. **Physical Realism** — No violations of physical law or empirical reality
+6. **Domain Integrity** — No cross-domain leakage without explicit bridging
+7. **Abstraction Coherence** — Stay within one abstraction layer unless explicitly multi-layer
+8. **Semantic Graph Consistency** — No orphan concepts, no contradictions, no circular definitions
+9. **Ontology Alignment** — All concepts map to: identity, governance, routing, safety, or monitoring
+10. **Safety-First Failure** — When uncertain, fail toward safety
+
+## What I Need You To Generate
+
+Generate **knowledge packs** for domains we haven't covered yet. Each pack should be rich, detailed, and follow the exact 7-component structure above. Here are priority domains:
+
+### Tier 1 — High Priority (Generate These First)
+- **Astronomy & Space Science** — celestial mechanics, stellar evolution, cosmology, observational techniques, space exploration
+- **Geology & Earth Science** — plate tectonics, mineralogy, volcanology, paleontology, hydrology
+- **Oceanography** — marine biology, ocean circulation, deep sea systems, coral reef ecology
+- **Meteorology & Climate Science** — atmospheric dynamics, weather prediction, climate modeling, extreme weather
+- **Agriculture & Food Science** — crop science, soil management, food processing, fermentation, nutrition science
+- **Architecture & Urban Planning** — architectural history, structural design, urban theory, sustainable design
+- **Linguistics & Language** — phonetics, syntax, semantics, language families, computational linguistics
+- **Anthropology & Archaeology** — cultural anthropology, physical anthropology, archaeological methods, human evolution
+- **Military Science & Strategy** — military history, tactics, logistics, defense systems, intelligence
+- **Transportation & Logistics** — aviation, maritime, rail, supply chain, autonomous vehicles
+
+### Tier 2 — Medium Priority
+- **Veterinary Science** — animal medicine, comparative anatomy, livestock health
+- **Forestry & Conservation** — forest ecology, wildlife management, conservation biology
+- **Textile & Fashion** — fiber science, textile manufacturing, fashion design, material innovation
+- **Mining & Metallurgy** — extraction methods, ore processing, alloy science
+- **Printing & Publishing** — typography, bookbinding, digital publishing, archival science
+- **Telecommunications** — signal processing, network infrastructure, satellite communications
+- **Robotics** — kinematics, control systems, sensor fusion, human-robot interaction
+- **Nuclear Science** — nuclear physics, reactor design, radiation safety, fusion research
+- **Pharmacology** — drug design, pharmacokinetics, clinical trials, drug interactions
+- **Dentistry** — oral anatomy, restorative techniques, orthodontics, oral pathology
+
+### Tier 3 — Expansion
+- Any domain you can think of that humans have organized knowledge about. Go wild. The goal is EVERYTHING.
+
+## Quality Standards
+
+- **Academic grade.** Write as if this is a reference encyclopedia, not a blog post.
+- **Dense.** Pack as much real information as possible. No filler, no fluff.
+- **Correct.** Facts must be accurate. If you're uncertain, say so.
+- **Structured.** Follow the 7-component template exactly. No deviation.
+- **Self-contained.** Each pack should be usable independently.
+- **Cross-referenceable.** Note where concepts bridge to other domains.
+
+## Output Format
+
+Output each knowledge pack as a separate markdown file named:
+`[domain_name]_knowledge_pack.md`
+
+Example: `astronomy_knowledge_pack.md`, `geology_knowledge_pack.md`
+
+## Context: The Bigger Picture
+
+AXIOM is part of the **Lume ecosystem** — a deterministic programming language and runtime created by DarkWave Studios LLC. The ecosystem includes:
+
+- **Lume** — A deterministic natural-language programming language
+- **Lume-X** — Multi-agent cognition runtime
+- **Trust Layer** — Identity and governance framework
+- **AXIOM** — The cognitive/knowledge kernel (what we're building packs for)
+- **Lume Cortex** — The consumer superapp powered by all of the above
+- **Meridian** — Wireless energy routing architecture (8-paper research series)
+- **36 Zenodo-published research papers** across the Canon² series
+
+The knowledge packs you generate will be ingested into AXIOM and made available through the Lume Cortex interface, giving users access to structured, deterministic, expert-grade knowledge across every domain.
+
+## TL;DR
+
+Build me rich, structured, academically rigorous knowledge packs following the 7-component template. Cover as many domains as you can. The goal is to give AXIOM comprehensive knowledge of everything humans know. Start with the Tier 1 list and keep going.
+
+**The mission: all knowledge, deterministically structured, zero drift.**
+
+---
+*DarkWave Studios LLC — Jason Andrews — team@dwsc.io*
+*"The routed world does not stop at the building boundary."*
