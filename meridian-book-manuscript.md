@@ -16,7 +16,7 @@
 **Contact:** team@dwsc.io | lume-lang.org
 **Patent Pending:** Systems and Methods for Deterministic Multi-Layer Wireless Energy Routing Using Ambient Harvesting, Mesh Coordination, and Directional Transmission (DarkWave Studios LLC)
 
-*This manuscript incorporates material from seven technical papers authored under the Canon² series. All technical claims reflect the current state of the Meridian architecture specification. No experimental validation data currently exists. Phase 1 experimental work is the immediate next step.*
+*This manuscript incorporates material from eight technical papers authored under the Canon² series. All technical claims reflect the current state of the Meridian architecture specification. No experimental validation data currently exists. Phase 1 experimental work is the immediate next step.*
 
 *© 2026 DarkWave Studios LLC. All rights reserved.*
 
@@ -87,6 +87,13 @@ Chapter Seven — Deterministic Infrastructure: A General Theory
 
 ---
 
+**Part Six: The Vision**
+*Where This All Leads*
+
+Chapter Eight — Beyond the Grid: Fusion, Long-Haul Beaming, and the End of Transmission Lines
+
+---
+
 **Epilogue** — What Comes Next
 
 **Glossary** — Key Terms and Concepts
@@ -118,9 +125,9 @@ Meridian is a routing architecture for energy. It treats a watt the same way the
 
 This book is the complete account of that architecture — from the hardware specification to the biological theory to the building deployment guide to the formal security proof. It is written for engineers, architects, product designers, and anyone who has thought seriously about what wireless infrastructure should look like in a world with a trillion autonomous devices and no human operator available to replace their batteries.
 
-The seven technical papers that form the chapters of this book were written sequentially over the course of an intense research period at DarkWave Studios LLC. Each paper answered a different question about the same system. The first asked: *what is this architecture?* The second asked: *what kind of thing is this architecture?* The third asked: *where does this architecture lead?* And so on, through security, deployment, and finally a general theory that places Meridian in a broader class of autonomous physical systems I call Deterministic Infrastructure.
+The eight technical papers that form the chapters of this book were written sequentially over the course of an intense research period at DarkWave Studios LLC. Each paper answered a different question about the same system. The first asked: *what is this architecture?* The second asked: *what kind of thing is this architecture?* The third asked: *where does this architecture lead?* And so on, through security, deployment, a general theory of Deterministic Infrastructure, and finally the question the whole series builds toward: *where does the energy come from, and what happens to the physical grid when you can route power through the air all the way from the reactor to the device?*
 
-Read together, these seven papers tell a complete story: from the engineering specification of a specific system to a general theory of the next generation of physical infrastructure. That is what this book is — the complete story, assembled in the order that makes the most sense to read it, with the connecting tissue that turns seven technical papers into a single coherent argument.
+Read together, these eight papers tell a complete story: from the engineering specification of a specific system to the elimination of physical transmission infrastructure entirely. That is what this book is — the complete story, assembled in the order that makes the most sense to read it, with the connecting tissue that turns eight technical papers into a single coherent argument.
 
 The argument is this: the infrastructure paradigms that govern the physical world — the electrical grid, the internet, the supply chain, the transportation network — were designed for a world of human operators, central coordination, and wired physical plants. They are not adequate for the world that is coming: a world of trillions of autonomous devices, distributed physical operation, adversarial environments, and millisecond decision timescales that cannot wait for human intervention.
 
@@ -193,6 +200,8 @@ This book is organized in five parts, each addressing a different dimension of t
 **Part Four (Chapter Six)** covers security: the first formal threat model and defense framework for wireless energy routing, including the proof that certain classes of physically harmful attacks are impossible under the specified architecture.
 
 **Part Five (Chapter Seven)** covers the general theory: the argument that Meridian is one instance of a broader class of systems — Deterministic Infrastructure — and that the principles Meridian embodies will shape the design of autonomous physical infrastructure across every domain.
+
+**Part Six (Chapter Eight)** closes the full stack. If Parts One through Five define how energy is routed from the building boundary to the device, Part Six asks what sits above the building boundary — and proposes eliminating the physical transmission grid entirely. This chapter integrates the Meridian architecture with fusion energy generation and long-haul directed microwave beaming to specify, for the first time, a complete energy chain from plasma to device in which no physical transmission infrastructure appears at any layer.
 
 The chapters build on each other but are also designed to be read independently. A reader who cares primarily about the security framework can read Chapter Six without having read Chapters One through Five, though the security discussion will be richer with the engineering background. A reader interested primarily in the general theory can read Chapter Seven first and treat the earlier chapters as supporting evidence.
 
@@ -508,14 +517,64 @@ This is the broadest claim in the book. It rests on three confirmed instances an
 
 ---
 
+**Part Five Closing**
+
+Chapter Seven has named the class Meridian belongs to and argued that the next generation of physical infrastructure — across energy, transportation, manufacturing, and emergency coordination — will be built on the same four properties. The general theory is stated. The instances are identified. The design paradigm is defined.
+
+There remains one question the preceding seven chapters do not answer: where does the energy in the Meridian mesh come from?
+
+Today the answer is: from the electrical grid, through the source node's power connection to the building electrical panel. The grid is the foundation on which everything above it rests. And the grid is a $4 trillion physical plant of transmission towers, high-voltage cables, and substations — the antithesis of deterministic, resilient, dynamic routing.
+
+Chapter Eight asks whether that foundation needs to exist.
+
+---
+
+---
+
+# PART SIX
+## The Vision: Where This All Leads
+
+*Every infrastructure revolution follows the same arc. First, the new technology is adopted at the edge — in the last mile, at the device, in the building. Then it propagates inward, displacing the legacy infrastructure layer by layer, until the legacy core itself is the target. The internet began as a last-mile service connecting individual users to centralized servers. It ended as the core infrastructure of every enterprise, every government, and every communications system on the planet.*
+
+*Meridian began as a last-mile energy routing architecture — from the district boundary to the device. Parts One through Five have specified that last-mile architecture completely. Part Six asks what happens when the same routing principles propagate inward — past the district boundary, past the substation, past the transmission line — all the way to the generation source itself.*
+
+*The answer is: no transmission lines. No substations. No physical transmission infrastructure at any layer. Energy routed through air from plasma to device, addressed and governed at every hop, by the same Deterministic Infrastructure framework that governs the last-mile mesh.*
+
+*Chapter Eight is the full stack vision. It is clearly labeled as conceptual — no demonstration at the proposed scale exists, fusion energy is not yet commercially available, and the regulatory path is long. But the architecture is coherent, the physics is sound, and the destination is worth specifying clearly so that the work of building toward it can begin.*
+
+---
+
+## Chapter Eight
+### Beyond the Grid: Fusion, Long-Haul Beaming, and the End of Transmission Lines
+
+**Chapter Opening**
+
+A $4 trillion infrastructure is not replaced quickly. But it can be made obsolete, and the process of making it obsolete begins with specifying what replaces it — precisely enough that engineers, regulators, and investors can evaluate the specification and decide whether to build toward it.
+
+The electrical transmission grid — 700,000 kilometers of high-voltage lines in the United States alone, connected through 55,000 substations to 10,000 generation plants — is the infrastructure that every wireless energy revolution described in this book ultimately depends on. Meridian's source nodes plug into it. The Energy Internet's access nodes draw from it. The self-sustaining device's district mesh is fed by it. Take the grid away and the whole wireless energy architecture has nowhere to source its energy.
+
+This chapter takes the grid away. It replaces it with two things: fusion energy, generated locally at district scale by reactors governed by the Deterministic Fusion Control framework; and a directed microwave beam — a Tier 1 long-haul energy link at 2.45 GHz — that routes that energy from the generation site to the district receiver array without a single conductor between them.
+
+The physics that enables this is mature. The SPS (Solar Power Satellite) program demonstrated the complete physics chain in the 1970s — microwave power generation, beam formation, long-distance propagation, and rectenna collection — and confirmed the Fresnel-regime efficiency numbers that make the architecture viable. What has changed since then is the generation source (fusion rather than orbital solar) and the control architecture (Lume-X deterministic invariant enforcement at every layer).
+
+The honest accounting is in this chapter, too. The wireless architecture is approximately half the thermal-to-device efficiency of the wired grid at current technology levels. The regulatory pathway spans two regulatory bodies and a decade of experimental work. Fusion power is not yet commercially available. These are the boundary conditions on the timeline, not arguments against the destination.
+
+The destination is a world where no transmission tower stands between a reactor and a device. Energy, addressed and routed from plasma to phone, through air.
+
+---
+
+*[Chapter Eight body: Full text of* Beyond the Grid: Fusion-Fed Wireless Energy Architecture and the Elimination of Physical Transmission Infrastructure *(meridian-paper-8.md), beginning at the Abstract and continuing through all sections and appendices.]*
+
+---
+
 ---
 
 # EPILOGUE
 ## What Comes Next
 
-The seven chapters of this book have made a complete argument. Let me state it plainly before stepping back.
+The eight chapters of this book have made a complete argument. Let me state it plainly before stepping back.
 
-Meridian is a routing architecture for energy. It is built on the same principles as the data internet — addressed nodes, routing tables, quality-of-service guarantees, delivery confirmation — and applies them to a physical resource instead of an informational one. It is formally specified, safety-proven, and deployable in real buildings under the architectural constraints described in Chapter Two. It scales to a global Energy Internet through the protocol stack specified in Chapter Four. It routes data and energy simultaneously through the unified fabric specified in Chapter Five. It defends itself against the complete space of physical attacks through the security framework specified in Chapter Six. And it is one instance of a general class of autonomous physical infrastructure systems — Deterministic Infrastructure — that will shape the design of every autonomous physical domain in the coming decades.
+Meridian is a routing architecture for energy. It is built on the same principles as the data internet — addressed nodes, routing tables, quality-of-service guarantees, delivery confirmation — and applies them to a physical resource instead of an informational one. It is formally specified, safety-proven, and deployable in real buildings under the architectural constraints described in Chapter Two. It scales to a global Energy Internet through the protocol stack specified in Chapter Four. It routes data and energy simultaneously through the unified fabric specified in Chapter Five. It defends itself against the complete space of physical attacks through the security framework specified in Chapter Six. It is one instance of a general class of autonomous physical infrastructure systems — Deterministic Infrastructure — that will shape the design of every autonomous physical domain in the coming decades. And in the full stack vision of Chapter Eight, it extends upward from the building mesh to eliminate the physical transmission grid entirely, routing energy wirelessly from fusion generation to district receiver to device without a transmission tower anywhere in the chain.
 
 That is the argument. Now here is what comes next.
 
@@ -659,6 +718,24 @@ The work ahead is long. The foundation is now laid.
 **UEDM (Unified Energy-Data Mesh):** The architecture in which the same Meridian node infrastructure routes both energy and data under a unified 128-bit addressing scheme, co-routing arbitration framework, and Guardian Security authentication system. Specified in Chapter Five.
 
 **z_safe:** The minimum safe height above a floor slab, defined as floor_slab_height + 2.2m (providing 10 cm margin above the 99th percentile standing height). FLOOR_SAFE voxels are at or above z_safe. Ceiling-plane routing keeps beam paths within FLOOR_SAFE voxels for all non-final hops.
+
+**Deterministic Fusion Control:** The framework, developed in a companion Canon² series, that applies Lume-X invariant enforcement to magnetic confinement plasma stability — governing energy confinement time, plasma beta, density, and energy gain as hard invariants enforced in real time. Produces a generation source whose output is formally bounded and modulated on demand.
+
+**Fresnel Number (N_F):** The dimensionless parameter governing microwave beam propagation efficiency between two apertures. N_F = (A_t × A_r)^(1/2) / (λ × d), where A_t and A_r are transmitter and receiver aperture areas, λ is wavelength, and d is distance. N_F ≈ 1 (Fresnel transition regime) is the practical operating target for Tier 1, yielding ~85–90% collection efficiency with Gaussian-tapered illumination.
+
+**Rectenna:** A rectifying antenna — an antenna optimized for power reception combined with a Schottky diode rectifier circuit — that converts incoming microwave power to DC. Current rectenna efficiency at 2.45 GHz: ~80–85%. The T1-RX district receiver array is a scaled rectenna installation.
+
+**Retrodirective Pilot-Tone Locking:** The primary Tier 1 safety mechanism. The T1-RX receiver transmits a low-power pilot tone from a phase-reference element; the T1-TX transmitter locks its beam to the direction from which the pilot arrives and emits power only while the pilot is actively received above threshold. Loss of pilot signal immediately and hardware-enforces beam cutoff within 100 μs, without any software command.
+
+**T1-RX (Tier 1 Receiver Node):** A district-boundary rectenna array that collects the Tier 1 microwave beam, converts it to DC, transmits the retrodirective pilot tone, and feeds the local Meridian mesh. Registered with the Trust Layer under a T1-RX capability profile.
+
+**T1-TX (Tier 1 Transmitter Node):** A phased array transmitter located at the fusion generation site, converting DC power to 2.45 GHz RF and beam-steering to the designated T1-RX node via retrodirective pilot-tone locking. Registered with the Trust Layer under a T1-TX capability profile.
+
+**Tier 1 (Long-Haul Beam Layer):** The upper layer of the two-tier wireless energy architecture. Routes bulk energy from fusion generation hubs to district receiver arrays via directed 2.45 GHz microwave beams, operating over distances of 500m–5km with projected collection efficiency of 75–87% in Fresnel-regime geometry.
+
+**Tier 2 (Last-Mile Mesh Layer):** The lower layer of the two-tier wireless energy architecture. The complete Meridian architecture as specified in Chapters One through Six — routing energy from the district receiver through the building mesh to individual devices at 60 GHz.
+
+**Two-Tier Wireless Energy Architecture:** The complete transmission-line-free energy delivery system proposed in Chapter Eight. Tier 1 routes bulk energy from fusion generation to district receivers via long-haul microwave beaming; Tier 2 routes energy from district receivers to devices via the Meridian mesh. No physical transmission conductor appears at any layer.
 
 ---
 
@@ -840,6 +917,44 @@ The work ahead is long. The foundation is now laid.
 
 [M7] Andrews, J. (2026). *Meridian Physical Deployment Architecture: Volumetric Beam Routing in Complex Built Environments.* DarkWave Studios LLC. [Chapter Two of this volume]
 
+[M8] Andrews, J. (2026). *Beyond the Grid: Fusion-Fed Wireless Energy Architecture and the Elimination of Physical Transmission Infrastructure.* DarkWave Studios LLC. [Chapter Eight of this volume]
+
+---
+
+## Space-Based Solar Power and Power Beaming (Chapter Eight)
+
+[80] Glaser, P.E. (1968). "Power from the Sun: Its Future." *Science, 162*(3856), 857–861.
+
+[81] NASA/DOE. (1979). *Reference System Report: Solar Power Satellite.* DOE/ER-0023.
+
+[82] JAXA. (2015). *Space Solar Power Systems (SSPS) Technical Report.* Japan Aerospace Exploration Agency.
+
+[83] European Space Agency. (2022). *SOLARIS Initiative: Space-Based Solar Power Feasibility Study.*
+
+[84] Hajimiri, A., et al. (2023). "Caltech Space Solar Power Project: On-Orbit Demonstration." *Nature, 623*, 539–544.
+
+[85] Brown, W.C. (1964). "The Microwave Powered Helicopter." *Journal of Microwave Power, 1*(1), 1–20.
+
+[86] Brown, W.C. (1984). "The History of Power Transmission by Radio Waves." *IEEE Transactions on Microwave Theory and Techniques, 32*(9), 1230–1242.
+
+[87] LaserMotive LLC. (2009). *Climber Power Beaming Challenge: Technical Report.* NASA Centennial Challenge.
+
+[88] PowerLight Technologies. (2022). *Wireless Power Transmission Demonstration: 400W at 300m.* Technical Report.
+
+[89] Emrod Ltd. (2021). *Long-Range Wireless Power Transmission: Field Trial Results.* Technical Report.
+
+[90] Kappenman, J.G. (2010). "Geomagnetic Storms and Their Impacts on the U.S. Power Grid." *Metatech Corporation Report.*
+
+[91] National Academy of Sciences. (2008). *Severe Space Weather Events — Understanding Societal and Economic Impacts.* The National Academies Press.
+
+[92] Lawrence Berkeley National Laboratory. (2020). *The Cost of Power Interruptions to U.S. Electricity Consumers.* LBNL Report.
+
+[93] Assante, M., & Bochman, A. (2014). "Physical-Cyber Attacks on Power Grid Control Systems." *S&T Journal.*
+
+[94] Rectenwald, G., & Hartmann, A. (2012). "High-Efficiency Rectenna Design for Microwave Power Transmission." *IEEE Transactions on Microwave Theory and Techniques, 60*(7), 2177–2185.
+
+[95] McSpadden, J.O., & Mankins, J.C. (2002). "Space Solar Power Programs and Microwave Wireless Power Transmission Technology." *IEEE Microwave Magazine, 3*(4), 46–57.
+
 ---
 
 ---
@@ -882,5 +997,6 @@ github.com/cryptocreeper94-sudo
 *Chapter Five ← meridian-paper-6.md*
 *Chapter Six ← meridian-paper-5.md*
 *Chapter Seven ← meridian-paper-4.md*
+*Chapter Eight ← meridian-paper-8.md*
 
-*Estimated final manuscript length: approximately 101,000 words.*
+*Estimated final manuscript length: approximately 112,000 words.*
