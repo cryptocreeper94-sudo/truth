@@ -29,6 +29,10 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 **AXIOM Consumer Products** (spec: `axiom-consumer-suite-spec.md`):
 AXIOM Neuro (NeuroCore) · AXIOM Bio (BioCore) · AXIOM Social (SocioCore) · AXIOM Daily (3-organism aggregate) · AXIOM Work (GovernanceCore + SocioCore, B2B)
 
+**Key build documents:**
+- `lume-engine-spec.md` — Lume Organism Engine full technical specification (node population, API endpoints, data source mappings, coupling logic, hard constraints)
+- `master-build-handoff.md` — Master combined handoff: ecosystem + all 7 organisms + engine + lume42.com site + all 5 AXIOM products + build order
+
 **Product hierarchy:**
 ```
 lume-cortex.com          ← Lume-OS: Deterministic Meta-Operating System
