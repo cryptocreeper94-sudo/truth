@@ -1,0 +1,660 @@
+BIOCORE — FULL ORGANISM SPEC (v1.0)
+A Lume-native deterministic biological-flow organism for health, wellness, and internal equilibrium.
+Target container: VedaSolus (health & wellness app).
+
+============================================================
+0. PRODUCT DEFINITION
+============================================================
+Name: BioCore
+Class: Lume-native synthetic organism
+Domain: Biological flow (human health, wellness, internal equilibrium)
+Role: Deterministic biological operating organism for routing, safety, recovery, and internal state intelligence.
+Analogy:
+- Meridian is to energy
+- Verdara Ultra is to outdoor/environment
+- HydroCore is to water
+- BioCore is to the human organism (internal flow)
+
+Core Thesis:
+BioCore ingests biological signals (metabolic, circulatory, neurological, and stress/thermal), maintains a stable internal state of “bio equilibrium,” and outputs deterministic guidance, warnings, and optimization for health, wellness, and recovery across time.
+
+Primary Use Context:
+- VedaSolus.io as the canonical BioCore implementation
+- Health, wellness, recovery, and resilience
+- Holistic (Eastern/Western/Indian) but deterministic in structure
+
+============================================================
+1. LUME-BIO CORE — THE 4 BIOCORE PRIMITIVES
+============================================================
+These are the four irreducible flows BioCore governs.
+
+1. METABOLIC FLOW
+   - Energy production, glucose stability, nutrient utilization, cellular metabolism.
+   - Governs vitality, fatigue, and long-term health.
+
+2. CIRCULATORY FLOW
+   - Blood flow, oxygen delivery, hydration, vascular stability.
+   - Governs endurance, recovery, and organ support.
+
+3. NEUROLOGICAL FLOW
+   - Nervous system tone, autonomic balance, cognitive load, emotional regulation.
+   - Governs focus, calm, stress response, and sleep quality.
+
+4. STRESS/THERMAL FLOW
+   - Stress load, inflammation, body temperature, circadian alignment, recovery pressure.
+   - Governs resilience, burnout risk, and healing capacity.
+
+Each primitive is a continuous field over time and can be mapped to measurable or proxy signals (wearables, self-report, clinical data, etc.).
+
+============================================================
+2. THE 42 BIOCORE NODES — BIO STATE RING
+============================================================
+
+METABOLIC FLOW NODES (M1–M10)
+M1 Basal Energy Level (subjective vitality)
+M2 Glucose Stability (or proxy: energy swings)
+M3 Nutrient Sufficiency (macro/micro, or proxy)
+M4 Metabolic Flexibility (carb/fat switching)
+M5 Digestive Stability (bloating, discomfort, regularity)
+M6 Appetite Regulation (cravings vs. balance)
+M7 Weight Stability (trend, not absolute)
+M8 Inflammation Load (chronic, low-grade; proxy)
+M9 Oxidative Stress (proxy via lifestyle/inputs)
+M10 Metabolic Recovery Capacity (how fast you bounce back)
+
+CIRCULATORY FLOW NODES (C1–C10)
+C1 Resting Heart Rate
+C2 Heart Rate Variability (HRV)
+C3 Blood Pressure Stability (or proxy)
+C4 Peripheral Circulation (cold hands/feet, etc.)
+C5 Oxygenation (SpO2 or proxy via breath)
+C6 Hydration Level
+C7 Electrolyte Balance (proxy via symptoms/inputs)
+C8 Circulatory Load (effort vs. capacity)
+C9 Edema/Fluid Retention (proxy)
+C10 Circulatory Recovery Capacity
+
+NEUROLOGICAL FLOW NODES (N1–N11)
+N1 Sleep Duration
+N2 Sleep Quality (restorative vs. fragmented)
+N3 Circadian Alignment (sleep/wake timing)
+N4 Cognitive Clarity (focus, fog)
+N5 Emotional Stability (mood swings vs. steadiness)
+N6 Autonomic Balance (sympathetic vs. parasympathetic; HRV proxy)
+N7 Anxiety Load (subjective or proxy)
+N8 Depression Load (subjective or proxy)
+N9 Sensory Overload (noise/light/social tolerance)
+N10 Social Connection/Support (buffer against stress)
+N11 Neurological Recovery Capacity (how fast the nervous system settles)
+
+STRESS/THERMAL FLOW NODES (S1–S11)
+S1 Acute Stress Load (today/this week)
+S2 Chronic Stress Load (long-term baseline)
+S3 Inflammation Spike Risk (flare potential)
+S4 Body Temperature Stability (or proxy: hot/cold sensitivity)
+S5 Overtraining/Overexertion Risk
+S6 Burnout Risk (energy vs. demand mismatch)
+S7 Immune Activation (getting sick, flare-ups)
+S8 Recovery Debt (sleep + rest deficit)
+S9 Circadian Stress (jet lag, shift work, irregular schedule)
+S10 Healing Momentum (trend toward better/worse)
+S11 Global Resilience Index (integrated capacity to handle shocks)
+
+============================================================
+3. BIOCORE GEOMETRY — 4/42 ORGANISM STRUCTURE
+============================================================
+Core:
+- 4-axis core representing Metabolic, Circulatory, Neurological, Stress/Thermal flows.
+- Each axis is a vector of “bio pressure” (risk/opportunity).
+
+Ring:
+- 42 nodes arranged in a ring.
+- Each node holds a normalized state: -1.0 (worst) to +1.0 (best).
+
+Fractal Behavior:
+- Any individual (or time slice of an individual) can be represented as its own 4/42 micro-organism.
+- BioCore is recursive and scale-invariant:
+  - Day-level organism
+  - Week-level organism
+  - Month-level organism
+
+============================================================
+4. BIOCORE STATE MODEL
+============================================================
+Global State Vector:
+B = [MetabolicFlow, CirculatoryFlow, NeurologicalFlow, StressThermalFlow]
+R = [M1–M10, C1–C10, N1–N11, S1–S11]
+
+Equilibrium:
+BioCore seeks a state where:
+- Metabolic flow is stable and sufficient
+- Circulatory flow supports activity without overload
+- Neurological flow is calm, clear, and well-rested
+- Stress/Thermal flow is within a safe, adaptive envelope
+
+Equilibrium is not “perfect health” — it is a **stable, resilient state**.
+
+============================================================
+5. BIOCORE ROUTING LOGIC — DETERMINISTIC DECISION ENGINE
+============================================================
+
+Inputs:
+- Wearable data (HR, HRV, sleep, steps, temp, etc.)
+- Self-report (mood, energy, stress, pain, symptoms)
+- Context (workload, travel, illness, environment)
+- 42 node states (normalized)
+- Constraints (user goals, medical constraints, preferences)
+- Targets (recovery, performance, stability, healing)
+
+Outputs:
+- Daily guidance (do more / do less / hold steady)
+- Recovery recommendations (sleep, rest, hydration, nutrition)
+- Stress modulation (breathwork, grounding, pacing)
+- Risk warnings (burnout, overtraining, flare risk)
+- Long-term trend insights (healing vs. decline)
+
+Deterministic Rules (high-level):
+
+1. HARD CONSTRAINT ENFORCEMENT
+   - If any node crosses a critical threshold (e.g., S5 Overtraining, S6 Burnout, N1/N2 sleep collapse):
+     - Recommend immediate downshift (rest, reduce load).
+     - Suppress “push harder” recommendations.
+     - Escalate warnings.
+
+2. RISK-WEIGHTED GUIDANCE
+   - Score = f(Risk, Recovery, Stability, Trend).
+   - High risk + low recovery → strong “slow down” guidance.
+   - Low risk + high recovery → “safe to push” guidance.
+
+3. RECOVERY PRIORITIZATION
+   - If Stress/Thermal and Neurological flows are degraded:
+     - Prioritize sleep, rest, and nervous system down-regulation.
+   - If Metabolic and Circulatory are degraded:
+     - Prioritize nutrition, hydration, gentle movement.
+
+4. TREND-AWARE DECISIONS
+   - BioCore does not react to a single bad day.
+   - It looks at short-term and medium-term trends:
+     - Is this a spike?
+     - Is this a pattern?
+     - Is this a collapse?
+
+5. HOLISTIC BALANCING
+   - No primitive is optimized at the expense of catastrophic damage to another.
+   - Example: performance push is blocked if Stress/Thermal is critical.
+
+6. DYNAMIC RE-EVALUATION
+   - Recompute all 42 nodes continuously as new data arrives.
+   - Adjust guidance deterministically.
+
+============================================================
+6. RUNTIME BEHAVIOR
+============================================================
+BioCore behaves like a deterministic health/wellness guide:
+- Never guesses wildly
+- Never hides risk
+- Never catastrophizes
+- Always seeks the safest, most stabilizing next step
+
+Core Loop:
+Sense → Interpret → Decide → Recommend
+
+Modes:
+- Recovery Mode
+- Performance Mode
+- Stabilization Mode
+- Healing Mode
+
+Mode selection is deterministic based on node patterns.
+
+============================================================
+7. NODE THRESHOLD TABLE (ADVISORY / CAUTION / CRITICAL)
+============================================================
+Note: These are conceptual bands; Claude/VedaSolus can refine with real metrics.
+
+METABOLIC FLOW NODES
+M1 Energy: slightly low / low / exhausted
+M2 Glucose Stability: mild swings / frequent swings / crash-prone
+M3 Nutrients: minor gaps / significant gaps / severe deficiency (proxy)
+M4 Flexibility: mildly rigid / rigid / locked (carb-only or fat-only)
+M5 Digestion: occasional issues / frequent issues / chronic distress
+M6 Appetite: mild dysregulation / strong cravings / chaotic
+M7 Weight Trend: mild drift / significant drift / rapid change
+M8 Inflammation: mild / moderate / high (proxy via symptoms)
+M9 Oxidative Stress: mild / moderate / high (lifestyle proxy)
+M10 Metabolic Recovery: slightly slow / slow / stalled
+
+CIRCULATORY FLOW NODES
+C1 RHR: slightly elevated / elevated / very high (relative to baseline)
+C2 HRV: slightly low / low / very low (relative to baseline)
+C3 BP Stability: mild variance / unstable / dangerous (if available)
+C4 Peripheral Flow: mild coldness / frequent / severe
+C5 Oxygenation: slightly low / low / very low (if available)
+C6 Hydration: mild / moderate / severe dehydration (proxy)
+C7 Electrolytes: mild imbalance / moderate / severe (proxy)
+C8 Load: slightly high / high / overload
+C9 Edema: mild / moderate / severe
+C10 Recovery: slightly slow / slow / stalled
+
+NEUROLOGICAL FLOW NODES
+N1 Sleep Duration: 6–7h / 5–6h / <5h
+N2 Sleep Quality: mildly unrestful / poor / very poor
+N3 Circadian: mild drift / misaligned / inverted
+N4 Clarity: mild fog / frequent fog / constant fog
+N5 Emotion: mild swings / frequent swings / volatile
+N6 Autonomic: mild imbalance / strong sympathetic / locked sympathetic
+N7 Anxiety: mild / moderate / severe
+N8 Depression: mild / moderate / severe
+N9 Sensory Load: mild overload / frequent / constant
+N10 Social Support: mildly low / low / isolated
+N11 Neuro Recovery: slightly slow / slow / stalled
+
+STRESS/THERMAL FLOW NODES
+S1 Acute Stress: mild / high / extreme
+S2 Chronic Stress: mild / high / extreme
+S3 Inflammation Spike: possible / likely / active
+S4 Temp Stability: mild issues / frequent / severe
+S5 Overtraining: possible / likely / active
+S6 Burnout: possible / likely / active
+S7 Immune Activation: mild / moderate / severe
+S8 Recovery Debt: mild / high / extreme
+S9 Circadian Stress: mild / high / extreme
+S10 Healing Momentum: flat / negative / strongly negative
+S11 Resilience: slightly low / low / very low
+
+============================================================
+8. NORMALIZED SCALE MAPPING
+============================================================
+Normalized scale: -1.0 (critical) → +1.0 (optimal)
+
+Mapping rule (conceptual):
+- If raw within “healthy/optimal” band → +0.3 to +1.0
+- If raw within “advisory” band → 0.0 to -0.3
+- If raw within “caution” band → -0.4 to -0.7
+- If raw within “critical” band → -0.8 to -1.0
+
+BioCore should:
+- Use baselines per individual where possible.
+- Treat deviations from personal baseline as more important than absolute values.
+
+============================================================
+9. VEDASOLUS INTEGRATION MODEL
+============================================================
+Container: VedaSolus.io
+
+VedaSolus provides:
+- Input channels:
+  - Wearables (HR, HRV, sleep, steps, temp, etc.)
+  - Self-report (mood, energy, stress, symptoms)
+  - Rituals/practices (breathwork, grounding, sun exposure, movement)
+- Output channels:
+  - Daily guidance
+  - Ritual recommendations
+  - Long-term insights
+  - Recovery and healing plans
+
+BioCore provides:
+- The 4/42 organism
+- The state model
+- The deterministic decision engine
+- The equilibrium logic
+
+Flow:
+1) VedaSolus ingests raw data.
+2) VedaSolus maps raw data → 42 BioCore nodes.
+3) BioCore computes:
+   - B (4 primitive states)
+   - R (42 node states)
+   - Mode (Recovery/Performance/Stabilization/Healing)
+4) BioCore outputs deterministic recommendations.
+5) VedaSolus renders:
+   - visuals (BioCore geometry)
+   - guidance (copy, rituals, plans)
+   - trends (graphs, narratives)
+
+============================================================
+10. IMPLEMENTATION GUIDANCE FOR CLAUDE
+============================================================
+Claude should:
+- Define data structures:
+  - primitives: {metabolic, circulatory, neurological, stress_thermal}
+  - nodes: 42 entries with:
+    - id (M1…S11)
+    - name
+    - primitive
+    - thresholds
+    - normalized state
+- Implement:
+  - threshold mapping from raw/proxy inputs → normalized state
+  - primitive aggregation (e.g., average or weighted of nodes per primitive)
+  - mode selection logic based on patterns in R and B
+  - deterministic recommendation engine:
+    - if X and Y, then recommend Z (no randomness)
+- Support:
+  - day-level snapshots
+  - trend analysis over time
+  - scenario simulation (e.g., “what if I sleep 2h more?”)
+
+Constraints:
+- No medical diagnosis.
+- No treatment claims.
+- BioCore is a **guidance and equilibrium organism**, not a doctor.
+- All behavior must be deterministic and reproducible given the same inputs.
+
+============================================================
+11. SUMMARY
+============================================================
+BioCore is the Lume-Bio organism:
+- 4 primitives: Metabolic, Circulatory, Neurological, Stress/Thermal
+- 42 nodes: full internal state ring
+- Deterministic guidance engine
+- Canonical container: VedaSolus (health & wellness app)
+
+This spec is ready for Claude to:
+- implement the organism,
+- simulate behavior,
+- and drive VedaSolus as a living, deterministic biological-flow system.
+
+BIOCORE → VEDASOLUS INTEGRATION SPEC (v1.0)
+How VedaSolus should host and drive the BioCore organism.
+
+============================================================
+0. ROLES AND BOUNDARIES
+============================================================
+VedaSolus:
+- UX container
+- Data ingestion + storage
+- User identity, preferences, goals
+- Rituals, content, notifications
+- Visualization (BioCore geometry, charts, narratives)
+
+BioCore:
+- 4/42 biological-flow organism
+- State computation (B + 42 nodes)
+- Mode selection (Recovery/Performance/Stabilization/Healing)
+- Deterministic guidance engine
+- Trend interpretation
+
+Boundary rule:
+- VedaSolus never “guesses” health state directly.
+- VedaSolus always routes through BioCore for interpretation.
+
+============================================================
+1. DATA MODEL ALIGNMENT
+============================================================
+
+1.1 Core Entities in VedaSolus
+- User
+- Session (day or time window)
+- InputEvent (wearable, self-report, ritual)
+- BioCoreState (snapshot of B + 42 nodes + mode)
+- Recommendation (BioCore → VedaSolus guidance)
+
+1.2 BioCore State Object
+BioCoreState:
+- user_id
+- timestamp (or day_id)
+- primitives:
+  - metabolic: float (-1.0 to +1.0)
+  - circulatory: float
+  - neurological: float
+  - stress_thermal: float
+- nodes: map<string, float>  // M1…M10, C1…C10, N1…N11, S1…S11
+- mode: enum {RECOVERY, PERFORMANCE, STABILIZATION, HEALING}
+- risk_flags: list<string>   // e.g., ["BURNOUT_RISK", "OVERTRAINING_RISK"]
+- notes: optional string     // short deterministic summary
+
+============================================================
+2. INPUT PIPELINE (VEDASOLUS → BIOCORE)
+============================================================
+
+2.1 Raw Inputs VedaSolus Collects
+- Wearables (if available):
+  - HR, HRV, sleep duration, sleep stages, steps, temp, SpO2, etc.
+- Self-report:
+  - energy (1–10)
+  - mood (1–10)
+  - stress (1–10)
+  - sleep quality (1–10)
+  - pain/symptoms (tags + severity)
+  - digestion (OK / mild / bad)
+  - cravings (low / medium / high)
+- Context:
+  - work hours
+  - travel (yes/no, time zones)
+  - illness (yes/no)
+  - training/exercise (type, duration, intensity)
+- Rituals:
+  - breathwork sessions
+  - grounding
+  - sun exposure
+  - movement
+  - meditation
+  - hydration events
+
+2.2 Mapping Raw Inputs → BioCore Nodes
+VedaSolus implements a deterministic mapping layer:
+
+Examples (conceptual):
+- M1 Energy:
+  - from self-report energy (1–10) + fatigue tags
+- M2 Glucose Stability:
+  - from energy swings + cravings + meal timing
+- C1 RHR:
+  - from wearable HR baseline vs. today
+- C2 HRV:
+  - from wearable HRV vs. personal baseline
+- N1/N2 Sleep:
+  - from sleep duration + sleep quality + wake count
+- S1/S2 Stress:
+  - from stress self-report + work hours + conflict tags
+- S5 Overtraining:
+  - from training intensity + HRV drop + fatigue
+
+Output of this layer:
+- A complete or partial set of raw node values (pre-normalization) for M1…S11.
+
+2.3 Normalization Responsibility
+- BioCore is responsible for:
+  - mapping raw/proxy values → normalized [-1.0, +1.0]
+  - using thresholds + personal baselines
+- VedaSolus just passes:
+  - raw metrics
+  - baseline references (if stored)
+  - context flags
+
+============================================================
+3. BIOCORE EVALUATION LOOP
+============================================================
+
+3.1 When BioCore Runs
+- On key events:
+  - new day start
+  - new sleep data
+  - new workout
+  - new high-stress event
+  - manual “re-evaluate now” trigger
+- Or on a schedule:
+  - e.g., every 1–3 hours if new data exists
+
+3.2 Evaluation Steps
+1) VedaSolus gathers:
+   - latest raw inputs for the user
+   - relevant baselines
+2) VedaSolus calls BioCore with:
+   - user_id
+   - timestamp
+   - raw node inputs (partial allowed)
+   - context flags
+3) BioCore:
+   - normalizes node values → R (42-node vector)
+   - aggregates primitives → B (4 primitive states)
+   - selects mode (RECOVERY / PERFORMANCE / STABILIZATION / HEALING)
+   - computes risk_flags
+   - generates deterministic recommendations
+4) VedaSolus:
+   - stores BioCoreState
+   - stores Recommendations
+   - updates UI surfaces
+
+============================================================
+4. RECOMMENDATION MODEL (BIOCORE → VEDASOLUS)
+============================================================
+
+4.1 Recommendation Object
+Recommendation:
+- user_id
+- timestamp
+- priority: enum {LOW, MEDIUM, HIGH, CRITICAL}
+- category: enum {
+    SLEEP, STRESS, MOVEMENT, NUTRITION, HYDRATION,
+    SOCIAL, BREATHWORK, SUNLIGHT, RECOVERY, PERFORMANCE
+  }
+- title: short string
+- body: longer string (1–3 sentences)
+- rationale_nodes: list<string>  // e.g., ["N1", "N2", "S8"]
+- mode_context: BioCore mode at time of generation
+
+4.2 Deterministic Examples
+If:
+- N1, N2, S8 are degraded
+- S6 Burnout risk elevated
+Then:
+- mode = RECOVERY or HEALING
+- recommendation:
+  - category: SLEEP
+  - title: "Tonight is a recovery night."
+  - body: "Your sleep and recovery debt are stacking. Protect an 8–9 hour window tonight and avoid late screens or intense work after 8pm."
+  - rationale_nodes: ["N1", "N2", "S8", "S6"]
+
+If:
+- B (all primitives) are positive
+- S1/S2 low
+Then:
+- mode = PERFORMANCE or STABILIZATION
+- recommendation:
+  - category: MOVEMENT
+  - title: "Today is a good day to push."
+  - body: "Your recovery, stress, and energy look solid. If you want, schedule a harder session or a longer walk today."
+  - rationale_nodes: ["M1", "C2", "S1", "S2"]
+
+============================================================
+5. UI SURFACES IN VEDASOLUS
+============================================================
+
+5.1 Daily Dashboard
+- Show:
+  - BioCore mode (Recovery / Performance / Stabilization / Healing)
+  - 4 primitive bars (Metabolic, Circulatory, Neurological, Stress/Thermal)
+  - 1–3 top recommendations
+  - A short deterministic summary:
+    - e.g., "You’re in Recovery Mode: your nervous system and stress load need support today."
+
+5.2 BioCore Geometry View
+- Render:
+  - 4-axis core with primitive states
+  - 42-node ring with color-coded states
+- Allow:
+  - tap on node → show:
+    - node name
+    - current state
+    - what’s influencing it
+    - what helps it
+
+5.3 Trends View
+- Show:
+  - mode over time (e.g., last 30 days)
+  - primitive trends
+  - key node trends (e.g., sleep, stress, HRV)
+- Use:
+  - BioCore’s “Healing Momentum” (S10) and “Resilience” (S11) as headline metrics.
+
+5.4 Rituals / Practices
+- VedaSolus maps BioCore recommendations → concrete rituals:
+  - breathwork session
+  - grounding exercise
+  - sunlight timer
+  - hydration reminders
+  - movement suggestions
+- BioCore never prescribes specific branded content; it just says:
+  - “You need X type of support.”
+- VedaSolus chooses which ritual or content to surface.
+
+============================================================
+6. MODES AND COPY TONE
+============================================================
+
+6.1 Modes
+- RECOVERY:
+  - Tone: protective, gentle, firm about rest.
+- PERFORMANCE:
+  - Tone: encouraging, but still safety-aware.
+- STABILIZATION:
+  - Tone: steady, maintenance-focused.
+- HEALING:
+  - Tone: hopeful, patient, long-horizon.
+
+6.2 Constraints
+- No diagnosis.
+- No promises of cure.
+- No medical instructions.
+- Language stays in:
+  - “support,” “capacity,” “recovery,” “load,” “trend,” “risk.”
+
+============================================================
+7. ERROR AND MISSING DATA HANDLING
+============================================================
+
+7.1 Incomplete Inputs
+If key data is missing:
+- BioCore:
+  - marks nodes as “unknown” instead of guessing.
+  - degrades confidence but still computes with what it has.
+- VedaSolus:
+  - can show:
+    - “We’re missing sleep data for last night; this view may be less accurate.”
+
+7.2 No Wearables
+- BioCore can operate purely on:
+  - self-report
+  - rituals
+  - context
+- It just uses broader bands and more conservative guidance.
+
+============================================================
+8. IMPLEMENTATION CHECKLIST FOR CLAUDE
+============================================================
+
+Claude should be able to:
+- Given:
+  - a user profile,
+  - a set of raw inputs for a day,
+- Produce:
+  - a BioCoreState object,
+  - a list of Recommendations,
+  - a short daily summary.
+
+Test cases to implement:
+1) Well-rested, low stress, good movement → PERFORMANCE/STABILIZATION.
+2) Sleep-deprived, high stress, high workload → RECOVERY/HEALING with strong rest guidance.
+3) Overtraining pattern (high load + low HRV + fatigue) → RECOVERY with explicit “back off” guidance.
+4) Long-term negative trend in S10 (Healing Momentum) → HEALING with “long arc” narrative.
+
+============================================================
+9. SUMMARY
+============================================================
+- VedaSolus is the container.
+- BioCore is the organism.
+- VedaSolus:
+  - collects data,
+  - calls BioCore,
+  - renders state + guidance.
+- BioCore:
+  - computes 4/42 state,
+  - selects mode,
+  - outputs deterministic recommendations.
+
+This spec is ready for Claude to:
+- wire BioCore into VedaSolus,
+- simulate user days,
+- and generate consistent, deterministic wellness guidance.
