@@ -1,0 +1,249 @@
+VERDARA ULTRA — FULL ORGANISM SPEC (v1.0)
+A Lume-native deterministic outdoor organism for ultra-distance navigation, safety, and environmental flow governance.
+
+============================================================
+0. PRODUCT DEFINITION
+============================================================
+Name: Verdara Ultra
+Class: Lume-native synthetic organism
+Domain: Outdoor ultra (terrain, weather, environment, biological hazards, routing)
+Role: Deterministic outdoor operating organism for ultra-distance navigation, safety, and environmental awareness.
+Analogy: Verdara Ultra is to the outdoors what Meridian is to energy: a 4/42 deterministic organism that governs continuous flows in a physical domain.
+
+Core Thesis:
+Verdara Ultra ingests outdoor signals (terrain, weather, environment, biological factors), maintains a stable internal state of “outdoor equilibrium,” and outputs deterministic routing, warnings, and recommendations for ultra-distance movement and survival.
+
+============================================================
+1. LUME-OUTDOOR CORE — THE 4 VERDARA PRIMITIVES
+============================================================
+These are the four irreducible flows Verdara governs.
+
+1. TERRAIN FLOW
+   - Elevation, slope, grade, surface type, stability, obstacles.
+   - Governs traversability, effort, risk, speed envelope.
+
+2. WEATHER FLOW
+   - Temperature, wind, precipitation, storms.
+   - Governs exposure risk, thermal load, safe windows.
+
+3. ENVIRONMENTAL FLOW
+   - Humidity, visibility, air quality, light levels, pressure.
+   - Governs sensory clarity, breathing comfort, fatigue.
+
+4. BIOLOGICAL FLOW
+   - Wildlife, vegetation, insects, pathogens.
+   - Governs encounter risk, resource availability, biological safety.
+
+Each primitive is a continuous field over space and time.
+
+============================================================
+2. THE 42 VERDARA NODES — OUTDOOR STATE RING
+============================================================
+
+TERRAIN FLOW NODES (T1–T10)
+T1 Elevation
+T2 Slope/Grade
+T3 Terrain Type
+T4 Surface Stability
+T5 Technicality
+T6 Trail Quality
+T7 Obstacle Density
+T8 Traction Quality
+T9 Water Crossing Complexity
+T10 Route Ambiguity
+
+WEATHER FLOW NODES (W1–W10)
+W1 Temperature
+W2 Wind Speed
+W3 Wind Direction
+W4 Precipitation Type
+W5 Precipitation Intensity
+W6 Storm Proximity
+W7 Lightning Risk
+W8 Thermal Load
+W9 Weather Volatility
+W10 Safe Weather Window
+
+ENVIRONMENTAL FLOW NODES (E1–E11)
+E1 Humidity
+E2 Dew Point
+E3 Fog/Cloud Presence
+E4 Visibility Distance
+E5 Sunlight Intensity
+E6 UV Index
+E7 Air Quality
+E8 Pressure Trend
+E9 Day/Night Phase
+E10 Light Pollution
+E11 Sensory Clarity Index
+
+BIOLOGICAL FLOW NODES (B1–B11)
+B1 Wildlife Density
+B2 Wildlife Risk
+B3 Insect Density
+B4 Pathogen Risk
+B5 Vegetation Density
+B6 Edible Resource Availability
+B7 Water Availability
+B8 Allergen Load
+B9 Human Density
+B10 Land Use Constraints
+B11 Rescue Accessibility
+
+============================================================
+3. VERDARA GEOMETRY — 4/42 ORGANISM STRUCTURE
+============================================================
+Core:
+- 4-axis core representing the four primitives.
+- Each axis is a vector of “flow pressure” (how strongly that primitive pushes toward risk or opportunity).
+
+Ring:
+- 42 nodes arranged in a ring.
+- Each node holds a normalized state: -1.0 (worst) to +1.0 (best).
+
+Fractal Behavior:
+- Any segment of the environment (1 km, 10 minutes, etc.) can be represented as its own 4/42 micro-organism.
+- Verdara is recursive and scale-invariant.
+
+============================================================
+4. VERDARA STATE MODEL
+============================================================
+Global State Vector:
+P = [TerrainFlow, WeatherFlow, EnvironmentalFlow, BiologicalFlow]
+R = [T1–T10, W1–W10, E1–E11, B1–B11]
+
+Equilibrium:
+Verdara seeks a state where:
+- Risk is minimized
+- Progress is maximized
+- Resilience is preserved
+
+============================================================
+5. VERDARA ROUTING LOGIC — DETERMINISTIC DECISION ENGINE
+============================================================
+
+Inputs:
+- Position, elevation
+- Waypoints, bailout points
+- 42 node states
+- Time budget
+- User profile (fitness, gear, risk tolerance)
+
+Outputs:
+- Recommended route segment
+- Pace envelope
+- Warnings
+- Opportunities
+- Adaptation suggestions
+
+Deterministic Rules:
+
+1. HARD CONSTRAINT ENFORCEMENT
+If any node crosses critical threshold:
+- Halt forward progress on that path
+- Propose alternate routes
+- Escalate warnings
+
+2. RISK-WEIGHTED PATH SCORING
+Score = f(Risk, Effort, Progress, Resilience)
+
+3. TIME-WINDOW ALIGNMENT
+Align movement with safe weather windows.
+
+4. RESOURCE-AWARE ROUTING
+Ensure access to water, shelter, bailout points.
+
+5. DYNAMIC RE-EVALUATION
+Recompute all 42 nodes continuously.
+
+6. USER-ALIGNED RISK ENVELOPE
+Risk profile modifies thresholds but logic remains deterministic.
+
+============================================================
+6. RUNTIME BEHAVIOR
+============================================================
+Verdara behaves like a deterministic mountain guide:
+- Never guesses
+- Never hides risk
+- Never panics
+- Always re-routes deterministically
+
+Core Loop:
+Sense → Interpret → Decide → Act
+
+============================================================
+7. NODE THRESHOLD TABLE (ADVISORY / CAUTION / CRITICAL)
+============================================================
+
+TERRAIN FLOW NODES
+T1 Elevation: 10k / 12k / 14k ft
+T2 Slope: 15% / 25% / 35%
+T3 Terrain Type: gravel / scree / ice
+T4 Stability: moderate / low / collapse risk
+T5 Technicality: Class 2 / Class 3 / Class 4–5
+T6 Trail Quality: faint / intermittent / off-trail
+T7 Obstacles: moderate / high / impassable
+T8 Traction: reduced / poor / none
+T9 Water Crossing: ankle / knee / waist+
+T10 Ambiguity: 2–3 / 4–5 / >5
+
+WEATHER FLOW NODES
+W1 Temp: <40 or >80 / <32 or >90 / <20 or >100
+W2 Wind: 15 / 25 / 40 mph
+W3 Wind Dir: headwind / crosswind / gusting
+W4 Precip Type: light / heavy / hail/whiteout
+W5 Precip Intensity: moderate / heavy / extreme
+W6 Storm Proximity: 10 / 5 / 2 miles
+W7 Lightning: elevated / high / imminent
+W8 Thermal Load: moderate / high / extreme
+W9 Volatility: unstable / rapid / chaotic
+W10 Safe Window: <2h / <1h / <30m
+
+ENVIRONMENTAL FLOW NODES
+E1 Humidity: 70% / 85% / 95%
+E2 Dew Point: 10°F / 5°F / equal to temp
+E3 Fog: patchy / dense / whiteout
+E4 Visibility: 500m / 200m / 50m
+E5 Sunlight: low / very low / dark
+E6 UV: 6 / 8 / 10
+E7 AQI: 75 / 125 / 175
+E8 Pressure: falling / rapid / collapse
+E9 Day/Night: dusk / twilight / night
+E10 Light Pollution: moderate / low / none
+E11 Sensory Clarity: reduced / poor / extreme poor
+
+BIOLOGICAL FLOW NODES
+B1 Wildlife Density: moderate / high / very high
+B2 Wildlife Risk: possible / likely / confirmed
+B3 Insects: moderate / heavy / extreme
+B4 Pathogens: suspected / likely / confirmed
+B5 Vegetation: moderate / heavy / impassable
+B6 Edible Resources: scarce / very scarce / none
+B7 Water Availability: 3 / 6 / 10 miles
+B8 Allergens: moderate / high / extreme
+B9 Human Density: moderate / high / very high
+B10 Land Use: advisory / restricted / illegal
+B11 Rescue Access: 2h / 4h / 8h
+
+============================================================
+8. NORMALIZED SCALE MAPPING
+============================================================
+Normalized scale: -1.0 (critical) → +1.0 (optimal)
+
+Mapping rule:
+if raw < advisory: +0.3 to +1.0
+elif raw < caution: -0.1 to -0.4
+elif raw < critical: -0.5 to -0.8
+else: -1.0
+
+============================================================
+9. IMPLEMENTATION GUIDANCE FOR CLAUDE
+============================================================
+Claude should:
+- Define data structures for primitives + nodes
+- Implement threshold mapping
+- Implement scoring function
+- Implement constraint system
+- Implement routing engine
+- Implement 4/42 geometry
+- Simulate scenarios
