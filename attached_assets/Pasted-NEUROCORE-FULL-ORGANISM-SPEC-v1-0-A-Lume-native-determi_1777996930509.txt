@@ -1,0 +1,522 @@
+NEUROCORE — FULL ORGANISM SPEC (v1.0)
+A Lume-native deterministic cognitive-flow organism for attention, clarity, emotional load, and decision equilibrium.
+Vertical: Lume‑Cognition
+Position in Canon: First organism of the Cognitive Layer (after BioCore)
+
+============================================================
+0. PRODUCT DEFINITION
+============================================================
+Name: NeuroCore
+Class: Lume-native synthetic organism
+Domain: Cognitive flow (attention, intention, emotional load, decision pressure)
+Role: Deterministic cognitive operating organism for clarity, stability, drift control, and mental resilience.
+
+Analogy:
+- Meridian → Energy
+- Verdara Ultra → Environment
+- HydroCore → Water
+- BioCore → Biology
+- NeuroCore → Cognition (mind-layer)
+
+Core Thesis:
+NeuroCore ingests cognitive signals (attention, clarity, emotional load, decision fatigue, narrative stability), maintains a stable internal state of “cognitive equilibrium,” and outputs deterministic guidance for mental clarity, focus, emotional regulation, and cognitive resilience.
+
+============================================================
+1. NEUROCORE PRIMITIVES — THE 4 COGNITIVE FLOWS
+============================================================
+
+1. ATTENTION FLOW
+   - Focus, distractibility, task-switching cost, sustained attention.
+   - Governs clarity, productivity, and cognitive precision.
+
+2. INTENTION FLOW
+   - Goal alignment, motivation, executive function, decision direction.
+   - Governs purpose, drive, and cognitive coherence.
+
+3. EMOTIONAL FLOW
+   - Emotional load, mood stability, affective drift, reactivity.
+   - Governs emotional resilience and internal narrative tone.
+
+4. COGNITIVE LOAD FLOW
+   - Stress, overwhelm, burnout pressure, mental fatigue.
+   - Governs capacity, bandwidth, and cognitive safety.
+
+Each primitive is a continuous cognitive field over time.
+
+============================================================
+2. THE 42 NEUROCORE NODES — COGNITIVE STATE RING
+============================================================
+
+ATTENTION FLOW NODES (A1–A10)
+A1 Focus Stability
+A2 Distractibility Index
+A3 Task Switching Cost
+A4 Working Memory Load
+A5 Sensory Interference
+A6 Cognitive Drift (mind wandering)
+A7 Attention Recovery Speed
+A8 Precision/Detail Orientation
+A9 Information Saturation
+A10 Attention Fatigue
+
+INTENTION FLOW NODES (I1–I10)
+I1 Goal Clarity
+I2 Motivation Level
+I3 Executive Function Strength
+I4 Decision Direction (sense of “what to do next”)
+I5 Decision Paralysis Risk
+I6 Internal Narrative Coherence
+I7 Purpose Alignment
+I8 Initiative Momentum
+I9 Cognitive Confidence
+I10 Intention Recovery Speed
+
+EMOTIONAL FLOW NODES (E1–E11)
+E1 Mood Stability
+E2 Emotional Reactivity
+E3 Anxiety Load
+E4 Depression Load
+E5 Irritability/Frustration
+E6 Emotional Drift (unexplained shifts)
+E7 Social Overload
+E8 Social Withdrawal Pressure
+E9 Emotional Recovery Speed
+E10 Empathy/Connection Capacity
+E11 Emotional Safety Index
+
+COGNITIVE LOAD FLOW NODES (L1–L11)
+L1 Acute Cognitive Load
+L2 Chronic Cognitive Load
+L3 Burnout Pressure
+L4 Overwhelm Index
+L5 Narrative Fragmentation Risk
+L6 Cognitive Exhaustion
+L7 Sleep Debt Impact (from BioCore)
+L8 Stress Integration (BioCore → NeuroCore)
+L9 Decision Fatigue
+L10 Cognitive Recovery Momentum
+L11 Global Cognitive Resilience
+
+============================================================
+3. NEUROCORE GEOMETRY — 4/42 COGNITIVE ORGANISM
+============================================================
+
+ASCII DIAGRAM — TOP-DOWN 2D VIEW
+---------------------------------
+
+                [A1] [A2] [A3]
+             [A10]             [I1]
+          [A9]                     [I2]
+        [A8]                         [I3]
+       [A7]                           [I4]
+        [A6]                         [I5]
+          [A5]                     [I6]
+             [A4]             [I7]
+                \     |     /
+                  \   |   /
+                    \ | /
+   [E11] --- [EMOTIONAL CORE] --- [INTENTION CORE]
+                    / | \
+                  /   |   \
+                /     |     \
+             [L1] [L2] [L3]  ... (full 42-node ring continues)
+
+Core Axes (ASCII):
+- Up: ATTENTION
+- Right: INTENTION
+- Down: EMOTIONAL
+- Left: COGNITIVE LOAD
+
+============================================================
+4. STATE MODEL
+============================================================
+Global State Vector:
+N = [AttentionFlow, IntentionFlow, EmotionalFlow, CognitiveLoadFlow]
+R = [A1–A10, I1–I10, E1–E11, L1–L11]
+
+Equilibrium:
+NeuroCore seeks:
+- stable attention
+- coherent intention
+- regulated emotion
+- safe cognitive load
+
+============================================================
+5. ROUTING LOGIC — DETERMINISTIC COGNITIVE ENGINE
+============================================================
+
+Inputs:
+- Self-report (clarity, mood, stress, overwhelm)
+- Behavioral signals (task switching, procrastination, avoidance)
+- BioCore outputs (sleep, stress, recovery)
+- Context (workload, deadlines, social load)
+- 42 node states
+
+Outputs:
+- Cognitive mode
+- Guidance (focus, rest, emotional regulation, decision pacing)
+- Drift warnings
+- Load balancing recommendations
+
+Deterministic Rules:
+
+1. HARD CONSTRAINTS
+   - If L3 Burnout Pressure or L4 Overwhelm is critical:
+     → Force RECOVERY mode
+     → Suppress all “push” recommendations
+
+2. ATTENTION ROUTING
+   - If A1/A7 low → recommend monotasking + reduced switching
+
+3. INTENTION ROUTING
+   - If I4/I5 degraded → recommend narrowing goals to 1–2 items
+
+4. EMOTIONAL ROUTING
+   - If E3/E4/E5 elevated → recommend emotional decompression rituals
+
+5. LOAD ROUTING
+   - If L1/L2/L9 high → recommend cognitive unloading (journaling, breaks)
+
+6. TREND-AWARE
+   - NeuroCore uses multi-day patterns, not single spikes
+
+============================================================
+6. RUNTIME BEHAVIOR
+============================================================
+Modes:
+- FOCUS MODE
+- RECOVERY MODE
+- EMOTIONAL STABILIZATION MODE
+- DECISION MODE
+- COGNITIVE SAFETY MODE
+
+Core Loop:
+Sense → Interpret → Decide → Recommend
+
+============================================================
+7. THRESHOLD TABLE (ADVISORY / CAUTION / CRITICAL)
+============================================================
+
+ATTENTION
+A1 Focus: mild drift / frequent drift / cannot sustain
+A3 Switching Cost: mild / high / extreme
+A10 Fatigue: mild / high / collapse
+
+INTENTION
+I1 Clarity: mild fog / unclear / lost
+I5 Paralysis: possible / likely / active
+
+EMOTIONAL
+E3 Anxiety: mild / moderate / severe
+E4 Depression: mild / moderate / severe
+E5 Irritability: mild / high / extreme
+
+COGNITIVE LOAD
+L1 Acute Load: mild / high / extreme
+L3 Burnout: possible / likely / active
+L9 Decision Fatigue: mild / high / collapse
+
+============================================================
+8. NORMALIZATION
+============================================================
+-1.0 = critical  
++1.0 = optimal  
+
+Mapping:
+- optimal → +0.3 to +1.0  
+- advisory → 0.0 to -0.3  
+- caution → -0.4 to -0.7  
+- critical → -0.8 to -1.0  
+
+============================================================
+9. INTEGRATION WITH BIOCORE
+============================================================
+BioCore → NeuroCore Inputs:
+- Sleep quality (N1/N2)
+- Stress load (S1/S2)
+- Recovery debt (S8)
+- Emotional load (E-nodes)
+- Inflammation (affects cognitive fatigue)
+
+NeuroCore → BioCore:
+- Cognitive load affects stress/thermal flow
+- Emotional drift affects biological recovery
+
+============================================================
+10. IMPLEMENTATION GUIDANCE FOR CLAUDE
+============================================================
+Claude must:
+- Implement 42-node normalization
+- Compute 4 primitive states
+- Select cognitive mode deterministically
+- Generate guidance based on rule patterns
+- Produce:
+  - daily summary
+  - cognitive recommendations
+  - drift warnings
+  - equilibrium insights
+
+============================================================
+11. VISUAL GEOMETRY — 3D STACK
+============================================================
+
+ASCII 3D STACK (Cognitive Layer Above Bio Layer)
+------------------------------------------------
+
+           [NeuroCore 4/42]
+                 /   \
+                /     \
+        [BioCore 4/42]  (biology)
+              /     \
+             /       \
+     [Physical Layer: Meridian / Verdara / HydroCore]
+
+NeuroCore sits directly above BioCore in the canonical stack.
+
+============================================================
+12. SUMMARY
+============================================================
+NeuroCore is the cognitive-flow organism:
+- 4 primitives: Attention, Intention, Emotional, Cognitive Load
+- 42 nodes: full cognitive state ring
+- Deterministic cognitive engine
+- Integrates with BioCore and AXIOM
+- Governs clarity, focus, emotional stability, and cognitive safety
+
+This handoff is complete and ready for Claude to implement.
+If you want, I can now generate the NeuroCore → AXIOM integration model or the NeuroCore 2D/3D geometry spec.
+
+NeuroCore 2D/3D geometry spec.
+See my thinking
+text
+NEUROCORE — 2D/3D GEOMETRY SPEC (v1.0)
+Deterministic visual geometry for the Lume-Cognition organism.
+
+============================================================
+0. GEOMETRY PURPOSE
+============================================================
+NeuroCore’s geometry is a direct encoding of:
+- the 4 cognitive primitives,
+- the 42 cognitive nodes,
+- their current states,
+- and their relationships in the cognitive system.
+
+Requirements:
+- Renderable in 2D and 3D.
+- Preserve 4/42 structure.
+- Support real-time updates.
+- Legible at multiple scales (moment, day, week).
+
+============================================================
+1. CORE LAYOUT — 4/42 COGNITIVE FRAME
+============================================================
+Base frame:
+- Center: 4-axis cognitive core (Attention, Intention, Emotional, Cognitive Load).
+- Surrounding ring: 42 nodes, grouped by primitive.
+- Outer field: overlays for drift, pressure, and resilience.
+
+Coordinate system:
+- 2D: polar coordinates for ring (angle = node index, radius = state).
+- 3D: Cartesian for extrusion (Z = time or depth).
+
+============================================================
+2. CORE — 4 PRIMITIVE AXES
+============================================================
+Axes (clockwise from top in 2D):
+
+- Up (0°): ATTENTION FLOW
+- Right (90°): INTENTION FLOW
+- Down (180°): EMOTIONAL FLOW
+- Left (270°): COGNITIVE LOAD FLOW
+
+Each axis:
+- Length: aggregate primitive health (−1.0 to +1.0).
+- Color: fixed per primitive.
+- Thickness: volatility (rate of change).
+
+Suggested palette:
+- Attention: bright cyan
+- Intention: gold/amber
+- Emotional: magenta/pink
+- Cognitive Load: deep violet/indigo
+
+Core shape:
+- Axes form a diamond or cross.
+- A small central polygon (4-sided) connects axis tips, showing overall cognitive balance.
+
+============================================================
+3. RING — 42 NODE POSITIONS
+============================================================
+Ring radius:
+- Base radius R_base.
+- Node radial offset encodes node state.
+
+Angular segmentation:
+- 360° / 42 ≈ 8.571° per node.
+- Nodes grouped in contiguous arcs by primitive:
+
+Groups:
+- Attention (A1–A10): 10 sectors
+- Intention (I1–I10): 10 sectors
+- Emotional (E1–E11): 11 sectors
+- Cognitive Load (L1–L11): 11 sectors
+
+Ordering (clockwise from top):
+- Start at 0° with A1 → A10
+- Then I1 → I10
+- Then E1 → E11
+- Then L1 → L11
+
+Node representation:
+- Small circles or hexagons.
+- Node radius: alert level or importance.
+- Fill color: state band
+  - Cool/bright: favorable
+  - Yellow: advisory
+  - Orange: caution
+  - Red: critical
+- Border thickness: confidence (data quality).
+
+Radial mapping:
+- s ∈ [−1.0, +1.0]
+- s = +1.0 → slightly outside R_base (healthy outward pulse)
+- s = 0.0 → on R_base
+- s = −1.0 → pulled inward toward core (collapsing)
+
+============================================================
+4. 2D GEOMETRY — TOP-DOWN COGNITIVE ORGANISM
+============================================================
+Primary 2D view:
+- Center: 4-axis cognitive core.
+- Ring: 42 nodes.
+- Optional: arcs per primitive.
+
+Connections:
+- Faint lines:
+  - within same primitive (e.g., A1–A2–A3),
+  - between strongly coupled nodes (e.g., I1 ↔ A1, E3 ↔ L1).
+
+Overlays:
+- Primitive envelopes:
+  - Smooth contour around each primitive’s nodes.
+  - Attention envelope, Intention envelope, etc.
+- Drift vectors:
+  - Small arrows showing direction of change for key nodes.
+
+State animation (optional):
+- Subtle pulsing of overloaded nodes.
+- Slow breathing-like expansion/contraction of the core to indicate global load.
+
+============================================================
+5. 3D GEOMETRY — EXTRUDED COGNITIVE STACK
+============================================================
+3D builds on 2D and adds Z.
+
+Z-axis modes:
+
+Option A — Time stack:
+- Each Z-slice = snapshot at a time (e.g., hour or day).
+- Stacked slices form a “cognitive history column.”
+- Node trajectories over time become vertical ribbons.
+
+Option B — Depth stack:
+- Top: conscious layer.
+- Middle: preconscious.
+- Bottom: background load.
+- Same 4/42 layout per layer, with transparency.
+
+Node extrusion:
+- Each node → short cylinder.
+- Height: magnitude of deviation |s|.
+- Color: same as 2D state.
+- Top cap: small glow if node is critical.
+
+Primitive volumes:
+- Semi-transparent lobes around each primitive’s nodes.
+- Volume size: aggregate primitive activation.
+- Distortion/spikes: instability or volatility.
+
+============================================================
+6. DRIFT, PRESSURE, AND SAFETY VISUALS
+============================================================
+Drift:
+- Draw small arrows on nodes showing direction of trend (improving vs. degrading).
+- In 3D time mode, drift is visible as slanted ribbons.
+
+Cognitive pressure:
+- Cognitive Load primitive (L-nodes) can be visualized as:
+  - a “weight” pressing on the core from the left,
+  - or a darkening halo when load is high.
+
+Safety envelope:
+- If multiple critical nodes:
+  - Outer ring pulses.
+  - Cognitive Load axis glows.
+  - A subtle “crack” effect on the central polygon (visual metaphor for fragmentation risk).
+
+============================================================
+7. ALERT STATES
+============================================================
+Per-node:
+- Critical nodes:
+  - bright red,
+  - pulsing,
+  - halo ring.
+
+Per-primitive:
+- If primitive aggregate < threshold:
+  - axis thickens and glows,
+  - primitive envelope turns jagged or irregular.
+
+Global:
+- If multiple primitives critical:
+  - entire organism outline pulses.
+  - central polygon shrinks or distorts.
+
+============================================================
+8. INTERACTION MODEL (FOR UI/TOOLS)
+============================================================
+Hover/select:
+- Hover node:
+  - show id (e.g., A3 Task Switching Cost),
+  - raw value,
+  - normalized state,
+  - trend (up/down/flat),
+  - short explanation.
+- Hover primitive:
+  - show summary of that flow (e.g., “Attention is fragmented; focus is hard to sustain.”)
+
+Zoom:
+- Zoom in:
+  - see individual nodes and labels.
+- Zoom out:
+  - see primitive envelopes and global balance.
+
+Time scrub (3D time mode):
+- Scrub along Z:
+  - watch cognitive state evolve.
+  - highlight transitions (e.g., onset of burnout, recovery after rest).
+
+============================================================
+9. IMPLEMENTATION GUIDANCE
+============================================================
+Renderer (Claude or other) should:
+- Define:
+  - node list with angle, primitive, state.
+  - primitive aggregates.
+- Implement:
+  - 2D polar layout,
+  - 3D extrusion,
+  - color/state mapping,
+  - simple animation hooks (pulsing, glow, drift arrows).
+
+Constraints:
+- Geometry must be deterministic:
+  - same inputs → same visual state.
+- No randomness in layout or mapping.
+
+The NeuroCore geometry should feel:
+- precise,
+- calm,
+- analytical,
+- and clearly tied to cognitive states, not decorative abstraction.

@@ -78,6 +78,12 @@ All papers follow the DarkWave Studios LLC Canon² Technical Paper Series format
 | `biocore-paper.md` | BioCore: A Four-Primitive Deterministic Biological Flow Organism |
 | `tri-organism-geometry-paper.md` | Tri-Organism Geometry: A Formal Interaction Framework for Lume-Native Physical Flow Organisms |
 
+### Lume-Cognition Vertical Papers
+
+| File | Title | Notes |
+|------|-------|-------|
+| `neurocore-paper.md` | NeuroCore: A Four-Primitive Deterministic Cognitive Flow Organism | First organism of the Cognitive Layer; formally coupled to BioCore |
+
 ### Organism Specs (in `attached_assets/`)
 
 | File | Description |
