@@ -84,6 +84,7 @@ All papers follow the DarkWave Studios LLC Canon² Technical Paper Series format
 |------|-------|-------|
 | `neurocore-paper.md` | NeuroCore: A Four-Primitive Deterministic Cognitive Flow Organism | First organism of the Cognitive Layer; formally coupled to BioCore |
 | `sociocore-paper.md` | SocioCore: A Four-Primitive Deterministic Social Flow Organism | First organism of the Social Layer; formally coupled to NeuroCore and BioCore |
+| `governancecore-paper.md` | GovernanceCore: A Four-Primitive Deterministic Governance Flow Organism | First organism of the Governance Layer; substrate for Trust Layer, Lume-QOS, DAMOS |
 
 ### Organism Specs (in `attached_assets/`)
 
