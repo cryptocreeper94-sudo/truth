@@ -1,0 +1,145 @@
+AXIOM CONSUMER PRODUCT SUITE — FULL SPEC HANDOFF
+Prepared for: Claude (Build Agent)
+Author: Jason Andrews / DarkWave Studios LLC
+Date: May 2026
+
+==========================================================
+PURPOSE
+==========================================================
+Define the four AXIOM-branded consumer-facing products that
+surface the Lume synthetic organism engines (BioCore,
+NeuroCore, SocioCore) in simple, daily-use form. These are
+lightweight, deterministic, immediately useful tools for
+the general public.
+
+Brand: AXIOM (trusted, deterministic, “AI that never guesses”)
+Architecture: Powered by Lume 4/42 organisms
+Products: AXIOM Neuro, AXIOM Social, AXIOM Bio, AXIOM Daily
+
+==========================================================
+BRAND POSITIONING
+==========================================================
+AXIOM is the consumer-facing brand for deterministic,
+non-hallucinating, precision AI. Lume is the architecture
+brand. Trust Layer is the identity/auth fabric. These
+products must feel like AXIOM modules, not Lume organisms.
+
+Naming convention:
+  AXIOM Neuro
+  AXIOM Social
+  AXIOM Bio
+  AXIOM Daily
+
+All four products share:
+- deterministic outputs
+- no guessing, no hallucinations
+- 4 primitive inputs
+- 1 daily mode
+- 3 recommendations
+- 1-sentence summary
+- optional ring visualization (mini 4/42)
+
+==========================================================
+PRODUCT 1 — AXIOM NEURO
+==========================================================
+Tagline: “Your mind’s daily operating mode.”
+Powered by: NeuroCore (Cognitive Layer)
+
+User Input (30 seconds):
+- clarity
+- emotional load
+- decision pressure
+- attention stability
+
+Output:
+- 1 mode: Focus / Recovery / Emotional / Decision / Safety
+- 3 deterministic recommendations
+- 1-sentence cognitive summary
+- optional mini NeuroCore ring
+
+Use Cases:
+- students, professionals, ADHD, overwhelmed users
+
+==========================================================
+PRODUCT 2 — AXIOM SOCIAL
+==========================================================
+Tagline: “Your interpersonal operating system.”
+Powered by: SocioCore (Social Layer)
+
+User Input:
+- social energy
+- identity stability
+- relational load
+- communication pressure
+
+Output:
+- 1 mode: Social Recovery / Connection / Boundary /
+          Identity Stabilization / Communication Safety
+- 3 deterministic recommendations
+- 1-sentence social summary
+- optional mini SocioCore ring
+
+Use Cases:
+- burnout, relationships, identity drift, communication overload
+
+==========================================================
+PRODUCT 3 — AXIOM BIO
+==========================================================
+Tagline: “Your biological baseline.”
+Powered by: BioCore (Biological Layer)
+
+User Input:
+- energy
+- stress
+- sleep debt
+- recovery load
+
+Output:
+- 1 mode: Biological Recovery / Stress Safety /
+          Energy Optimization / Thermal Balance / Rest Mode
+- 3 deterministic recommendations
+- 1-sentence biological summary
+- optional mini BioCore ring
+
+Use Cases:
+- fatigue, stress, burnout, sleep issues
+
+==========================================================
+PRODUCT 4 — AXIOM DAILY
+==========================================================
+Tagline: “Your personal operating system.”
+Powered by: BioCore + NeuroCore + SocioCore
+
+User Input:
+- 4 primitive scores (Physical, Biological, Cognitive, Social)
+
+Output:
+- 1 unified daily operating mode
+- 3 deterministic cross-layer recommendations
+- 1-sentence whole-system summary
+- optional unified 4-axis ring
+
+Use Cases:
+- general public, daily check-in, habit building
+
+==========================================================
+ARCHITECTURE NOTES
+==========================================================
+All four products:
+- use deterministic Lume organism engines
+- collapse 42 nodes → 4 primitive inputs
+- produce stable, predictable outputs
+- require no wearables or integrations
+- can run inside AXIOM, Lume-Cortex, or standalone
+
+==========================================================
+IMPLEMENTATION PRIORITY
+==========================================================
+1. AXIOM Neuro (fastest adoption)
+2. AXIOM Social (high emotional resonance)
+3. AXIOM Bio (broad appeal)
+4. AXIOM Daily (unified dashboard)
+
+==========================================================
+END OF HANDOFF
+==========================================================
