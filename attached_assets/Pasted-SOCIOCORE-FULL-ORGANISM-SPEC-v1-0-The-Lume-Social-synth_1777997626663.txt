@@ -1,0 +1,271 @@
+SOCIOCORE — FULL ORGANISM SPEC (v1.0)
+The Lume‑Social synthetic organism governing interpersonal flow, identity coherence, relational stability, and social bandwidth.
+
+============================================================
+0. POSITION IN CANON
+============================================================
+Layer: SOCIAL  
+Preceded by:
+- Physical Layer (Meridian, Verdara Ultra, HydroCore)
+- Biological Layer (BioCore)
+- Cognitive Layer (NeuroCore)
+
+SocioCore is the first organism that governs:
+- the space *between* people,
+- the stability of identity across contexts,
+- the flow of social energy,
+- the load of relationships and communication.
+
+============================================================
+1. THE 4 PRIMITIVES — SOCIAL FLOW AXES
+============================================================
+
+1. SOCIAL ENERGY FLOW
+   - Capacity for interaction, connection, presence.
+   - Depletion → isolation, irritability, avoidance.
+
+2. IDENTITY COHERENCE FLOW
+   - Stability of self across contexts.
+   - Depletion → fragmentation, masking, role confusion.
+
+3. RELATIONAL STABILITY FLOW
+   - Quality, safety, and predictability of relationships.
+   - Depletion → conflict, volatility, withdrawal.
+
+4. COMMUNICATION LOAD FLOW
+   - Messaging pressure, social obligations, emotional labor.
+   - Depletion → overwhelm, shutdown, miscommunication.
+
+These are continuous interpersonal fields.
+
+============================================================
+2. THE 42 NODES — SOCIAL STATE RING
+============================================================
+
+SOCIAL ENERGY (S1–S10)
+S1 Social Battery Level  
+S2 Interaction Fatigue  
+S3 Social Overload  
+S4 Social Isolation Pressure  
+S5 Connection Warmth  
+S6 Presence/Attunement  
+S7 Social Recovery Speed  
+S8 Social Burnout Risk  
+S9 Social Curiosity/Openness  
+S10 Social Energy Stability  
+
+IDENTITY COHERENCE (I1–I10)
+I1 Self-Consistency Across Contexts  
+I2 Role Stability  
+I3 Masking Load  
+I4 Identity Drift  
+I5 Self-Trust  
+I6 Boundary Strength  
+I7 Authenticity Pressure  
+I8 Identity Recovery Speed  
+I9 Narrative Coherence  
+I10 Identity Safety Index  
+
+RELATIONAL STABILITY (R1–R11)
+R1 Trust Level  
+R2 Conflict Pressure  
+R3 Emotional Contagion Sensitivity  
+R4 Relational Predictability  
+R5 Attachment Security  
+R6 Relational Overwhelm  
+R7 Social Support Strength  
+R8 Loneliness Load  
+R9 Relational Recovery Speed  
+R10 Reciprocity Balance  
+R11 Relational Safety Index  
+
+COMMUNICATION LOAD (C1–C11)
+C1 Messaging Pressure  
+C2 Emotional Labor Load  
+C3 Miscommunication Risk  
+C4 Social Obligations Load  
+C5 Group Dynamics Stress  
+C6 Social Role Conflict  
+C7 Communication Clarity  
+C8 Social Bandwidth  
+C9 Conversation Fatigue  
+C10 Communication Recovery Speed  
+C11 Global Social Resilience  
+
+============================================================
+3. 2D GEOMETRY — SOCIAL ORGANISM MAP
+============================================================
+
+Axes (clockwise from top):
+- Up: SOCIAL ENERGY
+- Right: IDENTITY COHERENCE
+- Down: RELATIONAL STABILITY
+- Left: COMMUNICATION LOAD
+
+ASCII 2D CORE:
+
+                 ↑ Social Energy
+                 |
+          [S1] [S2] [S3]
+             \    |    /
+               \  |  /
+                 \|/
+   ← Comm Load — [CORE] — Identity →
+                 /|\
+               /  |  \
+             /    |    \
+          [R1] [R2] [R3]
+                 |
+                 ↓ Relational Stability
+
+Ring:
+- 42 nodes arranged in four contiguous arcs.
+- Radial distance = node health.
+- Color = state band (green → yellow → orange → red).
+- Border thickness = confidence.
+
+Primitive envelopes:
+- Smooth lobes around each primitive’s arc.
+- Distortion = instability.
+
+============================================================
+4. 3D GEOMETRY — SOCIAL FIELD STACK
+============================================================
+
+3D modes:
+
+A) TIME STACK  
+- Z-axis = time (hours/days).  
+- Each slice = full 4/42 snapshot.  
+- Node trajectories become vertical ribbons.
+
+B) DEPTH STACK  
+- Top: conscious social behavior  
+- Middle: habitual patterns  
+- Bottom: implicit relational load  
+
+Extrusion:
+- Node height = |state deviation|  
+- Primitive volumes = semi-transparent lobes  
+- Social pressure = inward “gravity” on the left axis  
+
+Global alerts:
+- Multiple critical nodes → pulsing outer ring  
+- Identity fragmentation → crack pattern in identity axis  
+- Relational instability → wobble in relational lobe  
+
+============================================================
+5. STATE MODEL
+============================================================
+Global State Vector:
+SC = [SocialEnergy, IdentityCoherence, RelationalStability, CommunicationLoad]
+
+Node Vector:
+R = [S1–S10, I1–I10, R1–R11, C1–C11]
+
+Equilibrium:
+- Social energy stable  
+- Identity coherent  
+- Relationships predictable  
+- Communication load manageable  
+
+============================================================
+6. ROUTING LOGIC — DETERMINISTIC SOCIAL ENGINE
+============================================================
+
+Inputs:
+- Social interactions  
+- Messaging volume  
+- Conflict events  
+- Support events  
+- Identity stressors  
+- NeuroCore outputs (emotional load, cognitive load)  
+- BioCore outputs (fatigue, stress)  
+
+Outputs:
+- Social mode  
+- Guidance (boundaries, rest, reconnection, decompression)  
+- Drift warnings  
+- Identity stabilization recommendations  
+
+Rules:
+
+1. SOCIAL ENERGY ROUTING  
+   - If S2/S3 high → recommend social rest  
+   - If S4 high → recommend gentle reconnection  
+
+2. IDENTITY ROUTING  
+   - If I3/I4 high → reduce context switching  
+   - If I6 low → strengthen boundaries  
+
+3. RELATIONAL ROUTING  
+   - If R2 high → conflict de-escalation  
+   - If R7 low → seek support  
+
+4. COMMUNICATION LOAD ROUTING  
+   - If C1/C2/C4 high → reduce obligations  
+   - If C9 high → silence notifications  
+
+5. TREND-AWARE  
+   - Multi-day patterns override single spikes  
+
+============================================================
+7. MODES
+============================================================
+- SOCIAL RECOVERY MODE  
+- CONNECTION MODE  
+- BOUNDARY MODE  
+- IDENTITY STABILIZATION MODE  
+- COMMUNICATION SAFETY MODE  
+
+============================================================
+8. THRESHOLDS
+============================================================
+- advisory → 0.0 to -0.3  
+- caution → -0.4 to -0.7  
+- critical → -0.8 to -1.0  
+
+Critical patterns:
+- I4 + R2 + C2 → identity fragmentation risk  
+- S3 + C1 + R6 → social burnout risk  
+
+============================================================
+9. INTEGRATION WITH NEUROCORE & BIOCORE
+============================================================
+
+BioCore → SocioCore:
+- fatigue → social battery  
+- stress → communication load  
+- inflammation → irritability  
+
+NeuroCore → SocioCore:
+- emotional drift → relational instability  
+- cognitive load → communication overload  
+- anxiety → identity fragmentation  
+
+SocioCore → NeuroCore:
+- social overload → cognitive drift  
+- conflict → emotional load  
+
+============================================================
+10. IMPLEMENTATION GUIDANCE
+============================================================
+Renderer must:
+- place 42 nodes in polar ring  
+- compute primitive aggregates  
+- animate drift vectors  
+- support 2D + 3D modes  
+- maintain deterministic mapping  
+
+============================================================
+11. SUMMARY
+============================================================
+SocioCore is the Lume-Social organism:
+- 4 primitives  
+- 42 nodes  
+- deterministic social engine  
+- 2D/3D geometry  
+- integrates with BioCore + NeuroCore  
+- governs social bandwidth, identity, relationships, communication load  
+
+This is the complete vertical spec.
