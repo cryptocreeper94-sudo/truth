@@ -1,0 +1,218 @@
+HYDROCORE — 2D/3D GEOMETRY SPEC (v1.0)
+Deterministic visual geometry for the Lume-Hydro organism.
+
+============================================================
+0. GEOMETRY PURPOSE
+============================================================
+HydroCore’s geometry is not decorative. It is a direct, visual encoding of:
+- the 4 hydrological primitives,
+- the 42 operational nodes,
+- their current states,
+- and their relationships in a hydrological system.
+
+The geometry must:
+- be renderable in both 2D and 3D,
+- preserve the 4/42 structure,
+- support real-time state updates,
+- and remain legible at multiple scales (pipe, building, watershed, region).
+
+============================================================
+1. CORE LAYOUT — 4/42 ORGANISM FRAME
+============================================================
+Base frame:
+- Center: 4-axis core (Pressure, Volume, Purity, Thermal).
+- Surrounding ring: 42 nodes, grouped by primitive.
+- Outer field: contextual overlays (flows, vectors, envelopes).
+
+Coordinate system:
+- Use polar coordinates for the ring (angle = node index, radius = state).
+- Use Cartesian coordinates for 3D extrusion and layering.
+
+============================================================
+2. CORE — 4 PRIMITIVE AXES
+============================================================
+At the center of the organism, define a 4-armed cross (or diamond) with equal angular separation (90° between axes):
+
+Axis assignments (clockwise from top in 2D):
+- Up (0°): PRESSURE FLOW
+- Right (90°): VOLUME FLOW
+- Down (180°): PURITY FLOW
+- Left (270°): THERMAL FLOW
+
+Each axis:
+- Length encodes aggregate primitive health (normalized -1.0 to +1.0).
+- Color encodes primitive type (fixed palette).
+- Thickness encodes volatility (rate of change).
+
+Suggested color palette:
+- Pressure: deep blue
+- Volume: cyan/teal
+- Purity: white/blue mix
+- Thermal: orange/red
+
+============================================================
+3. RING — 42 NODE POSITIONS
+============================================================
+The 42 nodes are placed on a circular ring around the core.
+
+Ring radius:
+- Fixed base radius R_base in 2D.
+- Node radial offset encodes node state (R = R_base + delta).
+
+Angular segmentation:
+- Divide 360° into 42 equal sectors (~8.571° each).
+- Group nodes by primitive in contiguous arcs.
+
+Primitive arc allocation:
+- Pressure nodes (P1–P10): 10 sectors
+- Volume nodes (V1–V10): 10 sectors
+- Purity nodes (U1–U11): 11 sectors
+- Thermal nodes (T1–T11): 11 sectors
+
+Ordering (clockwise from top):
+- Start at 0° with P1 and proceed P1–P10.
+- Then V1–V10.
+- Then U1–U11.
+- Then T1–T11.
+
+Node representation:
+- Each node is a small circle or hexagon.
+- Node radius encodes importance or alert level.
+- Node fill color encodes state:
+  - Green/blue: favorable
+  - Yellow: advisory
+  - Orange: caution
+  - Red: critical
+- Node border thickness encodes confidence (data quality).
+
+Radial state mapping:
+- Node state s ∈ [-1.0, +1.0]
+- Map to radial offset:
+  - s = +1.0 → slightly outside R_base (healthy outward pulse)
+  - s = 0.0 → exactly on R_base
+  - s = -1.0 → pulled inward toward core (collapsing)
+
+============================================================
+4. 2D GEOMETRY — TOP-DOWN ORGANISM VIEW
+============================================================
+Primary 2D view:
+- Center: 4-axis core cross.
+- Ring: 42 nodes in a circle.
+- Optional: thin arcs connecting nodes within the same primitive group.
+
+Connections:
+- Draw faint lines between:
+  - nodes within the same primitive (intra-primitive coupling),
+  - nodes with strong correlation (e.g., P1–P3, V1–V3, U1–U3, T1–T3).
+
+Overlays:
+- Pressure envelope: a smooth contour line connecting all Pressure nodes.
+- Volume envelope: same for Volume, etc.
+- These envelopes can be drawn as colored “petals” extending from the core.
+
+State animation (optional):
+- Pulsing of nodes to indicate active change.
+- Slow rotation of the entire ring to indicate system continuity.
+
+============================================================
+5. 3D GEOMETRY — EXTRUDED ORGANISM
+============================================================
+3D representation builds on the 2D layout and extrudes it into a volumetric form.
+
+Z-axis usage:
+- Z encodes either:
+  - time (past → present → future),
+  - or scale (micro → macro).
+
+Option A — Time stack:
+- Each “slice” in Z is a snapshot of the 2D organism at a given time.
+- Stacking slices creates a 3D “hydro history column.”
+- Node trajectories over time become vertical ribbons.
+
+Option B — Scale stack:
+- Bottom slice: micro (pipe/segment).
+- Middle slice: meso (building/system).
+- Top slice: macro (watershed/region).
+- Lines connect corresponding nodes across scales.
+
+Node extrusion:
+- Each node becomes a short cylinder or pillar.
+- Height encodes magnitude of deviation from neutral (|s|).
+- Color and top cap match 2D state encoding.
+
+Primitive volumes:
+- Each primitive’s nodes can be wrapped in a semi-transparent 3D “lobe” or volume.
+- Pressure lobe, Volume lobe, Purity lobe, Thermal lobe.
+- These lobes expand/contract based on aggregate primitive state.
+
+============================================================
+6. FLOW VECTORS AND FIELD LINES
+============================================================
+To visually encode water flow:
+
+2D:
+- Draw arrows along the ring or radiating outward to show dominant flow direction.
+- Use arrow thickness to encode flow magnitude (VolumeFlow).
+
+3D:
+- Use streamlines or particle traces that:
+  - originate from high-pressure regions,
+  - terminate in low-pressure regions,
+  - curve according to channel geometry.
+
+Color coding:
+- Flow lines colored by Purity or Thermal state (e.g., clean/cold vs dirty/warm).
+
+============================================================
+7. ALERT AND ENVELOPE VISUALIZATION
+============================================================
+Critical states:
+- Any node in critical state:
+  - flashes or pulses red,
+  - triggers a halo or ring segment highlight.
+
+Primitive envelope breach:
+- If a primitive’s aggregate state crosses a threshold:
+  - its axis glows,
+  - its lobe in 3D distorts or spikes.
+
+Global system alert:
+- If multiple primitives are in critical:
+  - the entire organism’s outer ring pulses,
+  - a global “hydro instability” indicator appears.
+
+============================================================
+8. INTERACTION MODEL (FOR UI/TOOLS)
+============================================================
+Hover/select:
+- Hovering a node shows:
+  - node ID (e.g., U4 Pathogen Index),
+  - raw value,
+  - normalized state,
+  - thresholds.
+
+Zoom:
+- Zoom in to see micro-level detail (individual nodes).
+- Zoom out to see primitive envelopes and global state.
+
+Time scrub (3D time stack mode):
+- Scrub along Z to see how the organism evolved.
+- Highlight transitions where nodes crossed thresholds.
+
+============================================================
+9. IMPLEMENTATION GUIDANCE
+============================================================
+For Claude or any renderer:
+- Define a data model:
+  - primitives: {pressure, volume, purity, thermal}
+  - nodes: 42 entries with angle, primitive, state, thresholds
+- Implement:
+  - 2D polar layout,
+  - 3D extrusion,
+  - color/state mapping,
+  - optional animation hooks.
+
+The geometry must remain:
+- deterministic,
+- reproducible,
+- and directly driven by HydroCore’s live state vector.
