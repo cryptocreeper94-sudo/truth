@@ -26,6 +26,9 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 | lume-lang.org | Live | Lume Language Specification — canonical DOI property |
 | vedasolus.io | Registered | BioCore target container |
 
+**AXIOM Consumer Products** (spec: `axiom-consumer-suite-spec.md`):
+AXIOM Neuro (NeuroCore) · AXIOM Bio (BioCore) · AXIOM Social (SocioCore) · AXIOM Daily (3-organism aggregate) · AXIOM Work (GovernanceCore + SocioCore, B2B)
+
 **Product hierarchy:**
 ```
 lume-cortex.com          ← Lume-OS: Deterministic Meta-Operating System
