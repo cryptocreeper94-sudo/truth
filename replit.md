@@ -16,6 +16,27 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - **API codegen**: Orval (from OpenAPI spec)
 - **Build**: esbuild (CJS bundle)
 
+## DarkWave Studios LLC — Domain Registry
+
+| Domain | Status | Purpose |
+|--------|--------|---------|
+| axiom42.com | Live | AXIOM deterministic agent — 181k topics, 148 domain packs, 11 specialty agents, <2ms response |
+| lume42.com | Acquiring | Lume organism aggregate site — all 7 organisms (Meridian → GovernanceCore), 4/42 reference hub |
+| lume-cortex.com | Registered | Lume-Cortex — the full operating system built on Lume; sits above the organism stack |
+| lume-lang.org | Live | Lume Language Specification — canonical DOI property |
+| vedasolus.io | Registered | BioCore target container |
+
+**Product hierarchy:**
+```
+lume-cortex.com   ← The Lume operating system
+      ↓ built on
+lume42.com        ← Organism stack (Meridian → GovernanceCore)
+      ↓ governed by
+axiom42.com       ← AXIOM deterministic agent (operates within organisms)
+```
+
+---
+
 ## AXIOM Engine Knowledge Packs
 
 **Project:** Trust Layer Ecosystem — Lume Knowledge Pack Generation
