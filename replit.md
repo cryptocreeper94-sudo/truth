@@ -36,23 +36,54 @@ All 10 invariants are satisfied in every pack: Determinism, Identity Primacy, Sa
 | T1 (10 packs) | Core foundational domains | ✅ Complete |
 | T2 (10 packs) | Applied/engineering domains | ✅ Complete |
 | T3 (10 packs) | Wild-domain variety | ✅ Complete |
+| T4 (10 packs) | Deep academic/professional domains | ✅ Complete |
 
-### Tier 3 Packs (AXIOM-KP-T3-001 through T3-010)
+### Tier 4 Packs (AXIOM-KP-T4-001 through T4-010)
 
-| ID | Domain | File |
-|----|--------|------|
-| T3-001 | Cryptography & Information Security | `cryptography_information_security_knowledge_pack.md` |
-| T3-002 | Neuroscience & Brain Science | `neuroscience_brain_science_knowledge_pack.md` |
-| T3-003 | Economics & Behavioral Finance | `economics_behavioral_finance_knowledge_pack.md` |
-| T3-004 | Philosophy & Logic | `philosophy_logic_knowledge_pack.md` |
-| T3-005 | Music Theory & Acoustics | `music_theory_acoustics_knowledge_pack.md` |
-| T3-006 | Culinary Science & Food Technology | `culinary_science_food_technology_knowledge_pack.md` |
-| T3-007 | Sports Science & Biomechanics | `sports_science_biomechanics_knowledge_pack.md` |
-| T3-008 | Environmental Engineering & Sustainability | `environmental_engineering_sustainability_knowledge_pack.md` |
-| T3-009 | Cognitive Psychology & Decision Science | `cognitive_psychology_decision_science_knowledge_pack.md` |
-| T3-010 | Game Theory & Systems Thinking | `game_theory_systems_thinking_knowledge_pack.md` |
+| ID | Domain | File (numbered) |
+|----|--------|-----------------|
+| T4-001 | Mathematics | `036_mathematics_knowledge_pack.md` |
+| T4-002 | Physics | `039_physics_2_knowledge_pack.md` |
+| T4-003 | Chemistry | `032_chemistry_3_knowledge_pack.md` |
+| T4-004 | Molecular Biology & Genetics | `038_molecular_biology_genetics_knowledge_pack.md` |
+| T4-005 | Medicine & Clinical Practice | `037_medicine_clinical_practice_knowledge_pack.md` |
+| T4-006 | Law & Jurisprudence | `035_law_jurisprudence_knowledge_pack.md` |
+| T4-007 | Electrical Engineering & Electronics | `033_electrical_engineering_electronics_knowledge_pack.md` |
+| T4-008 | Statistics & Data Science | `040_statistics_data_science_knowledge_pack.md` |
+| T4-009 | Art History & Visual Arts | `031_art_history_visual_arts_knowledge_pack.md` |
+| T4-010 | Finance & Investment Theory | `034_finance_investment_theory_knowledge_pack.md` |
 
-**Total packs in `knowledge_packs/`:** 30 (includes T1, T2, T3)
+**Total packs in `knowledge_packs/`:** 40 (T1–T4), numbered 001–040 in chronological creation order.
+
+---
+
+## Canon² Academic Papers
+
+All papers follow the DarkWave Studios LLC Canon² Technical Paper Series format: abstract, table of contents, full academic sections, appendices, and references. Files live in the project root.
+
+### Meridian Papers
+
+| File | Title |
+|------|-------|
+| `meridian-paper.md` | Meridian: A Four-Layer Deterministic Wireless Energy Routing Architecture |
+| `meridian-paper-2.md` | Meridian as Synthetic Organism |
+| `meridian-paper-3.md` through `meridian-paper-8.md` | Additional Meridian series papers |
+
+### Lume Physical Flow Organism Papers
+
+| File | Title |
+|------|-------|
+| `verdara-ultra-paper.md` | Verdara Ultra: A Four-Primitive Deterministic Outdoor Flow Organism |
+| `hydrocore-paper.md` | HydroCore: A Four-Primitive Deterministic Hydrological Flow Organism |
+| `biocore-paper.md` | BioCore: A Four-Primitive Deterministic Biological Flow Organism |
+| `tri-organism-geometry-paper.md` | Tri-Organism Geometry: A Formal Interaction Framework for Lume-Native Physical Flow Organisms |
+
+### Organism Specs (in `attached_assets/`)
+
+| File | Description |
+|------|-------------|
+| `verdara_ultra_geometry_spec.md` | Verdara Ultra 2D/3D geometry spec |
+| `HYDROCORE — 2D/3D GEOMETRY SPEC v1.0` | HydroCore 2D/3D geometry spec |
 
 ---
 
