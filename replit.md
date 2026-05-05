@@ -28,11 +28,18 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 
 **Product hierarchy:**
 ```
-lume-cortex.com   ← The Lume operating system
-      ↓ built on
-lume42.com        ← Organism stack (Meridian → GovernanceCore)
-      ↓ governed by
-axiom42.com       ← AXIOM deterministic agent (operates within organisms)
+lume-cortex.com          ← Lume-OS: Deterministic Meta-Operating System
+                            Browser-based OS shell (Windows/iOS hybrid)
+                            Hosts and showcases all ecosystem products
+                            Auth: Trust Layer SSO (already live)
+        ├── lume42.com   ← Organism stack module (Meridian → GovernanceCore)
+        │                   4/42 reference hub, 7 organisms, 294 nodes
+        └── axiom42.com  ← AXIOM agent module
+                            181k topics, 148 domain packs, <2ms response
+                            Operates within organism governance framework
+
+Trust Layer (DOI: 10.5281/zenodo.19560674)
+        ↑ identity and auth fabric beneath all products
 ```
 
 ---
