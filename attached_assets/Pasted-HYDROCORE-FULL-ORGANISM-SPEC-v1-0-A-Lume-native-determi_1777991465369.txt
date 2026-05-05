@@ -1,0 +1,251 @@
+HYDROCORE — FULL ORGANISM SPEC (v1.0)
+A Lume-native deterministic hydrological organism for water flow, pressure, purity, and distribution governance.
+
+============================================================
+0. PRODUCT DEFINITION
+============================================================
+Name: HydroCore
+Class: Lume-native synthetic organism
+Domain: Water flow (micro-hydro, macro-hydro, pressure systems, purity, routing)
+Role: Deterministic hydrological operating organism for routing, safety, equilibrium, and environmental water intelligence.
+Analogy: HydroCore is to water what Meridian is to energy and Verdara Ultra is to outdoor flow.
+
+Core Thesis:
+HydroCore ingests hydrological signals (pressure, flow rate, purity, temperature, turbulence, contamination), maintains a stable internal state of “hydro equilibrium,” and outputs deterministic routing, warnings, and flow optimization for water systems at any scale.
+
+============================================================
+1. LUME-HYDRO CORE — THE 4 HYDROCORE PRIMITIVES
+============================================================
+These are the four irreducible flows HydroCore governs.
+
+1. PRESSURE FLOW
+   - Pressure, head, differential, hydraulic potential.
+   - Governs routing, force, and system stability.
+
+2. VOLUME FLOW
+   - Flow rate, discharge, throughput, saturation.
+   - Governs distribution, availability, and load.
+
+3. PURITY FLOW
+   - Contamination, turbidity, pathogens, chemical load.
+   - Governs safety, potability, and filtration needs.
+
+4. THERMAL FLOW
+   - Temperature, thermal gradients, freeze/thaw states.
+   - Governs viscosity, phase change, and flow behavior.
+
+Each primitive is a continuous field over space and time.
+
+============================================================
+2. THE 42 HYDROCORE NODES — HYDRO STATE RING
+============================================================
+
+PRESSURE FLOW NODES (P1–P10)
+P1 Static Pressure
+P2 Dynamic Pressure
+P3 Pressure Differential
+P4 Head Height
+P5 Hydraulic Gradient
+P6 Pipe/Channel Constriction
+P7 Backpressure
+P8 Cavitation Risk
+P9 Pressure Stability
+P10 Burst/Failure Probability
+
+VOLUME FLOW NODES (V1–V10)
+V1 Flow Rate (Q)
+V2 Velocity
+V3 Discharge Volume
+V4 Saturation Level
+V5 Soil/Material Absorption
+V6 Channel Capacity
+V7 Flood Probability
+V8 Drought Probability
+V9 Flow Continuity
+V10 Flow Variability
+
+PURITY FLOW NODES (U1–U11)
+U1 Turbidity
+U2 Sediment Load
+U3 Chemical Contamination
+U4 Pathogen Index
+U5 Mineral Load
+U6 pH Level
+U7 Dissolved Oxygen
+U8 Conductivity
+U9 Salinity
+U10 Filtration Requirement
+U11 Potability Index
+
+THERMAL FLOW NODES (T1–T11)
+T1 Water Temperature
+T2 Thermal Gradient
+T3 Freeze Risk
+T4 Thaw Risk
+T5 Viscosity Shift
+T6 Thermal Shock Risk
+T7 Heat Load
+T8 Evaporation Rate
+T9 Condensation Rate
+T10 Thermal Stability
+T11 Phase Change Probability
+
+============================================================
+3. HYDROCORE GEOMETRY — 4/42 ORGANISM STRUCTURE
+============================================================
+Core:
+- 4-axis core representing Pressure, Volume, Purity, Thermal flows.
+- Each axis is a vector of “flow pressure” (risk/opportunity).
+
+Ring:
+- 42 nodes arranged in a ring.
+- Each node holds a normalized state: -1.0 (worst) to +1.0 (best).
+
+Fractal Behavior:
+- Any hydrological segment (pipe, stream, watershed) can be represented as its own 4/42 micro-organism.
+- HydroCore is recursive and scale-invariant.
+
+============================================================
+4. HYDROCORE STATE MODEL
+============================================================
+Global State Vector:
+P = [PressureFlow, VolumeFlow, PurityFlow, ThermalFlow]
+R = [P1–P10, V1–V10, U1–U11, T1–T11]
+
+Equilibrium:
+HydroCore seeks a state where:
+- Flow is stable
+- Purity is safe
+- Pressure is within envelope
+- Thermal conditions support flow continuity
+
+============================================================
+5. HYDROCORE ROUTING LOGIC — DETERMINISTIC DECISION ENGINE
+============================================================
+
+Inputs:
+- Pressure, flow rate, temperature, purity metrics
+- Channel geometry, pipe data, watershed data
+- 42 node states
+- System constraints (capacity, safety limits)
+- Targets (distribution points, reservoirs, outlets)
+
+Outputs:
+- Optimal routing path
+- Flow adjustments
+- Pressure balancing
+- Purity warnings
+- Thermal risk alerts
+- System optimization recommendations
+
+Deterministic Rules:
+
+1. HARD CONSTRAINT ENFORCEMENT
+If any node crosses critical threshold:
+- Halt routing through that segment
+- Propose alternate flow paths
+- Escalate warnings
+
+2. RISK-WEIGHTED FLOW SCORING
+Score = f(Risk, Efficiency, Stability, Purity)
+
+3. PRESSURE EQUALIZATION
+HydroCore balances pressure across segments to avoid bursts or collapse.
+
+4. PURITY PROTECTION
+Routes avoid contaminated segments unless filtered.
+
+5. THERMAL SAFETY
+Avoids freeze zones, high thermal shock zones, and viscosity extremes.
+
+6. DYNAMIC RE-EVALUATION
+Recompute all 42 nodes continuously.
+
+============================================================
+6. RUNTIME BEHAVIOR
+============================================================
+HydroCore behaves like a deterministic hydrologist:
+- Never guesses
+- Never hides risk
+- Never panics
+- Always re-routes deterministically
+
+Core Loop:
+Sense → Interpret → Decide → Act
+
+============================================================
+7. NODE THRESHOLD TABLE (ADVISORY / CAUTION / CRITICAL)
+============================================================
+
+PRESSURE FLOW NODES
+P1 Static Pressure: 60 psi / 90 psi / 120 psi
+P2 Dynamic Pressure: moderate / high / extreme
+P3 Differential: 10% / 20% / 30%
+P4 Head Height: 10 ft / 20 ft / 30 ft
+P5 Gradient: moderate / steep / extreme
+P6 Constriction: mild / severe / blocked
+P7 Backpressure: elevated / high / critical
+P8 Cavitation: possible / likely / active
+P9 Stability: reduced / poor / collapse
+P10 Burst Probability: 5% / 15% / 30%
+
+VOLUME FLOW NODES
+V1 Flow Rate: moderate / high / extreme
+V2 Velocity: 3 ft/s / 6 ft/s / 10 ft/s
+V3 Discharge: moderate / high / extreme
+V4 Saturation: 70% / 85% / 95%
+V5 Absorption: moderate / low / none
+V6 Capacity: 70% / 85% / 95%
+V7 Flood Risk: elevated / high / imminent
+V8 Drought Risk: moderate / high / extreme
+V9 Continuity: reduced / poor / broken
+V10 Variability: moderate / high / chaotic
+
+PURITY FLOW NODES
+U1 Turbidity: 5 NTU / 10 NTU / 20 NTU
+U2 Sediment: moderate / high / extreme
+U3 Chemical Load: detectable / high / toxic
+U4 Pathogens: possible / likely / confirmed
+U5 Minerals: moderate / high / extreme
+U6 pH: 6–8 / 5–6 or 8–9 / <5 or >9
+U7 DO: 6 mg/L / 4 mg/L / 2 mg/L
+U8 Conductivity: moderate / high / extreme
+U9 Salinity: moderate / high / extreme
+U10 Filtration: needed / urgent / critical
+U11 Potability: reduced / unsafe / dangerous
+
+THERMAL FLOW NODES
+T1 Temperature: 40–80°F / 32–40 or 80–95 / <32 or >95
+T2 Gradient: moderate / steep / extreme
+T3 Freeze Risk: possible / likely / active
+T4 Thaw Risk: moderate / high / extreme
+T5 Viscosity Shift: moderate / high / extreme
+T6 Thermal Shock: possible / likely / active
+T7 Heat Load: moderate / high / extreme
+T8 Evaporation: moderate / high / extreme
+T9 Condensation: moderate / high / extreme
+T10 Stability: reduced / poor / chaotic
+T11 Phase Change: possible / likely / active
+
+============================================================
+8. NORMALIZED SCALE MAPPING
+============================================================
+Normalized scale: -1.0 (critical) → +1.0 (optimal)
+
+Mapping rule:
+if raw < advisory: +0.3 to +1.0
+elif raw < caution: -0.1 to -0.4
+elif raw < critical: -0.5 to -0.8
+else: -1.0
+
+============================================================
+9. IMPLEMENTATION GUIDANCE FOR CLAUDE
+============================================================
+Claude should:
+- Define data structures for primitives + nodes
+- Implement threshold mapping
+- Implement scoring function
+- Implement constraint system
+- Implement routing engine
+- Implement 4/42 geometry
+- Simulate hydrological scenarios

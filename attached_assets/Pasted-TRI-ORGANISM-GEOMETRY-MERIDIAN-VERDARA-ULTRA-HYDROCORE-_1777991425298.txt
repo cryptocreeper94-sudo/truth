@@ -1,0 +1,219 @@
+TRI-ORGANISM GEOMETRY — MERIDIAN / VERDARA ULTRA / HYDROCORE (v1.0)
+Deterministic 2D/3D interaction geometry for three Lume-native physical flow organisms.
+
+============================================================
+0. PURPOSE
+============================================================
+This geometry describes how three 4/42 organisms:
+- Meridian (Lume-Energy),
+- Verdara Ultra (Lume-Outdoor),
+- HydroCore (Lume-Hydro),
+are visualized and related in a single coherent 2D/3D frame.
+
+Goal:
+- Show each organism as a distinct 4/42 entity.
+- Show how their flows interact.
+- Preserve determinism and structural clarity.
+
+============================================================
+1. HIGH-LEVEL LAYOUT
+============================================================
+Top-level structure:
+- A triangular arrangement of three organisms.
+- Each vertex of the triangle is a full 4/42 organism:
+  - Top: MERIDIAN (Energy)
+  - Bottom-left: VERDARA ULTRA (Outdoor)
+  - Bottom-right: HYDROCORE (Hydro)
+
+Center:
+- A shared interaction core where cross-domain flows are visualized.
+
+2D:
+- Equilateral triangle layout.
+3D:
+- Slight vertical offsets to emphasize domain layering.
+
+============================================================
+2. INDIVIDUAL ORGANISM NODES
+============================================================
+Each organism retains its own:
+- 4-axis core,
+- 42-node ring,
+- internal color palette.
+
+Meridian:
+- Domain: energy flow.
+- Palette: electric blues, violets, whites.
+
+Verdara Ultra:
+- Domain: outdoor flow.
+- Palette: earth tones, greens, sky blues.
+
+HydroCore:
+- Domain: water flow.
+- Palette: deep blues, teals, whites.
+
+Each organism is rendered as defined in its own geometry spec (4/42 core + ring).
+
+============================================================
+3. TRIANGLE EDGES — PAIRWISE INTERACTION CHANNELS
+============================================================
+Each edge of the triangle represents a **pairwise interaction channel** between two organisms.
+
+Edges:
+- Meridian ↔ Verdara Ultra
+- Verdara Ultra ↔ HydroCore
+- HydroCore ↔ Meridian
+
+Representation:
+- Each edge is a semi-transparent band or conduit.
+- Within each band, directional flow lines show influence and data exchange.
+
+Edge semantics:
+
+1) Meridian ↔ Verdara Ultra
+   - Energy ↔ Outdoor.
+   - Examples:
+     - Powering outdoor infrastructure.
+     - Energy availability affecting route safety.
+     - Environmental conditions affecting energy demand.
+
+2) Verdara Ultra ↔ HydroCore
+   - Outdoor ↔ Water.
+   - Examples:
+     - Terrain and weather affecting water flow.
+     - Water availability affecting outdoor routing and survival.
+     - Flood/drought risk feeding into Verdara’s hazard model.
+
+3) HydroCore ↔ Meridian
+   - Water ↔ Energy.
+   - Examples:
+     - Hydro power generation.
+     - Cooling systems.
+     - Water availability affecting energy infrastructure.
+
+Flow encoding on edges:
+- Line color: which organism is “sending” influence.
+- Line thickness: magnitude of influence.
+- Line direction: source → target.
+
+============================================================
+4. CENTRAL INTERACTION CORE
+============================================================
+At the center of the triangle:
+- A small, composite 4/42-like “meta-core” representing the **combined state**.
+
+Structure:
+- 3 mini-axes, one per organism:
+  - Meridian axis
+  - Verdara axis
+  - HydroCore axis
+- Each axis length encodes that organism’s global health.
+- A small inner triangle connects the tips of these axes.
+
+Color:
+- Each axis uses its organism’s primary color.
+- The inner triangle is blended from all three.
+
+Purpose:
+- Quick visual of tri-organism balance.
+- If one axis collapses (critical), the triangle distorts visibly.
+
+============================================================
+5. CROSS-ORGANISM NODE LINKING
+============================================================
+Certain nodes in each organism are logically linked to nodes in others.
+
+Examples:
+
+Meridian ↔ Verdara:
+- Meridian: load, capacity, outage risk.
+- Verdara: safe weather window, visibility, hazard probability.
+
+Verdara ↔ HydroCore:
+- Verdara: terrain type, saturation, flood risk.
+- HydroCore: flow rate, saturation, flood probability.
+
+HydroCore ↔ Meridian:
+- HydroCore: flow rate, head, hydro potential.
+- Meridian: generation capacity, cooling capacity.
+
+Visualization:
+- Thin, semi-transparent lines connecting specific nodes across organisms.
+- Only show:
+  - active links (where influence is non-trivial),
+  - or on demand (hover/selection).
+
+Line encoding:
+- Color: source organism.
+- Opacity: strength of coupling.
+
+============================================================
+6. 3D STACKING MODEL
+============================================================
+In 3D, the tri-organism system can be rendered as a **layered tetrahedral form**:
+
+Option A — Vertical layering:
+- Top layer: Meridian (infrastructure/energy).
+- Middle layer: Verdara Ultra (surface/outdoor).
+- Bottom layer: HydroCore (subsurface/water).
+
+Each organism:
+- Slightly offset in Z.
+- Connected by vertical “pillars” representing cross-domain dependencies.
+
+Option B — Tetrahedral:
+- Three organisms at base vertices.
+- Central meta-core slightly elevated.
+- Edge conduits rise slightly toward the center.
+
+============================================================
+7. ALERT AND ENVELOPE VISUALIZATION
+============================================================
+Per-organism alerts:
+- Each organism’s ring and core behave as defined in its own spec.
+
+Tri-organism alerts:
+- If a critical state in one organism propagates to another:
+  - The connecting edge pulses.
+  - The central meta-core triangle distorts toward the failing organism.
+
+Global instability:
+- If all three have critical nodes:
+  - The entire triangle outline pulses.
+  - The central core flashes a warning color (e.g., amber/red).
+
+============================================================
+8. INTERACTION MODES (FOR UI/TOOLS)
+============================================================
+Hover/select:
+- Hovering an organism:
+  - Highlights its edges and node links.
+- Hovering an edge:
+  - Shows which nodes are currently influencing across organisms.
+- Hovering the central core:
+  - Shows a summary of tri-organism health.
+
+Filters:
+- Toggle visibility of:
+  - pairwise edges,
+  - cross-node links,
+  - central meta-core.
+
+Time:
+- In 3D time-stack mode, each organism can be extruded in Z.
+- Tri-organism interactions can be visualized as evolving over time.
+
+============================================================
+9. IMPLEMENTATION GUIDANCE
+============================================================
+For Claude or any renderer:
+- Implement each organism’s 4/42 geometry independently.
+- Place them at triangle vertices in a shared coordinate system.
+- Implement edge conduits as Bezier or straight bands between organism centers.
+- Implement cross-node links as optional overlays.
+- Implement central meta-core as a small, blended 3-axis mini-organism.
+
+Constraints:
+- Geometry must remain deterministic and reproducible.
+- All visual states must be directly driven by the three organisms’ live state vectors.
