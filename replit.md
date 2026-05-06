@@ -32,6 +32,8 @@ AXIOM Neuro (NeuroCore) · AXIOM Bio (BioCore) · AXIOM Social (SocioCore) · AX
 **Key build documents:**
 - `lume-engine-spec.md` — Lume Organism Engine full technical specification (node population, API endpoints, data source mappings, coupling logic, hard constraints)
 - `master-build-handoff.md` — Master combined handoff: ecosystem + all 7 organisms + engine + lume42.com site + all 5 AXIOM products + build order
+- `hydrocore-physical-spec.md` — Full engineering spec for the Deterministic Hydraulic Engine (BOM, firmware, 42-node sensor mapping, lag compensation, test harness)
+- `hydrocore-physical-paper.md` — Canon² paper: HydroCore Physical — first physical instantiation of the Lume 4/42 architecture
 
 **Product hierarchy:**
 ```
