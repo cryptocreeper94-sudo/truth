@@ -115,6 +115,16 @@ All papers follow the DarkWave Studios LLC Canon² Technical Paper Series format
 | `biocore-paper.md` | BioCore: A Four-Primitive Deterministic Biological Flow Organism |
 | `tri-organism-geometry-paper.md` | Tri-Organism Geometry: A Formal Interaction Framework for Lume-Native Physical Flow Organisms |
 
+### Physical Instantiation Papers (Canon² Series)
+
+| File | Title | Companion Spec |
+|------|-------|---------------|
+| `hydrocore-physical-paper.md` | HydroCore Physical: Bench Hydraulic Engine — Physical Instantiation Vol. I | `hydrocore-physical-spec.md` |
+| `hydrocore-drive-paper.md` | HydroCore Drive: Deterministic Onboard Hydrogen Production — Physical Instantiation Vol. II | `hydrocore-drive-spec.md` |
+| `meridian-infrastructure-paper.md` | Meridian Infrastructure: Deterministic Roadway Wireless Energy Routing — Infrastructure Vol. I | `meridian-infrastructure-spec.md` |
+
+**HydroCore Drive ↔ Meridian Infrastructure cross-boundary coupling:** First formal inter-organism coupling across a physical system boundary in the Canon² series. HydroCore (vehicle) and Meridian (road) exchange governance state bidirectionally at 100ms intervals. Coupling nodes: PR8, FS9, TB10 (HydroCore receives Meridian input); LD2, LD4 (Meridian receives HydroCore demand).
+
 ### Lume-Cognition Vertical Papers
 
 | File | Title | Notes |
