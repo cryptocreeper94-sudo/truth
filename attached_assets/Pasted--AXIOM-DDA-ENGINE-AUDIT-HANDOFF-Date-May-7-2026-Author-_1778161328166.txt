@@ -1,0 +1,151 @@
+# AXIOM DDA ENGINE — AUDIT HANDOFF
+## Date: May 7, 2026
+## Author: DarkWave Studios LLC Engineering
+## Classification: Internal — Architecture Change Record
+
+---
+
+## 1. SCOPE OF CHANGE
+
+The Axiom Deterministic AI (DDA) knowledge engine was upgraded from a static pattern-response lookup architecture to a dynamic deterministic Natural Language Generation (NLG) pipeline. This change affects how responses are composed at runtime while preserving all existing knowledge data and deterministic guarantees.
+
+**Systems Affected:** DDA Engine (`D:\dda`)
+**Systems NOT Affected:** Trust Layer SSO, Firebase Auth, Axiom Studio IDE, Lume-Cortex OS, Arbora Platform
+
+---
+
+## 2. PROBLEM STATEMENT
+
+The prior architecture matched user queries via regex patterns and returned pre-written ("canned") text responses from 212 domain packs containing ~181,000 topics. This created two issues:
+
+1. **Stale Responses** — Every query on the same topic returned the identical verbatim paragraph, producing a robotic feel that contradicted the product's "live" conversational goal.
+2. **No Learning** — The system could not incorporate new knowledge, user corrections, or conversational preferences without manually editing pack source files.
+
+---
+
+## 3. WHAT WAS BUILT
+
+### 3.1 New Files Created
+
+| File | Location | Purpose |
+|------|----------|---------|
+| `composition-engine.js` | `src/composition/` | Central NLG orchestrator — parses facts, selects templates, applies variation |
+| `grammar-engine.js` | `src/composition/` | ~200 grammar templates across 13 intent types |
+| `tone-adapter.js` | `src/composition/` | 5 register modes: conversational, technical, concise, empathetic, scholarly |
+| `thesaurus.js` | `src/composition/` | Deterministic synonym/antonym engine with preference learning |
+| `learning-memory.js` | `src/composition/` | 5-dimension persistent learning system |
+| `moby-thesaurus.json` | `data/` | 128 root words, 1,022 synonym links (public domain) |
+| `wordnet-core.json` | `data/` | 19 antonym entries (Princeton license, free commercial use) |
+| `ingest-thesaurus.mjs` | `scripts/` | Thesaurus data build/ingestion script |
+| `test-composition.mjs` | `tests/` | Integration test suite |
+
+### 3.2 Modified Files
+
+| File | Location | Nature of Change |
+|------|----------|------------------|
+| `cognitive-engine.js` | `src/engines/` | Wired CompositionEngine into the execution pipeline with try/catch fallback to legacy behavior |
+
+### 3.3 No Files Deleted
+
+Zero domain packs were removed. All 212 packs (~181K topics) remain intact and functional.
+
+---
+
+## 4. ARCHITECTURE — BEFORE vs AFTER
+
+### Before (Static Lookup)
+```
+User Input → Regex Match → Return pre-written paragraph verbatim
+```
+
+### After (Deterministic NLG Pipeline)
+```
+User Input
+  → Intent Classification (unchanged)
+  → Knowledge Engine match (unchanged)
+  → Response text parsed into structured fact:
+      { subject, core, process, goal, aspects, keywords }
+  → Grammar template selected by intent type (DEFINE, EXPLAIN, etc.)
+  → Template slots filled with fact fields
+  → Synonym variation applied (deterministic, hash-seeded)
+  → Tone register applied (auto-detected from query style)
+  → Learning preferences applied (corrections, preferred terms)
+  → Final composed response returned
+```
+
+---
+
+## 5. DETERMINISM GUARANTEE
+
+The synonym variation engine uses a deterministic seed derived from `hash(query)`. This means:
+
+- **Same input → Same output, every time.** No randomness. No probability.
+- **Different inputs → Different phrasing.** "What is X" and "Explain X" produce different but factually equivalent responses.
+- **Verified:** Determinism test passed — 100 identical queries produced 100 identical responses.
+
+No stochastic models, no LLM calls, and no external API dependencies are introduced by this change. The engine remains fully offline-capable.
+
+---
+
+## 6. LEARNING SYSTEM
+
+Five persistent learning dimensions were added:
+
+| Dimension | Trigger | Storage | Persistence |
+|-----------|---------|---------|-------------|
+| Alias Learning (pre-existing) | `teach()` API | `learned_aliases.json` | Disk |
+| Fact Learning | "Remember that..." / "Learn this..." | `learned_facts.json` | Disk |
+| Correction Learning | "Actually..." / "That's wrong..." | `learned_corrections.json` | Disk |
+| Preference Learning | "I prefer..." / "Be more concise" | `learned_preferences.json` | Disk |
+| Conversation Context | Automatic (turn tracking) | In-memory | Session only |
+
+All disk-persisted learning survives server restarts. Learning data is stored as plain JSON in `src/knowledge/`.
+
+---
+
+## 7. BACKWARDS COMPATIBILITY
+
+- The `cognitive-engine.js` integration uses a try/catch wrapper: if the new CompositionEngine fails for any reason, it falls back to the original `_applyMode()` legacy behavior silently.
+- The knowledge engine's `query()` method return schema is unchanged — existing consumers receive the same `{ domain, intentKey, answer }` object.
+- The `conversation.js` pack (greetings, feelings, time, jokes) continues to use its existing dynamic response functions and is not routed through the CompositionEngine.
+
+---
+
+## 8. TEST RESULTS
+
+```
+Test 1: Define composition         — ✓ PASS (natural language from structured facts)
+Test 2: Explain composition        — ✓ PASS (process extraction from response text)
+Test 3: Summarize composition      — ✓ PASS (concise output)
+Test 4: Name learning              — ✓ PASS ("my name is Jason" → remembered)
+Test 5: Fact learning              — ✓ PASS ("remember that HydroCore..." → stored)
+Test 6: Determinism                — ✓ PASS (same input = same output, 100%)
+Test 7: Hybrid pack composition    — ✓ PASS (domain ID cleaned for display)
+Test 8: Follow-up context          — ✓ PASS ("tell me more" uses prior context)
+```
+
+---
+
+## 9. DATA LICENSING
+
+| Dataset | License | Source |
+|---------|---------|--------|
+| Moby Thesaurus II | Public Domain | Grady Ward, Project Gutenberg |
+| WordNet Core | Princeton WordNet License (free commercial use) | Princeton University |
+
+No proprietary, restricted, or NSFW data sources were used.
+
+---
+
+## 10. REMAINING WORK (Not in this change)
+
+1. **Bulk Pre-Decomposition** — Optionally pre-process all 212 packs into JSON fact files for faster startup (currently parsed on-the-fly).
+2. **API Router Metadata** — Expose composition trace (template used, synonyms applied, tone) in API response headers.
+3. **Thesaurus Expansion** — The curated 128-entry vocabulary can be expanded with additional domain-specific terms.
+4. **Live Integration Test** — End-to-end chat testing in Axiom Studio IDE.
+
+---
+
+**Prepared for audit review. No breaking changes. Zero data loss. Full backwards compatibility.**
+
+DarkWave Studios LLC — Axiom Engineering Division
