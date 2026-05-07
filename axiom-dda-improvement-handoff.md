@@ -1,15 +1,39 @@
-# AXIOM DDA ENGINE — IMPROVEMENT HANDOFF
+# AXIOM DLA ENGINE — IMPROVEMENT HANDOFF
 ## Date: May 2026
 ## Author: DarkWave Studios LLC Engineering
 ## Classification: Internal — Architecture Improvement Recommendations
 
 ---
 
+## TERMINOLOGY
+
+**DLA — Deterministic Language Architecture**
+Coined: May 2026
+Author: Jason Andrews / DarkWave Studios LLC
+Patent: 64/032,339 (Pending)
+
+A DLA is a language response system in which output is governed by deterministic architecture rather than probabilistic inference. Same input always produces the same output. No stochastic models, no neural weights, no sampling temperature. Responses are composed from structured knowledge and governed grammar — auditable, reproducible, and offline-capable.
+
+DLA is the category term that distinguishes AXIOM from Large Language Models (LLMs). An LLM is large and probabilistic. A DLA is deterministic by architecture. These are not points on the same spectrum — they are fundamentally different classes of language system.
+
+| Property | LLM | DLA |
+|----------|-----|-----|
+| Output | Probabilistic — varies per run | Deterministic — identical every run |
+| Auditability | Black box | Pure function |
+| Infrastructure | Cloud, GPU, token billing | Local, offline-capable |
+| Safety | Guardrails bolted on after | Hard constraints at architecture level |
+| Licensing | Training data provenance uncertain | Explicit, clean, documented |
+| Hallucination | Structural risk | Structurally impossible |
+
+AXIOM is a DLA. It does not guess.
+
+---
+
 ## 1. SCOPE
 
-This document identifies five targeted improvements to the DDA NLG pipeline introduced in the May 7, 2026 audit handoff. All improvements are additive — no breaking changes to the existing pipeline, no data loss, no changes to the backwards-compatible fallback behavior.
+This document identifies five targeted improvements to the DLA NLG pipeline introduced in the May 7, 2026 audit handoff. All improvements are additive — no breaking changes to the existing pipeline, no data loss, no changes to the backwards-compatible fallback behavior.
 
-**Systems Affected:** DDA Engine (`D:\dda`) — composition layer only
+**Systems Affected:** DLA Engine (`D:\dda`) — composition layer only
 **Systems NOT Affected:** Trust Layer SSO, Firebase Auth, Axiom Studio IDE, Lume-Cortex OS, Arbora Platform, all 212 knowledge packs
 
 ---

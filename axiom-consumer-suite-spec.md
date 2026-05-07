@@ -11,10 +11,13 @@
 Five AXIOM-branded consumer and professional products that surface the Lume synthetic organism engines in simple, daily-use form. These are lightweight, deterministic, immediately useful tools powered by the 4/42 organism architecture.
 
 **Brand:** AXIOM — "The AI That Never Guesses"
+**Engine class:** DLA — Deterministic Language Architecture (coined May 2026, Jason Andrews / DarkWave Studios LLC, Patent 64/032,339)
 **Architecture:** Powered by Lume 4/42 organisms (BioCore, NeuroCore, SocioCore, GovernanceCore)
 **Products:** AXIOM Neuro · AXIOM Social · AXIOM Bio · AXIOM Daily · AXIOM Work
 
 All five products share the same guarantee: same inputs always produce the same outputs. No guessing, no hallucination, no probabilistic drift. Deterministic by architecture.
+
+AXIOM is not an LLM. It is a DLA — a Deterministic Language Architecture. Where LLMs produce probabilistic outputs that vary per run, a DLA produces identical outputs for identical inputs, every time. Hallucination is not a risk to be mitigated — it is structurally impossible.
 
 ---
 
