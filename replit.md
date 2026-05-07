@@ -94,9 +94,13 @@ All 10 invariants are satisfied in every pack: Determinism, Identity Primacy, Sa
 
 ---
 
-## Canon² Academic Papers
+## Canon³ — The Lume Synthetic Organism Canon (L-SOC)
 
-All papers follow the DarkWave Studios LLC Canon² Technical Paper Series format: abstract, table of contents, full academic sections, appendices, and references. Files live in the project root.
+**Series name:** The Lume Synthetic Organism Canon
+**Abbreviation:** L-SOC
+**Series designation:** Canon³ (follows Canon¹ — original Lume papers; Canon² — organism spec papers)
+
+All L-SOC papers follow the DarkWave Studios LLC Canon³ Technical Paper Series format: abstract, table of contents, full academic sections, appendices, and references. Files live in the project root.
 
 ### Meridian Papers
 
@@ -115,14 +119,20 @@ All papers follow the DarkWave Studios LLC Canon² Technical Paper Series format
 | `biocore-paper.md` | BioCore: A Four-Primitive Deterministic Biological Flow Organism |
 | `tri-organism-geometry-paper.md` | Tri-Organism Geometry: A Formal Interaction Framework for Lume-Native Physical Flow Organisms |
 
-### Physical Instantiation Papers (Canon² Series)
+### L-SOC Papers — Physical Instantiation Series
 
 | File | Title | Companion Spec |
 |------|-------|---------------|
-| `hydrocore-physical-paper.md` | HydroCore Physical: Deterministic Hydraulic Governance via the Lume 4/42 Synthetic Organism Architecture — Physical Instantiation Vol. I | `hydrocore-physical-spec.md` |
-| `hydrocore-drive-paper.md` | HydroCore Drive: Deterministic Onboard Hydrogen Production via Lume 4/42 Organism Governance in a Hydrogen-Hybrid Electric Vehicle — Physical Instantiation Vol. II | `hydrocore-drive-spec.md` |
-| `hydrocore-steam-paper.md` | HydroCore Steam: Deterministic Governance of Industrial Steam Power Systems via the Lume 4/42 Synthetic Organism Architecture — Physical Instantiation Vol. III | (no spec yet) |
-| `meridian-infrastructure-paper.md` | Meridian Infrastructure: Deterministic Roadway Wireless Energy Routing via the Lume 4/42 Synthetic Organism Architecture — Infrastructure Vol. I | `meridian-infrastructure-spec.md` |
+| `hydrocore-physical-paper.md` | HydroCore Physical — Physical Instantiation Vol. I | `hydrocore-physical-spec.md` |
+| `hydrocore-drive-paper.md` | HydroCore Drive — Physical Instantiation Vol. II | `hydrocore-drive-spec.md` |
+| `hydrocore-steam-paper.md` | HydroCore Steam — Physical Instantiation Vol. III | (no spec yet) |
+| `meridian-infrastructure-paper.md` | Meridian Infrastructure — Infrastructure Vol. I | `meridian-infrastructure-spec.md` |
+
+### L-SOC Papers — Language Architecture Series
+
+| File | Title | Notes |
+|------|-------|-------|
+| `dla-paper.md` | DLA: Deterministic Language Architecture — Language Architecture Vol. I | Category-defining paper. Coins "DLA." Hallucination impossibility theorem. Patent 64/032,339. |
 
 **HydroCore Drive ↔ Meridian Infrastructure cross-boundary coupling:** First formal inter-organism coupling across a physical system boundary in the Canon² series. HydroCore (vehicle) and Meridian (road) exchange governance state bidirectionally at 100ms intervals. Coupling nodes: PR8, FS9, TB10 (HydroCore receives Meridian input); LD2, LD4 (Meridian receives HydroCore demand).
 

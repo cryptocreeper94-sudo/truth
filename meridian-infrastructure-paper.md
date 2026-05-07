@@ -1,6 +1,7 @@
 # Meridian Infrastructure: Deterministic Roadway Wireless Energy Routing via the Lume 4/42 Synthetic Organism Architecture
 
-**Canon² Paper Series — Infrastructure Volume I**
+**Canon³ — The Lume Synthetic Organism Canon (L-SOC)**
+**Infrastructure Volume I**
 
 **Author:** Jason Andrews
 **ORCID:** 0009-0007-5214-649X

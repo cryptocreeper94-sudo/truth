@@ -1,6 +1,7 @@
 # HydroCore Drive: Deterministic Onboard Hydrogen Production via Lume 4/42 Organism Governance in a Hydrogen-Hybrid Electric Vehicle
 
-**Canon² Paper Series — Physical Instantiation Volume II**
+**Canon³ — The Lume Synthetic Organism Canon (L-SOC)**
+**Physical Instantiation Volume II**
 
 **Author:** Jason Andrews
 **ORCID:** 0009-0007-5214-649X
