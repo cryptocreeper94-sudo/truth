@@ -565,6 +565,16 @@ HydroCore Physical represents the opening of a new product category: determinist
 
 This is the physical world expression of the AXIOM brand promise: "The AI That Never Guesses" applied to a physical machine. The hydraulic engine never guesses what valve state to adopt. It always knows, because the governance logic is deterministic.
 
+### 13.5 Forward Reference — HydroCore Steam
+
+The bench hydraulic engine described in this paper operates at prototype scale: near-atmospheric pressure, ambient temperature, single-digit watts. The same organism architecture governs at the opposite extreme of the physical power spectrum.
+
+Steam turbines generate approximately 80% of global electricity — nuclear, coal, natural gas, and concentrated solar sources all produce steam that drives turbines to produce power. Every one of these systems is a fluid-pressure plant governed by the same four primitive domains HydroCore governs here: flow stability, pressure regulation, thermal balance, and structural load. The control challenges of industrial steam — pressure surge, thermal creep, turbine blade resonance, supercritical fluid dynamics — are the same multi-variable interaction problems HydroCore addresses, at nine orders of magnitude greater power scale.
+
+HydroCore Steam (Canon² Series — Physical Instantiation Volume III) specifies the complete 42-node mapping of HydroCore primitives to industrial steam plant variables, including two novel governance nodes not present in the bench system: SL5 Thermal Creep Accumulation (continuous remaining-life estimation for pressure vessel components via real-time Norton power law integration) and SL3 Turbine Blade Resonance Governance (real-time Campbell diagram monitoring as a live organism output).
+
+The organism does not change between this paper and that one. The physics does not change. The scale does.
+
 ---
 
 ## Appendix A — Complete 42-Node Table
