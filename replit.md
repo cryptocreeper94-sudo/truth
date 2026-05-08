@@ -164,19 +164,19 @@ All L-SOC papers follow the DarkWave Studios LLC Canon³ Technical Paper Series 
 
 | File | Title | Notes |
 |------|-------|-------|
-| `lume-stack-paper.md` | The Lume Organism Stack — Architecture Vol. I | Canonical system-of-systems paper. All 7 layers. Coupling topology. Full-stack formal guarantees. The paper everything else cites. |
-| `coupling-protocol-paper.md` | Organism Coupling: LIOCP — Architecture Vol. II | Formal inter-organism coupling protocol. NSEP format, α-bounded integration, mode-aware coupling, conflict resolution. Two worked examples. |
-| `lume-formal-math-paper.md` | The Lume 4/42 Formal Mathematics — Architecture Vol. III | Complete formal dynamical system specification. Six theorems: compactness, determinism, hard constraint invariance, coupled determinism, mode stability, convergence. |
-| `human-machine-coupling-paper.md` | Human-Machine Coupling — Architecture Vol. IV | First formal governance of the human-machine boundary. BioCore ↔ HydroCore coupling. Microsleep hard constraint. Causal model + full coupling table. |
-| `lume-safety-certification-paper.md` | Safety and Certification — Architecture Vol. V | IEC 61508 / ISO 26262 / IEC 61511 framework. Translates organism formal properties to regulatory language. SIL assessment, ASIL D for HydroCore Drive H₂ isolation, safety case structure. |
-| `lume-cortex-paper.md` | Lume-Cortex — Architecture Vol. VI | Deterministic meta-OS for the organism stack. Five modules: Lifecycle Manager, Coupling Registry, Query Router, State Display, Policy Enforcer. CCD version control. DLA as OS interface. |
+| `4-lume-stack-paper.md` | The Lume Organism Stack — Architecture Vol. I | Canonical system-of-systems paper. All 7 layers. Coupling topology. Full-stack formal guarantees. The paper everything else cites. |
+| `4-coupling-protocol-paper.md` | Organism Coupling: LIOCP — Architecture Vol. II | Formal inter-organism coupling protocol. NSEP format, α-bounded integration, mode-aware coupling, conflict resolution. Two worked examples. |
+| `4-lume-formal-math-paper.md` | The Lume 4/42 Formal Mathematics — Architecture Vol. III | Complete formal dynamical system specification. Six theorems: compactness, determinism, hard constraint invariance, coupled determinism, mode stability, convergence. |
+| `4-human-machine-coupling-paper.md` | Human-Machine Coupling — Architecture Vol. IV | First formal governance of the human-machine boundary. BioCore ↔ HydroCore coupling. Microsleep hard constraint. Causal model + full coupling table. |
+| `4-lume-safety-certification-paper.md` | Safety and Certification — Architecture Vol. V | IEC 61508 / ISO 26262 / IEC 61511 framework. Translates organism formal properties to regulatory language. SIL assessment, ASIL D for HydroCore Drive H₂ isolation, safety case structure. |
+| `4-lume-cortex-paper.md` | Lume-Cortex — Architecture Vol. VI | Deterministic meta-OS for the organism stack. Five modules: Lifecycle Manager, Coupling Registry, Query Router, State Display, Policy Enforcer. CCD version control. DLA as OS interface. |
 
 ### L-SOC Papers — Infrastructure Series
 
 | File | Title | Notes |
 |------|-------|-------|
 | `meridian-infrastructure-paper.md` | Meridian Infrastructure — Infrastructure Vol. I | Single-segment roadway organism. First inter-organism coupling across physical system boundary. |
-| `meridian-network-paper.md` | Meridian Network — Infrastructure Vol. II | City-scale federated Meridian mesh. Cascade isolation theorem. Load migration protocol. District and city mode hierarchy. Decade deployment path. |
+| `4-meridian-network-paper.md` | Meridian Network — Infrastructure Vol. II | City-scale federated Meridian mesh. Cascade isolation theorem. Load migration protocol. District and city mode hierarchy. Decade deployment path. |
 
 **HydroCore Drive ↔ Meridian Infrastructure cross-boundary coupling:** First formal inter-organism coupling across a physical system boundary in the Canon² series. HydroCore (vehicle) and Meridian (road) exchange governance state bidirectionally at 100ms intervals. Coupling nodes: PR8, FS9, TB10 (HydroCore receives Meridian input); LD2, LD4 (Meridian receives HydroCore demand).
 
