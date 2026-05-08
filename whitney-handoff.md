@@ -147,196 +147,349 @@ team@dwsc.io | lume-lang.org
 
 ---
 
-## DELIVERABLE 2 — PAGE SPEC FOR BUILD AGENT
-
-### Route
-Add to lume-ops-recon: `/lume-overview`
-
-### Tech stack
-React 19 + Vite 7 + Radix UI + Tailwind CSS (match existing app conventions exactly)
-No new dependencies. Use existing UI components from the app's component library.
-Dark theme consistent with existing lume-ops-recon styling.
-
-### File to create
-`client/src/pages/LumeOverview.tsx`
-
-### Router registration — follow this exact process
-
-1. Open `client/src/App.tsx` first. If it contains a `<Routes>` or `<Switch>` block with
-   `<Route>` elements, add the new route there following the exact same pattern as existing routes.
-
-2. If `App.tsx` does not contain the route definitions, search the `client/src/` directory for
-   the file that does — it may be `client/src/router.tsx`, `client/src/routes.tsx`, or similar.
-   Look for where other page-level components are imported and mounted.
-
-3. Add the import at the top of whichever file handles routing:
-   ```tsx
-   import LumeOverview from "./pages/LumeOverview";
-   ```
-
-4. Add the route entry following the existing pattern in that file. It will look something like:
-   ```tsx
-   <Route path="/lume-overview" element={<LumeOverview />} />
-   ```
-
-5. This route must NOT be wrapped in any auth guard, PrivateRoute, or session check.
-   Whitney must be able to open `lotopspro.com/lume-overview` directly from the email
-   without logging in. If the router has a public vs protected route pattern, place this
-   route in the public section.
-
-### Page layout — top to bottom
+## DELIVERABLE 2 — PAGE BUILD INSTRUCTIONS FOR GEMINI
 
 ---
 
-**SECTION 1 — Hero**
-- Full-width dark header section
-- Headline (large): "This is not AI."
-- Subheadline: "It is something more reliable."
-- Small label below: "LotOpsPro × Lume — A fuller picture for Cox Automotive"
-- No CTA buttons in this section. Let it breathe.
+### STEP 0 — READ THESE FILES BEFORE WRITING ANY CODE
+
+Do not write a single line of code until you have read and understood these files.
+Read them now, in this order:
+
+1. `client/src/App.tsx` — this is the router. Understand the import pattern (static vs lazy),
+   the `Switch`/`Route` structure from `wouter`, and where public vs session-gated routes live.
+2. `client/src/pages/Pricing.tsx` — use this as your primary style reference for a public-facing
+   page with cards, badges, and sections.
+3. `client/src/pages/About.tsx` — secondary style reference.
+4. `client/src/components/ui/card.tsx` — understand the Card component API before using it.
+5. `client/src/lib/utils.ts` — confirm the `cn()` utility import path.
+
+Only after reading all five files should you begin writing `LumeOverview.tsx`.
 
 ---
 
-**SECTION 2 — What you already saw (the update)**
-- Two-column card layout (or stacked on mobile)
-- Card A — "LotOpsPro (What you saw)"
+### STEP 1 — CONFIRMED REPO FACTS (do not guess, these are verified)
+
+- **Router library:** `wouter` — use `Switch` and `Route` from `"wouter"`, NOT react-router-dom
+- **Path alias:** `@/` maps to `client/src/` — use `@/components/ui/card` not relative paths
+- **Icon library:** `lucide-react` — already installed, use it for all icons
+- **framer-motion:** REMOVED from this project — do NOT import or use it anywhere
+- **Card component:** available at `@/components/ui/card` — exports `Card`, `CardHeader`,
+  `CardContent`, `CardTitle`, `CardDescription`, `CardFooter`
+- **Other UI:** `Badge` from `@/components/ui/badge`, `Button` from `@/components/ui/button`
+- **Dark theme:** Tailwind dark slate palette — `bg-slate-950`, `bg-slate-900`, `bg-slate-800`,
+  `border-slate-700`, `text-slate-300`, `text-slate-400`, `text-cyan-400`, `text-cyan-300`
+- **No new dependencies** — install nothing, use only what is already in the project
+
+---
+
+### STEP 2 — FILE TO CREATE
+
+**Path:** `client/src/pages/LumeOverview.tsx`
+
+Start the file with this exact structure, then fill in each section below:
+
+```tsx
+import { Shield, RefreshCw, FileCheck, Layers, ArrowRight,
+         ExternalLink, ChevronRight, Lock } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+
+export default function LumeOverview() {
+  return (
+    <div className="min-h-screen bg-slate-950 text-slate-100">
+      {/* SECTION 1: Hero */}
+      {/* SECTION 2: What you already saw */}
+      {/* SECTION 3: What Lume is */}
+      {/* SECTION 4: lume-ops-recon native build */}
+      {/* SECTION 5: Axiom */}
+      {/* SECTION 6: Lume-V wrapping */}
+      {/* SECTION 7: About this work */}
+      {/* SECTION 8: Further reading */}
+      {/* SECTION 9: Footer */}
+    </div>
+  );
+}
+```
+
+---
+
+### STEP 3 — ROUTER REGISTRATION
+
+The router lives in `client/src/App.tsx`. It uses `wouter`.
+
+1. Add a **static import** at the top of `App.tsx` alongside the other static page imports
+   (not lazy — this is a lightweight public page):
+   ```tsx
+   import LumeOverview from "@/pages/LumeOverview";
+   ```
+
+2. Find the `<Switch>` block inside `App.tsx`. Locate where other public pages are registered
+   (pages that do NOT require a session, such as Login, Pricing, About, PrivacyPolicy,
+   TermsOfService). Add the new route in that same public section:
+   ```tsx
+   <Route path="/lume-overview" component={LumeOverview} />
+   ```
+   Note: `wouter` uses `component={...}` not `element={<... />}` — match the pattern you
+   see in the existing routes exactly.
+
+3. This route must NOT be inside any auth guard, session check, or PrivateRoute wrapper.
+   Whitney must be able to open `lotopspro.com/lume-overview` cold from an email link
+   with no login. If you are unsure whether a wrapper is auth-gating, check what the
+   wrapper does before placing the route inside it.
+
+---
+
+### STEP 4 — PAGE SECTIONS (build each in order)
+
+---
+
+#### SECTION 1 — Hero
+
+```tsx
+<section className="w-full px-6 py-24 md:py-32 text-center border-b border-slate-800">
+  <p className="text-xs uppercase tracking-widest text-cyan-400 mb-6">
+    LotOpsPro × Lume — A fuller picture for Cox Automotive
+  </p>
+  <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6">
+    This is not AI.
+  </h1>
+  <p className="text-xl md:text-2xl text-slate-400 max-w-2xl mx-auto">
+    It is something more reliable.
+  </p>
+</section>
+```
+
+---
+
+#### SECTION 2 — What you already saw (the update)
+
+Structure: two `Card` components side by side (`grid grid-cols-1 md:grid-cols-2 gap-6`),
+with an `ArrowRight` icon centered between them on desktop (hidden on mobile).
+
+Card A — title: "LotOpsPro (What you saw)"
+- Badge label: "Previously presented"  variant: outline
+- Content lines (use `<p>` tags with `text-slate-400`):
   - React-based lot operations application
   - Vehicle inventory, reconditioning workflows, driver management, shift operations
-  - Built and presented to Cox Automotive in early 2025
-- Card B — "LotOpsPro Today"
+  - Built and presented to Cox Automotive
+
+Card B — title: "LotOpsPro Today"
+- Badge label: "Now governed by Lume-V"  className: `bg-cyan-950 text-cyan-300 border-cyan-800`
+- Content lines:
   - That same application is now wrapped in Lume-V
-  - Every operational decision now produces a signed, auditable governance certificate
+  - Every operational decision produces a signed, auditable governance certificate
   - Speed enforcement, lot capacity, shift rules, weather freezes — all governed in real time
-  - The UI looks similar. The system underneath is categorically different.
-- Use a subtle "→" or arrow between the two cards to show evolution
+- Closing line in `text-slate-300 font-medium`:
+  "The UI looks similar. The system underneath is categorically different."
+
+Section wrapper: `<section className="max-w-5xl mx-auto px-6 py-20">`
+Section heading above the grid: `<h2 className="text-2xl font-semibold mb-10">A quick update on what you've seen</h2>`
 
 ---
 
-**SECTION 3 — What Lume is (plain language, no jargon)**
-- Section heading: "What Lume actually is"
-- Four feature tiles in a 2×2 grid:
+#### SECTION 3 — What Lume is
 
-  Tile 1 — NOT AI
-  Icon: shield or lock
-  Title: "Deterministic, not probabilistic"
-  Body: Lume does not guess, infer, or learn from data. Same input produces the same output every
-  time — mathematically guaranteed. It cannot hallucinate. It cannot surprise you.
+Section wrapper: `<section className="bg-slate-900 px-6 py-20">`
+Inner wrapper: `<div className="max-w-5xl mx-auto">`
+Section heading: `<h2 className="text-2xl font-semibold mb-3">What Lume actually is</h2>`
+Subheading: `<p className="text-slate-400 mb-12 max-w-2xl">Plain language. No jargon.</p>`
 
-  Tile 2 — Self-governing
-  Icon: refresh/cycle
-  Title: "Self-monitoring and self-correcting"
-  Body: Lume watches the system state continuously and enforces defined rules as hard constraints.
-  It doesn't log violations after the fact — it intervenes in real time.
+Four tiles in a `grid grid-cols-1 md:grid-cols-2 gap-6`:
 
-  Tile 3 — Auditable
-  Icon: document/certificate
-  Title: "Every decision is certified"
-  Body: Each governed operation produces an Operational Certificate — a signed, hash-linked record
-  that says what happened, what rules were checked, and why the decision was made. Replayable.
-  Tamper-evident. Audit-ready.
+**Tile 1**
+- Icon: `<Shield className="w-6 h-6 text-cyan-400" />`
+- Title: "Deterministic, not probabilistic"
+- Pill/badge above title: `NOT AI` — style with `bg-red-950 text-red-400 border-red-800 text-xs`
+- Body: "Lume does not guess, infer, or learn from data. Same input produces the same
+  output every time — mathematically guaranteed. It cannot hallucinate. It cannot surprise you."
 
-  Tile 4 — A substrate, not a product
-  Icon: layers
-  Title: "Works across any domain"
-  Body: Lume is not built for lot operations specifically. It is an architecture that governs
-  operations in any domain — physical, logistical, cognitive, organizational — using the same
-  deterministic principles.
+**Tile 2**
+- Icon: `<RefreshCw className="w-6 h-6 text-cyan-400" />`
+- Title: "Self-monitoring and self-correcting"
+- Body: "Lume watches the system state continuously and enforces defined rules as hard
+  constraints. It doesn't log violations after the fact — it intervenes in real time."
 
----
+**Tile 3**
+- Icon: `<FileCheck className="w-6 h-6 text-cyan-400" />`
+- Title: "Every decision is certified"
+- Body: "Each governed operation produces an Operational Certificate — a signed, hash-linked
+  record of what happened, what rules were checked, and why the decision was made.
+  Replayable. Tamper-evident. Audit-ready."
 
-**SECTION 4 — lume-ops-recon: The native build**
-- Section heading: "The next step — built with Lume at the core"
-- Full-width feature highlight (dark card, accent border)
-- Body copy:
-  lume-ops-recon is not a wrapper. It is a lot operations platform built natively on the Lume
-  architecture from the ground up. Where LotOpsPro was a React application that Lume-V was applied
-  to, lume-ops-recon starts from Lume. The governance is structural, not added on.
-- Three bullet features below the copy:
-  • Real-time governance of every move, assignment, safety event, and crew action
-  • Live Operational Certificate chain — every decision signed, chained, and replayable
-  • Designed to deploy to lotopspro.com as the primary successor to LotOpsPro
+**Tile 4**
+- Icon: `<Layers className="w-6 h-6 text-cyan-400" />`
+- Title: "Works across any domain"
+- Body: "Lume is not built for lot operations specifically. It is an architecture that
+  governs operations in any domain — physical, logistical, cognitive, organizational —
+  using the same deterministic principles."
+
+Each tile is a `Card` with `className="bg-slate-800 border-slate-700"`.
+Inside each: `CardHeader` with icon + title, `CardContent` with body text in `text-slate-400`.
 
 ---
 
-**SECTION 5 — Axiom (language interface)**
-- Section heading: "If you want a language interface — Axiom"
-- Subheading in smaller text: "Still not AI."
-- Two-column layout:
-  Left: explanation
-    Axiom is a Deterministic Language Architecture (DLA). It accepts natural spoken language and
-    produces responses by composing from a verified, explicitly defined knowledge base. It cannot
-    produce information that is not in that base. Hallucination is not a risk to manage — it is
-    architecturally impossible.
-  Right: use case tiles (small, subtle cards)
-    - Driver assistant — knows lot rules, current assignments, vehicle locations
-    - Service writer assistant — work order status, reconditioning workflows
-    - Lot manager assistant — shift summaries, capacity reports, safety event logs
-    - Knowledge can be packed per role — each version knows only what it needs to
+#### SECTION 4 — lume-ops-recon: The native build
+
+Section wrapper: `<section className="max-w-5xl mx-auto px-6 py-20">`
+Section heading: `<h2 className="text-2xl font-semibold mb-10">The next step — built with Lume at the core</h2>`
+
+Single full-width `Card` with `className="bg-slate-900 border border-cyan-800"`:
+
+CardContent body text (`text-slate-300 text-lg leading-relaxed mb-8`):
+"lume-ops-recon is not a wrapper. It is a lot operations platform built natively on the
+Lume architecture from the ground up. Where LotOpsPro was a React application that
+Lume-V was applied to, lume-ops-recon starts from Lume. The governance is structural,
+not added on."
+
+Below the paragraph, three feature rows — each as a `div` with a `ChevronRight` icon
+in `text-cyan-400` and text in `text-slate-300`:
+- "Real-time governance of every move, assignment, safety event, and crew action"
+- "Live Operational Certificate chain — every decision signed, chained, and replayable"
+- "Designed to deploy to lotopspro.com as the primary successor to LotOpsPro"
 
 ---
 
-**SECTION 6 — Lume-V wrapping**
-- Section heading: "Your existing systems don't have to change"
-- Single centered paragraph (wider max-width):
-  Lume-V is a governance wrapper. It can be applied to Cox systems already in operation, bringing
-  deterministic oversight, real-time constraint enforcement, and an auditable decision record —
-  without replacing what is already there. The work of integration is significantly lighter than
-  a full rebuild.
-- No bullet points in this section. Let the paragraph stand on its own.
+#### SECTION 5 — Axiom
+
+Section wrapper: `<section className="bg-slate-900 px-6 py-20">`
+Inner: `<div className="max-w-5xl mx-auto">`
+
+Heading: `<h2 className="text-2xl font-semibold mb-2">If you want a language interface — Axiom</h2>`
+Subheading directly below (smaller, muted red): 
+```tsx
+<p className="text-red-400 text-sm font-medium mb-10">Still not AI.</p>
+```
+
+Two-column grid `grid grid-cols-1 md:grid-cols-2 gap-10 items-start`:
+
+**Left column** — explanation paragraph in `text-slate-300 leading-relaxed`:
+"Axiom is a Deterministic Language Architecture (DLA). It accepts natural spoken language
+and produces responses by composing from a verified, explicitly defined knowledge base.
+It cannot produce information that is not in that base. Hallucination is not a risk to
+manage — it is architecturally impossible."
+
+**Right column** — four small Cards stacked vertically (`flex flex-col gap-3`):
+
+Each card: `Card` with `className="bg-slate-800 border-slate-700 p-4"`, no CardHeader,
+just a `p` with icon inline and text:
+- `Lock` icon + "Driver assistant — lot rules, current assignments, vehicle locations"
+- `Lock` icon + "Service writer assistant — work order status, reconditioning workflows"
+- `Lock` icon + "Lot manager assistant — shift summaries, capacity reports, safety logs"
+- `Lock` icon + "Knowledge packed per role — each version knows only what it needs to"
+
+Use `Lock className="w-4 h-4 text-cyan-400 inline mr-2"` for the inline icons.
 
 ---
 
-**SECTION 7 — About this work**
-- Section heading: "A note on where this comes from"
-- Muted/secondary text styling (not the hero style — honest, direct tone)
-- Body:
-  This technology was not developed for LotOpsPro specifically, and it was not developed for Cox
-  Automotive. It is the foundation for 42 applications built independently by Jason Andrews at
-  DarkWave Studios LLC. LotOpsPro is one. The architecture was designed to work across all of
-  them — and beyond.
+#### SECTION 6 — Lume-V wrapping
 
-  All of this was built on personal time, with personal resources, without direction from anyone.
-  The first presentation to Cox happened sooner than expected — there was one evening to prepare.
-  What you are looking at now is the fuller picture.
+Section wrapper: `<section className="max-w-3xl mx-auto px-6 py-20 text-center">`
 
-- Small patent/IP notice below the paragraph:
-  Patent Pending: U.S. Provisional Application No. 64/032,339 | ORCID: 0009-0007-5214-649X
+Heading: `<h2 className="text-2xl font-semibold mb-8">Your existing systems don't have to change</h2>`
+
+Single paragraph `text-slate-300 text-lg leading-relaxed`:
+"Lume-V is a governance wrapper. It can be applied to Cox systems already in operation,
+bringing deterministic oversight, real-time constraint enforcement, and an auditable
+decision record — without replacing what is already there. The work of integration is
+significantly lighter than a full rebuild."
+
+No bullet points. No cards. Let the paragraph stand alone.
 
 ---
 
-**SECTION 8 — Further reading (optional)**
-- Section heading: "For those who want to go deeper"
-- Two link cards side by side:
-  Card A:
-    Title: "Lume Language Specification"
-    Label: Published reference
-    URL: https://lume-lang.org
-  Card B:
-    Title: "Deterministic Language Architecture"
-    Label: Technical paper (DOI: 10.5281/zenodo.19491784)
-    URL: https://doi.org/10.5281/zenodo.19491784
-- Small note below: "These are optional. The page above covers everything needed for a business conversation."
+#### SECTION 7 — About this work
+
+Section wrapper: `<section className="bg-slate-900 px-6 py-20">`
+Inner: `<div className="max-w-3xl mx-auto">`
+
+Heading: `<h2 className="text-2xl font-semibold mb-8 text-slate-300">A note on where this comes from</h2>`
+
+Two paragraphs in `text-slate-400 leading-relaxed mb-6`:
+
+Paragraph 1:
+"This technology was not developed for LotOpsPro specifically, and it was not developed
+for Cox Automotive. It is the foundation for 42 applications built independently by
+Jason Andrews at DarkWave Studios LLC. LotOpsPro is one. The architecture was designed
+to work across all of them — and beyond."
+
+Paragraph 2:
+"All of this was built on personal time, with personal resources, without direction from
+anyone. The first presentation to Cox happened sooner than expected — there was one
+evening to prepare. What you are looking at now is the fuller picture."
+
+IP notice below both paragraphs — `text-slate-600 text-xs mt-8`:
+"Patent Pending: U.S. Provisional Application No. 64/032,339 | ORCID: 0009-0007-5214-649X"
 
 ---
 
-**SECTION 9 — Footer / Contact**
-- Simple footer bar
-- "Questions? Jason Andrews — team@dwsc.io"
-- DarkWave Studios LLC
-- No social links, no nav. Keep it clean.
+#### SECTION 8 — Further reading
+
+Section wrapper: `<section className="max-w-5xl mx-auto px-6 py-16">`
+
+Heading: `<h2 className="text-xl font-semibold mb-2 text-slate-300">For those who want to go deeper</h2>`
+Subheading: `<p className="text-slate-500 text-sm mb-10">Optional — the page above covers everything needed for a business conversation.</p>`
+
+Two `Card` components side by side (`grid grid-cols-1 md:grid-cols-2 gap-6`):
+
+Card A:
+- className: `"bg-slate-900 border-slate-700 hover:border-cyan-700 transition-colors cursor-pointer"`
+- onClick: `window.open("https://lume-lang.org", "_blank")`
+- CardHeader: Badge `"Published reference"` + title "Lume Language Specification"
+- CardContent: `ExternalLink` icon + `"lume-lang.org"` in `text-cyan-400 text-sm`
+
+Card B:
+- className: same as Card A
+- onClick: `window.open("https://doi.org/10.5281/zenodo.19491784", "_blank")`
+- CardHeader: Badge `"Technical paper"` + title "Deterministic Language Architecture"
+- CardContent: `ExternalLink` icon + `"DOI: 10.5281/zenodo.19491784"` in `text-cyan-400 text-sm`
 
 ---
 
-### Design notes for build agent
-- Color palette: match existing lume-ops-recon dark theme (dark slate backgrounds, cyan/teal accents)
-- Typography: match existing app — no new fonts
-- The word "AI" appears in a negative context throughout — style it subtly differently wherever it
-  appears as "not AI" (e.g., muted red or strikethrough) to reinforce the point visually
-- The page should feel like a serious technical product page, not a marketing brochure
-- No animations that feel flashy or salesy — subtle fade-in on scroll is acceptable
-- Mobile responsive — Whitney may open this on her phone
-- Page title (browser tab): "LotOpsPro × Lume — DarkWave Studios"
-- No login required to view this page — it must be publicly accessible without authentication
+#### SECTION 9 — Footer
+
+```tsx
+<footer className="border-t border-slate-800 px-6 py-10 text-center">
+  <p className="text-slate-400 text-sm mb-1">
+    Questions?{" "}
+    <a href="mailto:team@dwsc.io" className="text-cyan-400 hover:underline">
+      Jason Andrews — team@dwsc.io
+    </a>
+  </p>
+  <p className="text-slate-600 text-xs">DarkWave Studios LLC</p>
+</footer>
+```
+
+---
+
+### STEP 5 — PAGE TITLE
+
+Add this inside the component, before the return, using the document API:
+```tsx
+useEffect(() => {
+  document.title = "LotOpsPro × Lume — DarkWave Studios";
+}, []);
+```
+Add `useEffect` to the import from `"react"` at the top of the file.
+
+---
+
+### STEP 6 — SELF-VERIFICATION CHECKLIST
+
+Before marking this task complete, verify every item:
+
+- [ ] `client/src/pages/LumeOverview.tsx` exists and has no TypeScript errors
+- [ ] framer-motion is NOT imported anywhere in the file
+- [ ] All icons are from `lucide-react`
+- [ ] All UI components use `@/` path alias (no relative `../../` imports)
+- [ ] Route is added to `client/src/App.tsx` using `wouter` syntax (`component={LumeOverview}`)
+- [ ] The route is NOT inside any auth guard or session wrapper
+- [ ] Page renders on `/lume-overview` without requiring a login
+- [ ] All 9 sections are present and contain the correct copy (spot-check section headings)
+- [ ] The word "AI" appears styled differently (red text or badge) wherever "not AI" is stated
+- [ ] Page title updates to "LotOpsPro × Lume — DarkWave Studios" on mount
+- [ ] Page is mobile responsive — no horizontal scroll on a 375px viewport
+- [ ] No `console.error` or unhandled TypeScript type errors in the file
 
 ---
 
