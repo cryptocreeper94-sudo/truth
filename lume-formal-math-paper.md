@@ -1,4 +1,4 @@
-# 4 The Lume 4/42 Organism: A Formal Mathematical Specification of the Deterministic Synthetic Organism Architecture
+# The Lume 4/42 Organism: A Formal Mathematical Specification of the Deterministic Synthetic Organism Architecture
 
 **Canon³ — The Lume Synthetic Organism Canon (L-SOC)**
 **Architecture Series Volume III**

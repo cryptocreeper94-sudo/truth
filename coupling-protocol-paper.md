@@ -1,4 +1,4 @@
-# 4 Organism Coupling: A Formal Protocol for Deterministic State Exchange Across Lume 4/42 System Boundaries
+# Organism Coupling: A Formal Protocol for Deterministic State Exchange Across Lume 4/42 System Boundaries
 
 **Canon³ — The Lume Synthetic Organism Canon (L-SOC)**
 **Architecture Series Volume II**

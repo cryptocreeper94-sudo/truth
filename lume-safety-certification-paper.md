@@ -1,4 +1,4 @@
-# 4 Safety and Certification of Lume 4/42 Organism Deployments: A Formal Framework for IEC 61508, ISO 26262, and IEC 61511 Compliance
+# Safety and Certification of Lume 4/42 Organism Deployments: A Formal Framework for IEC 61508, ISO 26262, and IEC 61511 Compliance
 
 **Canon³ — The Lume Synthetic Organism Canon (L-SOC)**
 **Architecture Series Volume V**

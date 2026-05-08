@@ -1,4 +1,4 @@
-# 4 Meridian Network: Deterministic City-Scale Wireless Energy Routing via Federated Lume 4/42 Organism Governance
+# Meridian Network: Deterministic City-Scale Wireless Energy Routing via Federated Lume 4/42 Organism Governance
 
 **Canon³ — The Lume Synthetic Organism Canon (L-SOC)**
 **Infrastructure Series Volume II**

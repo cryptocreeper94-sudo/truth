@@ -1,4 +1,4 @@
-# 4 Lume-Cortex: A Deterministic Meta-Operating System Built on the Lume Synthetic Organism Stack
+# Lume-Cortex: A Deterministic Meta-Operating System Built on the Lume Synthetic Organism Stack
 
 **Canon³ — The Lume Synthetic Organism Canon (L-SOC)**
 **Architecture Series Volume VI**

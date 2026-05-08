@@ -1,4 +1,4 @@
-# 4 Deterministic Language Architecture: A Formal Category Definition and Architectural Specification for Non-Probabilistic Language Generation Systems
+# Deterministic Language Architecture: A Formal Category Definition and Architectural Specification for Non-Probabilistic Language Generation Systems
 
 **Canon³ — The Lume Synthetic Organism Canon (L-SOC)**
 **Language Architecture Volume I**
