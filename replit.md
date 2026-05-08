@@ -158,7 +158,7 @@ All L-SOC papers follow the DarkWave Studios LLC Canon³ Technical Paper Series 
 | File | Title | Notes |
 |------|-------|-------|
 | `dla-paper.md` | DLA: Deterministic Language Architecture — Language Architecture Vol. I | Category-defining paper. Coins "DLA." Hallucination impossibility theorem. Patent 64/032,339. |
-| `axiom-consumer-suite-paper.md` | AXIOM Consumer Suite — Language Architecture Vol. II | Five DLA products: AXIOM Bio, Neuro, Social, Daily, Work. Organism grounding by product. Shared DLA composition engine. Trust Layer SSO. B2B audit trail. |
+| `4-axiom-consumer-suite-paper.md` | AXIOM Consumer Suite — Language Architecture Vol. II | Five DLA products: AXIOM Bio, Neuro, Social, Daily, Work. Organism grounding by product. Shared DLA composition engine. Trust Layer SSO. B2B audit trail. |
 
 ### L-SOC Papers — Architecture Series
 
@@ -168,7 +168,7 @@ All L-SOC papers follow the DarkWave Studios LLC Canon³ Technical Paper Series 
 | `coupling-protocol-paper.md` | Organism Coupling: LIOCP — Architecture Vol. II | Formal inter-organism coupling protocol. NSEP format, α-bounded integration, mode-aware coupling, conflict resolution. Two worked examples. |
 | `lume-formal-math-paper.md` | The Lume 4/42 Formal Mathematics — Architecture Vol. III | Complete formal dynamical system specification. Six theorems: compactness, determinism, hard constraint invariance, coupled determinism, mode stability, convergence. |
 | `human-machine-coupling-paper.md` | Human-Machine Coupling — Architecture Vol. IV | First formal governance of the human-machine boundary. BioCore ↔ HydroCore coupling. Microsleep hard constraint. Causal model + full coupling table. |
-| `4-lume-safety-certification-paper.md` | Safety and Certification — Architecture Vol. V | IEC 61508 / ISO 26262 / IEC 61511 framework. Translates organism formal properties to regulatory language. SIL assessment, ASIL D for HydroCore Drive H₂ isolation, safety case structure. |
+| `lume-safety-certification-paper.md` | Safety and Certification — Architecture Vol. V | IEC 61508 / ISO 26262 / IEC 61511 framework. Translates organism formal properties to regulatory language. SIL assessment, ASIL D for HydroCore Drive H₂ isolation, safety case structure. |
 | `lume-cortex-paper.md` | Lume-Cortex — Architecture Vol. VI | Deterministic meta-OS for the organism stack. Five modules: Lifecycle Manager, Coupling Registry, Query Router, State Display, Policy Enforcer. CCD version control. DLA as OS interface. |
 
 ### L-SOC Papers — Infrastructure Series
