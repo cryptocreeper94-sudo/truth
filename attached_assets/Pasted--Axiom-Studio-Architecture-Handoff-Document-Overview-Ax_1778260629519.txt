@@ -1,0 +1,38 @@
+# Axiom Studio: Architecture & Handoff Document
+
+## Overview
+Axiom Studio is a cloud-native, AI-first Integrated Development Environment (IDE) built by DarkWave Studios. It is designed to provide a comprehensive, multi-tenant workspace where developers can write code, run terminal commands, and collaborate with multiple AI agents (e.g., Claude 3.5 Sonnet, Claude 3 Opus, GPT-4) directly within their editor.
+
+## Tech Stack
+- **Frontend**: React (Vite), TypeScript, Tailwind CSS, Framer Motion for animations.
+- **Editor**: Monaco Editor (`@monaco-editor/react`) for core file editing.
+- **Terminal**: `xterm.js` connected via WebSockets to a backend `node-pty` instance.
+- **Backend**: Express (Node.js) with standard REST and SSE (Server-Sent Events) for AI streaming.
+- **Database**: PostgreSQL managed via Drizzle ORM.
+- **Authentication**: Firebase Authentication (Client) -> JWT verification (Backend).
+- **Monetization**: Stripe Checkout for a Pay-As-You-Go AI Credit system.
+
+## Core Features & Mechanisms
+
+1. **Multi-Tenant Workspace Isolation**
+   - The application supports multiple users simultaneously.
+   - Upon login, a strictly isolated workspace directory is mounted/created for the user (e.g., `/data/workspaces/{userId}`).
+   - The backend enforces security by verifying the Firebase JWT on every API and WebSocket request. No user can access or read files outside their dedicated root.
+
+2. **AI Agent Integration**
+   - **Chat Interface**: Users can chat with various AI models. The frontend streams responses via Server-Sent Events (SSE).
+   - **Context Awareness**: The chat payload includes the contents of the currently active files or files the user explicitly attaches.
+   - **Code Application**: The AI generates code blocks that can be single-click "applied" directly into the Monaco Editor.
+
+3. **Pay-As-You-Go Credit System**
+   - AI interactions are gated by an internal credit balance.
+   - Users purchase "Credit Packs" via Stripe dynamic checkout sessions.
+   - Different models cost different amounts per request (e.g., Opus costs 10 credits, Sonnet costs 3 credits, Mini is free).
+   - The UI includes real-time low-credit pulsing alerts and actively intercepts chat requests if the user lacks sufficient funds.
+
+4. **File System & Terminal**
+   - **File Tree**: Uses `react-arborist` to visualize the workspace. The frontend proxies file CRUD operations to backend endpoints (`/api/files/*`).
+   - **Terminal**: WebSockets proxy bidirectional terminal input/output, restricted strictly to the user's workspace CWD.
+
+## Audit Objective
+Please review the repository with this context in mind. Prioritize identifying security vulnerabilities (especially regarding file path traversal or multi-tenant bleed), performance bottlenecks in the IDE layout, and optimizations for the AI streaming layer.
