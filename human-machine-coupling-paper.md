@@ -1,4 +1,4 @@
-# Human-Machine Coupling: Deterministic Governance at the Boundary Between Biological and Physical Organisms
+# 4 Human-Machine Coupling: Deterministic Governance at the Boundary Between Biological and Physical Organisms
 
 **Canon³ — The Lume Synthetic Organism Canon (L-SOC)**
 **Architecture Series Volume IV**

@@ -1,4 +1,4 @@
-# HydroCore Steam: Deterministic Governance of Industrial Steam Power Systems via the Lume 4/42 Synthetic Organism Architecture
+# 4 HydroCore Steam: Deterministic Governance of Industrial Steam Power Systems via the Lume 4/42 Synthetic Organism Architecture
 
 **Canon³ — The Lume Synthetic Organism Canon (L-SOC)**
 **Physical Instantiation Volume III**

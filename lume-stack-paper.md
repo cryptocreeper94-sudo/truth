@@ -1,4 +1,4 @@
-# The Lume Organism Stack: A Unified Architecture for Deterministic Governance Across Physical, Biological, Cognitive, Social, Governance, Infrastructure, and Language Domains
+# 4 The Lume Organism Stack: A Unified Architecture for Deterministic Governance Across Physical, Biological, Cognitive, Social, Governance, Infrastructure, and Language Domains
 
 **Canon³ — The Lume Synthetic Organism Canon (L-SOC)**
 **Architecture Series Volume I**
