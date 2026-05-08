@@ -126,13 +126,39 @@ All L-SOC papers follow the DarkWave Studios LLC Canon³ Technical Paper Series 
 | `hydrocore-physical-paper.md` | HydroCore Physical — Physical Instantiation Vol. I | `hydrocore-physical-spec.md` |
 | `hydrocore-drive-paper.md` | HydroCore Drive — Physical Instantiation Vol. II | `hydrocore-drive-spec.md` |
 | `hydrocore-steam-paper.md` | HydroCore Steam — Physical Instantiation Vol. III | (no spec yet) |
+| `hydrocore-nuclear-paper.md` | HydroCore Nuclear — Physical Instantiation Vol. IV | (no spec yet) |
 | `meridian-infrastructure-paper.md` | Meridian Infrastructure — Infrastructure Vol. I | `meridian-infrastructure-spec.md` |
+
+### L-SOC Papers — Cognitive Physical Instantiation Series
+
+| File | Title | Notes |
+|------|-------|-------|
+| `neurocore-physical-paper.md` | NeuroCore Physical — Cognitive Physical Instantiation Vol. I | Neuromorphic computing substrate. 4 novel nodes: FS10 output quality, SL5 lifecycle fraction. Recursive governance: cognitive organism governing cognitive hardware. |
+
+### L-SOC Papers — Biological Physical Instantiation Series
+
+| File | Title | Notes |
+|------|-------|-------|
+| `biocore-physical-paper.md` | BioCore Physical — Biological Physical Instantiation Vol. I | Wearable biosensor array. 6 sensing modalities. 3 HC clinical alerts. First consumer L-SOC product. Novel nodes: SL10 physiological resilience, FS10 attentional flow proxy. |
+
+### L-SOC Papers — Governance Physical Instantiation Series
+
+| File | Title | Notes |
+|------|-------|-------|
+| `governancecore-physical-paper.md` | GovernanceCore Physical — Governance Physical Instantiation Vol. I | Institutional decision process governance. Process-level observation without content surveillance. Novel nodes: FS7 precedent coherence, SL10 long-term governance health. 3 HCs: quorum failure, COI, out-of-mandate. |
+
+### L-SOC Papers — Social Network Series
+
+| File | Title | Notes |
+|------|-------|-------|
+| `sociocore-network-paper.md` | SocioCore Network — Social Network Series Vol. I | Multi-agent coordination governance. Federated organism architecture. Novel nodes: PR8 trust deficit, FS7 AI-human collaboration flow. Cascade isolation theorem. Human-AI mixed network governance. |
 
 ### L-SOC Papers — Language Architecture Series
 
 | File | Title | Notes |
 |------|-------|-------|
 | `dla-paper.md` | DLA: Deterministic Language Architecture — Language Architecture Vol. I | Category-defining paper. Coins "DLA." Hallucination impossibility theorem. Patent 64/032,339. |
+| `axiom-consumer-suite-paper.md` | AXIOM Consumer Suite — Language Architecture Vol. II | Five DLA products: AXIOM Bio, Neuro, Social, Daily, Work. Organism grounding by product. Shared DLA composition engine. Trust Layer SSO. B2B audit trail. |
 
 ### L-SOC Papers — Architecture Series
 
