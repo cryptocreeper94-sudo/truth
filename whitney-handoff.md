@@ -160,7 +160,29 @@ Dark theme consistent with existing lume-ops-recon styling.
 ### File to create
 `client/src/pages/LumeOverview.tsx`
 
-Register the route in the app's router (wherever other routes are declared).
+### Router registration — follow this exact process
+
+1. Open `client/src/App.tsx` first. If it contains a `<Routes>` or `<Switch>` block with
+   `<Route>` elements, add the new route there following the exact same pattern as existing routes.
+
+2. If `App.tsx` does not contain the route definitions, search the `client/src/` directory for
+   the file that does — it may be `client/src/router.tsx`, `client/src/routes.tsx`, or similar.
+   Look for where other page-level components are imported and mounted.
+
+3. Add the import at the top of whichever file handles routing:
+   ```tsx
+   import LumeOverview from "./pages/LumeOverview";
+   ```
+
+4. Add the route entry following the existing pattern in that file. It will look something like:
+   ```tsx
+   <Route path="/lume-overview" element={<LumeOverview />} />
+   ```
+
+5. This route must NOT be wrapped in any auth guard, PrivateRoute, or session check.
+   Whitney must be able to open `lotopspro.com/lume-overview` directly from the email
+   without logging in. If the router has a public vs protected route pattern, place this
+   route in the public section.
 
 ### Page layout — top to bottom
 
