@@ -1,4 +1,4 @@
-# 4 HydroCore Nuclear: Deterministic Governance of Nuclear Power Plant Systems via the Lume 4/42 Synthetic Organism Architecture
+# HydroCore Nuclear: Deterministic Governance of Nuclear Power Plant Systems via the Lume 4/42 Synthetic Organism Architecture
 
 **Canon³ — The Lume Synthetic Organism Canon (L-SOC)**
 **Physical Instantiation Volume IV**

@@ -1,4 +1,4 @@
-# 4 BioCore Physical: Deterministic Governance of Wearable Biosensor Arrays via the Lume 4/42 Synthetic Organism Architecture
+# BioCore Physical: Deterministic Governance of Wearable Biosensor Arrays via the Lume 4/42 Synthetic Organism Architecture
 
 **Canon³ — The Lume Synthetic Organism Canon (L-SOC)**
 **Biological Physical Instantiation Volume I**

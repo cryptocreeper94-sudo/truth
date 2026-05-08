@@ -1,4 +1,4 @@
-# 4 SocioCore Network: Deterministic Governance of Multi-Agent Coordination Systems via the Lume 4/42 Synthetic Organism Architecture
+# SocioCore Network: Deterministic Governance of Multi-Agent Coordination Systems via the Lume 4/42 Synthetic Organism Architecture
 
 **Canon³ — The Lume Synthetic Organism Canon (L-SOC)**
 **Social Network Series Volume I**

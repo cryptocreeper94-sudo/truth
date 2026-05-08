@@ -1,4 +1,4 @@
-# 4 GovernanceCore Physical: Deterministic Governance of Institutional Decision Processes via the Lume 4/42 Synthetic Organism Architecture
+# GovernanceCore Physical: Deterministic Governance of Institutional Decision Processes via the Lume 4/42 Synthetic Organism Architecture
 
 **Canon³ — The Lume Synthetic Organism Canon (L-SOC)**
 **Governance Physical Instantiation Volume I**

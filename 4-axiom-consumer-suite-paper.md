@@ -1,4 +1,4 @@
-# 4 AXIOM Consumer Suite: The First Deterministic Language Architecture Product Ecosystem
+# AXIOM Consumer Suite: The First Deterministic Language Architecture Product Ecosystem
 
 **Canon³ — The Lume Synthetic Organism Canon (L-SOC)**
 **Language Architecture Volume II**
