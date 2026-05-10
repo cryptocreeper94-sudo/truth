@@ -24,3 +24,9 @@ id = "Htmr-Nj15rcJp533u5gmJ"
 uri = "file://meridian-book-final.md"
 type = "text"
 title = "The Routed World — Complete Assembled Manuscript"
+
+[[outputs]]
+id = "9CXfc2WM4mw7qrtemTDaa"
+uri = "file://release-day-handoff.md"
+type = "text"
+title = "Release Day Build Handoff — DDA + Axiom Studio"
