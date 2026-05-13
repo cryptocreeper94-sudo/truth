@@ -8,7 +8,7 @@
 ---
 
 > **OPEN ITEMS (resolve before build):**
-> - "42 deterministic test cases with zero AI calls" — verify exact test count with Jason before publishing externally.
+> - ~~"42 deterministic test cases"~~ — confirmed: **2,358 deterministic test cases** passed with zero AI calls. Use this figure throughout.
 > - Lume Drive scope — confirm with Jason what Lume Drive governs and whether it is foregrounded in the Manheim pitch or held for a separate vertical.
 >
 > **RESOLVED:**
@@ -66,7 +66,7 @@ Lume-Auto runs on the Lume deterministic runtime — a purpose-built execution s
 - **Self-optimizing:** Scoring accuracy improves over time as the organism accumulates vehicle-specific telemetry and refines its efficiency model.
 - **Zero AI dependency:** The governance engine operates without AI inference calls. All decisions are deterministic rule-governed flows.
 
-**Verification:** 42 deterministic test cases passed with zero AI calls. *(Confirm exact count before external publication.)*
+**Verification:** 2,358 deterministic test cases passed with zero AI calls.
 
 **Why this matters for Manheim:** Deterministic outputs are auditable. Every condition score, every fault prediction, every arbitration flag can be traced to a specific node state at a specific timestamp. This is not a black-box recommendation — it is a reproducible, verifiable computation.
 
@@ -358,7 +358,7 @@ All metrics are tracked and reported in the 30-day pilot ROI report, signed by D
 - [x] `lumeauto.tech` — confirmed live, use throughout all deliverables
 - [x] All CO₂ figures use metric tons (~934M metric tons, not 1.029B short tons)
 - [x] "60% auto-generated" framed as pilot target, not proven result
-- [ ] "42 deterministic test cases" count — confirm exact number with Jason before external publication
+- [x] "2,358 deterministic test cases" — confirmed by Jason, use throughout all deliverables
 - [ ] Lume Drive scope — confirm with Jason before including description in ecosystem ladder
 - [ ] No contradictions between technical whitepaper, landing page, investor narrative, and deck
 - [ ] All improvement claims cite source range: "3–12% typical, 15%+ deferred maintenance"
