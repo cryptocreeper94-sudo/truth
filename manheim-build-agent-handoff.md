@@ -7,12 +7,14 @@
 
 ---
 
-> **AUDITOR NOTES (resolve before build):**
-> - `lumeauto.tech` — confirm domain is registered and controlled before embedding in any deliverable.
-> - "60% auto-generated condition reports" — reframed below as a pilot target metric, not a proven result. Do not revert to a factual claim without a tested baseline.
+> **OPEN ITEMS (resolve before build):**
 > - "42 deterministic test cases with zero AI calls" — verify exact test count with Jason before publishing externally.
-> - CO₂ figure corrected throughout: ~934 million metric tons (metric), not "1 billion metric tons." The 1.029B figure is US short tons. Use 934M for all scientific, regulatory, and investor contexts. "Nearly 1 billion metric tons" is acceptable shorthand in marketing copy only.
-> - Lume Drive is now complete — added to ecosystem section. Confirm with Jason whether it should be foregrounded in Manheim pitch or held back.
+> - Lume Drive scope — confirm with Jason what Lume Drive governs and whether it is foregrounded in the Manheim pitch or held for a separate vertical.
+>
+> **RESOLVED:**
+> - `lumeauto.tech` — confirmed live. Use throughout all deliverables.
+> - CO₂ corrected: ~934 million metric tons (metric tons, not short tons). The 1.029B figure was US short tons — corrected throughout.
+> - "60% auto-generated condition reports" — framed as pilot target below, not a proven result.
 
 ---
 
@@ -251,7 +253,7 @@ Lume-Auto is the first commercially deployed organism in the Lume deterministic 
 
 ## SECTION 9 — WEBSITE & DECK INTEGRATION
 
-**Domain:** `lumeauto.tech` *(Confirm registration with Jason before publishing.)*
+**Domain:** `lumeauto.tech` *(Live and confirmed.)*
 
 **Pages / assets to generate:**
 
@@ -353,11 +355,11 @@ All metrics are tracked and reported in the 30-day pilot ROI report, signed by D
 
 ## OUTPUT REQUIREMENTS CHECKLIST
 
-- [ ] All CO₂ figures use metric tons (not short tons)
-- [ ] "60% auto-generated" framed as pilot target, not proven result
-- [ ] `lumeauto.tech` domain confirmed registered before embedding in deliverables
-- [ ] "42 deterministic test cases" count confirmed with Jason before external publication
-- [ ] Lume Drive scope confirmed before including in ecosystem ladder
+- [x] `lumeauto.tech` — confirmed live, use throughout all deliverables
+- [x] All CO₂ figures use metric tons (~934M metric tons, not 1.029B short tons)
+- [x] "60% auto-generated" framed as pilot target, not proven result
+- [ ] "42 deterministic test cases" count — confirm exact number with Jason before external publication
+- [ ] Lume Drive scope — confirm with Jason before including description in ecosystem ladder
 - [ ] No contradictions between technical whitepaper, landing page, investor narrative, and deck
 - [ ] All improvement claims cite source range: "3–12% typical, 15%+ deferred maintenance"
 - [ ] Conservative public CO₂ claim used in all press/regulatory materials
