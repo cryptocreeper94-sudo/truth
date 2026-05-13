@@ -9,7 +9,7 @@
 
 > **OPEN ITEMS (resolve before build):**
 > - ~~"42 deterministic test cases"~~ — confirmed: **2,358 deterministic test cases** passed with zero AI calls. Use this figure throughout.
-> - OBD-II scanner system — confirm with Jason whether this is proprietary hardware, custom firmware on ELM327, or a software integration layer. Framing in Section 1 and Section 9 depends on this answer.
+> - ~~OBD-II scanner system~~ — confirmed: custom Lume firmware running on standard OBD-II adapter hardware. Proprietary hardware in development as next phase. Framing updated throughout.
 >
 > **RESOLVED:**
 > - `lumeauto.tech` — confirmed live. Use throughout all deliverables.
@@ -32,7 +32,7 @@ Everything must be internally consistent, scientifically accurate, and enterpris
 Lume-Auto is a deterministic synthetic organism — not an application — built on the native Lume deterministic runtime. It governs fuel efficiency in existing petroleum vehicles by ingesting 42 OBD-II telemetry signals at 100ms intervals and applying the Lume 4/42 governance architecture in real time.
 
 **Key product facts:**
-- Connects via commodity ELM327 OBD-II adapter (no proprietary hardware, no manufacturing)
+- Connects via standard OBD-II adapter hardware running proprietary Lume firmware — no custom manufacturing required for initial deployment. Purpose-built Lume hardware in development as the next phase.
 - Works on any OBD-II vehicle (all post-1996 US vehicles)
 - No ECU modification, no warranty impact, no emissions system interference
 - Reads: airflow, fuel flow, combustion timing, engine load, throttle behavior, component health, drivetrain state, driver behavioral patterns — 42 governance nodes across four flow primitives
@@ -358,7 +358,7 @@ All metrics are tracked and reported in the 30-day pilot ROI report, signed by D
 - [x] All CO₂ figures use metric tons (~934M metric tons, not 1.029B short tons)
 - [x] "60% auto-generated" framed as pilot target, not proven result
 - [x] "2,358 deterministic test cases" — confirmed by Jason, use throughout all deliverables
-- [ ] OBD-II scanner system — confirm scope with Jason (proprietary hardware vs. firmware vs. software layer) before finalizing Section 1 and Section 9
+- [x] OBD-II scanner system — confirmed: proprietary Lume firmware on standard adapter hardware. Purpose-built hardware in development.
 - [ ] No contradictions between technical whitepaper, landing page, investor narrative, and deck
 - [ ] All improvement claims cite source range: "3–12% typical, 15%+ deferred maintenance"
 - [ ] Conservative public CO₂ claim used in all press/regulatory materials
