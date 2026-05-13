@@ -9,7 +9,7 @@
 
 > **OPEN ITEMS (resolve before build):**
 > - ~~"42 deterministic test cases"~~ — confirmed: **2,358 deterministic test cases** passed with zero AI calls. Use this figure throughout.
-> - Lume Drive scope — confirm with Jason what Lume Drive governs and whether it is foregrounded in the Manheim pitch or held for a separate vertical.
+> - OBD-II scanner system — confirm with Jason whether this is proprietary hardware, custom firmware on ELM327, or a software integration layer. Framing in Section 1 and Section 9 depends on this answer.
 >
 > **RESOLVED:**
 > - `lumeauto.tech` — confirmed live. Use throughout all deliverables.
@@ -234,13 +234,12 @@ Lume-Auto is the first commercially deployed organism in the Lume deterministic 
 3. **Auditable outcomes** — every MPG improvement claim is traceable to a specific governance action
 4. **Enterprise integration** — condition report and lot-flow intelligence establish the enterprise API pattern
 
-**Ecosystem ladder:**
+**Ecosystem ladder (Manheim-relevant):**
 
-| Organism | Domain | Status |
+| Component | Domain | Status |
 |---|---|---|
 | Lume Runtime | Deterministic execution substrate | Complete |
-| Lume Drive | [Confirm scope with Jason before publishing] | Complete |
-| Lume-Auto | Petroleum vehicle efficiency | Complete — Canon³ paper published |
+| Lume-Auto | Petroleum vehicle efficiency organism | Complete — Canon³ paper published |
 | HydroCore | Industrial water-flow governance | In specification |
 | Closed-Loop Hydrogen | Synthetic hydrogen fuel organism | In specification |
 | Meridian | Wireless energy internet | In specification |
@@ -359,7 +358,7 @@ All metrics are tracked and reported in the 30-day pilot ROI report, signed by D
 - [x] All CO₂ figures use metric tons (~934M metric tons, not 1.029B short tons)
 - [x] "60% auto-generated" framed as pilot target, not proven result
 - [x] "2,358 deterministic test cases" — confirmed by Jason, use throughout all deliverables
-- [ ] Lume Drive scope — confirm with Jason before including description in ecosystem ladder
+- [ ] OBD-II scanner system — confirm scope with Jason (proprietary hardware vs. firmware vs. software layer) before finalizing Section 1 and Section 9
 - [ ] No contradictions between technical whitepaper, landing page, investor narrative, and deck
 - [ ] All improvement claims cite source range: "3–12% typical, 15%+ deferred maintenance"
 - [ ] Conservative public CO₂ claim used in all press/regulatory materials
