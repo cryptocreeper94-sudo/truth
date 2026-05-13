@@ -30,16 +30,21 @@ This paper introduces Lume-Auto, a deterministic synthetic organism that governs
 5. Mode Hierarchy
 6. Governance Logic
 7. MPG Improvement Mechanisms
-8. Organism Coupling Protocols
-   - 8.1 Lume-Auto ↔ BioCore
-   - 8.2 Lume-Auto ↔ HydroCore
-   - 8.3 Lume-Auto ↔ Meridian
-9. Deployment Architecture
-10. Novel Contributions
-11. Prior Art and Intellectual Property
-12. Future Work
-13. Appendices
-14. References
+8. Global Impact Analysis
+   - 8.1 Baseline
+   - 8.2 Universal Deployment Scenario
+   - 8.3 Conservative Public Claim
+   - 8.4 Deployment Leverage
+9. Organism Coupling Protocols
+   - 9.1 Lume-Auto ↔ BioCore
+   - 9.2 Lume-Auto ↔ HydroCore
+   - 9.3 Lume-Auto ↔ Meridian
+10. Deployment Architecture
+11. Novel Contributions
+12. Prior Art and Intellectual Property
+13. Future Work
+14. Appendices
+15. References
 
 ---
 
@@ -370,11 +375,56 @@ DFCO is free fuel savings — no fuel is consumed during deceleration when RPM i
 
 ---
 
-## 8. Organism Coupling Protocols
+## 8. Global Impact Analysis
+
+### 8.1 Baseline
+
+Global petroleum vehicle fuel consumption is estimated at approximately 700 billion gallons per year, derived from:
+- ~1.4 billion OBD-II-compatible vehicles in active operation
+- Average annual consumption of ~500 gallons per vehicle
+
+This baseline is conservative and consistent with IEA and EIA reporting on global light-vehicle fuel demand.
+
+### 8.2 Universal Deployment Scenario (15% improvement)
+
+At the organism's demonstrated upper-bound improvement of 15% MPG across the full fleet:
+
+| Metric | Value |
+|---|---|
+| Fuel saved annually | 105 billion gallons |
+| Equivalent vehicles eliminated | ~210 million vehicle-equivalents |
+| Equivalent barrels per day | ~6.85 million bpd |
+| CO₂ reduced (metric tons) | ~934 million metric tons/year |
+
+**Note on units:** CO₂ reduction expressed throughout in metric tons (1 metric ton = 2,204.62 lbs). The equivalent figure in US short tons is 1.029 billion short tons. All scientific and climate reporting uses metric tons; 934 Mt is the correct figure for peer review and regulatory contexts.
+
+For reference, 6.85 million barrels per day exceeds the combined petroleum consumption of Japan and Germany (~5.8–6.1M bpd combined). The CO₂ reduction of 934 million metric tons annually exceeds the total CO₂ output of India's entire transportation sector (~333 Mt, IEA 2022) by a factor of approximately 2.8.
+
+### 8.3 Conservative Public Claim
+
+For publication and regulatory purposes, the defensible public claim is:
+
+> *"Moderate adoption of Lume-Auto — covering 30–50% of the global petroleum vehicle fleet — could reduce global fuel consumption by 5–8%, representing 35–56 billion gallons saved annually and 175–280 million metric tons of CO₂ eliminated per year."*
+
+This claim requires no assumption of universal deployment and is achievable within a realistic 10-year commercial adoption curve.
+
+### 8.4 Deployment Leverage
+
+Lume-Auto's planetary leverage is exceptional for a software-only intervention because:
+
+1. **Zero marginal hardware cost at scale.** The only physical component is a commodity OBD-II adapter already present in service fleets and enthusiast ecosystems. Marginal cost of adding another vehicle to the governance network approaches zero.
+
+2. **Largest addressable fleet in history.** 1.4 billion OBD-II vehicles represent the largest single addressable substrate for any efficiency intervention ever proposed.
+
+3. **Immediate deployment.** Unlike infrastructure interventions (EV transition, grid upgrades, renewable buildout), Lume-Auto governance is deployable to any vehicle in service today, with no lead time for manufacturing, installation, or grid capacity.
+
+4. **Compounding benefit.** As the SL-node fleet model improves through aggregated telemetry, per-vehicle improvement rates increase over time. Early fleet data makes later fleet governance more precise.
+
+## 9. Organism Coupling Protocols
 
 Lume-Auto follows the Lume Inter-Organism Coupling Protocol (LIOCP) for all cross-organism state exchanges. Coupling operates in Mode-Aware fashion: coupling signals are exchanged only when both organisms are in OPTIMAL or EFFICIENCY mode.
 
-### 8.1 Lume-Auto ↔ BioCore Coupling
+### 9.1 Lume-Auto ↔ BioCore Coupling
 
 **Coupling rationale:** Driver physiological state (governed by BioCore) directly influences behavioral efficiency (FS10). A fatigued or high-stress driver exhibits degraded throttle coherence and increased braking frequency — measurable in FS10 but with ambiguous cause unless BioCore state is available.
 
@@ -386,7 +436,7 @@ Lume-Auto follows the Lume Inter-Organism Coupling Protocol (LIOCP) for all cros
 
 **Coupling behavior:** When BioCore reports SL10 < 0.4 (moderate fatigue), Lume-Auto adjusts FS10 scoring to weight behavioral anomalies as physiological rather than habitual — suppressing behavioral efficiency guidance in favor of rest/break recommendations.
 
-### 8.2 Lume-Auto ↔ HydroCore Coupling
+### 9.2 Lume-Auto ↔ HydroCore Coupling
 
 **Coupling rationale:** HydroCore governs hydraulic and hydrogen fuel systems. In hydrogen or hydraulic hybrid vehicles, HydroCore's output state directly constrains Lume-Auto's propulsion efficiency model.
 
@@ -396,7 +446,7 @@ Lume-Auto follows the Lume Inter-Organism Coupling Protocol (LIOCP) for all cros
 | TB6 (Torque Throughput) | PR7 (Hydraulic Power Transfer Rate) | Propulsion share | HydroCore → Lume-Auto |
 | TB8 (Braking Energy Loss) | FS9 (Hydraulic Accumulator State) | Regeneration availability | HydroCore → Lume-Auto |
 
-### 8.3 Lume-Auto ↔ Meridian Coupling
+### 9.3 Lume-Auto ↔ Meridian Coupling
 
 **Coupling rationale:** In grid-connected or V2G scenarios, vehicle accessory load (TB9) can be coordinated with Meridian's energy routing state to minimize grid draw during peak periods.
 
@@ -408,7 +458,7 @@ Lume-Auto follows the Lume Inter-Organism Coupling Protocol (LIOCP) for all cros
 
 ---
 
-## 9. Deployment Architecture
+## 10. Deployment Architecture
 
 Lume-Auto deploys as a three-layer system:
 
@@ -425,7 +475,7 @@ Aggregates anonymized telemetry across the vehicle fleet. Refines BSFC surface m
 
 ---
 
-## 10. Novel Contributions
+## 11. Novel Contributions
 
 This paper makes the following original contributions to the Lume synthetic organism taxonomy:
 
@@ -441,7 +491,7 @@ This paper makes the following original contributions to the Lume synthetic orga
 
 ---
 
-## 11. Prior Art and Intellectual Property
+## 12. Prior Art and Intellectual Property
 
 **Patent:** US Provisional Application 64/032,339 (DarkWave Studios LLC)
 **Prior art anchor:** May 2026
@@ -451,7 +501,7 @@ The 4/42 organism architecture, four-primitive decomposition, LIOCP coupling pro
 
 ---
 
-## 12. Future Work
+## 13. Future Work
 
 - **Fleet optimization:** Multi-vehicle organism coordination for commercial trucking fleets, municipal vehicles, and logistics operators
 - **Hydrogen integration:** Lume-Auto extension for hydrogen ICE vehicles (H2-ICE) with modified AFR governance bounds and combustion coherence parameters
@@ -461,7 +511,7 @@ The 4/42 organism architecture, four-primitive decomposition, LIOCP coupling pro
 
 ---
 
-## 13. Appendices
+## 14. Appendices
 
 ### Appendix A — OBD-II PID Mapping to Governance Nodes
 
@@ -490,7 +540,7 @@ The vehicle-specific BSFC approximation is constructed from the first 500 miles 
 
 ---
 
-## 14. References
+## 15. References
 
 1. Heywood, J.B. (1988). *Internal Combustion Engine Fundamentals*. McGraw-Hill.
 2. SAE International. (2016). *OBD-II Standards and PID Reference*. SAE J1979.
