@@ -160,6 +160,18 @@ All L-SOC papers follow the DarkWave Studios LLC Canon³ Technical Paper Series 
 | `dla-paper.md` | DLA: Deterministic Language Architecture — Language Architecture Vol. I | Category-defining paper. Coins "DLA." Hallucination impossibility theorem. Patent 64/032,339. |
 | `4-axiom-consumer-suite-paper.md` | AXIOM Consumer Suite — Language Architecture Vol. II | Five DLA products: AXIOM Bio, Neuro, Social, Daily, Work. Organism grounding by product. Shared DLA composition engine. Trust Layer SSO. B2B audit trail. |
 
+### L-SOC Papers — Automotive Series
+
+| File | Title | Notes |
+|------|-------|-------|
+| `4-lume-auto-paper.md` | Lume-Auto: A Four-Primitive Deterministic Petroleum Engine Efficiency Organism — Automotive Vol. I | First petroleum engine organism. 42 nodes (TB10/PR10/FS12/SL10). Novel nodes: FS8 combustion cycle coherence, FS10 driver behavioral flow state, SL10 vehicle efficiency lifecycle score. Read-only governance architecture. HC1: no lean detonation, HC2: emissions inviolability, HC3: safety-critical suspension. Coupling: BioCore, HydroCore, Meridian. |
+
+### Lume-Auto Product Package
+
+| File | Contents |
+|------|----------|
+| `lume-auto-product.md` | Full commercial package: accessible whitepaper, landing page copy (all sections), investor narrative, press release, site blueprint, FAQ, build agent instructions |
+
 ### L-SOC Papers — Architecture Series
 
 | File | Title | Notes |

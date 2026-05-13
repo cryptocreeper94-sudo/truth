@@ -30,3 +30,15 @@ id = "9CXfc2WM4mw7qrtemTDaa"
 uri = "file://release-day-handoff.md"
 type = "text"
 title = "Release Day Build Handoff — DDA + Axiom Studio"
+
+[[outputs]]
+id = "RDRxunFq_CIAZZJmHzoCM"
+uri = "file://4-lume-auto-paper.md"
+type = "text"
+title = "Canon³ Paper — Lume-Auto Organism (Technical)"
+
+[[outputs]]
+id = "hJ7ywBrMfGWoTeC0DP77t"
+uri = "file://lume-auto-product.md"
+type = "text"
+title = "Lume-Auto Product Package (Commercial)"
