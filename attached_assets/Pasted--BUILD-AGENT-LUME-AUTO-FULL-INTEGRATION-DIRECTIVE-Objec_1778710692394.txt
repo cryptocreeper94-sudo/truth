@@ -1,0 +1,101 @@
+# BUILD AGENT — LUME‑AUTO FULL INTEGRATION DIRECTIVE
+## Objective
+Integrate all components of the Lume‑Auto vertical into a unified, production‑ready package for presentation to Manheim and enterprise partners. This includes product narrative, technical architecture, deterministic runtime references, synthetic organism framing, business model, pilot proposal, and Manheim‑specific operational intelligence.
+
+## Required Components to Incorporate
+
+### 1. Lume‑Auto Core Product Description
+- Lume‑Auto as a synthetic organism built on the native Lume deterministic runtime.
+- Real‑time ingestion of 42 OBD‑II telemetry signals at 100ms intervals.
+- Zero hardware manufacturing; uses commodity ELM327 adapters.
+- Consumer, family, fleet, and enterprise feature sets.
+
+### 2. Native Lume Runtime Integration
+Explicitly incorporate:
+- Deterministic execution (no nondeterminism, no hallucinations).
+- Self‑healing runtime (auto‑corrects drift, maintains stability).
+- Self‑monitoring (organism observes its own performance).
+- Self‑optimizing (improves scoring accuracy over time).
+- Synthetic organism architecture (Lume‑Auto is not an app; it is a computational organism).
+- Reference the 42 deterministic test cases passed with zero AI calls.
+
+### 3. Technical Architecture
+Include:
+- Flow‑governance models (airflow, fuel flow, thermal, torque, drivetrain, behavior).
+- Predictive maintenance modeling.
+- Passive fuel‑efficiency coaching (audio conditioning).
+- Condition‑report automation pipeline.
+- Lot‑flow intelligence pipeline.
+- Fleet dashboard and multi‑vehicle scoring.
+
+### 4. Manheim‑Specific Intelligence Layer
+Integrate the full Manheim brief:
+- Automated condition reports (60% auto‑generated).
+- Arbitration reduction through deterministic scoring.
+- Lot flow intelligence (battery health, pending faults, lane readiness).
+- Transport and reconditioning integration.
+- Operational dashboards for lane managers.
+- Inventory velocity modeling.
+- First‑mover advantage narrative.
+
+### 5. Business Model
+Include all tiers:
+- Free tier
+- Premium consumer tier
+- Family dashboard
+- Commercial fleet
+- Enterprise/auction integrations
+- API licensing
+
+### 6. Pilot Proposal
+Include:
+- 30‑day pilot
+- 500–1,000 vehicles
+- Automated condition reports
+- Arbitration tracking
+- Lot‑flow modeling
+- Transport integration
+- Success metrics and ROI validation
+
+### 7. Planetary Impact Section
+Integrate:
+- 5–15% MPG improvement modeling
+- 105B gallons/year potential global savings
+- 1B metric tons CO₂ reduction
+- 210M vehicle‑equivalent removal
+- Conservative public claim: 5–10% global reduction
+
+### 8. Ecosystem Positioning
+Tie Lume‑Auto into:
+- AXIOM (cognitive architecture)
+- HydroCore (water‑flow governance)
+- Closed‑Loop Hydrogen (synthetic fuel organism)
+- Meridian (wireless energy internet)
+- Lume42 Labs deterministic substrate
+
+### 9. Website & Deck Integration
+Ensure the following are generated or updated:
+- Landing page copy for lumeauto.tech
+- Technical whitepaper
+- Manheim‑specific deck sections
+- Pilot proposal slide
+- Global impact slide
+- Runtime architecture diagram
+- Organism behavior diagram
+- Condition‑report automation diagram
+
+### 10. Executive Outreach Package
+Prepare:
+- Executive summary
+- Outreach email
+- 2‑minute demo script
+- One‑page Manheim brief
+- One‑page ROI summary
+
+## Output Requirements
+- All content must be deterministic, consistent, and aligned with the Lume substrate.
+- Tone: scientific, authoritative, operational, enterprise‑ready.
+- No contradictions across documents.
+- Everything must be packaged as if ready for immediate enterprise presentation.
+
+# END OF DIRECTIVE
