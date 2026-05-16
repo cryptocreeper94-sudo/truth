@@ -3,13 +3,13 @@
 **Issued by:** Jason Andrews, DarkWave Studios LLC / Lume42 Labs
 **Version:** 1.0
 **Domain:** `lotopspro.com` *(future — switch when ready)*
-**Context:** This is the enterprise-facing product layer that sits on top of the Lume-Auto organism and Trust Layer node network. It is what Manheim's lot managers, reconditioning coordinators, and transport dispatchers actually touch every day.
+**Context:** This is the enterprise-facing product layer that sits on top of the Lume-Auto organism and Cox Automotive Ledger (CAL) node network. It is what Manheim's lot managers, reconditioning coordinators, and transport dispatchers actually touch every day.
 
 ---
 
 ## WHAT THIS IS
 
-**Lume-Ops Recon** is a Windows desktop application that delivers Lume-Auto's organism intelligence and Trust Layer's immutable record infrastructure to Manheim lot staff through a clean, installable enterprise tool.
+**Lume-Ops Recon** is a Windows desktop application that delivers Lume-Auto's organism intelligence and CAL's immutable record infrastructure to Manheim lot staff through a clean, installable enterprise tool.
 
 It is not a new product. It is the enterprise packaging of three things that already exist:
 
@@ -17,7 +17,7 @@ It is not a new product. It is the enterprise packaging of three things that alr
 |---|---|---|
 | **Lume-Ops Recon** | Windows executable (what they see) | Dashboard, reports, alerts, arbitration viewer |
 | **Lume-Auto** | Deterministic organism (what runs) | 42-node vehicle governance, condition scoring, fault detection |
-| **Trust Layer** | Node network (what connects) | Immutable record ledger, cross-location sync, audit trail |
+| **Cox Automotive Ledger (CAL)** | Node network (what connects) | Immutable record ledger, cross-location sync, audit trail |
 
 The lane manager installs Lume-Ops Recon. They never need to know what's underneath it.
 
@@ -25,7 +25,7 @@ The lane manager installs Lume-Ops Recon. They never need to know what's underne
 
 ## DEPLOYMENT ARCHITECTURE — TWO-TRACK STRATEGY
 
-The Lume ecosystem deploys across two distinct tracks. Same organism engine, same Trust Layer network underneath — different delivery layer based on context.
+The Lume ecosystem deploys across two distinct tracks. Same organism engine, same CAL network underneath — different delivery layer based on context.
 
 | Track | Platform | Product | Target User |
 |---|---|---|---|
@@ -33,10 +33,10 @@ The Lume ecosystem deploys across two distinct tracks. Same organism engine, sam
 | **Desktop** | Windows + Linux — local installation | Lume-Ops Recon | Manheim lot staff, enterprise fleet operators, lane managers, recon coordinators |
 
 **What this means for the build agent:**
-- The Expo mobile build and the Windows/Linux desktop build share the same Lume-Auto organism core and Trust Layer node infrastructure
+- The Expo mobile build and the Windows/Linux desktop build share the same Lume-Auto organism core and CAL node infrastructure
 - The mobile app is the consumer and small business entry point
 - Lume-Ops Recon is the enterprise entry point — installed locally on lot workstations, tablets (Windows/Linux), and laptops
-- Both tracks feed into the same Trust Layer node network — a vehicle scanned on a mobile device and a vehicle scanned through Lume-Ops Recon both write to the same immutable ledger
+- Both tracks feed into the same Cox Automotive Ledger (CAL) node network — a vehicle scanned on a mobile device and a vehicle scanned through Lume-Ops Recon both write to the same immutable ledger
 
 ---
 
@@ -62,7 +62,7 @@ The Lume ecosystem deploys across two distinct tracks. Same organism engine, sam
 └─────────────────────────────────────┘
 ```
 
-Each Manheim location runs one Trust Layer node. 300 locations = 300 nodes. The network is Manheim's — they operate it, they own the data, they control access.
+Each Manheim location runs one CAL node. 300 locations = 300 nodes. The network is Manheim's — they operate it, they own the data, they control access.
 
 ---
 
@@ -72,7 +72,7 @@ Each Manheim location runs one Trust Layer node. 300 locations = 300 nodes. The 
 - Technician connects OBD-II adapter to incoming vehicle
 - Lume-Auto organism runs full 42-node scan
 - Lume-Ops Recon displays structured condition report in real time
-- Report is written to the local Trust Layer node (immutable, timestamped)
+- Report is written to the local CAL node (immutable, timestamped)
 - Lane readiness score generated automatically
 
 ### Module 2: Condition Report Dashboard
@@ -97,7 +97,7 @@ Each Manheim location runs one Trust Layer node. 300 locations = 300 nodes. The 
 ### Module 5: Reconditioning Queue Manager
 - Incoming maintenance work orders generated from organism SL-node scores
 - Priority sorted by severity and lot position
-- Technician marks work complete → record written to Trust Layer node
+- Technician marks work complete → record written to CAL node
 - Before/after organism scores compared automatically
 
 ### Module 6: Transport Readiness
@@ -107,7 +107,7 @@ Each Manheim location runs one Trust Layer node. 300 locations = 300 nodes. The 
 - Transport manifest generated with per-vehicle health summary
 
 ### Module 7: Node Network Status (Admin Only)
-- Status of this location's Trust Layer node
+- Status of this location's CAL node
 - Cross-location vehicle history lookup (vehicle scanned at another lot appears here)
 - Network sync status
 - Record count and integrity confirmation
@@ -120,8 +120,8 @@ Each Manheim location runs one Trust Layer node. 300 locations = 300 nodes. The 
 |---|---|---|
 | **Lume-Ops Recon** | Enterprise (Manheim) | The Windows application. What they install and use. |
 | **Lume-Auto** | Technical / investor | The organism engine underneath Lume-Ops Recon. |
-| **Trust Layer** | Technical / investor | The node network. Not named to Manheim staff — it's just "the network." |
-| **TrustVault** | Technical | The immutable record store within Trust Layer. Manheim staff see "audit log" or "scan record." |
+| **Cox Automotive Ledger (CAL)** | Technical / investor | The POA node network built specifically for Cox Automotive / Manheim. Not named to lot staff — they see "the network" or "the audit log." |
+| **TrustVault** | Technical | The immutable record store within CAL. Manheim staff see "audit log" or "scan record." |
 | **TrustGen** | Technical | The condition report generation engine. Manheim staff see "condition report." |
 
 **Rule:** In Manheim-facing materials, use **Lume-Ops Recon** as the product name. Reference Lume-Auto only when speaking to technical decision-makers. Never say "blockchain" — say "distributed governance network" or "federated node infrastructure."
@@ -139,7 +139,7 @@ The existing `manheim-build-agent-handoff.md` positions Lume-Auto as the enterpr
 **After (correct framing):**
 - Enterprise tier = **Lume-Ops Recon** — Windows executable, per-location deployment
 - Delivery mechanism = Windows installer, deployed to lot workstations
-- Underlying stack = Lume-Auto organism + Trust Layer node (invisible to end user)
+- Underlying stack = Lume-Auto organism + CAL node (invisible to end user)
 
 **Update required in `manheim-build-agent-handoff.md`:**
 - Section 1: Add Lume-Ops Recon as the enterprise product name
@@ -152,7 +152,7 @@ The existing `manheim-build-agent-handoff.md` positions Lume-Auto as the enterpr
 ## PILOT DEPLOYMENT FLOW
 
 1. DarkWave installs Lume-Ops Recon on 2–3 workstations at the pilot Manheim location
-2. Trust Layer node is activated for that location
+2. CAL node is activated for that location
 3. Technicians run OBD-II intake scans using existing adapter hardware (Lume firmware)
 4. Lume-Ops Recon surfaces condition reports, lot-flow dashboard, and arbitration viewer
 5. All records written to the local node — immutable from point of generation
@@ -166,7 +166,7 @@ The existing `manheim-build-agent-handoff.md` positions Lume-Auto as the enterpr
 - [ ] Update `lume-auto-product.md` — add Lume-Ops Recon section under Enterprise Features
 - [ ] Create Lume-Ops Recon one-page product brief (Manheim-facing)
 - [ ] Create Lume-Ops Recon feature module diagram (the 7 modules above)
-- [ ] Create three-layer stack diagram (Lume-Ops Recon → Lume-Auto → Trust Layer)
+- [ ] Create three-layer stack diagram (Lume-Ops Recon → Lume-Auto → Cox Automotive Ledger)
 - [ ] Update `manheim.tlid.io` site to include Lume-Ops Recon product section
 - [ ] Update Manheim deck: add Lume-Ops Recon slide, three-layer architecture slide
 
@@ -176,7 +176,7 @@ The existing `manheim-build-agent-handoff.md` positions Lume-Auto as the enterpr
 
 - **To lane managers:** "Lume-Ops Recon gives you a complete picture of every vehicle on the lot — condition, faults, battery, lane readiness — from the moment it arrives."
 - **To IT:** "Windows application, standard installer, connects to your existing network infrastructure. No browser dependency, no cloud-only requirement."
-- **To executives:** "Lume-Ops Recon is the operational intelligence layer your teams use every day. The underlying Lume-Auto organism and Trust Layer network are the infrastructure it runs on."
+- **To executives:** "Lume-Ops Recon is the operational intelligence layer your teams use every day. The underlying Lume-Auto organism and CAL network are the infrastructure it runs on."
 - **To technical evaluators:** "Deterministic 42-node OBD-II governance engine, 2,358 test cases passed with zero AI calls, immutable POA ledger with per-location nodes."
 
 # END OF LUME-OPS RECON BUILD HANDOFF
