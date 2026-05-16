@@ -1,24 +1,25 @@
-# BUILD AGENT — LOT OPS PRO
+# BUILD AGENT — LUME-OPS RECON
 ## Windows Enterprise Application for Manheim Lot Operations
 **Issued by:** Jason Andrews, DarkWave Studios LLC / Lume42 Labs
 **Version:** 1.0
+**Domain:** `lotopspro.com` *(future — switch when ready)*
 **Context:** This is the enterprise-facing product layer that sits on top of the Lume-Auto organism and Trust Layer node network. It is what Manheim's lot managers, reconditioning coordinators, and transport dispatchers actually touch every day.
 
 ---
 
 ## WHAT THIS IS
 
-**Lot Ops Pro** is a Windows desktop application that delivers Lume-Auto's organism intelligence and Trust Layer's immutable record infrastructure to Manheim lot staff through a clean, installable enterprise tool.
+**Lume-Ops Recon** is a Windows desktop application that delivers Lume-Auto's organism intelligence and Trust Layer's immutable record infrastructure to Manheim lot staff through a clean, installable enterprise tool.
 
 It is not a new product. It is the enterprise packaging of three things that already exist:
 
 | Layer | What it is | What it does |
 |---|---|---|
-| **Lot Ops Pro** | Windows executable (what they see) | Dashboard, reports, alerts, arbitration viewer |
+| **Lume-Ops Recon** | Windows executable (what they see) | Dashboard, reports, alerts, arbitration viewer |
 | **Lume-Auto** | Deterministic organism (what runs) | 42-node vehicle governance, condition scoring, fault detection |
 | **Trust Layer** | Node network (what connects) | Immutable record ledger, cross-location sync, audit trail |
 
-The lane manager installs Lot Ops Pro. They never need to know what's underneath it.
+The lane manager installs Lume-Ops Recon. They never need to know what's underneath it.
 
 ---
 
@@ -29,13 +30,13 @@ The Lume ecosystem deploys across two distinct tracks. Same organism engine, sam
 | Track | Platform | Product | Target User |
 |---|---|---|---|
 | **Mobile** | iOS + Android — Expo native build | Lume-Auto | Consumer drivers, personal vehicles, small fleet owners |
-| **Desktop** | Windows + Linux — local installation | Lot Ops Pro | Manheim lot staff, enterprise fleet operators, lane managers, recon coordinators |
+| **Desktop** | Windows + Linux — local installation | Lume-Ops Recon | Manheim lot staff, enterprise fleet operators, lane managers, recon coordinators |
 
 **What this means for the build agent:**
 - The Expo mobile build and the Windows/Linux desktop build share the same Lume-Auto organism core and Trust Layer node infrastructure
 - The mobile app is the consumer and small business entry point
-- Lot Ops Pro is the enterprise entry point — installed locally on lot workstations, tablets (Windows/Linux), and laptops
-- Both tracks feed into the same Trust Layer node network — a vehicle scanned on a mobile device and a vehicle scanned through Lot Ops Pro both write to the same immutable ledger
+- Lume-Ops Recon is the enterprise entry point — installed locally on lot workstations, tablets (Windows/Linux), and laptops
+- Both tracks feed into the same Trust Layer node network — a vehicle scanned on a mobile device and a vehicle scanned through Lume-Ops Recon both write to the same immutable ledger
 
 ---
 
@@ -43,7 +44,7 @@ The Lume ecosystem deploys across two distinct tracks. Same organism engine, sam
 
 ```
 ┌─────────────────────────────────────┐
-│           LOT OPS PRO               │
+│           LUME-OPS RECON               │
 │      Windows Desktop Application    │
 │  (Lane Manager / Recon / Transport) │
 └──────────────┬──────────────────────┘
@@ -65,12 +66,12 @@ Each Manheim location runs one Trust Layer node. 300 locations = 300 nodes. The 
 
 ---
 
-## LOT OPS PRO — FEATURE MODULES
+## LUME-OPS RECON — FEATURE MODULES
 
 ### Module 1: Vehicle Intake Scanner
 - Technician connects OBD-II adapter to incoming vehicle
 - Lume-Auto organism runs full 42-node scan
-- Lot Ops Pro displays structured condition report in real time
+- Lume-Ops Recon displays structured condition report in real time
 - Report is written to the local Trust Layer node (immutable, timestamped)
 - Lane readiness score generated automatically
 
@@ -117,13 +118,13 @@ Each Manheim location runs one Trust Layer node. 300 locations = 300 nodes. The 
 
 | Product Name | Audience | Description |
 |---|---|---|
-| **Lot Ops Pro** | Enterprise (Manheim) | The Windows application. What they install and use. |
-| **Lume-Auto** | Technical / investor | The organism engine underneath Lot Ops Pro. |
+| **Lume-Ops Recon** | Enterprise (Manheim) | The Windows application. What they install and use. |
+| **Lume-Auto** | Technical / investor | The organism engine underneath Lume-Ops Recon. |
 | **Trust Layer** | Technical / investor | The node network. Not named to Manheim staff — it's just "the network." |
 | **TrustVault** | Technical | The immutable record store within Trust Layer. Manheim staff see "audit log" or "scan record." |
 | **TrustGen** | Technical | The condition report generation engine. Manheim staff see "condition report." |
 
-**Rule:** In Manheim-facing materials, use **Lot Ops Pro** as the product name. Reference Lume-Auto only when speaking to technical decision-makers. Never say "blockchain" — say "distributed governance network" or "federated node infrastructure."
+**Rule:** In Manheim-facing materials, use **Lume-Ops Recon** as the product name. Reference Lume-Auto only when speaking to technical decision-makers. Never say "blockchain" — say "distributed governance network" or "federated node infrastructure."
 
 ---
 
@@ -136,24 +137,24 @@ The existing `manheim-build-agent-handoff.md` positions Lume-Auto as the enterpr
 - Delivery mechanism = unspecified
 
 **After (correct framing):**
-- Enterprise tier = **Lot Ops Pro** — Windows executable, per-location deployment
+- Enterprise tier = **Lume-Ops Recon** — Windows executable, per-location deployment
 - Delivery mechanism = Windows installer, deployed to lot workstations
 - Underlying stack = Lume-Auto organism + Trust Layer node (invisible to end user)
 
 **Update required in `manheim-build-agent-handoff.md`:**
-- Section 1: Add Lot Ops Pro as the enterprise product name
-- Section 5: Rename "Enterprise / Auction" tier to "Lot Ops Pro"
+- Section 1: Add Lume-Ops Recon as the enterprise product name
+- Section 5: Rename "Enterprise / Auction" tier to "Lume-Ops Recon"
 - Section 6: Add Windows deployment detail to pilot proposal
-- Section 9: Add Lot Ops Pro to website and deck assets list
+- Section 9: Add Lume-Ops Recon to website and deck assets list
 
 ---
 
 ## PILOT DEPLOYMENT FLOW
 
-1. DarkWave installs Lot Ops Pro on 2–3 workstations at the pilot Manheim location
+1. DarkWave installs Lume-Ops Recon on 2–3 workstations at the pilot Manheim location
 2. Trust Layer node is activated for that location
 3. Technicians run OBD-II intake scans using existing adapter hardware (Lume firmware)
-4. Lot Ops Pro surfaces condition reports, lot-flow dashboard, and arbitration viewer
+4. Lume-Ops Recon surfaces condition reports, lot-flow dashboard, and arbitration viewer
 5. All records written to the local node — immutable from point of generation
 6. At pilot close: pull 30-day report from node, demonstrate record integrity, present ROI
 
@@ -161,21 +162,21 @@ The existing `manheim-build-agent-handoff.md` positions Lume-Auto as the enterpr
 
 ## DELIVERABLES FOR BUILD AGENT
 
-- [ ] Update `manheim-build-agent-handoff.md` — rename Enterprise tier to Lot Ops Pro, add Windows deployment detail
-- [ ] Update `lume-auto-product.md` — add Lot Ops Pro section under Enterprise Features
-- [ ] Create Lot Ops Pro one-page product brief (Manheim-facing)
-- [ ] Create Lot Ops Pro feature module diagram (the 7 modules above)
-- [ ] Create three-layer stack diagram (Lot Ops Pro → Lume-Auto → Trust Layer)
-- [ ] Update `manheim.tlid.io` site to include Lot Ops Pro product section
-- [ ] Update Manheim deck: add Lot Ops Pro slide, three-layer architecture slide
+- [ ] Update `manheim-build-agent-handoff.md` — rename Enterprise tier to Lume-Ops Recon, add Windows deployment detail
+- [ ] Update `lume-auto-product.md` — add Lume-Ops Recon section under Enterprise Features
+- [ ] Create Lume-Ops Recon one-page product brief (Manheim-facing)
+- [ ] Create Lume-Ops Recon feature module diagram (the 7 modules above)
+- [ ] Create three-layer stack diagram (Lume-Ops Recon → Lume-Auto → Trust Layer)
+- [ ] Update `manheim.tlid.io` site to include Lume-Ops Recon product section
+- [ ] Update Manheim deck: add Lume-Ops Recon slide, three-layer architecture slide
 
 ---
 
 ## TONE GUIDANCE
 
-- **To lane managers:** "Lot Ops Pro gives you a complete picture of every vehicle on the lot — condition, faults, battery, lane readiness — from the moment it arrives."
+- **To lane managers:** "Lume-Ops Recon gives you a complete picture of every vehicle on the lot — condition, faults, battery, lane readiness — from the moment it arrives."
 - **To IT:** "Windows application, standard installer, connects to your existing network infrastructure. No browser dependency, no cloud-only requirement."
-- **To executives:** "Lot Ops Pro is the operational intelligence layer your teams use every day. The underlying Lume-Auto organism and Trust Layer network are the infrastructure it runs on."
+- **To executives:** "Lume-Ops Recon is the operational intelligence layer your teams use every day. The underlying Lume-Auto organism and Trust Layer network are the infrastructure it runs on."
 - **To technical evaluators:** "Deterministic 42-node OBD-II governance engine, 2,358 test cases passed with zero AI calls, immutable POA ledger with per-location nodes."
 
-# END OF LOT OPS PRO BUILD HANDOFF
+# END OF LUME-OPS RECON BUILD HANDOFF
