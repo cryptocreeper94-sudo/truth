@@ -22,6 +22,23 @@ The lane manager installs Lot Ops Pro. They never need to know what's underneath
 
 ---
 
+## DEPLOYMENT ARCHITECTURE — TWO-TRACK STRATEGY
+
+The Lume ecosystem deploys across two distinct tracks. Same organism engine, same Trust Layer network underneath — different delivery layer based on context.
+
+| Track | Platform | Product | Target User |
+|---|---|---|---|
+| **Mobile** | iOS + Android — Expo native build | Lume-Auto | Consumer drivers, personal vehicles, small fleet owners |
+| **Desktop** | Windows + Linux — local installation | Lot Ops Pro | Manheim lot staff, enterprise fleet operators, lane managers, recon coordinators |
+
+**What this means for the build agent:**
+- The Expo mobile build and the Windows/Linux desktop build share the same Lume-Auto organism core and Trust Layer node infrastructure
+- The mobile app is the consumer and small business entry point
+- Lot Ops Pro is the enterprise entry point — installed locally on lot workstations, tablets (Windows/Linux), and laptops
+- Both tracks feed into the same Trust Layer node network — a vehicle scanned on a mobile device and a vehicle scanned through Lot Ops Pro both write to the same immutable ledger
+
+---
+
 ## THE THREE-LAYER STACK
 
 ```
