@@ -179,4 +179,62 @@ The existing `manheim-build-agent-handoff.md` positions Lume-Auto as the enterpr
 - **To executives:** "Lume-Ops Recon is the operational intelligence layer your teams use every day. The underlying Lume-Auto organism and CAL network are the infrastructure it runs on."
 - **To technical evaluators:** "Deterministic 42-node OBD-II governance engine, 2,358 test cases passed with zero AI calls, immutable POA ledger with per-location nodes."
 
-# END OF LUME-OPS RECON BUILD HANDOFF
+---
+
+## GROUND TRUTH UPDATE — 2026-05-16
+*All items below supersede earlier sections where conflicts exist.*
+
+### What's Live Right Now
+- CAL deployed at `cox-automotive-ledger.onrender.com`
+- Every condition report: SHA-256 hashed + UUID certificate ID + anchored to CAL
+- Vehicle Asset Passport live at `GET /api/passport/:vin`
+- Arbitration proof endpoint live at `POST /api/submit/arbitration`
+- Tamper detection demo at `POST /api/demo/tamper`
+- `coxautoinc.com` whitelisted in Firebase — Manheim employees can log in today
+- APK downloadable at `lumeauto.tech/download`
+
+### What's NOT Built Yet in Lume-Ops Recon
+- Employee portal integration (documented in this handoff, not yet built)
+- Google Play Store submission pending
+- Real pilot data from a Manheim facility — needed to validate the 50%+ automation claim
+
+### Mode 04 Language — Mandatory Correction
+Do NOT use "read-only organism" or "no ECU modification" anywhere.
+Correct: **"no ECU reprogramming, no calibration changes, no firmware alteration."**
+Mode 04 (Clear DTCs + MIL reset) is a standard diagnostic write — Terms updated.
+
+### CAL API Endpoints for Lume-Ops Recon Integration
+| Endpoint | Purpose |
+|---|---|
+| `POST /api/submit/condition` | Submit intake condition report |
+| `POST /api/submit/custody` | Log custody transfer between lots |
+| `POST /api/submit/arbitration` | Submit cryptographic arbitration proof |
+| `GET /api/verify` | Chain integrity verification |
+| `GET /api/passport/:vin` | Vehicle Asset Passport lookup |
+| `GET /api/blocks` | Block explorer |
+| `POST /api/demo/tamper` | Live tamper detection demonstration |
+
+### Employee Hash Receipts — Scope for Lume-Ops Recon
+The employee portal module (when built) must generate cryptographic receipts for:
+- Timecard edits
+- Pay adjustments
+- Performance reviews
+- Safety incidents
+- Bonus calculations
+
+Each receipt: SHA-256 hash of the original record, written to the CAL node for that facility.
+Employees see proof their records are intact — not the records themselves.
+This is a **trust feature**, not a transparency feature.
+
+### "Verified but Private" — Build Requirement
+CAL stores hashes, never raw data. No cleartext PII, compensation, pricing, or operational intelligence on-chain. Every Lume-Ops Recon data write must pass through `AnchorService.ts` hash computation before submission to CAL.
+
+### Patent Portfolio — Corrected
+US Provisional 64/032,339 **+ 5 additional filings** = **6 total patents pending**
+
+### Tone — Mandatory
+"This doesn't replace anything. It wraps what already exists."
+Lume-Ops Recon adds a governance layer on top of existing Manheim systems.
+Nothing migrates. Nothing shuts down. Nothing breaks.
+
+# END OF LUME-OPS RECON BUILD HANDOFF — VERSION 1.2 — UPDATED 2026-05-16

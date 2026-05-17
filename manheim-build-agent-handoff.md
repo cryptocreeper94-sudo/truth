@@ -365,4 +365,143 @@ All metrics are tracked and reported in the 30-day pilot ROI report, signed by D
 - [ ] Manheim pitch leads with operational ROI, not global impact
 - [ ] Every deck slide references a specific document section for content sourcing
 
-# END OF DIRECTIVE — VERSION 1.1 AUDITED
+---
+
+## GROUND TRUTH UPDATE — 2026-05-16
+*All items below supersede earlier sections where conflicts exist.*
+
+### Production Status
+Everything below is **live and deployed** — not a prototype.
+
+**Completed:**
+- Full OBD-II scanner: Modes 01, 02, 03, 04, 07, 09
+- 42-node organism visualization (canvas-rendered)
+- SHA-256 cryptographic anchoring to CAL and Trust Layer
+- Vehicle Asset Passport (`/api/passport/:vin`) on CAL
+- Employee Hash Receipts — documented and live on site
+- "Verified but Private" data architecture — documented
+- Tone audit complete (2026-05-16) — humility, not indictment
+- Terms of Service updated for Mode 04 ECU writes
+- Visual effects: particle field, mini organism, animated counters, gradient shimmer
+- APK built and downloadable at `/download`
+- Firebase auth whitelist active — `coxautoinc.com` whitelisted
+- Deployed to production at `lumeauto.tech`
+- CAL live at `cox-automotive-ledger.onrender.com`
+
+**Not yet built:**
+- Meridian (wireless energy) — whitepaper stub only, no demo
+- Google Play Store submission
+- Real pilot data from a Manheim facility
+- Employee portal integration in Lume-Ops Recon (documented, not built)
+
+---
+
+### Repositories & Domains
+| System | Domain / URL |
+|---|---|
+| Lume-Auto Site + App | `lumeauto.tech` |
+| Lume-Auto Mobile | APK at `lumeauto.tech/download` |
+| Cox Automotive Ledger (CAL) | `cox-automotive-ledger.onrender.com` |
+| Manheim Pitch | `manheim.tlid.io` |
+| Trust Layer | `trust-layer.onrender.com` |
+
+---
+
+### Patent Portfolio — Corrected
+US Provisional 64/032,339 **+ 5 additional filings** = **6 total patents pending**
+ORCID: 0009-0007-5214-649X
+Prior Art Anchor: May 2026
+
+All referenced throughout the whitepaper and engineering brief.
+
+---
+
+### Mode 04 — Language Correction
+The organism is not "read-only." Mode 04 (Clear DTCs + MIL reset) writes to the ECU.
+
+Correct framing throughout all materials:
+- **Do NOT say:** "no ECU modification"
+- **Do say:** "no ECU reprogramming, no calibration changes, no firmware alteration"
+- Clearing DTCs is a standard diagnostic operation (mechanics do it daily). The Terms of Service have been updated to reflect Mode 04 capability.
+
+---
+
+### Cryptographic Evidence Layer — Full Arbitration Story
+Every condition report now:
+1. Computes SHA-256 hash (Web Crypto API — deterministic JSON serialization)
+2. Generates a UUID certificate ID
+3. POSTs to CAL (enterprise) or Trust Layer (consumer)
+4. Displays hash fingerprint + certificate ID + anchor status on the report
+5. If ledger is offline: "HASH COMPUTED · LOCAL" — hash remains valid
+
+**CAL API endpoints:**
+- `POST /api/submit/condition` — Submit condition report
+- `POST /api/submit/custody` — Submit custody transfer
+- `POST /api/submit/arbitration` — Submit arbitration proof
+- `GET /api/verify` — Chain integrity check
+- `GET /api/passport/:vin` — Vehicle Asset Passport lookup
+- `GET /api/blocks` — Block explorer
+- `POST /api/demo/tamper` — Tamper detection demonstration
+
+**Arbitration defense:** Pull certificate ID → recompute hash → verify against on-chain record. Tamper-evident, independently verifiable. This is the strongest version of the arbitration reduction story.
+
+---
+
+### Vehicle Asset Passport
+VIN-keyed identity document on the CAL chain. Every vehicle that passes through a Manheim lot accumulates a cryptographically verified history: condition at intake, faults detected, reconditioning performed, custody transfers, lane assignments. The passport travels with the VIN — not with the lot.
+
+This is a **product feature**, not just an API endpoint. Name it explicitly in all Manheim-facing materials.
+
+---
+
+### "Verified but Private" — Data Architecture
+CAL stores **SHA-256 hashes, not raw data.** No employee PII, compensation details, internal pricing, or competitive intelligence is written in cleartext.
+
+**Access tiers:**
+- Facility managers → their facility only
+- Corporate → aggregate view
+- Employees → only records that affect them
+- External → zero exposure
+- Trust Layer → only what Cox explicitly chooses to make verifiable
+
+**Lead with this in front of Manheim legal.** The answer to "what data do you store about our employees?" is: hashes, not records.
+
+---
+
+### Employee Hash Receipts
+CAL extends beyond vehicle data to operational integrity. Every record affecting a Manheim employee generates a cryptographic receipt:
+- Timecard edits → hash of original + modified entry
+- Pay adjustments → hash of payroll record
+- Performance reviews → hash of review as filed
+- Safety incidents → hash of incident report
+- Bonus calculations → hash of quota data + payout
+
+This is a **trust feature, not a transparency feature.** Employees see only proof that their own records are intact. This is relevant to Manheim's HR leadership — who were already in the room at the Nashville meeting.
+
+---
+
+### Firebase Auth — Enterprise Access Active
+- `coxautoinc.com` is already whitelisted
+- Any Manheim employee with a `@coxautoinc.com` email can log in **right now**
+- This is not a demo feature — it is a live enterprise access point
+- Lead with this in the next meeting: "Your team can log in today with their work email"
+
+---
+
+### Tone Guidance — Mandatory for All Materials
+The entire site was audited 2026-05-16. All materials must follow this principle:
+
+**"This doesn't replace anything. It wraps what already exists."**
+
+Key substitutions:
+| Avoid | Use instead |
+|---|---|
+| "patchwork of legacy systems" | "built and refined over 25 years" |
+| "eliminates subjective inspector variance" | "complements inspector expertise" |
+| "your current systems don't have" | "complements existing operations" |
+| "replaces clipboards and radios" | "mobile operational platform" |
+| "capabilities that don't exist anywhere" | "capabilities that extend current infrastructure" |
+
+The platform adds a governance layer **on top of** existing Manheim systems. Nothing migrates. Nothing shuts down. Nothing breaks.
+
+# END OF DIRECTIVE — VERSION 1.2 — UPDATED 2026-05-16

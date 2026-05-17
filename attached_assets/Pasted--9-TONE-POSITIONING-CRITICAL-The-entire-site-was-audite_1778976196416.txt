@@ -1,0 +1,73 @@
+## 9. TONE & POSITIONING — CRITICAL
+
+The entire site was audited for tone on 2026-05-16. Every piece of language was softened to convey HUMILITY, not indictment of Manheim's current operations.
+
+### What Was Changed
+- "patchwork of legacy systems" → "built and refined over 25 years"
+- "most consistently failed initiatives" → "most challenging initiatives"
+- "eliminates subjective inspector variance" → "complements inspector expertise"
+- "your current systems don't have" → "complement existing operations"
+- "replaces clipboards and radios" → "mobile operational platform"
+- "The AI thought is not acceptable" → "deterministic reproducibility changes the conversation"
+- "capabilities that don't exist anywhere" → "capabilities that extend current infrastructure"
+- Blog title "The Mechanic Killer Thesis" → "The Diagnostic Gap"
+- Home card "The Mechanic Killer" → "Diagnostic Intelligence"
+
+### Guiding Principle
+"This doesn't replace anything. It wraps what already exists."
+The platform adds a governance layer ON TOP of existing Manheim systems. Nothing migrates. Nothing shuts down. Nothing breaks.
+
+## 10. VISUAL EFFECTS (NEW — 2026-05-16)
+
+### Components Added
+- src/components/effects/ParticleField.tsx — Canvas particle system (hero background)
+- src/components/effects/MiniOrganism.tsx — 42-node ambient organism (hero right side, desktop only)
+- src/components/effects/AnimatedCounter.tsx — Scroll-triggered number counters
+
+### CSS Effects Added (index.css)
+- .text-gradient — Animated gradient shimmer on headlines (cyan → emerald → violet)
+- .panel:hover — Glow effect + translateY(-2px) lift
+- .btn-primary::after — Ripple effect on hover
+- .organism-float — Floating animation (4s ease-in-out)
+- .organism-glow — Pulsing glow drop-shadow
+- .glass — Glassmorphism utility (backdrop-filter: blur(12px))
+- Smooth scroll (html { scroll-behavior: smooth })
+
+## 11. CURRENT STATUS — PRODUCTION READY
+
+### What's Done
+- [x] Full OBD-II scanner (Modes 01-04, 07, 09)
+- [x] 42-node organism visualization (canvas-rendered)
+- [x] SHA-256 hashing + ledger anchoring
+- [x] Data Privacy Architecture documented
+- [x] Employee Hash Receipts documented + on site
+- [x] All content consistent across all pages
+- [x] Tone audit — humility not indictment
+- [x] Terms updated for Mode 04 ECU writes
+- [x] Visual effects (particles, mini organism, counters, gradients)
+- [x] APK built and downloadable
+- [x] Auth whitelist active
+- [x] Deployed to production (lumeauto.tech)
+
+### What's NOT Done
+- [ ] Meridian (wireless energy) — stub in whitepaper only, no demo
+- [ ] Google Play Store submission
+- [ ] Real pilot data from a Manheim facility
+- [ ] Employee portal integration in lume-ops-recon (documented, not built)
+
+### Patent Portfolio
+- US Provisional 64/032,339 + 5 additional filings
+- Referenced throughout the whitepaper and engineering brief
+- ORCID: 0009-0007-5214-649X
+
+### Build & Deploy
+cd d:\lume-auto-site
+npm run build          # TypeScript check + Vite production build
+git add -A
+git commit -m "message"
+git push origin main   # Auto-deploys via Vercel/Render
+
+### Key People
+- Owner: Jason Andrews (cryptocreeper94@gmail.com)
+- Company: DarkWave Studios LLC
+- Target: Manheim / Cox Automotive ($23B annual revenue)
