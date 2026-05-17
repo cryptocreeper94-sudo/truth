@@ -1,0 +1,42 @@
+## 6. OBD-II DIAGNOSTIC TOOL — COMPLETE FEATURE SET
+
+### Supported Modes
+- Mode 01: Real-time telemetry (14 PIDs, 150ms polling)
+- Mode 02: Freeze frame data capture
+- Mode 03: Read stored DTCs
+- Mode 04: Clear DTCs + MIL reset (WRITES TO ECU — Terms updated)
+- Mode 07: Read pending DTCs
+- Mode 09: VIN auto-read from ECU
+
+### Key Files
+- src/telemetry/BLEConnector.ts — All BLE AT-command logic for OBD-II
+- src/telemetry/WiFiConnector.ts — WiFi adapter support (native only)
+- src/telemetry/SimulatedEngine.ts — Demo mode (2019 Ford F-150 5.0L V8)
+- src/telemetry/AnchorService.ts — SHA-256 hashing + CAL/Trust Layer anchoring
+- src/components/organism/OrganismDashboard.tsx — Main dashboard (Tab 1)
+- src/components/organism/OrganismVisualization.tsx — 42-node canvas (Tab 2)
+- src/components/organism/OrganismReport.tsx — Condition report + hash (Tab 3)
+- src/components/organism/OrganismConnection.tsx — BLE/WiFi connection screen
+- src/components/organism/OrganismTabs.tsx — Bottom tab navigation
+
+### Cryptographic Anchoring (NEW — just built)
+Every condition report now:
+1. Computes SHA-256 hash via Web Crypto API
+2. Generates a UUID certificate ID
+3. POSTs to CAL (enterprise) or Trust Layer (consumer)
+4. Displays hash fingerprint + certificate ID + anchor status on report
+5. If ledger is offline, shows "HASH COMPUTED · LOCAL" — hash is still valid
+
+File: src/telemetry/AnchorService.ts
+- computeSHA256() — deterministic JSON serialization + Web Crypto digest
+- anchorReport() — routes to CAL or Trust Layer based on deployment context
+- verifyReport() — recomputes hash for tamper detection
+
+### CAL API Endpoints (cox-automotive-ledger)
+- POST /api/submit/condition — Submit condition report
+- POST /api/submit/custody — Submit custody transfer
+- POST /api/submit/arbitration — Submit arbitration proof
+- GET /api/verify — Chain integrity check
+- GET /api/passport/:vin — Vehicle Asset Passport lookup
+- GET /api/blocks — Block explorer
+- POST /api/demo/tamper — Tamper detection demonstration
