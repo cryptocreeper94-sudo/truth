@@ -504,4 +504,49 @@ Key substitutions:
 
 The platform adds a governance layer **on top of** existing Manheim systems. Nothing migrates. Nothing shuts down. Nothing breaks.
 
-# END OF DIRECTIVE — VERSION 1.2 — UPDATED 2026-05-16
+---
+
+## FRACTAL TRUST MESH — PHASE 2–4 ROADMAP EXTENSION
+*Do NOT present this in the initial Manheim pilot meeting. This is the post-pilot enterprise expansion narrative.*
+
+### What It Is
+The Fractal Trust Mesh generalizes CAL into a reusable Enterprise PoA Network template. Each enterprise (Manheim, transport vendors, reconditioning partners, insurers, dealers) receives its own sovereign, private, deterministic PoA chain. A Bridge Service allows cross-enterprise verification without exchanging raw data — only SHA-256 hashes, timestamps, and custody signatures are shared.
+
+Trust Layer becomes the neutral verifier between chains. LUME-V governs policy, validator rotation, and privacy tiering across all chains.
+
+### Why It Matters for Manheim
+Manheim cannot share raw condition data, employee records, or internal pricing with transport vendors or reconditioning partners — legal and competitive constraints make that impossible. The Fractal Trust Mesh solves this: both parties verify the same asset, the same custody chain, and the same time window through cryptographic proofs — without either side seeing the other's internal data.
+
+This collapses a major class of vendor arbitration disputes (transport damage claims, custody disagreements, condition discrepancies at handoff) without requiring any party to expose internal systems.
+
+### Cross-Enterprise Bridge — How It Works
+1. Manheim anchors a condition report to CAL (hashed VIN, condition hash, timestamp)
+2. Transport vendor anchors a pickup event to their own PoA chain
+3. Bridge Service verifies: same asset (hashed VIN match), same custody chain, timestamp within window, no tampering on either chain
+4. Returns deterministic verification object — no raw data exchanged by either party
+
+### Four-Phase Rollout (Post-Pilot)
+| Phase | What Gets Built | When |
+|---|---|---|
+| Phase 1 | CAL as Manheim's sovereign chain — **current, live** | Now |
+| Phase 2 | Bridge Service — cross-chain hash verification + Trust Layer CrossChainProof certificate | Post-pilot, post-contract |
+| Phase 3 | Manheim recommends PoA chains to transport vendors, recon partners, logistics providers | 6–12 months post-contract |
+| Phase 4 | Full Fractal Trust Mesh — dozens of enterprise chains, deterministic interoperability, zero-knowledge cross-company workflows | 18–36 months |
+
+### Sequencing Guidance for Build Agent
+- **Phase 1 (CAL):** Already built and live. This is what the Manheim pilot runs on.
+- **Phase 2 (Bridge Service):** Build after pilot validates CAL. Required components: Bridge Service module, CrossChainProof certificate type on Trust Layer, LUME-V cross-chain governance rules.
+- **Phases 3–4:** Driven by enterprise adoption, not by build schedule. Build when contracts are signed.
+
+### Guiding Principles
+- "Verified but Private" is the core doctrine across all phases
+- Each enterprise chain is sovereign — nobody owns another company's chain
+- The bridge shares proofs, not data
+- Determinism over AI
+- Governance over guesswork
+- Infrastructure over features
+
+### LUME-V — Clarification Needed
+LUME-V appears throughout this architecture as the governance wrapper for all PoA chains. Before the build agent implements LUME-V governance rules, Jason must provide the formal LUME-V specification. It is referenced on the Manheim pitch site but not formally documented in this workspace.
+
+# END OF DIRECTIVE — VERSION 1.3 — UPDATED 2026-05-16
