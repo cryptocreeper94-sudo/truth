@@ -546,7 +546,35 @@ This collapses a major class of vendor arbitration disputes (transport damage cl
 - Governance over guesswork
 - Infrastructure over features
 
-### LUME-V — Clarification Needed
-LUME-V appears throughout this architecture as the governance wrapper for all PoA chains. Before the build agent implements LUME-V governance rules, Jason must provide the formal LUME-V specification. It is referenced on the Manheim pitch site but not formally documented in this workspace.
+### LUME-V — Resolved
+LUME-V is a published paper: *"Lume-V: Deterministic Governance for Non-Deterministic AI Systems"*
+DOI: 10.5281/zenodo.19645097 · v1 · 2026
+The verification wrapper that validates, certifies, and arbitrates AI outputs before they reach downstream systems. 10-layer architecture with Ed25519-signed trust certificates.
+In the site context: LUME-V is the governance layer that wraps all organism outputs — condition reports, scoring decisions, custody records — before they are anchored to CAL. It provides the deterministic certification envelope that makes every CAL record auditable and tamper-evident.
+
+### Enterprise Mesh — Site Integration Instructions
+Add a new component: `src/components/manheim/EnterpriseMeshTeaser.tsx`
+
+**Placement in ManheimPitch.tsx:** After `<MeridianTeaser />` (confirm it is included in ManheimPitch or the relevant tab), before `<EcosystemCTA />`
+
+**Visual identity:**
+- Accent color: `#7c3aed` (violet/purple — distinct from Meridian red, Lume emerald, CAL cyan)
+- Badge label: `Future Vision Layer` (same pattern as Meridian's "Future Infrastructure Layer")
+- Icon: `<Globe />` or `<Network />` from Lucide
+
+**Section header:**
+- Eyebrow: `FUTURE VISION LAYER`
+- Title: `Enterprise Mesh`
+- Subtitle: *"When every company in the automotive ecosystem operates its own sovereign chain, the network becomes the infrastructure."*
+
+**Three feature cards:**
+1. **Sovereign Chains** — Every enterprise in the Cox ecosystem — Manheim, transport vendors, reconditioning partners — operates its own private PoA chain. No shared data. No shared risk.
+2. **Verified Without Exposure** — Two chains verify a shared asset using only cryptographic proofs. Neither party sees the other's internal records. Custody disputes resolved without litigation.
+3. **Industry Standard** — The same infrastructure Manheim deploys in this pilot becomes the foundation for the entire Cox Automotive vendor network. First mover owns the standard.
+
+**Closing callout (panel):**
+> *"The pilot you are evaluating today is Phase 1 of a network that scales to every node in the automotive supply chain — without requiring any participant to expose their internal data."*
+
+**Tone:** Vision only. No implementation dates. No deliverables. No commitment language. Same pattern as MeridianTeaser — reader understands the direction without being asked to act on it.
 
 # END OF DIRECTIVE — VERSION 1.3 — UPDATED 2026-05-16
