@@ -1,0 +1,48 @@
+## 7. HARDWARE STRATEGY
+
+### Phase 1: Commodity (Current)
+- Works with any ELM327-compatible OBD-II adapter ($15-30)
+- BLE via Web Bluetooth API (browser)
+- WiFi via native Android app (TCP socket)
+- Zero capital investment to begin evaluation
+
+### Phase 2: Lume Dongle (Future Production)
+- ESP32-S3 based, $13 BOM
+- WiFi + BT Classic + BLE simultaneously
+- Passive CAN bus sniffing (zero discovery latency)
+- Ghost Mode secure gateway bypass (2018+ vehicles)
+- OTA firmware updates
+- Unique fleet identity per device
+- IMPORTANT: Framed as "modular architecture" not "sales pitch"
+  - The site describes WHY proprietary hardware matters at scale
+  - Three constraints of commodity adapters: no identity, no firmware governance, no gateway compliance
+  - The dongle addresses each constraint — reader connects the dots
+
+### Tone Guidance
+The hardware section was specifically written to NOT be a sales pitch. It describes architectural constraints and solutions. The reader (Manheim) should conclude on their own that licensing/branding the dongle makes sense. Key phrases used:
+- "Architecturally modular"
+- "Configurable per deployment"  
+- "Brandable firmware — configurable identity layer"
+- "The same physical hardware supports independent identity configurations without hardware modification"
+
+## 8. DATA PRIVACY ARCHITECTURE (NEW)
+
+### "Verified but Private" — Core Principle
+CAL stores SHA-256 HASHES, not raw data. No employee PII, compensation details, internal pricing, or competitive intelligence is written in cleartext.
+
+### Access Tiers
+- Facility managers → their facility only
+- Corporate → aggregate view
+- Employees → only records that affect them
+- External → nothing (zero external exposure)
+- Trust Layer → only what Cox explicitly chooses to make verifiable
+
+### Employee Hash Receipts (NEW)
+Every record affecting an employee generates a cryptographic receipt:
+- Timecard edits → hash of original + modified entry
+- Pay adjustments → hash of payroll record
+- Performance reviews → hash of review as filed
+- Safety incidents → hash of incident report
+- Bonus calculations → hash of quota data + payout
+
+This is a TRUST feature, not a transparency feature. Employees see only proof that THEIR records are intact.
