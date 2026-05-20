@@ -1,0 +1,162 @@
+TITLE: LUME Dual‑Dongle Architecture with OBD‑II Splitter + Optional Vehicle‑Carried Mode
+
+OBJECTIVE:
+Define the complete architecture for running both the Cox2M cellular telematics dongle and the LUME diagnostic dongle simultaneously using an OBD‑II splitter, and outline the optional onboard‑storage mode where the LUME dongle can remain in the vehicle temporarily to capture full life‑cycle diagnostic data.
+
+------------------------------------------------------------
+SECTION 1 — COX2M CELLULAR DONGLE (EXISTING VEHICLE LAYER)
+------------------------------------------------------------
+1. Device Type:
+   - Cellular telematics unit (NOT Bluetooth, NOT Wi‑Fi).
+   - Uses LTE‑M / NB‑IoT for connectivity.
+
+2. Purpose:
+   - Long‑term asset tracking.
+   - GPS pings at low frequency.
+   - Basic OBD events (MIL, battery voltage, ignition state).
+   - Repossession, fleet visibility, compliance.
+
+3. Behavior:
+   - Stays plugged into the vehicle for months or years.
+   - Sends data directly to Cox servers.
+   - Not designed for real‑time diagnostics or operational workflows.
+
+4. Key Point:
+   - This device remains in the vehicle and is NOT replaced by LUME.
+
+------------------------------------------------------------
+SECTION 2 — LUME DIAGNOSTIC DONGLE (TECHNICIAN‑CARRIED MODE)
+------------------------------------------------------------
+1. Device Type:
+   - BLE (Bluetooth Low Energy) diagnostic dongle.
+
+2. Purpose:
+   - Real‑time, high‑frequency OBD telemetry.
+   - Intake, movement, recon, QC, checkout workflows.
+   - Synthetic organism scoring.
+   - Deterministic state transitions within the operational OS.
+
+3. Behavior:
+   - Carried by the technician.
+   - Plugged in only during workflow steps.
+   - Streams live OBD data to technician’s phone.
+   - Phone → cellular → cloud → dashboard.
+
+4. BLE Range:
+   - Sufficient because technician is physically at the vehicle.
+   - No need for long‑range radio.
+
+5. Key Point:
+   - This mode does NOT conflict with the Cox2M dongle.
+
+------------------------------------------------------------
+SECTION 3 — OBD‑II SPLITTER (DUAL‑DONGLE COEXISTENCE)
+------------------------------------------------------------
+1. Hardware:
+   - Standard OBD‑II Y‑splitter with two female ports.
+
+2. Configuration:
+   - Port A: Cox2M cellular dongle.
+   - Port B: LUME diagnostic dongle.
+
+3. CAN Bus Arbitration:
+   - Only one device actively communicates at a time.
+   - Cox2M dongle is passive most of the time (low‑frequency wake cycles).
+   - LUME dongle takes priority during active diagnostics.
+
+4. Result:
+   - Both devices can coexist without interference.
+   - No modification to Cox hardware or infrastructure required.
+
+------------------------------------------------------------
+SECTION 4 — LUME VEHICLE‑CARRIED MODE (OPTIONAL UPGRADE)
+------------------------------------------------------------
+1. Hardware Enhancements:
+   - Onboard flash storage (8–32MB).
+   - Low‑power sleep mode.
+   - Scheduled wake cycles.
+   - Buffered CAN data logging.
+
+2. Purpose:
+   - Capture full life‑cycle diagnostic history while vehicle is on the lot.
+   - Record:
+     - Cold starts
+     - Idle periods
+     - Battery voltage trends
+     - DTCs + freeze frames
+     - Movement events
+     - Recon/QC events
+     - Any CAN‑level anomalies
+
+3. Behavior:
+   - LUME dongle stays in the vehicle temporarily (days/weeks).
+   - Logs data locally without needing a phone present.
+   - Coexists with Cox2M dongle via splitter.
+
+4. Key Point:
+   - This mode does NOT replace Cox2M; it complements it.
+
+------------------------------------------------------------
+SECTION 5 — TECHNICIAN DOWNLOAD WORKFLOW
+------------------------------------------------------------
+1. Before vehicle leaves the lot:
+   - Technician connects via BLE.
+   - LUME app downloads all stored diagnostic data.
+   - Data is uploaded to the cloud and attached to the vehicle record.
+   - Technician removes the LUME dongle.
+
+2. Output:
+   - Certified diagnostic history for the entire time the vehicle was on the lot.
+   - Optional anchoring to CAL/VET for immutable provenance.
+
+------------------------------------------------------------
+SECTION 6 — ARCHITECTURAL POSITIONING
+------------------------------------------------------------
+1. Cox2M Dongle = Vehicle Layer
+   - Long‑term tracking.
+   - Cellular connectivity.
+   - Asset‑centric.
+
+2. LUME Dongle = Operational Layer
+   - Real‑time diagnostics.
+   - Workflow‑centric.
+   - Technician‑driven.
+
+3. Splitter = Coexistence Layer
+   - Enables both systems to operate simultaneously.
+
+4. Optional LUME Onboard Storage = Life‑Cycle Diagnostics Layer
+   - Full provenance of vehicle behavior while on the lot.
+
+5. Enterprise Alignment:
+   - No conflict with existing Cox hardware.
+   - No need to replace 500k+ cellular dongles.
+   - LUME becomes the operational OS instrumentation layer.
+
+------------------------------------------------------------
+SECTION 7 — IMPLEMENTATION REQUIREMENTS
+------------------------------------------------------------
+1. Firmware:
+   - CAN bus arbitration logic.
+   - Buffered logging.
+   - BLE sync protocol.
+   - Sleep/wake scheduling.
+
+2. Storage:
+   - 8–32MB flash for multi‑week logs.
+
+3. Data Model:
+   - Timestamped CAN frames.
+   - DTC snapshots.
+   - Freeze frames.
+   - Battery voltage curve.
+   - Movement events.
+
+4. Security:
+   - Local encryption at rest.
+   - Signed sync packets.
+   - Optional CAL anchoring for trust.
+
+------------------------------------------------------------
+END OF COPY BLOCK
+------------------------------------------------------------
