@@ -34,7 +34,7 @@ AXIOM is a DLA. It does not guess.
 This document identifies five targeted improvements to the DLA NLG pipeline introduced in the May 7, 2026 audit handoff. All improvements are additive — no breaking changes to the existing pipeline, no data loss, no changes to the backwards-compatible fallback behavior.
 
 **Systems Affected:** DLA Engine (`D:\dda`) — composition layer only
-**Systems NOT Affected:** Trust Layer SSO, Firebase Auth, Axiom Studio IDE, Lume-Cortex OS, Arbora Platform, all 212 knowledge packs
+**Systems NOT Affected:** Trust Layer Ledger (TLL) SSO, Firebase Auth, Axiom Studio IDE, Lume-Cortex OS, Arbora Platform, all 212 knowledge packs
 
 ---
 

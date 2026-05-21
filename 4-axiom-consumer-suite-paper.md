@@ -12,7 +12,7 @@
 
 **Related Works:**
 Lume Language Specification (DOI: 10.5281/zenodo.19382282)
-Trust Layer Ecosystem (DOI: 10.5281/zenodo.19560674)
+Trust Layer Ledger (TLL) Ecosystem (DOI: 10.5281/zenodo.19560674)
 DLA: Deterministic Language Architecture — L-SOC Language Architecture Vol. I (DOI pending)
 The Lume Organism Stack — L-SOC Architecture Vol. I (DOI pending)
 
@@ -46,7 +46,7 @@ Every AXIOM Consumer Suite product shares:
 
 - **DLA compliance:** All five products satisfy D1–D5. Hallucination is structurally impossible in all five.
 - **Organism grounding:** Every product's responses about current user state are grounded in live organism readings, not in model inference.
-- **Trust Layer identity:** All five products share a single user identity across the suite via Trust Layer SSO.
+- **Trust Layer Ledger (TLL) identity:** All five products share a single user identity across the suite via Trust Layer Ledger (TLL) SSO.
 - **Audit trail:** Every response in every product is auditable to its specific knowledge base entry and organism state values.
 - **The same brand promise:** "The AI That Never Guesses." Consistent across all five products regardless of domain.
 
@@ -224,7 +224,7 @@ AXIOM Work produces a response provenance document on demand for any workplace i
 All five products run on shared infrastructure within Lume-Cortex:
 
 - **Shared DLA composition engine:** The same `composition-engine.js`, `grammar-engine.js`, `tone-adapter.js`, and `thesaurus.js` underlie all five products. Domain differentiation comes from different knowledge bases and different organism groundings, not different engines.
-- **Shared Trust Layer:** Single sign-on across all five products. A user authenticated to AXIOM Bio is authenticated to AXIOM Daily without re-authentication.
+- **Shared Trust Layer Ledger (TLL):** Single sign-on across all five products. A user authenticated to AXIOM Bio is authenticated to AXIOM Daily without re-authentication.
 - **Shared learning system:** The five-dimension learning system (alias, fact, correction, preference, conversation context) is shared across the suite. A fact correction in AXIOM Bio propagates to AXIOM Daily's biological knowledge base.
 
 ### 7.2 Knowledge Base Separation
@@ -283,7 +283,7 @@ The category is defined. The architecture is specified. The products exist. The 
 Andrews, J. (2026). DLA: Deterministic Language Architecture. L-SOC Language Architecture Vol. I. DarkWave Studios LLC.
 Andrews, J. (2026). The Lume Organism Stack. L-SOC Architecture Vol. I. DarkWave Studios LLC.
 Andrews, J. (2026). Lume-Cortex. L-SOC Architecture Vol. VI. DarkWave Studios LLC.
-Andrews, J. (2026). Trust Layer Ecosystem. Zenodo. DOI: 10.5281/zenodo.19560674.
+Andrews, J. (2026). Trust Layer Ledger (TLL) Ecosystem. Zenodo. DOI: 10.5281/zenodo.19560674.
 
 ---
 

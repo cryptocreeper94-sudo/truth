@@ -12,7 +12,7 @@
 
 **Related Works:**
 Lume Language Specification (DOI: 10.5281/zenodo.19382282)
-Trust Layer Ecosystem (DOI: 10.5281/zenodo.19560674)
+Trust Layer Ledger (TLL) Ecosystem (DOI: 10.5281/zenodo.19560674)
 Lume-V Deterministic Wrapper (DOI: 10.5281/zenodo.19645097)
 Lume-X Multi-Organism Substrate (DOI: 10.5281/zenodo.19443968)
 The Lume Organism Stack — L-SOC Architecture Vol. I (DOI pending)
@@ -28,7 +28,7 @@ Every layer of the Lume Organism Stack — physical, biological, cognitive, soci
 
 This paper specifies Lume-Cortex — that meta-operating system. Lume-Cortex is not an organism. It does not have its own 42-node structure. It is the deterministic orchestration layer above the organism stack: the shell environment that makes the stack a coherent system rather than a collection of independent governance engines.
 
-The paper establishes: the architectural role of Lume-Cortex relative to the organism stack; the Cortex module structure (lifecycle manager, coupling registry, query router, state display, policy enforcer); the determinism requirement for orchestration (Cortex cannot be a source of non-determinism above the organism layer); the Trust Layer integration (how identity and authorization span the full Cortex environment); the DLA as the Cortex user interface (natural language access to all organism states); the Cortex configuration model (versioned, auditable, explicit); and the deployment architecture (browser-based OS shell hosting all DarkWave Studios LLC products).
+The paper establishes: the architectural role of Lume-Cortex relative to the organism stack; the Cortex module structure (lifecycle manager, coupling registry, query router, state display, policy enforcer); the determinism requirement for orchestration (Cortex cannot be a source of non-determinism above the organism layer); the Trust Layer Ledger (TLL) integration (how identity and authorization span the full Cortex environment); the DLA as the Cortex user interface (natural language access to all organism states); the Cortex configuration model (versioned, auditable, explicit); and the deployment architecture (browser-based OS shell hosting all DarkWave Studios LLC products).
 
 Lume-Cortex is the answer to the question: "What does it look like to run everything?" It looks like this.
 
@@ -38,7 +38,7 @@ Lume-Cortex is the answer to the question: "What does it look like to run everyt
 
 ### 1.1 The Need for an Orchestration Layer
 
-Seven organism layers. Five operating modes per organism. Up to forty-two nodes per organism. Multiple coupling channels between organisms. A Trust Layer providing cross-cutting identity. A DLA providing natural language output. Hard constraints enforced at two levels. Session state managed across multiple layers.
+Seven organism layers. Five operating modes per organism. Up to forty-two nodes per organism. Multiple coupling channels between organisms. A Trust Layer Ledger (TLL) providing cross-cutting identity. A DLA providing natural language output. Hard constraints enforced at two levels. Session state managed across multiple layers.
 
 None of this composes automatically. Composition requires orchestration: a layer above the organisms that manages their lifecycle, their connections, their shared resources, and their unified presentation to the humans using them.
 
@@ -60,7 +60,7 @@ Cortex determinism is achieved through the same mechanism as organism determinis
 2. The five Cortex modules and their interfaces
 3. The Cortex configuration model — version-controlled, auditable, explicit
 4. The determinism argument for Cortex orchestration
-5. Trust Layer integration across the Cortex environment
+5. Trust Layer Ledger (TLL) integration across the Cortex environment
 6. DLA as the Cortex natural language interface
 7. The deployment architecture — browser-based OS shell hosting the full DarkWave Studios LLC product ecosystem
 
@@ -96,7 +96,7 @@ User Interface (browser shell)
     ├── State Display
     └── Policy Enforcer
          ↕
-Trust Layer (identity fabric — cross-cutting)
+Trust Layer Ledger (TLL) (identity fabric — cross-cutting)
          ↕
 ┌────────────────────────────────────────────────────┐
 │                Organism Stack                      │
@@ -106,7 +106,7 @@ Trust Layer (identity fabric — cross-cutting)
 └────────────────────────────────────────────────────┘
 ```
 
-Cortex sits between the user interface and the organism stack. It manages the stack; it does not join it. The Trust Layer cuts across both Cortex and the organisms.
+Cortex sits between the user interface and the organism stack. It manages the stack; it does not join it. The Trust Layer Ledger (TLL) cuts across both Cortex and the organisms.
 
 ---
 
@@ -131,7 +131,7 @@ The Coupling Registry maintains the Coupling Node Tables (CNTs) for all active i
 **Functions:**
 - **Register coupling:** Given a CNT entry (export organism, export node, import organism, import node, interval, α), activate the coupling relationship by subscribing the import organism to NSEPs from the export organism
 - **Deregister coupling:** Gracefully terminate a coupling relationship, allowing the import organism's decay function to return it to local-only governance before the coupling channel closes
-- **NSEP routing:** Receive NSEPs from exporting organisms and deliver them to the appropriate importing organisms, with Trust Layer authentication check on each delivery
+- **NSEP routing:** Receive NSEPs from exporting organisms and deliver them to the appropriate importing organisms, with Trust Layer Ledger (TLL) authentication check on each delivery
 - **Coupling health monitor:** Track NSEP sequence numbers and intervals across all active couplings. Alert when couplings show missed packets or sequence gaps beyond the LIOCP thresholds
 
 **Registry state:** The active CNT for the current configuration is the complete specification of all inter-organism coupling relationships. The registry is a pure data structure — it routes and monitors, it does not modify coupling values.
@@ -194,7 +194,7 @@ All Cortex behavior is driven by the Cortex Configuration Document (CCD) — a v
 - Which coupling relationships are active (CNT entries)
 - Which stack-level policies are active (Policy Enforcer rules)
 - Which organisms feed the DLA (query routing rules)
-- Trust Layer integration parameters (session timeout, authorization role definitions)
+- Trust Layer Ledger (TLL) integration parameters (session timeout, authorization role definitions)
 
 The CCD is stored in version control. Any change to the CCD is a new version — it cannot be modified in place. The Lifecycle Manager always runs against a specific CCD version. Rollback to a prior CCD version is possible by re-deploying the prior version.
 
@@ -213,17 +213,17 @@ Hard configuration changes (changing an organism's node definitions or threshold
 
 ---
 
-## 5. Trust Layer Integration
+## 5. Trust Layer Ledger (TLL) Integration
 
-### 5.1 Cortex as Trust Layer Relying Party
+### 5.1 Cortex as Trust Layer Ledger (TLL) Relying Party
 
-Lume-Cortex authenticates every user session through the Trust Layer (DOI: 10.5281/zenodo.19560674) using the Trust Layer's SSO (Single Sign-On) mechanism. A user arriving at the Cortex browser interface is redirected to Trust Layer authentication before any organism state is displayed or any query is processed.
+Lume-Cortex authenticates every user session through the Trust Layer Ledger (TLL) (DOI: 10.5281/zenodo.19560674) using the Trust Layer Ledger (TLL)'s SSO (Single Sign-On) mechanism. A user arriving at the Cortex browser interface is redirected to Trust Layer Ledger (TLL) authentication before any organism state is displayed or any query is processed.
 
-The Trust Layer returns a session token encoding the user's identity and role. The Cortex uses this token for all subsequent authorization checks.
+The Trust Layer Ledger (TLL) returns a session token encoding the user's identity and role. The Cortex uses this token for all subsequent authorization checks.
 
 ### 5.2 Role-Based Organism Access
 
-The Trust Layer role definition determines which organisms a user can observe and which policies they can override:
+The Trust Layer Ledger (TLL) role definition determines which organisms a user can observe and which policies they can override:
 
 | Role | Observable Organisms | Override Authority |
 |---|---|---|
@@ -233,13 +233,13 @@ The Trust Layer role definition determines which organisms a user can observe an
 | Administrator | All organisms in session | All overrides including hard constraint bypass requests |
 | System | All organisms (cross-session) | Full configuration management |
 
-Hard constraint bypass requests — when an authorized administrator requests to override a hard constraint (e.g., enable Power Mode despite microsleep risk) — are routed through the Trust Layer authorization check and logged to the Trust Layer audit log. The Cortex does not approve override requests; it submits them to the Trust Layer for authorization.
+Hard constraint bypass requests — when an authorized administrator requests to override a hard constraint (e.g., enable Power Mode despite microsleep risk) — are routed through the Trust Layer Ledger (TLL) authorization check and logged to the Trust Layer Ledger (TLL) audit log. The Cortex does not approve override requests; it submits them to the Trust Layer Ledger (TLL) for authorization.
 
 ### 5.3 Session Lifecycle
 
 On session start:
-1. User authenticates to Trust Layer
-2. Trust Layer issues session token with identity and role
+1. User authenticates to Trust Layer Ledger (TLL)
+2. Trust Layer Ledger (TLL) issues session token with identity and role
 3. Cortex Lifecycle Manager activates organism instances for the session (or resumes from saved session state)
 4. Coupling Registry activates configured coupling relationships
 5. State Display renders initial organism states
@@ -248,9 +248,9 @@ On session start:
 On session end:
 1. User logs out (or session timeout)
 2. Cortex Lifecycle Manager issues graceful shutdown to all session organisms
-3. Session state saved to Trust Layer session store (optional, based on CCD configuration)
+3. Session state saved to Trust Layer Ledger (TLL) session store (optional, based on CCD configuration)
 4. Coupling channels cleanly terminated
-5. Trust Layer session token revoked
+5. Trust Layer Ledger (TLL) session token revoked
 
 ---
 
@@ -295,7 +295,7 @@ Lume-Cortex is deployed as a browser-based OS shell — a web application that p
 The "OS shell" framing is precise: like a traditional OS, Cortex:
 - Manages the lifecycle of running processes (organisms)
 - Provides inter-process communication (LIOCP coupling via the Coupling Registry)
-- Controls access through authentication and authorization (Trust Layer SSO)
+- Controls access through authentication and authorization (Trust Layer Ledger (TLL) SSO)
 - Presents a unified interface above the processes (State Display + DLA)
 - Manages configuration and versioning (CCD model)
 
@@ -325,14 +325,14 @@ lume-cortex.com (Cortex OS shell)
       ├── AXIOM Social (SocioCore-grounded DLA)
       ├── AXIOM Daily (L2+L3+L4 aggregate)
       └── AXIOM Work (L4+L5, B2B)
-Trust Layer (identity fabric beneath all products)
+Trust Layer Ledger (TLL) (identity fabric beneath all products)
 ```
 
 ### 7.3 Single Sign-On Across Products
 
-The Trust Layer SSO means a user authenticates once to Lume-Cortex and has authenticated access to all products within the Cortex environment — lume42.com organism stack, axiom42.com DLA, and any other Cortex-hosted product — without re-authenticating. Session state is managed by the Trust Layer and is consistent across all products.
+The Trust Layer Ledger (TLL) SSO means a user authenticates once to Lume-Cortex and has authenticated access to all products within the Cortex environment — lume42.com organism stack, axiom42.com DLA, and any other Cortex-hosted product — without re-authenticating. Session state is managed by the Trust Layer Ledger (TLL) and is consistent across all products.
 
-This is the practical expression of the Trust Layer's cross-cutting identity function: one identity, one session, spanning the full stack.
+This is the practical expression of the Trust Layer Ledger (TLL)'s cross-cutting identity function: one identity, one session, spanning the full stack.
 
 ---
 
@@ -367,11 +367,11 @@ This is not just a language claim. It is an architectural fact. And Lume-Cortex 
 
 ### 9.1 Multi-Tenant Cortex
 
-The current specification describes a single-organization Cortex deployment. A multi-tenant Cortex — hosting organism stacks for multiple organizations on shared infrastructure — requires Trust Layer multi-tenancy, coupling isolation between tenants, and configuration isolation in the Lifecycle Manager. These are engineering extensions of the existing architecture, not architectural changes.
+The current specification describes a single-organization Cortex deployment. A multi-tenant Cortex — hosting organism stacks for multiple organizations on shared infrastructure — requires Trust Layer Ledger (TLL) multi-tenancy, coupling isolation between tenants, and configuration isolation in the Lifecycle Manager. These are engineering extensions of the existing architecture, not architectural changes.
 
 ### 9.2 Cortex Federation
 
-For large organizations with multiple physical sites, a federated Cortex architecture allows multiple Cortex instances to share Trust Layer identity (SSO spanning all instances) while maintaining independent organism stacks per site. The Federation layer coordinates System-role operations (global configuration updates, cross-site state queries) across instances.
+For large organizations with multiple physical sites, a federated Cortex architecture allows multiple Cortex instances to share Trust Layer Ledger (TLL) identity (SSO spanning all instances) while maintaining independent organism stacks per site. The Federation layer coordinates System-role operations (global configuration updates, cross-site state queries) across instances.
 
 ### 9.3 Cortex as Certification Evidence
 
@@ -383,7 +383,7 @@ Future work defines the specific log format and retention policy required for co
 
 ## 10. Conclusion
 
-Lume-Cortex is the meta-operating system that makes the Lume Organism Stack a deployable product rather than a collection of formal specifications. It orchestrates organism lifecycle, manages coupling channels, routes queries, displays state, enforces stack-level policies, and provides a natural language interface — all deterministically, all auditably, all within the Trust Layer identity fabric.
+Lume-Cortex is the meta-operating system that makes the Lume Organism Stack a deployable product rather than a collection of formal specifications. It orchestrates organism lifecycle, manages coupling channels, routes queries, displays state, enforces stack-level policies, and provides a natural language interface — all deterministically, all auditably, all within the Trust Layer Ledger (TLL) identity fabric.
 
 It is not an organism. It does not govern any domain. It is the environment in which the organisms that govern all domains run together as a coherent system.
 
@@ -406,7 +406,7 @@ The organisms are the instruments. The Cortex is the orchestra.
 ## References
 
 Andrews, J. (2026). Lume Language Specification. Zenodo. DOI: 10.5281/zenodo.19382282
-Andrews, J. (2026). Trust Layer Ecosystem. Zenodo. DOI: 10.5281/zenodo.19560674
+Andrews, J. (2026). Trust Layer Ledger (TLL) Ecosystem. Zenodo. DOI: 10.5281/zenodo.19560674
 Andrews, J. (2026). Lume-V. Zenodo. DOI: 10.5281/zenodo.19645097
 Andrews, J. (2026). Lume-X. Zenodo. DOI: 10.5281/zenodo.19443968
 Andrews, J. (2026). The Lume Organism Stack. L-SOC Architecture Vol. I. DarkWave Studios LLC.

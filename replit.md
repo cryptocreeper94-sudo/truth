@@ -40,14 +40,14 @@ AXIOM Neuro (NeuroCore) · AXIOM Bio (BioCore) · AXIOM Social (SocioCore) · AX
 lume-cortex.com          ← Lume-OS: Deterministic Meta-Operating System
                             Browser-based OS shell (Windows/iOS hybrid)
                             Hosts and showcases all ecosystem products
-                            Auth: Trust Layer SSO (already live)
+                            Auth: Trust Layer Ledger (TLL) SSO (already live)
         ├── lume42.com   ← Organism stack module (Meridian → GovernanceCore)
         │                   4/42 reference hub, 7 organisms, 294 nodes
         └── axiom42.com  ← AXIOM agent module
                             181k topics, 148 domain packs, <2ms response
                             Operates within organism governance framework
 
-Trust Layer (DOI: 10.5281/zenodo.19560674)
+Trust Layer Ledger (TLL) (DOI: 10.5281/zenodo.19560674)
         ↑ identity and auth fabric beneath all products
 ```
 
@@ -55,10 +55,10 @@ Trust Layer (DOI: 10.5281/zenodo.19560674)
 
 ## AXIOM Engine Knowledge Packs
 
-**Project:** Trust Layer Ecosystem — Lume Knowledge Pack Generation
+**Project:** Trust Layer Ledger (TLL) Ecosystem — Lume Knowledge Pack Generation
 **Author:** Jason Andrews, DarkWave Studios LLC
 **ORCID:** 0009-0007-5214-649X | **Contact:** team@dwsc.io
-**DOIs:** Lume=19382282, Trust Layer=19560674, DAIGS=19491784, Lume-V=19645097, Lume-X=19443968
+**DOIs:** Lume=19382282, Trust Layer Ledger (TLL)=19560674, DAIGS=19491784, Lume-V=19645097, Lume-X=19443968
 **Patent:** 64/032,339
 
 All packs live in `knowledge_packs/` and follow the strict 7-component format:
@@ -158,7 +158,7 @@ All L-SOC papers follow the DarkWave Studios LLC Canon³ Technical Paper Series 
 | File | Title | Notes |
 |------|-------|-------|
 | `dla-paper.md` | DLA: Deterministic Language Architecture — Language Architecture Vol. I | Category-defining paper. Coins "DLA." Hallucination impossibility theorem. Patent 64/032,339. |
-| `4-axiom-consumer-suite-paper.md` | AXIOM Consumer Suite — Language Architecture Vol. II | Five DLA products: AXIOM Bio, Neuro, Social, Daily, Work. Organism grounding by product. Shared DLA composition engine. Trust Layer SSO. B2B audit trail. |
+| `4-axiom-consumer-suite-paper.md` | AXIOM Consumer Suite — Language Architecture Vol. II | Five DLA products: AXIOM Bio, Neuro, Social, Daily, Work. Organism grounding by product. Shared DLA composition engine. Trust Layer Ledger (TLL) SSO. B2B audit trail. |
 
 ### L-SOC Papers — Automotive Series
 
@@ -200,7 +200,7 @@ All L-SOC papers follow the DarkWave Studios LLC Canon³ Technical Paper Series 
 |------|-------|-------|
 | `neurocore-paper.md` | NeuroCore: A Four-Primitive Deterministic Cognitive Flow Organism | First organism of the Cognitive Layer; formally coupled to BioCore |
 | `sociocore-paper.md` | SocioCore: A Four-Primitive Deterministic Social Flow Organism | First organism of the Social Layer; formally coupled to NeuroCore and BioCore |
-| `governancecore-paper.md` | GovernanceCore: A Four-Primitive Deterministic Governance Flow Organism | First organism of the Governance Layer; substrate for Trust Layer, Lume-QOS, DAMOS |
+| `governancecore-paper.md` | GovernanceCore: A Four-Primitive Deterministic Governance Flow Organism | First organism of the Governance Layer; substrate for Trust Layer Ledger (TLL), Lume-QOS, DAMOS |
 
 ### Organism Specs (in `attached_assets/`)
 

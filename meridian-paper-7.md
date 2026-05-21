@@ -30,7 +30,7 @@
 
 **Related Work:**
 - Lume Language Specification — DOI: 10.5281/zenodo.19382282
-- Trust Layer Ecosystem — DOI: 10.5281/zenodo.19560674
+- Trust Layer Ledger (TLL) Ecosystem — DOI: 10.5281/zenodo.19560674
 - DAIGS Framework — DOI: 10.5281/zenodo.19491784
 - Lume-V Verification Suite — DOI: 10.5281/zenodo.19645097
 - Lume-X Multi-Agent Cognition — DOI: 10.5281/zenodo.19443968
@@ -348,7 +348,7 @@ A gateway relay node (GRN) is a specialized Meridian node installed at a floor-t
 
 **Directional isolation:** The two antenna faces are physically isolated by a ground plane to prevent the upper-face beam from coupling into the lower-face field and vice versa. The GRN appears as two independent nodes to the routing engines of the two floors it connects.
 
-**Shared identity:** The GRN registers with both floor meshes under a single Trust Layer identity with a capability profile that explicitly encodes its gateway function. The DRMA routing engine on each floor knows to terminate inter-floor routing paths at the GRN and resume them through the paired GRN on the adjacent floor.
+**Shared identity:** The GRN registers with both floor meshes under a single Trust Layer Ledger (TLL) identity with a capability profile that explicitly encodes its gateway function. The DRMA routing engine on each floor knows to terminate inter-floor routing paths at the GRN and resume them through the paired GRN on the adjacent floor.
 
 ### 6.3 Gateway Placement Rules
 
@@ -593,7 +593,7 @@ Before any node is installed, the commissioning checklist must be completed:
 □ Source node power connection points coordinated with electrical
 □ RF interference pre-survey completed (existing RF environment characterization)
 □ BSL sensor coverage map generated (no coverage gaps in final-hop zones)
-□ Trust Layer identity credentials ordered for all nodes
+□ Trust Layer Ledger (TLL) identity credentials ordered for all nodes
 □ Guardian Security commissioning authority credential issued
 ```
 
@@ -601,7 +601,7 @@ Before any node is installed, the commissioning checklist must be completed:
 
 1. **Gateway relay nodes first.** Install GRNs at all floor-transition points before intra-floor nodes. GRNs are the architectural anchor points for the mesh; intra-floor nodes are aligned to them.
 
-2. **Source nodes second.** Install source nodes at their planned positions and connect to building electrical. Verify power input and initial supercapacitor charge. Import AVM. Verify Trust Layer identity registration.
+2. **Source nodes second.** Install source nodes at their planned positions and connect to building electrical. Verify power input and initial supercapacitor charge. Import AVM. Verify Trust Layer Ledger (TLL) identity registration.
 
 3. **Relay nodes third.** Install intra-floor relay nodes working outward from source nodes and gateway nodes. Each relay node auto-announces at installation; the source node's routing engine validates its position against the AVM before accepting it into the mesh.
 
@@ -708,7 +708,7 @@ Any voxel with ambiguous classification is assigned the higher-priority (more re
 | BSL sensors | 2 sets (one per face) | Full 5-modality each |
 | Aperture requirement | ≥15 cm clear path | Between faces |
 | Mounting clearance | ≤2m from floor/ceiling transition | Close to transition |
-| Identity | Single Trust Layer ID | Capability: GATEWAY |
+| Identity | Single Trust Layer Ledger (TLL) ID | Capability: GATEWAY |
 | Maintenance access | Required | Replacement without occupancy disruption |
 
 ---
@@ -760,7 +760,7 @@ Header (64 bytes):
   voxel_size     : 4 bytes  (float, meters, default 0.25)
   grid_dims_i/j/k: 12 bytes (uint32 each)
   timestamp      : 8 bytes  (Unix epoch, milliseconds)
-  author_key_id  : 8 bytes  (Trust Layer identity of BIM author)
+  author_key_id  : 8 bytes  (Trust Layer Ledger (TLL) identity of BIM author)
   signature      : [64 bytes] (Ed25519 signature over header + voxel data)
 
 Voxel data:
@@ -769,7 +769,7 @@ Voxel data:
   Order: (i=0,j=0,k=0), (i=1,j=0,k=0), ..., row-major in i, then j, then k
 ```
 
-The signature covers the full voxel data array and the header (excluding the signature field itself). The Meridian commissioning tool verifies the signature against the author's Trust Layer public key before importing any AVM. An AVM with an invalid signature is rejected.
+The signature covers the full voxel data array and the header (excluding the signature field itself). The Meridian commissioning tool verifies the signature against the author's Trust Layer Ledger (TLL) public key before importing any AVM. An AVM with an invalid signature is rejected.
 
 ---
 
@@ -814,7 +814,7 @@ The signature covers the full voxel data array and the header (excluding the sig
 **Lume Ecosystem:**
 
 [15] Andrews, J. (2026). *Lume Language Specification.* DOI: 10.5281/zenodo.19382282
-[16] Andrews, J. (2026). *Trust Layer Ecosystem.* DOI: 10.5281/zenodo.19560674
+[16] Andrews, J. (2026). *Trust Layer Ledger (TLL) Ecosystem.* DOI: 10.5281/zenodo.19560674
 [17] Andrews, J. (2026). *DAIGS Framework.* DOI: 10.5281/zenodo.19491784
 [18] Andrews, J. (2026). *Lume-V Verification Suite.* DOI: 10.5281/zenodo.19645097
 [19] Andrews, J. (2026). *Lume-X Multi-Agent Cognition.* DOI: 10.5281/zenodo.19443968

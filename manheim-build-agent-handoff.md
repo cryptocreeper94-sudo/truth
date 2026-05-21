@@ -376,7 +376,7 @@ Everything below is **live and deployed** — not a prototype.
 **Completed:**
 - Full OBD-II scanner: Modes 01, 02, 03, 04, 07, 09
 - 42-node organism visualization (canvas-rendered)
-- SHA-256 cryptographic anchoring to CAL and Trust Layer
+- SHA-256 cryptographic anchoring to CAL and Trust Layer Ledger (TLL)
 - Vehicle Asset Passport (`/api/passport/:vin`) on CAL
 - Employee Hash Receipts — documented and live on site
 - "Verified but Private" data architecture — documented
@@ -403,7 +403,7 @@ Everything below is **live and deployed** — not a prototype.
 | Lume-Auto Mobile | APK at `lumeauto.tech/download` |
 | Cox Automotive Ledger (CAL) | `cox-automotive-ledger.onrender.com` |
 | Manheim Pitch | `manheim.tlid.io` |
-| Trust Layer | `trust-layer.onrender.com` |
+| Trust Layer Ledger (TLL) | `trust-layer.onrender.com` |
 
 ---
 
@@ -430,7 +430,7 @@ Correct framing throughout all materials:
 Every condition report now:
 1. Computes SHA-256 hash (Web Crypto API — deterministic JSON serialization)
 2. Generates a UUID certificate ID
-3. POSTs to CAL (enterprise) or Trust Layer (consumer)
+3. POSTs to CAL (enterprise) or Trust Layer Ledger (TLL) (consumer)
 4. Displays hash fingerprint + certificate ID + anchor status on the report
 5. If ledger is offline: "HASH COMPUTED · LOCAL" — hash remains valid
 
@@ -462,7 +462,7 @@ CAL stores **SHA-256 hashes, not raw data.** No employee PII, compensation detai
 - Corporate → aggregate view
 - Employees → only records that affect them
 - External → zero exposure
-- Trust Layer → only what Cox explicitly chooses to make verifiable
+- Trust Layer Ledger (TLL) → only what Cox explicitly chooses to make verifiable
 
 **Lead with this in front of Manheim legal.** The answer to "what data do you store about our employees?" is: hashes, not records.
 
@@ -512,7 +512,7 @@ The platform adds a governance layer **on top of** existing Manheim systems. Not
 ### What It Is
 The Fractal Trust Mesh generalizes CAL into a reusable Enterprise PoA Network template. Each enterprise (Manheim, transport vendors, reconditioning partners, insurers, dealers) receives its own sovereign, private, deterministic PoA chain. A Bridge Service allows cross-enterprise verification without exchanging raw data — only SHA-256 hashes, timestamps, and custody signatures are shared.
 
-Trust Layer becomes the neutral verifier between chains. LUME-V governs policy, validator rotation, and privacy tiering across all chains.
+Trust Layer Ledger (TLL) becomes the neutral verifier between chains. LUME-V governs policy, validator rotation, and privacy tiering across all chains.
 
 ### Why It Matters for Manheim
 Manheim cannot share raw condition data, employee records, or internal pricing with transport vendors or reconditioning partners — legal and competitive constraints make that impossible. The Fractal Trust Mesh solves this: both parties verify the same asset, the same custody chain, and the same time window through cryptographic proofs — without either side seeing the other's internal data.
@@ -529,13 +529,13 @@ This collapses a major class of vendor arbitration disputes (transport damage cl
 | Phase | What Gets Built | When |
 |---|---|---|
 | Phase 1 | CAL as Manheim's sovereign chain — **current, live** | Now |
-| Phase 2 | Bridge Service — cross-chain hash verification + Trust Layer CrossChainProof certificate | Post-pilot, post-contract |
+| Phase 2 | Bridge Service — cross-chain hash verification + Trust Layer Ledger (TLL) CrossChainProof certificate | Post-pilot, post-contract |
 | Phase 3 | Manheim recommends PoA chains to transport vendors, recon partners, logistics providers | 6–12 months post-contract |
 | Phase 4 | Full Fractal Trust Mesh — dozens of enterprise chains, deterministic interoperability, zero-knowledge cross-company workflows | 18–36 months |
 
 ### Sequencing Guidance for Build Agent
 - **Phase 1 (CAL):** Already built and live. This is what the Manheim pilot runs on.
-- **Phase 2 (Bridge Service):** Build after pilot validates CAL. Required components: Bridge Service module, CrossChainProof certificate type on Trust Layer, LUME-V cross-chain governance rules.
+- **Phase 2 (Bridge Service):** Build after pilot validates CAL. Required components: Bridge Service module, CrossChainProof certificate type on Trust Layer Ledger (TLL), LUME-V cross-chain governance rules.
 - **Phases 3–4:** Driven by enterprise adoption, not by build schedule. Build when contracts are signed.
 
 ### Guiding Principles

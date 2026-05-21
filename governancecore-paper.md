@@ -15,7 +15,7 @@
 
 **Related Work:**
 - Lume Language Specification — DOI: 10.5281/zenodo.19382282
-- Trust Layer Ecosystem — DOI: 10.5281/zenodo.19560674
+- Trust Layer Ledger (TLL) Ecosystem — DOI: 10.5281/zenodo.19560674
 - DAIGS Framework — DOI: 10.5281/zenodo.19491784
 - Lume-V Verification Suite — DOI: 10.5281/zenodo.19645097
 - Lume-X Multi-Agent Cognition — DOI: 10.5281/zenodo.19443968
@@ -26,7 +26,7 @@
 - Andrews, J. (2026). SocioCore: A Four-Primitive Deterministic Social Flow Organism. DarkWave Studios LLC. Canon² Paper Series.
 
 **Substrate for:**
-- Trust Layer Ecosystem (DOI: 10.5281/zenodo.19560674)
+- Trust Layer Ledger (TLL) Ecosystem (DOI: 10.5281/zenodo.19560674)
 - Lume Quality of Service Framework (Lume-QOS)
 - DAMOS (Deterministic Agent Management and Orchestration System)
 
@@ -40,13 +40,13 @@
 
 We present GovernanceCore, a Lume-native deterministic governance flow organism for rule coherence maintenance, multi-agent coordination, fairness protection, and conflict resolution in complex sociotechnical systems. GovernanceCore implements the Lume 4/42 organism architecture — four irreducible flow primitives governing forty-two operational nodes — in the governance domain. The four primitives are Rule Coherence Flow, Coordination Flow, Fairness Flow, and Conflict Resolution Flow. The forty-two nodes encode the complete systemic governance state space from rule clarity, consistency, and drift risk through alignment strength, coordination overhead, and shared intent, through equity index, exploitation risk, and fairness safety, through dispute detection speed, escalation pressure, deadlock risk, and global governance resilience.
 
-GovernanceCore is the first organism in the Lume-Governance vertical and occupies the governance layer directly above SocioCore in the canonical organism stack. Where SocioCore governs the space between individual people — social energy, identity coherence, relational stability, and communication load — GovernanceCore governs the space between groups, agents, and institutions: the systemic fields of rule, coordination, justice, and resolution that determine whether multi-agent systems remain stable, fair, and functional under load. GovernanceCore is the formal substrate beneath the Trust Layer Ecosystem, Lume-QOS, and DAMOS — the governance infrastructure that those systems depend upon and must maintain in a healthy state to function as intended.
+GovernanceCore is the first organism in the Lume-Governance vertical and occupies the governance layer directly above SocioCore in the canonical organism stack. Where SocioCore governs the space between individual people — social energy, identity coherence, relational stability, and communication load — GovernanceCore governs the space between groups, agents, and institutions: the systemic fields of rule, coordination, justice, and resolution that determine whether multi-agent systems remain stable, fair, and functional under load. GovernanceCore is the formal substrate beneath the Trust Layer Ledger (TLL) Ecosystem, Lume-QOS, and DAMOS — the governance infrastructure that those systems depend upon and must maintain in a healthy state to function as intended.
 
 GovernanceCore governs at the intersection of three domains previously treated as separate: institutional design (rules and their coherence), collective action theory (coordination and its failures), and distributive and procedural justice (fairness and its protection). It applies the Lume organism's deterministic governance logic to all three simultaneously, enforcing five operating modes (Rule Stabilization, Coordination, Fairness, Conflict Resolution, and Systemic Safety) selected deterministically by node pattern, and monitoring two critical compound failure patterns — systemic collapse risk (RC8+CR2+F2) and governance drift (CO5+RC6) — that require compound governance responses not reducible to individual node alerts.
 
 The paper includes a complete formal 2D/3D visual geometry specification including a polar coordinate ring with four governance-domain color-coded arcs, four-axis core, primitive envelope lobes, drift vector overlays, a conflict pressure inward-gravity visualization on the Conflict Resolution axis, a rule contradiction crack effect on the Rule Coherence axis, and a fairness collapse downward-distortion effect on the Fairness axis. Both 3D modes — time-stack for governance trajectory analysis and depth-stack for explicit/implicit/systemic layer decomposition — are formally specified.
 
-**Keywords:** deterministic governance, Lume synthetic organism, rule coherence, multi-agent coordination, fairness governance, conflict resolution, institutional drift, 4/42 organism architecture, systemic stability, Trust Layer substrate, Lume-Governance vertical, collective action
+**Keywords:** deterministic governance, Lume synthetic organism, rule coherence, multi-agent coordination, fairness governance, conflict resolution, institutional drift, 4/42 organism architecture, systemic stability, Trust Layer Ledger (TLL) substrate, Lume-Governance vertical, collective action
 
 ---
 
@@ -103,13 +103,13 @@ PHYSICAL LAYER:    Meridian / Verdara Ultra / HydroCore
 
 GovernanceCore is the first organism in the stack to govern multi-agent systems rather than individual practitioners. All prior organisms (BioCore, NeuroCore, SocioCore) govern the biological, cognitive, and social state of a single individual or the relationships between individuals. GovernanceCore governs the systemic layer that emerges when multiple individuals interact within rule-governed institutional structures: the rules themselves, the coordination mechanisms, the fairness properties, and the conflict resolution apparatus.
 
-This makes GovernanceCore structurally distinct. Its domain is not contained within any single practitioner or relationship. It governs the institutional environment that all practitioners and relationships exist within. Inputs come from SocioCore (social instability that loads governance systems), NeuroCore (cognitive overload that destabilizes decision-making and fairness judgment), and from direct observation of institutional events (rule changes, coordination failures, conflicts, fairness violations). Outputs flow upward to Trust Layer, Lume-QOS, and DAMOS, and flow back down to SocioCore and NeuroCore through the stability and predictability that functioning governance provides.
+This makes GovernanceCore structurally distinct. Its domain is not contained within any single practitioner or relationship. It governs the institutional environment that all practitioners and relationships exist within. Inputs come from SocioCore (social instability that loads governance systems), NeuroCore (cognitive overload that destabilizes decision-making and fairness judgment), and from direct observation of institutional events (rule changes, coordination failures, conflicts, fairness violations). Outputs flow upward to Trust Layer Ledger (TLL), Lume-QOS, and DAMOS, and flow back down to SocioCore and NeuroCore through the stability and predictability that functioning governance provides.
 
-### 1.4 GovernanceCore as Trust Layer Substrate
+### 1.4 GovernanceCore as Trust Layer Ledger (TLL) Substrate
 
-The Trust Layer Ecosystem [Andrews, 2026] — one of the Lume ecosystem's foundational published works — specifies the mechanisms by which agents in a multi-agent system establish, maintain, and revoke trust relationships. Trust Layer presupposes a governance substrate: trust presupposes rules (what commitments are enforceable and how), coordination (how agents signal and verify alignment), fairness (whether the trust framework is equitably accessible), and conflict resolution (what happens when trust is violated). GovernanceCore formalizes this substrate.
+The Trust Layer Ledger (TLL) Ecosystem [Andrews, 2026] — one of the Lume ecosystem's foundational published works — specifies the mechanisms by which agents in a multi-agent system establish, maintain, and revoke trust relationships. Trust Layer Ledger (TLL) presupposes a governance substrate: trust presupposes rules (what commitments are enforceable and how), coordination (how agents signal and verify alignment), fairness (whether the trust framework is equitably accessible), and conflict resolution (what happens when trust is violated). GovernanceCore formalizes this substrate.
 
-A Trust Layer system operating on a GovernanceCore with degraded Rule Coherence (RC1–RC10) will produce trust relationships that are fragile because the rules they depend on are ambiguous, inconsistent, or drifting. A Trust Layer operating on degraded Fairness Flow (F1–F11) will produce trust relationships that are structurally biased, extending trust efficiently to some classes of agents while systematically excluding others. GovernanceCore's health is a prerequisite for Trust Layer integrity.
+A Trust Layer Ledger (TLL) system operating on a GovernanceCore with degraded Rule Coherence (RC1–RC10) will produce trust relationships that are fragile because the rules they depend on are ambiguous, inconsistent, or drifting. A Trust Layer Ledger (TLL) operating on degraded Fairness Flow (F1–F11) will produce trust relationships that are structurally biased, extending trust efficiently to some classes of agents while systematically excluding others. GovernanceCore's health is a prerequisite for Trust Layer Ledger (TLL) integrity.
 
 ### 1.5 Novel Contributions
 
@@ -980,7 +980,7 @@ function generate_governance_guidance(GC, R, trend, sociocore_state, neurocore_s
 
 [17] Andrews, J. (2026). Lume Language Specification. DarkWave Studios LLC. DOI: 10.5281/zenodo.19382282.
 
-[18] Andrews, J. (2026). Trust Layer Ecosystem. DarkWave Studios LLC. DOI: 10.5281/zenodo.19560674.
+[18] Andrews, J. (2026). Trust Layer Ledger (TLL) Ecosystem. DarkWave Studios LLC. DOI: 10.5281/zenodo.19560674.
 
 [19] Andrews, J. (2026). DAIGS Framework. DarkWave Studios LLC. DOI: 10.5281/zenodo.19491784.
 

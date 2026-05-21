@@ -16,7 +16,7 @@
 
 **Related Works:**
 Lume Language Specification (DOI: 10.5281/zenodo.19382282)
-Trust Layer Ecosystem (DOI: 10.5281/zenodo.19560674)
+Trust Layer Ledger (TLL) Ecosystem (DOI: 10.5281/zenodo.19560674)
 Lume-V Deterministic Wrapper (DOI: 10.5281/zenodo.19645097)
 Lume-X Multi-Organism Substrate (DOI: 10.5281/zenodo.19443968)
 AXIOM DLA Engine (reference implementation — axiom42.com)

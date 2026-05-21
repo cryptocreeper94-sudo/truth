@@ -3,10 +3,10 @@
 **Domain:** Electrical Engineering & Electronics
 **Pack ID:** AXIOM-KP-T4-007
 **Version:** 1.0.0
-**Author:** Jason Andrews, DarkWave Studios LLC / Trust Layer Ecosystem
+**Author:** Jason Andrews, DarkWave Studios LLC / Trust Layer Ledger (TLL) Ecosystem
 **ORCID:** 0009-0007-5214-649X
 **Contact:** team@dwsc.io
-**DOI (Lume):** 19382282 | **DOI (Trust Layer):** 19560674 | **Patent:** 64/032,339
+**DOI (Lume):** 19382282 | **DOI (Trust Layer Ledger (TLL)):** 19560674 | **Patent:** 64/032,339
 
 ---
 
