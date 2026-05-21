@@ -23,7 +23,7 @@
 
 **Related Work:**
 - Lume Language Specification — DOI: 10.5281/zenodo.19382282
-- Trust Layer Ledger (TLL) Ecosystem — DOI: 10.5281/zenodo.19560674
+- Trust Layer Ecosystem — DOI: 10.5281/zenodo.19560674
 - DAIGS Framework — DOI: 10.5281/zenodo.19491784
 - Lume-V Verification Suite — DOI: 10.5281/zenodo.19645097
 - Lume-X Multi-Agent Cognition — DOI: 10.5281/zenodo.19443968
@@ -743,7 +743,7 @@ Until then, I make the following claim, which is supported by the architectural 
 
 [15] Andrews, J. (2026). *Lume Language Specification.* DarkWave Studios LLC. DOI: 10.5281/zenodo.19382282
 
-[16] Andrews, J. (2026). *Trust Layer Ledger (TLL) Ecosystem.* DarkWave Studios LLC. DOI: 10.5281/zenodo.19560674
+[16] Andrews, J. (2026). *Trust Layer Ecosystem.* DarkWave Studios LLC. DOI: 10.5281/zenodo.19560674
 
 [17] Andrews, J. (2026). *DAIGS Framework.* DarkWave Studios LLC. DOI: 10.5281/zenodo.19491784
 

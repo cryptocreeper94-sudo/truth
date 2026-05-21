@@ -12,7 +12,7 @@
 
 **Related Works:**
 Lume Language Specification (DOI: 10.5281/zenodo.19382282)
-Trust Layer Ledger (TLL) (DOI: 10.5281/zenodo.19560674)
+Trust Layer (DOI: 10.5281/zenodo.19560674)
 Lume-V Deterministic Wrapper (DOI: 10.5281/zenodo.19645097)
 Lume-X Multi-Organism Substrate (DOI: 10.5281/zenodo.19443968)
 HydroCore Biological (DOI: pending)
@@ -697,7 +697,7 @@ Structural Load: 11/42 = 0.262
 
 Andrews, J. (2026). Lume Language Specification. Zenodo. DOI: 10.5281/zenodo.19382282
 
-Andrews, J. (2026). Trust Layer Ledger (TLL): Deterministic Identity Architecture. Zenodo. DOI: 10.5281/zenodo.19560674
+Andrews, J. (2026). Trust Layer: Deterministic Identity Architecture. Zenodo. DOI: 10.5281/zenodo.19560674
 
 Andrews, J. (2026). Lume-V: The Deterministic Wrapper. Zenodo. DOI: 10.5281/zenodo.19645097
 

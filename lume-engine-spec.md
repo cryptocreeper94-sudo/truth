@@ -992,7 +992,7 @@ These constraints cannot be softened, overridden, or "UX-smoothed" by any produc
 - Database: PostgreSQL (daily records, user baselines)
 - Cache: Redis (organism schema, external API response cache — 15-minute TTL for weather data)
 - External API calls: handled server-side only (API keys never exposed to client)
-- Auth: Trust Layer Ledger (TLL) SSO or standard JWT
+- Auth: Trust Layer SSO or standard JWT
 
 **Deployment contexts:**
 - Standalone API service (serves all AXIOM consumer products)

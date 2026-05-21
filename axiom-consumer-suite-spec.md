@@ -27,7 +27,7 @@ AXIOM is not an LLM. It is a DLA — a Deterministic Language Architecture. Wher
 
 **Lume** is the architecture brand — visible to developers, researchers, and ecosystem integrators at lume42.com and lume-lang.org.
 
-**Trust Layer Ledger (TLL)** is the identity and auth fabric. AXIOM products authenticate through Trust Layer Ledger (TLL) SSO inside Lume-Cortex, or operate standalone with standard auth.
+**Trust Layer** is the identity and auth fabric. AXIOM products authenticate through Trust Layer SSO inside Lume-Cortex, or operate standalone with standard auth.
 
 **Lume-Cortex** is the OS shell that can host all five AXIOM products as modules alongside the broader DarkWave ecosystem.
 
@@ -67,7 +67,7 @@ Default time to complete: under 60 seconds.
 - After 7+ days: weekly summary mode available
 - After 14+ days: personal baseline calibration activates
   (thresholds adjust to personal baseline rather than population defaults)
-- Data stored locally or in Trust Layer Ledger (TLL)-authenticated account
+- Data stored locally or in Trust Layer-authenticated account
 
 **The Ring Visualization:**
 This is not optional. It is the signature visual output of every AXIOM product. A mini 4/42 polar ring showing:

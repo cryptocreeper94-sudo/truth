@@ -15,7 +15,7 @@
 
 **Related Work:**
 - Lume Language Specification — DOI: 10.5281/zenodo.19382282
-- Trust Layer Ledger (TLL) Ecosystem — DOI: 10.5281/zenodo.19560674
+- Trust Layer Ecosystem — DOI: 10.5281/zenodo.19560674
 - DAIGS Framework — DOI: 10.5281/zenodo.19491784
 - Lume-V Verification Suite — DOI: 10.5281/zenodo.19645097
 - Lume-X Multi-Agent Cognition — DOI: 10.5281/zenodo.19443968
@@ -978,7 +978,7 @@ function generate_cognitive_guidance(N, R, trend, biocore_state, user_profile):
 
 [17] Andrews, J. (2026). Lume Language Specification. DarkWave Studios LLC. DOI: 10.5281/zenodo.19382282.
 
-[18] Andrews, J. (2026). Trust Layer Ledger (TLL) Ecosystem. DarkWave Studios LLC. DOI: 10.5281/zenodo.19560674.
+[18] Andrews, J. (2026). Trust Layer Ecosystem. DarkWave Studios LLC. DOI: 10.5281/zenodo.19560674.
 
 [19] Andrews, J. (2026). BioCore: A Four-Primitive Deterministic Biological Flow Organism. DarkWave Studios LLC. Canon² Paper Series.
 

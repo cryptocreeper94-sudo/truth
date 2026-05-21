@@ -29,14 +29,14 @@ A deterministic AI ecosystem built on synthetic organisms. "Deterministic" means
 |---|---|---|---|
 | axiom42.com | Live | AXIOM deterministic agent. 181,282 topics, 148 domain packs, 11 specialty agents, <2ms response. Dark background, cyan (#00E5FF) accent. |
 | lume42.com | Acquiring | Lume organism reference hub. All 7 organisms, 4/42 architecture, 294 nodes. Documentation + live organism state. |
-| lume-cortex.com | Live (auth active) | Lume-OS. Deterministic Meta-Operating System. Browser-based OS shell (Windows/iOS hybrid). Trust Layer Ledger (TLL) SSO already live on login screen. Houses lume42.com and axiom42.com as modules. |
+| lume-cortex.com | Live (auth active) | Lume-OS. Deterministic Meta-Operating System. Browser-based OS shell (Windows/iOS hybrid). Trust Layer SSO already live on login screen. Houses lume42.com and axiom42.com as modules. |
 | lume-lang.org | Live | Lume Language Specification. Canonical DOI property. |
 | vedasolus.io | Registered | BioCore consumer container for personal health application. |
 
 ### Product Hierarchy
 
 ```
-lume-cortex.com                ← Lume-OS shell (auth: Trust Layer Ledger (TLL) SSO)
+lume-cortex.com                ← Lume-OS shell (auth: Trust Layer SSO)
   ├── lume42.com               ← Organism reference hub (7 organisms, 294 nodes)
   ├── axiom42.com              ← AXIOM deterministic agent (181k topics)
   └── AXIOM Product Suite      ← 5 consumer/professional products
@@ -46,7 +46,7 @@ lume-cortex.com                ← Lume-OS shell (auth: Trust Layer Ledger (TLL)
         ├── AXIOM Daily        ← 3-organism aggregate (Bio + Neuro + Social)
         └── AXIOM Work         ← GovernanceCore + SocioCore (B2B/teams)
 
-Trust Layer Ledger (TLL) (DOI: 10.5281/zenodo.19560674)
+Trust Layer (DOI: 10.5281/zenodo.19560674)
   ↑ identity and auth fabric beneath all products
 ```
 
@@ -248,7 +248,7 @@ Layer 1 — PHYSICAL:    Meridian | Verdara Ultra | HydroCore
 **Tagline:** Governance Flow Organism
 **Domain:** Rule coherence, multi-agent coordination, fairness, conflict resolution
 **Source paper:** governancecore-paper.md (989 lines — full 42-node spec, use this)
-**Substrate for:** Trust Layer Ledger (TLL), Lume-QOS, DAMOS, AXIOM Work
+**Substrate for:** Trust Layer, Lume-QOS, DAMOS, AXIOM Work
 
 **Primitives and palette:**
 | Primitive | Nodes | Color | Hex |
@@ -859,7 +859,7 @@ B2B product. Single-rater first, multi-rater in v2.
 
 **Lume Ecosystem DOIs:**
 - Lume Language Spec: 10.5281/zenodo.19382282
-- Trust Layer Ledger (TLL): 10.5281/zenodo.19560674
+- Trust Layer: 10.5281/zenodo.19560674
 - DAIGS: 10.5281/zenodo.19491784
 - Lume-V: 10.5281/zenodo.19645097
 - Lume-X: 10.5281/zenodo.19443968

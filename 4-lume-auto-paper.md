@@ -495,7 +495,7 @@ This paper makes the following original contributions to the Lume synthetic orga
 
 **Patent:** US Provisional Application 64/032,339 (DarkWave Studios LLC)
 **Prior art anchor:** May 2026
-**Ecosystem DOIs:** Lume=10.5281/zenodo.19382282, Trust Layer Ledger (TLL)=10.5281/zenodo.19560674, DLA=10.5281/zenodo.19645097
+**Ecosystem DOIs:** Lume=10.5281/zenodo.19382282, Trust Layer=10.5281/zenodo.19560674, DLA=10.5281/zenodo.19645097
 
 The 4/42 organism architecture, four-primitive decomposition, LIOCP coupling protocol, and hard constraint governance framework are original contributions of DarkWave Studios LLC, established in prior Canon series publications. Lume-Auto applies this framework to the petroleum vehicle efficiency domain for the first time in this paper.
 

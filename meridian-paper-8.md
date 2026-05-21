@@ -32,7 +32,7 @@
 
 **Related Work:**
 - Lume Language Specification — DOI: 10.5281/zenodo.19382282
-- Trust Layer Ledger (TLL) Ecosystem — DOI: 10.5281/zenodo.19560674
+- Trust Layer Ecosystem — DOI: 10.5281/zenodo.19560674
 - DAIGS Framework — DOI: 10.5281/zenodo.19491784
 - Lume-V Verification Suite — DOI: 10.5281/zenodo.19645097
 - Lume-X Multi-Agent Cognition — DOI: 10.5281/zenodo.19443968
@@ -306,10 +306,10 @@ Fusion Hub
 The Tier 1 layer introduces two new node types in the energy routing architecture:
 
 **T1-TX: Tier 1 Transmitter Node**
-Located at the generation facility. Receives DC power from the generator bus, converts to 2.45 GHz via solid-state power amplifier array, and feeds a phased array antenna. The phased array beam-steers to the designated T1-RX receiver, locking to the retrodirective pilot tone (Section 6.2). Registered with the Trust Layer Ledger (TLL) under a T1-TX capability profile. Lume-X governs the output power modulation and invariant enforcement.
+Located at the generation facility. Receives DC power from the generator bus, converts to 2.45 GHz via solid-state power amplifier array, and feeds a phased array antenna. The phased array beam-steers to the designated T1-RX receiver, locking to the retrodirective pilot tone (Section 6.2). Registered with the Trust Layer under a T1-TX capability profile. Lume-X governs the output power modulation and invariant enforcement.
 
 **T1-RX: Tier 1 Receiver Node**
-Located at the district boundary receiver site. A rectenna array collects the incoming microwave beam and converts it to DC. Transmits a retrodirective pilot tone that the T1-TX uses for beam locking. Registered with the Trust Layer Ledger (TLL) under a T1-RX capability profile. The DC output feeds the local distribution bus that supplies Meridian source nodes. The T1-RX node monitors received power and reports delivery confirmation to the T1-TX via the data channel (standard 802.11 or 5G communication link, separate from the power beam).
+Located at the district boundary receiver site. A rectenna array collects the incoming microwave beam and converts it to DC. Transmits a retrodirective pilot tone that the T1-TX uses for beam locking. Registered with the Trust Layer under a T1-RX capability profile. The DC output feeds the local distribution bus that supplies Meridian source nodes. The T1-RX node monitors received power and reports delivery confirmation to the T1-TX via the data channel (standard 802.11 or 5G communication link, separate from the power beam).
 
 **T1-REL: Tier 1 Relay Node (optional)**
 For configurations where direct T1-TX to T1-RX line-of-sight is unavailable due to terrain or building obstruction, a relay node receives the T1-TX beam, reconverts to DC, and retransmits to the T1-RX. Each relay hop introduces an additional conversion loss cycle. T1-REL nodes are avoided by siting selection wherever possible.
@@ -361,7 +361,7 @@ At the Tier 1 transmission layer, the T1-TX converts DC power to 2.45 GHz RF wit
 At the Tier 2 mesh layer, the full Meridian architecture applies: addressed delivery, quality-of-service guarantees, BSL safety enforcement, Guardian-E security, and Lume-X invariant enforcement.
 
 Every layer from plasma to device is:
-- Identity-verified (Trust Layer Ledger (TLL) identity at every node, T1-TX through leaf device)
+- Identity-verified (Trust Layer identity at every node, T1-TX through leaf device)
 - Explicitly routed (beam routing at Tier 1, mesh routing at Tier 2)
 - Invariant-enforced (Lume-X at generation, T1 control at transmission, Lume-X at mesh)
 - Self-maintaining (deterministic fusion control auto-recovers from plasma perturbation; Meridian SHDCL auto-recovers from mesh perturbation)
@@ -526,7 +526,7 @@ The physical electrical grid is vulnerable to four classes of disruption, each o
 
 **Class 3 — Physical attack.** The U.S. Federal Energy Regulatory Commission (FERC) warned in a 2014 report that coordinated physical attacks on a small number of critical transmission substations could cause a nationwide blackout lasting weeks. Physical attacks on grid infrastructure are increasing globally. A wireless architecture has no transmission substations to attack — the transmitter and receiver are not single points of failure (multiple T1-TX nodes serve each district, and loss of one redirects to others), and the beam path itself has no physical infrastructure at all.
 
-**Class 4 — Cyber attacks on control systems.** Grid SCADA systems are known attack targets. A cyber attack that causes incorrect switching in a transmission substation can trigger cascading failures across the grid. The Lume-X invariant enforcement and Trust Layer Ledger (TLL) identity verification of the wireless architecture make the equivalent attack — causing a T1-TX to redirect its beam to an unintended receiver — impossible without physical compromise of the pilot-tone system. Software commands alone cannot redirect the beam.
+**Class 4 — Cyber attacks on control systems.** Grid SCADA systems are known attack targets. A cyber attack that causes incorrect switching in a transmission substation can trigger cascading failures across the grid. The Lume-X invariant enforcement and Trust Layer identity verification of the wireless architecture make the equivalent attack — causing a T1-TX to redirect its beam to an unintended receiver — impossible without physical compromise of the pilot-tone system. Software commands alone cannot redirect the beam.
 
 ### 8.2 Dynamic Rerouting
 
@@ -569,20 +569,20 @@ The seven preceding papers in this series established Meridian as a complete las
 The Deterministic Infrastructure general theory (Paper 4) defined four properties that any DI system must satisfy: verified identity at every node, explicitly routed resources, invariant-enforced homeostasis, and organism-like self-maintenance. I now verify that each layer of the complete stack satisfies all four properties:
 
 **Deterministic Fusion Control layer:**
-- Verified identity: the fusion control system registers with the Trust Layer Ledger (TLL) as a T1-TX source node; its identity is verified before it is permitted to transmit
+- Verified identity: the fusion control system registers with the Trust Layer as a T1-TX source node; its identity is verified before it is permitted to transmit
 - Explicitly routed: output power is explicitly allocated to a designated T1-TX node based on demand routing from the Energy Internet protocol layer
 - Invariant-enforced: four plasma invariants (INV-F1 through INV-F4) enforced by Lume-X at the plasma control timescale
 - Self-maintaining: automated recovery from plasma perturbation (disruption prevention, ramp-down and ramp-up sequences) without operator intervention
 
 **Tier 1 Wireless Transmission layer:**
-- Verified identity: T1-TX and T1-RX nodes registered with Trust Layer Ledger (TLL); pilot-tone provides physical identity verification (only the authorized receiver has the pilot transmitter)
+- Verified identity: T1-TX and T1-RX nodes registered with Trust Layer; pilot-tone provides physical identity verification (only the authorized receiver has the pilot transmitter)
 - Explicitly routed: beam directed to a specific T1-RX node based on routing table; cannot be redirected without changing pilot-tone direction
 - Invariant-enforced: T1 control invariants (pilot signal strength ≥ threshold, power density ≤ limit, intruder detection clear) enforced in hardware; violation triggers beam cutoff
 - Self-maintaining: automatic failover to backup T1-TX node on primary failure; automatic beam power adjustment for Fresnel-regime optimization
 
 **Tier 2 Meridian Mesh layer:**
 - All four properties fully specified in Papers 1–7
-- Verified identity: Trust Layer Ledger (TLL) MC addressing
+- Verified identity: Trust Layer MC addressing
 - Explicitly routed: DRMA multi-hop routing
 - Invariant-enforced: Lume-X INV-1 through INV-5
 - Self-maintaining: SHDCL self-healing
@@ -595,13 +595,13 @@ The complete stack relies on three components of the Lume ecosystem that appear 
 
 **Lume-X** operates at two timescales: the fusion control timescale (1–10ms for plasma stability) and the Meridian mesh timescale (13.7ms per control cycle). The Tier 1 layer operates at 100ms. All three use the same Lume-X invariant enforcement model; only the cycle time and invariant definitions differ.
 
-**Trust Layer Ledger (TLL)** provides identity verification for every node in the stack, from the fusion reactor's T1-TX capability profile through the Meridian relay nodes to the leaf device's endpoint identity. A device that receives power through this full stack can cryptographically verify the provenance of its energy — that it originated from an authorized generation source, was transmitted through authorized relay nodes, and was delivered by the authorized last-mile mesh.
+**Trust Layer** provides identity verification for every node in the stack, from the fusion reactor's T1-TX capability profile through the Meridian relay nodes to the leaf device's endpoint identity. A device that receives power through this full stack can cryptographically verify the provenance of its energy — that it originated from an authorized generation source, was transmitted through authorized relay nodes, and was delivered by the authorized last-mile mesh.
 
 **Guardian Security (Guardian-E)** extends from the Meridian mesh (where it is specified fully in Paper 5) upward into the Tier 1 layer. The Tier 1 threat model is a proper superset of the Meridian threat taxonomy — it includes all eleven Meridian threat categories plus three additional categories specific to large-scale beaming: T12 (exclusion zone breach), T13 (pilot-tone spoofing), and T14 (regulatory fraudulent operation). The Guardian Security framework's two-tier innate/adaptive defense structure applies at both layers.
 
 ### 10.3 The Stack in Three Sentences
 
-A fusion reactor, governed by deterministic plasma control and formally registered in the Trust Layer Ledger (TLL), converts thermal energy to electricity and feeds a phased array transmitter that locks its beam to a pilot tone transmitted from an authorized district receiver array ten kilometers away, where the received microwave power is converted to DC and delivered to the Meridian mesh that routes it — addressed, authenticated, quality-of-service-guaranteed — to every device in the buildings the district serves.
+A fusion reactor, governed by deterministic plasma control and formally registered in the Trust Layer, converts thermal energy to electricity and feeds a phased array transmitter that locks its beam to a pilot tone transmitted from an authorized district receiver array ten kilometers away, where the received microwave power is converted to DC and delivered to the Meridian mesh that routes it — addressed, authenticated, quality-of-service-guaranteed — to every device in the buildings the district serves.
 
 No transmission towers. No high-voltage cables. No substations.
 
@@ -653,7 +653,7 @@ The argument of this paper is simple, even if the engineering is not: a world wi
 
 The argument has two parts. The first part is that the physics permits it. Fresnel-regime microwave power beaming at 2.45 GHz, with 10–20 meter aperture arrays, achieves 80–87% collection efficiency at the district distances (1–5 km) relevant for urban energy delivery. Retrodirective pilot-tone locking provides a physically robust safety mechanism that cannot be bypassed by software attacks. Hardware-enforced intruder detection and automatic beam cutoff satisfy the public safety requirements for operation in uncontrolled airspace. The physics is not speculative.
 
-The second part is that the architecture connects. The Tier 1 long-haul beam layer interfaces cleanly with the Tier 2 Meridian mesh at the DC bus of the district rectenna array. The Meridian mesh routes the delivered energy to every device in the district without wires. The fusion control system below the Tier 1 layer provides a deterministically governed generation source whose output is formally bounded and formally modulated. The Trust Layer Ledger (TLL) identity system, Lume-X control runtime, and Guardian Security framework operate across all three layers, providing a unified DI governance framework from generation to device.
+The second part is that the architecture connects. The Tier 1 long-haul beam layer interfaces cleanly with the Tier 2 Meridian mesh at the DC bus of the district rectenna array. The Meridian mesh routes the delivered energy to every device in the district without wires. The fusion control system below the Tier 1 layer provides a deterministically governed generation source whose output is formally bounded and formally modulated. The Trust Layer identity system, Lume-X control runtime, and Guardian Security framework operate across all three layers, providing a unified DI governance framework from generation to device.
 
 The efficiency penalty is real. The regulatory path is long. The fusion source is not yet commercially available. These are honest limitations stated without minimization. They are the engineering and policy problems that Phase 1–3 experimental work and regulatory engagement will address.
 
@@ -703,7 +703,7 @@ Pilot spoofing defense:
   Pilot frequency is encrypted using ECDH key exchange between T1-TX and T1-RX
   at session establishment. Pilot carrier is modulated with a 64-bit rolling code
   that T1-TX verifies. An unkeyed pilot source cannot produce a valid rolling code.
-  Key rotation: every 24 hours via Trust Layer Ledger (TLL) key exchange.
+  Key rotation: every 24 hours via Trust Layer key exchange.
 ```
 
 ---
@@ -729,18 +729,18 @@ Public exposure is below ICNIRP limits at the beam edge (10m from centerline). E
 
 | Layer | Technology | DI Property: Identity | DI Property: Routing | DI Property: Invariants | DI Property: Self-Maintenance |
 |---|---|---|---|---|---|
-| Generation | Deterministic Fusion Control | Trust Layer Ledger (TLL) T1-TX profile | Demand allocation via EI protocol | INV-F1 through INV-F4 (plasma) | Plasma disruption avoidance + ramp sequences |
-| Long-haul TX | T1-TX phased array | Trust Layer Ledger (TLL) identity, pilot-tone physical auth | Beam directed to T1-RX via pilot lock | Pilot signal ≥ threshold, P ≤ P_max | Auto failover to backup T1-TX |
-| Long-haul RX | T1-RX rectenna | Trust Layer Ledger (TLL) identity, pilot transmitter | n/a (passive receive) | Received power ≥ P_min | Alert and reroute on underpower |
+| Generation | Deterministic Fusion Control | Trust Layer T1-TX profile | Demand allocation via EI protocol | INV-F1 through INV-F4 (plasma) | Plasma disruption avoidance + ramp sequences |
+| Long-haul TX | T1-TX phased array | Trust Layer identity, pilot-tone physical auth | Beam directed to T1-RX via pilot lock | Pilot signal ≥ threshold, P ≤ P_max | Auto failover to backup T1-TX |
+| Long-haul RX | T1-RX rectenna | Trust Layer identity, pilot transmitter | n/a (passive receive) | Received power ≥ P_min | Alert and reroute on underpower |
 | District mesh | Meridian Tier 2 | MC 64-bit address | DRMA multi-hop routing | INV-1 through INV-5 | SHDCL self-healing |
-| Device | Leaf node / SSD | Trust Layer Ledger (TLL) endpoint identity | Addressed final-hop delivery | Delivery confirmation protocol | Self-report on failure via mesh |
+| Device | Leaf node / SSD | Trust Layer endpoint identity | Addressed final-hop delivery | Delivery confirmation protocol | Self-report on failure via mesh |
 
 ---
 
 ## References
 
 [15] Andrews, J. (2026). *Lume Language Specification.* DOI: 10.5281/zenodo.19382282
-[16] Andrews, J. (2026). *Trust Layer Ledger (TLL) Ecosystem.* DOI: 10.5281/zenodo.19560674
+[16] Andrews, J. (2026). *Trust Layer Ecosystem.* DOI: 10.5281/zenodo.19560674
 [17] Andrews, J. (2026). *DAIGS Framework.* DOI: 10.5281/zenodo.19491784
 [18] Andrews, J. (2026). *Lume-V Verification Suite.* DOI: 10.5281/zenodo.19645097
 [19] Andrews, J. (2026). *Lume-X Multi-Agent Cognition.* DOI: 10.5281/zenodo.19443968

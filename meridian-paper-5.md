@@ -28,7 +28,7 @@
 
 **Related Work:**
 - Lume Language Specification — DOI: 10.5281/zenodo.19382282
-- Trust Layer Ledger (TLL) Ecosystem — DOI: 10.5281/zenodo.19560674
+- Trust Layer Ecosystem — DOI: 10.5281/zenodo.19560674
 - DAIGS Framework — DOI: 10.5281/zenodo.19491784
 - Lume-V Verification Suite — DOI: 10.5281/zenodo.19645097
 - Lume-X Multi-Agent Cognition — DOI: 10.5281/zenodo.19443968
@@ -194,9 +194,9 @@ I define the attack surface of a wireless energy routing system from first princ
 
 ### 3.3 Identity Attack Interfaces
 
-**IAI-1: Node identity credentials.** The cryptographic credentials that establish node identity in the Trust Layer Ledger (TLL) PKI. Accessible to an attacker who can compromise the provisioning process or extract credentials from a deployed node. Enables: node impersonation, credential replay.
+**IAI-1: Node identity credentials.** The cryptographic credentials that establish node identity in the Trust Layer PKI. Accessible to an attacker who can compromise the provisioning process or extract credentials from a deployed node. Enables: node impersonation, credential replay.
 
-**IAI-2: Trust Layer Ledger (TLL) PKI infrastructure.** The certificate authority infrastructure that signs node credentials. Accessible to a sophisticated attacker who can compromise CA infrastructure. Enables: fraudulent credential issuance, certificate chain forgery.
+**IAI-2: Trust Layer PKI infrastructure.** The certificate authority infrastructure that signs node credentials. Accessible to a sophisticated attacker who can compromise CA infrastructure. Enables: fraudulent credential issuance, certificate chain forgery.
 
 **IAI-3: Provisioning process.** The process by which new nodes receive their identity credentials. Accessible to an attacker who can intercept or hijack provisioning. Enables: identity substitution during provisioning, credential interception.
 
@@ -396,7 +396,7 @@ The three-tier architecture provides defense in depth. No single tier is a singl
 
 Before any beam authorization is issued, Guardian Security enforces a four-step pre-transmission authentication protocol:
 
-**Step 1 — Node identity verification.** The requesting node presents its Trust Layer Ledger (TLL) PKI credential. Guardian-E verifies the signature chain from the credential to the Trust Layer Ledger (TLL) root CA. If verification fails: request rejected, anomaly logged, node flagged as UNVERIFIED.
+**Step 1 — Node identity verification.** The requesting node presents its Trust Layer PKI credential. Guardian-E verifies the signature chain from the credential to the Trust Layer root CA. If verification fails: request rejected, anomaly logged, node flagged as UNVERIFIED.
 
 **Step 2 — Capability authorization check.** Guardian-E verifies that the requesting node's capability profile (encoded in its identity credential) includes the requested operation type, power level, and target zone. If the capability profile does not authorize the request: request rejected, anomaly logged.
 
@@ -412,7 +412,7 @@ Only after all four steps pass does Guardian-E issue beam authorization to the L
 Guardian-E enforces multi-source localization consistency: position reported by UWB localization must be consistent with position inferred from signal strength, TDMA timing, and mesh topology (neighbor node distances). A position report that is inconsistent across these sources is flagged as a potential T1 attack, the node is placed in POSITION_UNVERIFIED status, and no beam is authorized until consistency is restored. Threshold: if position variance across sources exceeds r_threshold (50 cm) for three consecutive measurements, the node is QUARANTINED. The BSL exclusion zone provides the ultimate backstop: even if localization is spoofed, biological presence detection prevents beam transmission at the spoofed location if a biological target is actually there.
 
 **T2 — Routing Table Manipulation:**
-All LINK_STATE_UPDATE messages are signed by the originating node using its Trust Layer Ledger (TLL) PKI credential. Receiving nodes verify the signature before applying the update. Guardian-E applies consistency checks to all routing updates: a link quality metric that changes by more than Δq_max in one update cycle without a corresponding physical event (node failure, localization loss) is flagged. Route selection is rate-limited: no node's routes can be completely replaced within a single control cycle. This prevents sudden, large-scale routing table corruption.
+All LINK_STATE_UPDATE messages are signed by the originating node using its Trust Layer PKI credential. Receiving nodes verify the signature before applying the update. Guardian-E applies consistency checks to all routing updates: a link quality metric that changes by more than Δq_max in one update cycle without a corresponding physical event (node failure, localization loss) is flagged. Route selection is rate-limited: no node's routes can be completely replaced within a single control cycle. This prevents sudden, large-scale routing table corruption.
 
 **T3 — Beam Hijacking:**
 Guardian-E tracks the expected position of the beam target throughout the delivery session. If the target's position deviates from the expected trajectory by more than the adaptive position model allows, the session is suspended and the node is flagged. Relay nodes in a multi-hop path are required to confirm receipt and forward within their TDMA window — a relay that receives but does not forward (potential redirection) is detected by the downstream node's missing receipt confirmation within T_relay_max.
@@ -489,7 +489,7 @@ Guardian Security operates at three levels in the Energy Internet [Energy Intern
 
 **Level 1 — Intra-mesh security.** The single-mesh Guardian Security implementation specified in Sections 5 and 6. Unchanged from the single-mesh architecture.
 
-**Level 2 — Inter-mesh security (Energy TLS).** Every EBGP peering session between gateway nodes is authenticated using EAS-level PKI managed through the Trust Layer Ledger (TLL). EBGP route updates are signed by the originating gateway; receiving gateways verify the signature and the ERPKI prefix authorization before accepting and propagating routes. The session uses forward-secret key exchange (ephemeral Diffie-Hellman over curves approved by the Trust Layer Ledger (TLL) governance framework) so that compromise of a long-term key does not expose past session traffic.
+**Level 2 — Inter-mesh security (Energy TLS).** Every EBGP peering session between gateway nodes is authenticated using EAS-level PKI managed through the Trust Layer. EBGP route updates are signed by the originating gateway; receiving gateways verify the signature and the ERPKI prefix authorization before accepting and propagating routes. The session uses forward-secret key exchange (ephemeral Diffie-Hellman over curves approved by the Trust Layer governance framework) so that compromise of a long-term key does not expose past session traffic.
 
 **Level 3 — Registry security (EIRA-level).** All EIRA operations — EAS Number assignment, EIP prefix delegation, Emergency Authority Credential issuance — are signed by the EIRA root credential and published in a transparency log. Any Energy Internet participant can verify any EIRA action independently. A fraudulent EIRA action is detectable by any participant within one log publication cycle.
 
@@ -559,15 +559,15 @@ This residual risk is accepted as the irreducible physical security baseline. Mi
 
 ### 9.1 Secure Provisioning
 
-Node provisioning is the process by which a new node receives its Trust Layer Ledger (TLL) identity credential. It is the most security-sensitive phase of a node's lifecycle, because a credential issued at provisioning cannot be recalled without revocation, and revocation has a propagation latency.
+Node provisioning is the process by which a new node receives its Trust Layer identity credential. It is the most security-sensitive phase of a node's lifecycle, because a credential issued at provisioning cannot be recalled without revocation, and revocation has a propagation latency.
 
 Guardian Security specifies a five-step secure provisioning process:
 
-1. **Factory key injection:** The node's Trust Layer Ledger (TLL) public/private key pair is generated in the factory inside a hardware security module. The private key never leaves the HSM — it is injected directly into the node's secure element without passing through any host system.
+1. **Factory key injection:** The node's Trust Layer public/private key pair is generated in the factory inside a hardware security module. The private key never leaves the HSM — it is injected directly into the node's secure element without passing through any host system.
 
-2. **Identity credential signing:** The factory generates a Certificate Signing Request using the node's public key and the node's identity parameters (Node_Type, EAS assignment, Zone ID, capability profile). The CSR is submitted to the Trust Layer Ledger (TLL) PKI for signing.
+2. **Identity credential signing:** The factory generates a Certificate Signing Request using the node's public key and the node's identity parameters (Node_Type, EAS assignment, Zone ID, capability profile). The CSR is submitted to the Trust Layer PKI for signing.
 
-3. **Hardware profile binding:** The Trust Layer Ledger (TLL) credential includes a hardware profile hash — a signed measurement of the node's hardware characteristics (power draw profile, timing characteristics, secure element measurements). A credential used on different hardware will fail the hardware profile consistency check.
+3. **Hardware profile binding:** The Trust Layer credential includes a hardware profile hash — a signed measurement of the node's hardware characteristics (power draw profile, timing characteristics, secure element measurements). A credential used on different hardware will fail the hardware profile consistency check.
 
 4. **Provisioning receipt:** The provisioned node signs a provisioning receipt confirming that it successfully received and stored its credential. The receipt is logged in the certificate chain.
 
@@ -578,7 +578,7 @@ Guardian Security specifies a five-step secure provisioning process:
 Every Guardian Security event — authentication, authorization, anomaly detection, quarantine, restoration — is logged in the certificate chain with a signed entry from the Lume-X control loop. The certificate chain is:
 
 - **Append-only:** Entries cannot be deleted or modified once written
-- **Signed:** Each entry is signed by the Lume-X runtime using the node's Trust Layer Ledger (TLL) credential
+- **Signed:** Each entry is signed by the Lume-X runtime using the node's Trust Layer credential
 - **Timestamped:** Each entry includes a network timestamp verifiable against the distributed time consensus
 - **Cross-referenced:** Each entry references the EBF sequence numbers and session IDs of the transactions it relates to
 
@@ -624,7 +624,7 @@ The localization integrity verification in Guardian Security (multi-source posit
 
 ### 10.4 The Lume Ecosystem Security Framework
 
-The Trust Layer Ledger (TLL) [16] provides the identity foundation that Guardian Security builds on. Guardian (the general, non-domain-specific security enforcement product) provides the general threat classification and adaptive response framework. Guardian-E is the energy-domain specialization that adds the physical-layer defenses (BSL integration, localization integrity, power measurement validation) that are specific to the energy routing context.
+The Trust Layer [16] provides the identity foundation that Guardian Security builds on. Guardian (the general, non-domain-specific security enforcement product) provides the general threat classification and adaptive response framework. Guardian-E is the energy-domain specialization that adds the physical-layer defenses (BSL integration, localization integrity, power measurement validation) that are specific to the energy routing context.
 
 Guardian Security is the first published formal specification of a Guardian deployment in a physical domain. The security architecture defined in this paper is the reference for future Guardian deployments in the transportation (DMI), manufacturing (DPI), and ambient computation (DII) domains described in [DI Theory, 2026].
 
@@ -638,7 +638,7 @@ Guardian Security is the first published formal specification of a Guardian depl
 
 **Coverage proof assumes correct implementation.** The coverage proof in Section 6.2 demonstrates that every attack path crosses at least one Guardian Security enforcement boundary. It does not prove that the implementation of those boundaries is correct. Implementation vulnerabilities — software bugs, cryptographic errors, side-channel attacks on secure elements — can create gaps in coverage that are not present in the specification. Lume-V formal verification [18] of the Guardian Security implementation is the mitigation; it has not yet been completed for all components.
 
-**Multi-party compromise is not addressed.** The Guardian Security framework assumes that the Trust Layer Ledger (TLL) PKI root is not compromised. A compromise of the Trust Layer Ledger (TLL) root credential — enabling issuance of fraudulent credentials for any identity — would defeat every cryptographic defense in Guardian Security simultaneously. This is the Tier 1 existential threat to any PKI-based system and requires organizational security controls beyond the scope of this technical paper.
+**Multi-party compromise is not addressed.** The Guardian Security framework assumes that the Trust Layer PKI root is not compromised. A compromise of the Trust Layer root credential — enabling issuance of fraudulent credentials for any identity — would defeat every cryptographic defense in Guardian Security simultaneously. This is the Tier 1 existential threat to any PKI-based system and requires organizational security controls beyond the scope of this technical paper.
 
 **No experimental validation exists.** Guardian Security has been formally specified but not deployed in a physical mesh. The timing guarantees (anomaly detection within 13.7 ms, quarantine within one control cycle), the physical layer consistency checks (position variance threshold, power measurement cross-validation), and the BSL sensor integration have not been validated in hardware. All quantitative claims are based on architectural analysis of the Meridian specification.
 
@@ -654,7 +654,7 @@ The Guardian Security framework — two-tier innate-plus-adaptive defense, pre-t
 
 The most important security property of the Guardian Security framework is the one that cannot be improved through protocol design: the Biological Safety Layer invariant. The BSL guarantees that no beam strikes a biological target regardless of the state of every software and protocol defense. This guarantee is the irreducible physical security baseline of wireless energy routing — the property that makes the difference between a security failure that damages data and a security failure that damages people.
 
-Guardian Security is a formal specification. It requires experimental validation, implementation in the Meridian architecture, and integration with the Trust Layer Ledger (TLL) PKI infrastructure. Those steps are the work of the experimental phases defined in [Meridian Architecture, 2026]. This paper establishes the specification so that when the hardware exists, the security architecture is already defined.
+Guardian Security is a formal specification. It requires experimental validation, implementation in the Meridian architecture, and integration with the Trust Layer PKI infrastructure. Those steps are the work of the experimental phases defined in [Meridian Architecture, 2026]. This paper establishes the specification so that when the hardware exists, the security architecture is already defined.
 
 The Energy Internet cannot be built without this foundation. A global wireless energy routing network with a complete absence of formal security architecture would be an infrastructure disaster — the energy equivalent of the early internet, where the absence of security design produced decades of vulnerability. Guardian Security is the security foundation that the Energy Internet needs to be built on, stated now, so that it is built in from the first deployment rather than retrofitted from the last breach.
 
@@ -728,8 +728,8 @@ The minimum attack complexity for each threat is the AND of independent enforcem
 
 | Level | Scope | Authentication | Key Management | Threat Coverage |
 |---|---|---|---|---|
-| L1 — Intra-mesh | Single EAS | Per-node PKI credential | Trust Layer Ledger (TLL) EAS-delegated CA | T1–T8, T11 |
-| L2 — Inter-mesh | Multi-EAS, single EXP | EAS-level PKI credential | Trust Layer Ledger (TLL) root-delegated EAS CA | T9–T10 + L1 |
+| L1 — Intra-mesh | Single EAS | Per-node PKI credential | Trust Layer EAS-delegated CA | T1–T8, T11 |
+| L2 — Inter-mesh | Multi-EAS, single EXP | EAS-level PKI credential | Trust Layer root-delegated EAS CA | T9–T10 + L1 |
 | L3 — Registry | Global | EIRA root credential | EIRA HSM, M-of-N threshold signing | EIRA operation integrity |
 
 ---
@@ -781,7 +781,7 @@ The minimum attack complexity for each threat is the AND of independent enforcem
 **Lume Ecosystem:**
 
 [15] Andrews, J. (2026). *Lume Language Specification.* DOI: 10.5281/zenodo.19382282
-[16] Andrews, J. (2026). *Trust Layer Ledger (TLL) Ecosystem.* DOI: 10.5281/zenodo.19560674
+[16] Andrews, J. (2026). *Trust Layer Ecosystem.* DOI: 10.5281/zenodo.19560674
 [17] Andrews, J. (2026). *DAIGS Framework.* DOI: 10.5281/zenodo.19491784
 [18] Andrews, J. (2026). *Lume-V Verification Suite.* DOI: 10.5281/zenodo.19645097
 [19] Andrews, J. (2026). *Lume-X Multi-Agent Cognition.* DOI: 10.5281/zenodo.19443968

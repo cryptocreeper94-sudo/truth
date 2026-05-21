@@ -1608,7 +1608,7 @@ The recommended implementation order, validated and confirmed in the Meridian sy
 
 [15] Andrews, J. (2026). *Lume Language Specification.* DarkWave Studios LLC. DOI: 10.5281/zenodo.19382282.
 
-[16] Andrews, J. (2026). *Trust Layer Ledger (TLL) Ecosystem.* DarkWave Studios LLC. DOI: 10.5281/zenodo.19560674.
+[16] Andrews, J. (2026). *Trust Layer Ecosystem.* DarkWave Studios LLC. DOI: 10.5281/zenodo.19560674.
 
 [17] Andrews, J. (2026). *DAIGS Framework.* DarkWave Studios LLC. DOI: 10.5281/zenodo.19491784.
 
@@ -1967,7 +1967,7 @@ A gateway relay node (GRN) is a specialized Meridian node installed at a floor-t
 
 **Directional isolation:** The two antenna faces are physically isolated by a ground plane to prevent the upper-face beam from coupling into the lower-face field and vice versa. The GRN appears as two independent nodes to the routing engines of the two floors it connects.
 
-**Shared identity:** The GRN registers with both floor meshes under a single Trust Layer Ledger (TLL) identity with a capability profile that explicitly encodes its gateway function. The DRMA routing engine on each floor knows to terminate inter-floor routing paths at the GRN and resume them through the paired GRN on the adjacent floor.
+**Shared identity:** The GRN registers with both floor meshes under a single Trust Layer identity with a capability profile that explicitly encodes its gateway function. The DRMA routing engine on each floor knows to terminate inter-floor routing paths at the GRN and resume them through the paired GRN on the adjacent floor.
 
 ### 6.3 Gateway Placement Rules
 
@@ -2212,7 +2212,7 @@ Before any node is installed, the commissioning checklist must be completed:
 □ Source node power connection points coordinated with electrical
 □ RF interference pre-survey completed (existing RF environment characterization)
 □ BSL sensor coverage map generated (no coverage gaps in final-hop zones)
-□ Trust Layer Ledger (TLL) identity credentials ordered for all nodes
+□ Trust Layer identity credentials ordered for all nodes
 □ Guardian Security commissioning authority credential issued
 ```
 
@@ -2220,7 +2220,7 @@ Before any node is installed, the commissioning checklist must be completed:
 
 1. **Gateway relay nodes first.** Install GRNs at all floor-transition points before intra-floor nodes. GRNs are the architectural anchor points for the mesh; intra-floor nodes are aligned to them.
 
-2. **Source nodes second.** Install source nodes at their planned positions and connect to building electrical. Verify power input and initial supercapacitor charge. Import AVM. Verify Trust Layer Ledger (TLL) identity registration.
+2. **Source nodes second.** Install source nodes at their planned positions and connect to building electrical. Verify power input and initial supercapacitor charge. Import AVM. Verify Trust Layer identity registration.
 
 3. **Relay nodes third.** Install intra-floor relay nodes working outward from source nodes and gateway nodes. Each relay node auto-announces at installation; the source node's routing engine validates its position against the AVM before accepting it into the mesh.
 
@@ -2327,7 +2327,7 @@ Any voxel with ambiguous classification is assigned the higher-priority (more re
 | BSL sensors | 2 sets (one per face) | Full 5-modality each |
 | Aperture requirement | ≥15 cm clear path | Between faces |
 | Mounting clearance | ≤2m from floor/ceiling transition | Close to transition |
-| Identity | Single Trust Layer Ledger (TLL) ID | Capability: GATEWAY |
+| Identity | Single Trust Layer ID | Capability: GATEWAY |
 | Maintenance access | Required | Replacement without occupancy disruption |
 
 ---
@@ -2379,7 +2379,7 @@ Header (64 bytes):
   voxel_size     : 4 bytes  (float, meters, default 0.25)
   grid_dims_i/j/k: 12 bytes (uint32 each)
   timestamp      : 8 bytes  (Unix epoch, milliseconds)
-  author_key_id  : 8 bytes  (Trust Layer Ledger (TLL) identity of BIM author)
+  author_key_id  : 8 bytes  (Trust Layer identity of BIM author)
   signature      : [64 bytes] (Ed25519 signature over header + voxel data)
 
 Voxel data:
@@ -2388,7 +2388,7 @@ Voxel data:
   Order: (i=0,j=0,k=0), (i=1,j=0,k=0), ..., row-major in i, then j, then k
 ```
 
-The signature covers the full voxel data array and the header (excluding the signature field itself). The Meridian commissioning tool verifies the signature against the author's Trust Layer Ledger (TLL) public key before importing any AVM. An AVM with an invalid signature is rejected.
+The signature covers the full voxel data array and the header (excluding the signature field itself). The Meridian commissioning tool verifies the signature against the author's Trust Layer public key before importing any AVM. An AVM with an invalid signature is rejected.
 
 ---
 
@@ -2433,7 +2433,7 @@ The signature covers the full voxel data array and the header (excluding the sig
 **Lume Ecosystem:**
 
 [15] Andrews, J. (2026). *Lume Language Specification.* DOI: 10.5281/zenodo.19382282
-[16] Andrews, J. (2026). *Trust Layer Ledger (TLL) Ecosystem.* DOI: 10.5281/zenodo.19560674
+[16] Andrews, J. (2026). *Trust Layer Ecosystem.* DOI: 10.5281/zenodo.19560674
 [17] Andrews, J. (2026). *DAIGS Framework.* DOI: 10.5281/zenodo.19491784
 [18] Andrews, J. (2026). *Lume-V Verification Suite.* DOI: 10.5281/zenodo.19645097
 [19] Andrews, J. (2026). *Lume-X Multi-Agent Cognition.* DOI: 10.5281/zenodo.19443968
@@ -3197,7 +3197,7 @@ Until then, I make the following claim, which is supported by the architectural 
 
 [15] Andrews, J. (2026). *Lume Language Specification.* DarkWave Studios LLC. DOI: 10.5281/zenodo.19382282
 
-[16] Andrews, J. (2026). *Trust Layer Ledger (TLL) Ecosystem.* DarkWave Studios LLC. DOI: 10.5281/zenodo.19560674
+[16] Andrews, J. (2026). *Trust Layer Ecosystem.* DarkWave Studios LLC. DOI: 10.5281/zenodo.19560674
 
 [17] Andrews, J. (2026). *DAIGS Framework.* DarkWave Studios LLC. DOI: 10.5281/zenodo.19491784
 
@@ -4153,7 +4153,7 @@ EBGP UPDATE:
 
 [45] Andrews, J. (2026). *Lume Language Specification.* DarkWave Studios LLC. DOI: 10.5281/zenodo.19382282
 
-[46] Andrews, J. (2026). *Trust Layer Ledger (TLL) Ecosystem.* DarkWave Studios LLC. DOI: 10.5281/zenodo.19560674
+[46] Andrews, J. (2026). *Trust Layer Ecosystem.* DarkWave Studios LLC. DOI: 10.5281/zenodo.19560674
 
 [47] Andrews, J. (2026). *DAIGS Framework.* DarkWave Studios LLC. DOI: 10.5281/zenodo.19491784
 
@@ -4204,11 +4204,11 @@ The Meridian mesh already carries two kinds of traffic. The first kind is the en
 
 The Meridian mesh is already a unified energy-data fabric. It just has not been formally recognized as one.
 
-This paper formalizes the co-routing architecture of the Meridian mesh — the simultaneous routing of energy and data through the same physical node infrastructure under a shared addressing and governance framework. I define the Unified Energy-Data Mesh (UEDM) as a formal architecture in which the same addressed nodes, the same topology-aware routing fabric, and the same Trust Layer Ledger (TLL) identity substrate serve both energy delivery and data communication simultaneously. I show that the UEDM is not a new design — it is a formal recognition and extension of what Meridian already does.
+This paper formalizes the co-routing architecture of the Meridian mesh — the simultaneous routing of energy and data through the same physical node infrastructure under a shared addressing and governance framework. I define the Unified Energy-Data Mesh (UEDM) as a formal architecture in which the same addressed nodes, the same topology-aware routing fabric, and the same Trust Layer identity substrate serve both energy delivery and data communication simultaneously. I show that the UEDM is not a new design — it is a formal recognition and extension of what Meridian already does.
 
 I define the co-routing arbitration rules that govern how energy bursts and data packets share TDMA capacity without conflict. I define the UEDM addressing scheme that unifies energy delivery addresses (EIP) and data communication addresses under the same 128-bit namespace. I show that the UEDM collapses two infrastructure problems — where does this device get its power, and how does this device communicate — into one, simplifying deployment, reducing infrastructure cost, and enabling a class of self-sustaining autonomous devices that power themselves and communicate through the same wireless fabric.
 
-I propose the Unified Energy-Data Mesh as the convergence point of the Energy Internet [Energy Internet, 2026] and the Trust Layer Ledger (TLL) communication infrastructure [16]: a single fabric that routes both resources and information under a unified governance framework, providing the complete infrastructure substrate for autonomous physical systems operating in the Deterministic Infrastructure paradigm [DI Theory, 2026].
+I propose the Unified Energy-Data Mesh as the convergence point of the Energy Internet [Energy Internet, 2026] and the Trust Layer communication infrastructure [16]: a single fabric that routes both resources and information under a unified governance framework, providing the complete infrastructure substrate for autonomous physical systems operating in the Deterministic Infrastructure paradigm [DI Theory, 2026].
 
 **Keywords:** unified energy-data mesh, co-routing, wireless power and communication, SWIPT, Meridian, deterministic infrastructure, TDMA co-scheduling, ambient IoT, self-sustaining networks, simultaneous wireless information and power transfer
 
@@ -4575,7 +4575,7 @@ Communication capacity at this budget: the RF transceiver in receive mode is alw
 
 An SSD has three operational states:
 
-**BOOTSTRAPPING:** The SSD has just been deployed and has not yet established UEDM identity. It broadcasts a NODE_ANNOUNCE with a provisioning credential (a temporary credential issued during manufacture). A source node or gateway node receives the announcement and initiates the Guardian Security provisioning protocol. Once the SSD receives its full Trust Layer Ledger (TLL) identity credential, it transitions to OPERATIONAL.
+**BOOTSTRAPPING:** The SSD has just been deployed and has not yet established UEDM identity. It broadcasts a NODE_ANNOUNCE with a provisioning credential (a temporary credential issued during manufacture). A source node or gateway node receives the announcement and initiates the Guardian Security provisioning protocol. Once the SSD receives its full Trust Layer identity credential, it transitions to OPERATIONAL.
 
 **OPERATIONAL:** The SSD participates fully in the UEDM — receiving energy, routing control messages, and conducting application data communication. It monitors its supercapacitor charge state and requests supplementation when charge falls below V_min + margin.
 
@@ -4684,7 +4684,7 @@ A building equipped with UEDM infrastructure requires no per-device wiring for e
 The UEDM mesh provides:
 - Power to every device from UEDM source nodes installed in ceiling panels or wall outlets
 - Data communication from every device to the building management system through the same mesh
-- Identity verification for every device through the Trust Layer Ledger (TLL), enabling granular access control and audit
+- Identity verification for every device through the Trust Layer, enabling granular access control and audit
 - Self-healing around device or mesh node failures, maintaining coverage without manual intervention
 
 The cost comparison against conventional smart building infrastructure (wired power + separate wireless communication) is significant: eliminating two separate infrastructure installations and replacing them with one unified mesh reduces material cost, installation labor, and ongoing maintenance complexity simultaneously.
@@ -4737,7 +4737,7 @@ The UEDM's anycast addressing (Section 6.3) is a limited form of NDN content rou
 
 ### 11.5 The Lume Ecosystem
 
-The UEDM is the convergence of two Lume ecosystem trajectories: the energy routing trajectory (Meridian [Meridian Architecture, 2026], Energy Internet [Energy Internet, 2026]) and the identity and communication trajectory (Trust Layer Ledger (TLL) [16], DAIGS [17]). The UEDM is the physical instantiation of the cross-domain interoperability model described in [DI Theory, 2026 §8] — the single fabric in which energy, data, and identity are governed under one framework.
+The UEDM is the convergence of two Lume ecosystem trajectories: the energy routing trajectory (Meridian [Meridian Architecture, 2026], Energy Internet [Energy Internet, 2026]) and the identity and communication trajectory (Trust Layer [16], DAIGS [17]). The UEDM is the physical instantiation of the cross-domain interoperability model described in [DI Theory, 2026 §8] — the single fabric in which energy, data, and identity are governed under one framework.
 
 ---
 
@@ -4884,7 +4884,7 @@ Reserved Ports:
 **Lume Ecosystem:**
 
 [15] Andrews, J. (2026). *Lume Language Specification.* DOI: 10.5281/zenodo.19382282
-[16] Andrews, J. (2026). *Trust Layer Ledger (TLL) Ecosystem.* DOI: 10.5281/zenodo.19560674
+[16] Andrews, J. (2026). *Trust Layer Ecosystem.* DOI: 10.5281/zenodo.19560674
 [17] Andrews, J. (2026). *DAIGS Framework.* DOI: 10.5281/zenodo.19491784
 [18] Andrews, J. (2026). *Lume-V Verification Suite.* DOI: 10.5281/zenodo.19645097
 [19] Andrews, J. (2026). *Lume-X Multi-Agent Cognition.* DOI: 10.5281/zenodo.19443968
@@ -5097,9 +5097,9 @@ I define the attack surface of a wireless energy routing system from first princ
 
 ### 3.3 Identity Attack Interfaces
 
-**IAI-1: Node identity credentials.** The cryptographic credentials that establish node identity in the Trust Layer Ledger (TLL) PKI. Accessible to an attacker who can compromise the provisioning process or extract credentials from a deployed node. Enables: node impersonation, credential replay.
+**IAI-1: Node identity credentials.** The cryptographic credentials that establish node identity in the Trust Layer PKI. Accessible to an attacker who can compromise the provisioning process or extract credentials from a deployed node. Enables: node impersonation, credential replay.
 
-**IAI-2: Trust Layer Ledger (TLL) PKI infrastructure.** The certificate authority infrastructure that signs node credentials. Accessible to a sophisticated attacker who can compromise CA infrastructure. Enables: fraudulent credential issuance, certificate chain forgery.
+**IAI-2: Trust Layer PKI infrastructure.** The certificate authority infrastructure that signs node credentials. Accessible to a sophisticated attacker who can compromise CA infrastructure. Enables: fraudulent credential issuance, certificate chain forgery.
 
 **IAI-3: Provisioning process.** The process by which new nodes receive their identity credentials. Accessible to an attacker who can intercept or hijack provisioning. Enables: identity substitution during provisioning, credential interception.
 
@@ -5299,7 +5299,7 @@ The three-tier architecture provides defense in depth. No single tier is a singl
 
 Before any beam authorization is issued, Guardian Security enforces a four-step pre-transmission authentication protocol:
 
-**Step 1 — Node identity verification.** The requesting node presents its Trust Layer Ledger (TLL) PKI credential. Guardian-E verifies the signature chain from the credential to the Trust Layer Ledger (TLL) root CA. If verification fails: request rejected, anomaly logged, node flagged as UNVERIFIED.
+**Step 1 — Node identity verification.** The requesting node presents its Trust Layer PKI credential. Guardian-E verifies the signature chain from the credential to the Trust Layer root CA. If verification fails: request rejected, anomaly logged, node flagged as UNVERIFIED.
 
 **Step 2 — Capability authorization check.** Guardian-E verifies that the requesting node's capability profile (encoded in its identity credential) includes the requested operation type, power level, and target zone. If the capability profile does not authorize the request: request rejected, anomaly logged.
 
@@ -5315,7 +5315,7 @@ Only after all four steps pass does Guardian-E issue beam authorization to the L
 Guardian-E enforces multi-source localization consistency: position reported by UWB localization must be consistent with position inferred from signal strength, TDMA timing, and mesh topology (neighbor node distances). A position report that is inconsistent across these sources is flagged as a potential T1 attack, the node is placed in POSITION_UNVERIFIED status, and no beam is authorized until consistency is restored. Threshold: if position variance across sources exceeds r_threshold (50 cm) for three consecutive measurements, the node is QUARANTINED. The BSL exclusion zone provides the ultimate backstop: even if localization is spoofed, biological presence detection prevents beam transmission at the spoofed location if a biological target is actually there.
 
 **T2 — Routing Table Manipulation:**
-All LINK_STATE_UPDATE messages are signed by the originating node using its Trust Layer Ledger (TLL) PKI credential. Receiving nodes verify the signature before applying the update. Guardian-E applies consistency checks to all routing updates: a link quality metric that changes by more than Δq_max in one update cycle without a corresponding physical event (node failure, localization loss) is flagged. Route selection is rate-limited: no node's routes can be completely replaced within a single control cycle. This prevents sudden, large-scale routing table corruption.
+All LINK_STATE_UPDATE messages are signed by the originating node using its Trust Layer PKI credential. Receiving nodes verify the signature before applying the update. Guardian-E applies consistency checks to all routing updates: a link quality metric that changes by more than Δq_max in one update cycle without a corresponding physical event (node failure, localization loss) is flagged. Route selection is rate-limited: no node's routes can be completely replaced within a single control cycle. This prevents sudden, large-scale routing table corruption.
 
 **T3 — Beam Hijacking:**
 Guardian-E tracks the expected position of the beam target throughout the delivery session. If the target's position deviates from the expected trajectory by more than the adaptive position model allows, the session is suspended and the node is flagged. Relay nodes in a multi-hop path are required to confirm receipt and forward within their TDMA window — a relay that receives but does not forward (potential redirection) is detected by the downstream node's missing receipt confirmation within T_relay_max.
@@ -5392,7 +5392,7 @@ Guardian Security operates at three levels in the Energy Internet [Energy Intern
 
 **Level 1 — Intra-mesh security.** The single-mesh Guardian Security implementation specified in Sections 5 and 6. Unchanged from the single-mesh architecture.
 
-**Level 2 — Inter-mesh security (Energy TLS).** Every EBGP peering session between gateway nodes is authenticated using EAS-level PKI managed through the Trust Layer Ledger (TLL). EBGP route updates are signed by the originating gateway; receiving gateways verify the signature and the ERPKI prefix authorization before accepting and propagating routes. The session uses forward-secret key exchange (ephemeral Diffie-Hellman over curves approved by the Trust Layer Ledger (TLL) governance framework) so that compromise of a long-term key does not expose past session traffic.
+**Level 2 — Inter-mesh security (Energy TLS).** Every EBGP peering session between gateway nodes is authenticated using EAS-level PKI managed through the Trust Layer. EBGP route updates are signed by the originating gateway; receiving gateways verify the signature and the ERPKI prefix authorization before accepting and propagating routes. The session uses forward-secret key exchange (ephemeral Diffie-Hellman over curves approved by the Trust Layer governance framework) so that compromise of a long-term key does not expose past session traffic.
 
 **Level 3 — Registry security (EIRA-level).** All EIRA operations — EAS Number assignment, EIP prefix delegation, Emergency Authority Credential issuance — are signed by the EIRA root credential and published in a transparency log. Any Energy Internet participant can verify any EIRA action independently. A fraudulent EIRA action is detectable by any participant within one log publication cycle.
 
@@ -5462,15 +5462,15 @@ This residual risk is accepted as the irreducible physical security baseline. Mi
 
 ### 9.1 Secure Provisioning
 
-Node provisioning is the process by which a new node receives its Trust Layer Ledger (TLL) identity credential. It is the most security-sensitive phase of a node's lifecycle, because a credential issued at provisioning cannot be recalled without revocation, and revocation has a propagation latency.
+Node provisioning is the process by which a new node receives its Trust Layer identity credential. It is the most security-sensitive phase of a node's lifecycle, because a credential issued at provisioning cannot be recalled without revocation, and revocation has a propagation latency.
 
 Guardian Security specifies a five-step secure provisioning process:
 
-1. **Factory key injection:** The node's Trust Layer Ledger (TLL) public/private key pair is generated in the factory inside a hardware security module. The private key never leaves the HSM — it is injected directly into the node's secure element without passing through any host system.
+1. **Factory key injection:** The node's Trust Layer public/private key pair is generated in the factory inside a hardware security module. The private key never leaves the HSM — it is injected directly into the node's secure element without passing through any host system.
 
-2. **Identity credential signing:** The factory generates a Certificate Signing Request using the node's public key and the node's identity parameters (Node_Type, EAS assignment, Zone ID, capability profile). The CSR is submitted to the Trust Layer Ledger (TLL) PKI for signing.
+2. **Identity credential signing:** The factory generates a Certificate Signing Request using the node's public key and the node's identity parameters (Node_Type, EAS assignment, Zone ID, capability profile). The CSR is submitted to the Trust Layer PKI for signing.
 
-3. **Hardware profile binding:** The Trust Layer Ledger (TLL) credential includes a hardware profile hash — a signed measurement of the node's hardware characteristics (power draw profile, timing characteristics, secure element measurements). A credential used on different hardware will fail the hardware profile consistency check.
+3. **Hardware profile binding:** The Trust Layer credential includes a hardware profile hash — a signed measurement of the node's hardware characteristics (power draw profile, timing characteristics, secure element measurements). A credential used on different hardware will fail the hardware profile consistency check.
 
 4. **Provisioning receipt:** The provisioned node signs a provisioning receipt confirming that it successfully received and stored its credential. The receipt is logged in the certificate chain.
 
@@ -5481,7 +5481,7 @@ Guardian Security specifies a five-step secure provisioning process:
 Every Guardian Security event — authentication, authorization, anomaly detection, quarantine, restoration — is logged in the certificate chain with a signed entry from the Lume-X control loop. The certificate chain is:
 
 - **Append-only:** Entries cannot be deleted or modified once written
-- **Signed:** Each entry is signed by the Lume-X runtime using the node's Trust Layer Ledger (TLL) credential
+- **Signed:** Each entry is signed by the Lume-X runtime using the node's Trust Layer credential
 - **Timestamped:** Each entry includes a network timestamp verifiable against the distributed time consensus
 - **Cross-referenced:** Each entry references the EBF sequence numbers and session IDs of the transactions it relates to
 
@@ -5527,7 +5527,7 @@ The localization integrity verification in Guardian Security (multi-source posit
 
 ### 10.4 The Lume Ecosystem Security Framework
 
-The Trust Layer Ledger (TLL) [16] provides the identity foundation that Guardian Security builds on. Guardian (the general, non-domain-specific security enforcement product) provides the general threat classification and adaptive response framework. Guardian-E is the energy-domain specialization that adds the physical-layer defenses (BSL integration, localization integrity, power measurement validation) that are specific to the energy routing context.
+The Trust Layer [16] provides the identity foundation that Guardian Security builds on. Guardian (the general, non-domain-specific security enforcement product) provides the general threat classification and adaptive response framework. Guardian-E is the energy-domain specialization that adds the physical-layer defenses (BSL integration, localization integrity, power measurement validation) that are specific to the energy routing context.
 
 Guardian Security is the first published formal specification of a Guardian deployment in a physical domain. The security architecture defined in this paper is the reference for future Guardian deployments in the transportation (DMI), manufacturing (DPI), and ambient computation (DII) domains described in [DI Theory, 2026].
 
@@ -5541,7 +5541,7 @@ Guardian Security is the first published formal specification of a Guardian depl
 
 **Coverage proof assumes correct implementation.** The coverage proof in Section 6.2 demonstrates that every attack path crosses at least one Guardian Security enforcement boundary. It does not prove that the implementation of those boundaries is correct. Implementation vulnerabilities — software bugs, cryptographic errors, side-channel attacks on secure elements — can create gaps in coverage that are not present in the specification. Lume-V formal verification [18] of the Guardian Security implementation is the mitigation; it has not yet been completed for all components.
 
-**Multi-party compromise is not addressed.** The Guardian Security framework assumes that the Trust Layer Ledger (TLL) PKI root is not compromised. A compromise of the Trust Layer Ledger (TLL) root credential — enabling issuance of fraudulent credentials for any identity — would defeat every cryptographic defense in Guardian Security simultaneously. This is the Tier 1 existential threat to any PKI-based system and requires organizational security controls beyond the scope of this technical paper.
+**Multi-party compromise is not addressed.** The Guardian Security framework assumes that the Trust Layer PKI root is not compromised. A compromise of the Trust Layer root credential — enabling issuance of fraudulent credentials for any identity — would defeat every cryptographic defense in Guardian Security simultaneously. This is the Tier 1 existential threat to any PKI-based system and requires organizational security controls beyond the scope of this technical paper.
 
 **No experimental validation exists.** Guardian Security has been formally specified but not deployed in a physical mesh. The timing guarantees (anomaly detection within 13.7 ms, quarantine within one control cycle), the physical layer consistency checks (position variance threshold, power measurement cross-validation), and the BSL sensor integration have not been validated in hardware. All quantitative claims are based on architectural analysis of the Meridian specification.
 
@@ -5557,7 +5557,7 @@ The Guardian Security framework — two-tier innate-plus-adaptive defense, pre-t
 
 The most important security property of the Guardian Security framework is the one that cannot be improved through protocol design: the Biological Safety Layer invariant. The BSL guarantees that no beam strikes a biological target regardless of the state of every software and protocol defense. This guarantee is the irreducible physical security baseline of wireless energy routing — the property that makes the difference between a security failure that damages data and a security failure that damages people.
 
-Guardian Security is a formal specification. It requires experimental validation, implementation in the Meridian architecture, and integration with the Trust Layer Ledger (TLL) PKI infrastructure. Those steps are the work of the experimental phases defined in [Meridian Architecture, 2026]. This paper establishes the specification so that when the hardware exists, the security architecture is already defined.
+Guardian Security is a formal specification. It requires experimental validation, implementation in the Meridian architecture, and integration with the Trust Layer PKI infrastructure. Those steps are the work of the experimental phases defined in [Meridian Architecture, 2026]. This paper establishes the specification so that when the hardware exists, the security architecture is already defined.
 
 The Energy Internet cannot be built without this foundation. A global wireless energy routing network with a complete absence of formal security architecture would be an infrastructure disaster — the energy equivalent of the early internet, where the absence of security design produced decades of vulnerability. Guardian Security is the security foundation that the Energy Internet needs to be built on, stated now, so that it is built in from the first deployment rather than retrofitted from the last breach.
 
@@ -5631,8 +5631,8 @@ The minimum attack complexity for each threat is the AND of independent enforcem
 
 | Level | Scope | Authentication | Key Management | Threat Coverage |
 |---|---|---|---|---|
-| L1 — Intra-mesh | Single EAS | Per-node PKI credential | Trust Layer Ledger (TLL) EAS-delegated CA | T1–T8, T11 |
-| L2 — Inter-mesh | Multi-EAS, single EXP | EAS-level PKI credential | Trust Layer Ledger (TLL) root-delegated EAS CA | T9–T10 + L1 |
+| L1 — Intra-mesh | Single EAS | Per-node PKI credential | Trust Layer EAS-delegated CA | T1–T8, T11 |
+| L2 — Inter-mesh | Multi-EAS, single EXP | EAS-level PKI credential | Trust Layer root-delegated EAS CA | T9–T10 + L1 |
 | L3 — Registry | Global | EIRA root credential | EIRA HSM, M-of-N threshold signing | EIRA operation integrity |
 
 ---
@@ -5684,7 +5684,7 @@ The minimum attack complexity for each threat is the AND of independent enforcem
 **Lume Ecosystem:**
 
 [15] Andrews, J. (2026). *Lume Language Specification.* DOI: 10.5281/zenodo.19382282
-[16] Andrews, J. (2026). *Trust Layer Ledger (TLL) Ecosystem.* DOI: 10.5281/zenodo.19560674
+[16] Andrews, J. (2026). *Trust Layer Ecosystem.* DOI: 10.5281/zenodo.19560674
 [17] Andrews, J. (2026). *DAIGS Framework.* DOI: 10.5281/zenodo.19491784
 [18] Andrews, J. (2026). *Lume-V Verification Suite.* DOI: 10.5281/zenodo.19645097
 [19] Andrews, J. (2026). *Lume-X Multi-Agent Cognition.* DOI: 10.5281/zenodo.19443968
@@ -5728,7 +5728,7 @@ Part Five names that class.
 
 Six chapters describe a specific system. This chapter describes what that system is a member of.
 
-Meridian routes energy. The Trust Layer Ledger (TLL) routes trust. The DAIGS framework routes computation. These are three systems in three different physical domains, built on the same foundational axioms, exhibiting the same organizational structure, and satisfying the same four formal properties. They are three instances of the same class.
+Meridian routes energy. The Trust Layer routes trust. The DAIGS framework routes computation. These are three systems in three different physical domains, built on the same foundational axioms, exhibiting the same organizational structure, and satisfying the same four formal properties. They are three instances of the same class.
 
 The class is Deterministic Infrastructure. The properties are: verified identity at every node, explicitly routed resources, invariant-enforced homeostasis, and organism-like self-maintenance. Any autonomous physical system that satisfies all four properties — in any physical domain, at any scale — is a Deterministic Infrastructure system.
 
@@ -5746,7 +5746,7 @@ Three papers precede this one. The first defined Meridian — a four-layer deter
 
 This paper steps back from the energy domain and asks what these three papers collectively demonstrate about autonomous physical infrastructure in general.
 
-I argue that Meridian is one instance of a general class of systems I call Deterministic Infrastructure — autonomous physical systems that operate under four defining properties: verified identity at every node, explicitly routed resources through topology-aware mesh protocols, invariant-enforced homeostasis at every operational layer, and organism-like self-maintenance in the absence of external supervision. I demonstrate that this class is not unique to the energy domain. The Trust Layer Ledger (TLL) ecosystem [16] is a Deterministic Infrastructure instance in the identity and data domain. The DAIGS framework [17] is a Deterministic Infrastructure instance in the multi-agent computation domain. Future instances in the transportation, manufacturing, and emergency coordination domains are predicted and characterized.
+I argue that Meridian is one instance of a general class of systems I call Deterministic Infrastructure — autonomous physical systems that operate under four defining properties: verified identity at every node, explicitly routed resources through topology-aware mesh protocols, invariant-enforced homeostasis at every operational layer, and organism-like self-maintenance in the absence of external supervision. I demonstrate that this class is not unique to the energy domain. The Trust Layer ecosystem [16] is a Deterministic Infrastructure instance in the identity and data domain. The DAIGS framework [17] is a Deterministic Infrastructure instance in the multi-agent computation domain. Future instances in the transportation, manufacturing, and emergency coordination domains are predicted and characterized.
 
 The 42 Assumptions [15] — the foundational axioms of the Lume ecosystem — are the universal axioms of Deterministic Infrastructure. Any system built on them, in any physical domain, will converge toward the same organizational form: the Synthetic Organism model [Meridian Organism, 2026]. The Lume language [15] is the substrate that makes this convergence repeatable and buildable rather than emergent and accidental. Lume-X [19] is the control runtime that enforces it at operational frequencies. Lume-V [18] is the verification layer that proves it before deployment.
 
@@ -5754,7 +5754,7 @@ The central claim of this paper is this: the world is about to need a new genera
 
 Deterministic Infrastructure is the design paradigm for that new world. The Lume ecosystem is the first complete framework for building it.
 
-**Keywords:** deterministic infrastructure, autonomous physical systems, verified identity, invariant enforcement, organism-like self-maintenance, resource routing, Lume, Meridian, Trust Layer Ledger (TLL), DAIGS, general theory, design paradigm, cyber-physical systems
+**Keywords:** deterministic infrastructure, autonomous physical systems, verified identity, invariant enforcement, organism-like self-maintenance, resource routing, Lume, Meridian, Trust Layer, DAIGS, general theory, design paradigm, cyber-physical systems
 
 ---
 
@@ -5827,7 +5827,7 @@ I make four contributions:
 
 **First,** I formally define Deterministic Infrastructure as a class, with the four properties above as the membership criteria. I show that membership in this class is binary — a system either satisfies all four properties or it does not — and that partial satisfaction corresponds to specific, predictable failure modes.
 
-**Second,** I demonstrate that the Lume ecosystem already contains at least three confirmed instances of Deterministic Infrastructure across different physical domains: Meridian in the energy domain, the Trust Layer Ledger (TLL) in the identity and data domain, and DAIGS in the multi-agent computation domain.
+**Second,** I demonstrate that the Lume ecosystem already contains at least three confirmed instances of Deterministic Infrastructure across different physical domains: Meridian in the energy domain, the Trust Layer in the identity and data domain, and DAIGS in the multi-agent computation domain.
 
 **Third,** I show that the 42 Assumptions are the universal axioms of Deterministic Infrastructure — that any system built on them, in any physical domain, will converge toward all four properties as a natural consequence of the axiomatic foundation.
 
@@ -5883,9 +5883,9 @@ I state the four properties formally here and analyze each.
 
 **Why this property is necessary.** A system without verified node identity cannot distinguish legitimate from illegitimate participants. It cannot enforce routing policy (route energy only to authenticated receivers), governance policy (allow only licensed nodes to serve as gateways), or safety policy (exclude unverified devices from proximity to high-power paths). Without verified identity, every other property of Deterministic Infrastructure is bypassed by a node that claims false capabilities, false position, or false authorization.
 
-**Meridian implementation.** MC 64-bit node identity, provisioned at manufacture, signed by the Trust Layer Ledger (TLL) PKI, capability-encoded in Node_Type byte, propagated via NODE_ANNOUNCE [Meridian Architecture, 2026 §4.2].
+**Meridian implementation.** MC 64-bit node identity, provisioned at manufacture, signed by the Trust Layer PKI, capability-encoded in Node_Type byte, propagated via NODE_ANNOUNCE [Meridian Architecture, 2026 §4.2].
 
-**Trust Layer Ledger (TLL) implementation.** Cryptographic identity bound at entity registration, immutable during entity lifecycle, capability-encoded in trust profile, propagated through the Trust Layer Ledger (TLL) mesh [16].
+**Trust Layer implementation.** Cryptographic identity bound at entity registration, immutable during entity lifecycle, capability-encoded in trust profile, propagated through the Trust Layer mesh [16].
 
 **DAIGS implementation.** Agent identity established at instantiation, capability-encoded in agent role profile, cryptographically bound to the DAIGS governance framework [17].
 
@@ -5899,7 +5899,7 @@ I state the four properties formally here and analyze each.
 
 **Meridian implementation.** DRMA multi-hop energy routing with per-hop TDMA scheduling and delivery confirmation [Meridian Architecture, 2026 §9], DWER directed beam delivery with closed-loop confirmation [§10], MFE burst scheduling with threshold-gated release [§5].
 
-**Trust Layer Ledger (TLL) implementation.** Routed trust relationships through the trust graph rather than broadcast trust assertions. A trust claim travels a defined path from issuer to verifier, with each hop verifiable and the complete path auditable [16].
+**Trust Layer implementation.** Routed trust relationships through the trust graph rather than broadcast trust assertions. A trust claim travels a defined path from issuer to verifier, with each hop verifiable and the complete path auditable [16].
 
 **DAIGS implementation.** Routed computation requests through the agent mesh — computation is allocated to specific agents along specific coordination paths, not broadcast to all available agents [17].
 
@@ -5913,7 +5913,7 @@ I state the four properties formally here and analyze each.
 
 **Meridian implementation.** INV-1 through INV-5 enforced at every 13.7 ms Lume-X control cycle: no uncontrolled discharge, no ambiguous routing, no non-deterministic flow, no unsafe transmission, no mesh oscillation [Meridian Architecture, 2026 §3.5, §11].
 
-**Trust Layer Ledger (TLL) implementation.** Trust invariants enforced continuously: no unverified entity participates in governance, no revoked credential remains active, no policy violation persists beyond one enforcement cycle [16].
+**Trust Layer implementation.** Trust invariants enforced continuously: no unverified entity participates in governance, no revoked credential remains active, no policy violation persists beyond one enforcement cycle [16].
 
 **DAIGS implementation.** Governance invariants over agent behavior: no agent exceeds its authorized capability scope, no coordination conflict persists beyond one resolution cycle, no unauthorized inter-agent communication [17].
 
@@ -5927,7 +5927,7 @@ I state the four properties formally here and analyze each.
 
 **Meridian implementation.** SHDCL self-healing [Meridian Architecture, 2026 §12.2], power-conservation mode below V_min (self-preservation), harvest modality shifting and routing path adjustment (adaptive response), MC identity immutability (identity persistence).
 
-**Trust Layer Ledger (TLL) implementation.** Automatic credential renewal, revocation propagation without central coordinator, identity persistence across entity state changes [16].
+**Trust Layer implementation.** Automatic credential renewal, revocation propagation without central coordinator, identity persistence across entity state changes [16].
 
 **DAIGS implementation.** Agent recovery after failure, capability reallocation when agents become unavailable, governance continuity during coordinator transitions [17].
 
@@ -5965,12 +5965,12 @@ I argued in that paper that deterministic autonomous systems converge toward bio
 
 The same argument applies to Deterministic Infrastructure in general. Every Deterministic Infrastructure system must:
 
-- Acquire resources from its operating environment (DAEH in Meridian; identity assertions in the Trust Layer Ledger (TLL); computation requests in DAIGS)
-- Transport those resources internally to where they are needed (DRMA in Meridian; trust propagation in the Trust Layer Ledger (TLL); agent coordination in DAIGS)
-- Coordinate distributed components toward coherent behavior (MMF in Meridian; policy synchronization in the Trust Layer Ledger (TLL); agent mesh orchestration in DAIGS)
-- Defend against threats to its integrity and identity (Guardian-E in Meridian; Guardian in the Trust Layer Ledger (TLL); DAIGS governance enforcement)
-- Maintain identity and capability profile despite operational changes (MC identity in Meridian; entity persistence in the Trust Layer Ledger (TLL); agent identity in DAIGS)
-- Heal from component failure without external intervention (SHDCL in Meridian; credential renewal in the Trust Layer Ledger (TLL); agent recovery in DAIGS)
+- Acquire resources from its operating environment (DAEH in Meridian; identity assertions in the Trust Layer; computation requests in DAIGS)
+- Transport those resources internally to where they are needed (DRMA in Meridian; trust propagation in the Trust Layer; agent coordination in DAIGS)
+- Coordinate distributed components toward coherent behavior (MMF in Meridian; policy synchronization in the Trust Layer; agent mesh orchestration in DAIGS)
+- Defend against threats to its integrity and identity (Guardian-E in Meridian; Guardian in the Trust Layer; DAIGS governance enforcement)
+- Maintain identity and capability profile despite operational changes (MC identity in Meridian; entity persistence in the Trust Layer; agent identity in DAIGS)
+- Heal from component failure without external intervention (SHDCL in Meridian; credential renewal in the Trust Layer; agent recovery in DAIGS)
 
 These are the same requirements that drive biological organism organization. Every Deterministic Infrastructure instance faces them. Every Deterministic Infrastructure instance will therefore converge toward the same organizational form: the Synthetic Organism [Meridian Organism, 2026].
 
@@ -5981,12 +5981,12 @@ This is a strong prediction: every correctly specified Deterministic Infrastruct
 | DI Instance | Current Classification | Notes |
 |---|---|---|
 | Meridian (energy) | Type 3+ structural, Type 5 structural | Awaiting experimental confirmation |
-| Trust Layer Ledger (TLL) (identity/data) | Type 3 confirmed | Deployed, operationally self-maintaining |
+| Trust Layer (identity/data) | Type 3 confirmed | Deployed, operationally self-maintaining |
 | DAIGS (multi-agent) | Type 2–3 | Adaptive and self-maintaining in simulation |
 | Future transportation DI | Type 2 predicted | Dynamic routing, but limited self-healing |
 | Future manufacturing DI | Type 3 predicted | Strong homeostasis requirements |
 
-The Trust Layer Ledger (TLL) is, by this classification, the most operationally confirmed Deterministic Infrastructure instance in the Lume ecosystem — it is deployed, it self-maintains, and it enforces its invariants in production. Meridian has the more complete architectural specification. DAIGS bridges the computation domain. Together they constitute the beginning of a Deterministic Infrastructure ecosystem.
+The Trust Layer is, by this classification, the most operationally confirmed Deterministic Infrastructure instance in the Lume ecosystem — it is deployed, it self-maintains, and it enforces its invariants in production. Meridian has the more complete architectural specification. DAIGS bridges the computation domain. Together they constitute the beginning of a Deterministic Infrastructure ecosystem.
 
 ---
 
@@ -5996,27 +5996,27 @@ The Trust Layer Ledger (TLL) is, by this classification, the most operationally 
 
 Meridian [Meridian Architecture, 2026] is the most fully specified Deterministic Infrastructure instance. It implements all four properties:
 
-- **Verified Identity:** MC 64-bit node identity, Trust Layer Ledger (TLL) PKI, capability-encoded Node_Type
+- **Verified Identity:** MC 64-bit node identity, Trust Layer PKI, capability-encoded Node_Type
 - **Explicit Routing:** DRMA multi-hop routing, DWER directed beam delivery, MFE burst scheduling
 - **Invariant Homeostasis:** INV-1 through INV-5, Lume-X 73 Hz enforcement, SHDCL continuous monitoring
 - **Organism Self-Maintenance:** SHDCL self-healing, power-conservation mode, harvest modality shifting
 
 Meridian operates in the energy domain — the resource it routes is stored electrical energy delivered as directed RF bursts. The Energy Internet [Energy Internet, 2026] extends this to an internet-scale protocol standard for energy routing across independently administered meshes. Meridian is the reference implementation; the Energy Internet is the standard.
 
-### 6.2 Identity and Data Domain: Trust Layer Ledger (TLL)
+### 6.2 Identity and Data Domain: Trust Layer
 
-The Trust Layer Ledger (TLL) [16] is a Deterministic Infrastructure instance in the identity and data domain. It routes trust relationships — not energy, not bits in the data-internet sense, but trust assertions: claims about identity, capability, authorization, and governance status.
+The Trust Layer [16] is a Deterministic Infrastructure instance in the identity and data domain. It routes trust relationships — not energy, not bits in the data-internet sense, but trust assertions: claims about identity, capability, authorization, and governance status.
 
-In the Trust Layer Ledger (TLL), the resource being routed is trust itself. A trust relationship between entity A and entity B is not broadcast — it is established, verified, and propagated along specific paths through the trust graph. Revocation is routed too: when an entity's credential is revoked, the revocation propagates through the same trust graph that carried the original credential, reaching every node that holds the credential within one propagation cycle.
+In the Trust Layer, the resource being routed is trust itself. A trust relationship between entity A and entity B is not broadcast — it is established, verified, and propagated along specific paths through the trust graph. Revocation is routed too: when an entity's credential is revoked, the revocation propagates through the same trust graph that carried the original credential, reaching every node that holds the credential within one propagation cycle.
 
-The Trust Layer Ledger (TLL) satisfies all four Deterministic Infrastructure properties:
+The Trust Layer satisfies all four Deterministic Infrastructure properties:
 
 - **Verified Identity:** Cryptographic identity bound at entity registration, immutable during entity lifecycle
 - **Explicit Routing:** Trust relationships propagated along defined paths through the trust graph; no trust assertion is accepted that cannot be traced to its origin along a valid trust path
 - **Invariant Homeostasis:** No revoked credential remains active; no unauthorized entity participates in governance; no policy violation persists beyond one enforcement cycle
 - **Organism Self-Maintenance:** Automatic credential renewal, revocation propagation without central coordinator, identity persistence across entity state changes
 
-The Trust Layer Ledger (TLL) is the oldest and most deployed Deterministic Infrastructure instance in the Lume ecosystem. Its operational experience provides the empirical foundation for the claim that Deterministic Infrastructure is viable, not merely theoretical.
+The Trust Layer is the oldest and most deployed Deterministic Infrastructure instance in the Lume ecosystem. Its operational experience provides the empirical foundation for the claim that Deterministic Infrastructure is viable, not merely theoretical.
 
 ### 6.3 Multi-Agent Computation Domain: DAIGS
 
@@ -6031,13 +6031,13 @@ DAIGS satisfies all four properties:
 - **Invariant Homeostasis:** No agent exceeds authorized capability scope; no coordination conflict persists
 - **Organism Self-Maintenance:** Agent recovery after failure, capability reallocation when agents become unavailable
 
-The DAIGS framework provides proof of concept for Deterministic Infrastructure in a domain that is already operating at scale — multi-agent AI systems. It also demonstrates that the Lume ecosystem spans the digital-physical boundary: Trust Layer Ledger (TLL) and DAIGS are primarily digital; Meridian is the first primarily physical instance.
+The DAIGS framework provides proof of concept for Deterministic Infrastructure in a domain that is already operating at scale — multi-agent AI systems. It also demonstrates that the Lume ecosystem spans the digital-physical boundary: Trust Layer and DAIGS are primarily digital; Meridian is the first primarily physical instance.
 
 ---
 
 ## 7. The Lume Substrate: Why the Convergence Is Repeatable
 
-The convergence of Meridian, the Trust Layer Ledger (TLL), and DAIGS toward Deterministic Infrastructure organization is not coincidental. All three were built on Lume [15] — the same language, the same 42 Assumptions, the same runtime substrate. The convergence is a property of the foundation, not of the specific domain.
+The convergence of Meridian, the Trust Layer, and DAIGS toward Deterministic Infrastructure organization is not coincidental. All three were built on Lume [15] — the same language, the same 42 Assumptions, the same runtime substrate. The convergence is a property of the foundation, not of the specific domain.
 
 This has a practical implication that distinguishes the Lume ecosystem from other approaches to autonomous system design: the convergence is **repeatable**. A designer who begins a new Deterministic Infrastructure instance using Lume does not need to independently discover the four properties, the Synthetic Organism organizational form, or the governance requirements. They are encoded in the axiomatic foundation of the language. The designer starts from the endpoint rather than discovering it through trial and error.
 
@@ -6057,19 +6057,19 @@ Together, Lume, Lume-X, and Lume-V form a complete substrate for building Determ
 
 ## 8. Cross-Domain Interoperability
 
-A single Deterministic Infrastructure instance — Meridian, the Trust Layer Ledger (TLL), or DAIGS — is valuable within its domain. Multiple Deterministic Infrastructure instances that interoperate across domain boundaries are qualitatively more powerful.
+A single Deterministic Infrastructure instance — Meridian, the Trust Layer, or DAIGS — is valuable within its domain. Multiple Deterministic Infrastructure instances that interoperate across domain boundaries are qualitatively more powerful.
 
-The Trust Layer Ledger (TLL) and Meridian already interoperate: Guardian Security (Guardian-E in the energy domain, Guardian in the identity domain) uses the Trust Layer Ledger (TLL) PKI to authenticate Meridian nodes. A Meridian node's identity is not Meridian-local — it is Trust Layer Ledger (TLL)-global. Any system that participates in the Trust Layer Ledger (TLL) can verify a Meridian node's identity without Meridian-specific knowledge. The Trust Layer Ledger (TLL) is the universal identity substrate for all Deterministic Infrastructure instances.
+The Trust Layer and Meridian already interoperate: Guardian Security (Guardian-E in the energy domain, Guardian in the identity domain) uses the Trust Layer PKI to authenticate Meridian nodes. A Meridian node's identity is not Meridian-local — it is Trust Layer-global. Any system that participates in the Trust Layer can verify a Meridian node's identity without Meridian-specific knowledge. The Trust Layer is the universal identity substrate for all Deterministic Infrastructure instances.
 
 This suggests a general model for cross-domain Deterministic Infrastructure interoperability:
 
-**Shared identity substrate.** The Trust Layer Ledger (TLL) provides the identity foundation for all DI instances. A node participating in the energy domain (Meridian), the computation domain (DAIGS), or any future domain is the same identity in all of them. When a medical device requests energy from Meridian, its identity is the same identity it uses to request computation from DAIGS and to authenticate with the Trust Layer Ledger (TLL) governance framework. Single identity, multiple domain participation.
+**Shared identity substrate.** The Trust Layer provides the identity foundation for all DI instances. A node participating in the energy domain (Meridian), the computation domain (DAIGS), or any future domain is the same identity in all of them. When a medical device requests energy from Meridian, its identity is the same identity it uses to request computation from DAIGS and to authenticate with the Trust Layer governance framework. Single identity, multiple domain participation.
 
-**Shared governance substrate.** The Trust Layer Ledger (TLL) enforces governance policy across all DI instances. A policy that says "devices below trust level 3 cannot receive high-power energy delivery" is enforced at the Trust Layer Ledger (TLL) level and respected by Meridian's routing layer. Policy does not need to be duplicated in each DI instance — it lives in the Trust Layer Ledger (TLL) and all DI instances enforce it through their Guardian Security integration.
+**Shared governance substrate.** The Trust Layer enforces governance policy across all DI instances. A policy that says "devices below trust level 3 cannot receive high-power energy delivery" is enforced at the Trust Layer level and respected by Meridian's routing layer. Policy does not need to be duplicated in each DI instance — it lives in the Trust Layer and all DI instances enforce it through their Guardian Security integration.
 
 **Shared audit substrate.** Every event in every DI instance — every energy delivery, every trust assertion, every computation allocation — generates a certificate chain entry. The certificate chain is the universal audit log for all DI instances. A compliance query about a specific device's energy consumption, trust interactions, and computation usage across a specific time window can be answered from the unified audit log without querying each DI instance separately.
 
-**Cross-domain resource coordination.** When a device needs energy (Meridian), computation (DAIGS), and authenticated identity (Trust Layer Ledger (TLL)) simultaneously — as any autonomous agent in a complex environment will — the three DI instances coordinate through shared identity and governance to provide all three resources without conflicting. The device does not negotiate with three independent systems. It presents its Trust Layer Ledger (TLL) identity and the three systems coordinate their resource provision.
+**Cross-domain resource coordination.** When a device needs energy (Meridian), computation (DAIGS), and authenticated identity (Trust Layer) simultaneously — as any autonomous agent in a complex environment will — the three DI instances coordinate through shared identity and governance to provide all three resources without conflicting. The device does not negotiate with three independent systems. It presents its Trust Layer identity and the three systems coordinate their resource provision.
 
 This cross-domain coordination is the Deterministic Infrastructure equivalent of a converged network: just as a modern communications network carries voice, video, and data over the same physical infrastructure using a shared addressing and routing protocol, a Deterministic Infrastructure ecosystem carries energy, computation, and trust over the same governance and identity substrate using a shared identity and routing framework.
 
@@ -6215,11 +6215,11 @@ The key distinction is determinism. Self-organizing systems are probabilistic �
 
 Blockchain and distributed ledger technologies address the identity and governance problems of distributed systems by replacing central authority with cryptographic consensus. They provide verified identity (cryptographic key pairs), explicit routing of transactions (validated and recorded on-chain), and some invariant enforcement (smart contract conditions).
 
-The critical limitation is performance. Blockchain consensus operates at the timescale of seconds to minutes. Deterministic Infrastructure operates at the timescale of milliseconds (Lume-X at 73 Hz). The governance overhead of blockchain consensus is incompatible with physical infrastructure that must respond to failure within one control cycle. The Trust Layer Ledger (TLL) achieves the governance properties of blockchain (cryptographic identity, auditable history, distributed validation) at infrastructure timescales by replacing consensus with deterministic cryptographic verification — each interaction is locally verifiable rather than requiring network-wide consensus.
+The critical limitation is performance. Blockchain consensus operates at the timescale of seconds to minutes. Deterministic Infrastructure operates at the timescale of milliseconds (Lume-X at 73 Hz). The governance overhead of blockchain consensus is incompatible with physical infrastructure that must respond to failure within one control cycle. The Trust Layer achieves the governance properties of blockchain (cryptographic identity, auditable history, distributed validation) at infrastructure timescales by replacing consensus with deterministic cryptographic verification — each interaction is locally verifiable rather than requiring network-wide consensus.
 
 ### 11.5 The Lume Ecosystem
 
-The three companion papers [Meridian Architecture, 2026; Meridian Organism, 2026; Energy Internet, 2026] provide the concrete grounding for this general theory. The Trust Layer Ledger (TLL) [16] and DAIGS [17] provide additional instances across different domains. Lume-V [18] provides the formal verification layer. Lume-X [19] provides the operational enforcement layer. Deterministic Dissolution [20] provides the formal model for graceful termination of DI instances.
+The three companion papers [Meridian Architecture, 2026; Meridian Organism, 2026; Energy Internet, 2026] provide the concrete grounding for this general theory. The Trust Layer [16] and DAIGS [17] provide additional instances across different domains. Lume-V [18] provides the formal verification layer. Lume-X [19] provides the operational enforcement layer. Deterministic Dissolution [20] provides the formal model for graceful termination of DI instances.
 
 This paper synthesizes these contributions into a general framework. The general framework is the contribution of this paper; the specific contributions of each companion paper stand independently and are not re-derived here.
 
@@ -6227,13 +6227,13 @@ This paper synthesizes these contributions into a general framework. The general
 
 ## 12. Limitations and Honest Boundaries
 
-**The theory rests on three confirmed instances.** Meridian (architecturally specified, experimentally unconfirmed), Trust Layer Ledger (TLL) (deployed), and DAIGS (deployed in simulation). Three instances do not prove generality. The predictions in Section 9 are argued predictions, not demonstrated facts. Each future domain requires independent specification and validation.
+**The theory rests on three confirmed instances.** Meridian (architecturally specified, experimentally unconfirmed), Trust Layer (deployed), and DAIGS (deployed in simulation). Three instances do not prove generality. The predictions in Section 9 are argued predictions, not demonstrated facts. Each future domain requires independent specification and validation.
 
 **The 42 Assumptions have not been formally proven to entail the four properties.** The mapping in Section 4 is argued rather than formally derived. A formal proof that the 42 Assumptions jointly entail all four Deterministic Infrastructure properties across all possible physical domains would require a level of formalization that neither the 42 Assumptions nor the four properties currently support. This is future work.
 
-**Deterministic Infrastructure does not eliminate all failure modes.** It eliminates the failure modes that correspond to missing properties. It cannot prevent hardware failures that exceed the SHDCL recovery budget, adversarial attacks that successfully compromise the Trust Layer Ledger (TLL) PKI, or physical events (electromagnetic pulse, physical destruction) that destroy nodes faster than self-maintenance mechanisms can respond.
+**Deterministic Infrastructure does not eliminate all failure modes.** It eliminates the failure modes that correspond to missing properties. It cannot prevent hardware failures that exceed the SHDCL recovery budget, adversarial attacks that successfully compromise the Trust Layer PKI, or physical events (electromagnetic pulse, physical destruction) that destroy nodes faster than self-maintenance mechanisms can respond.
 
-**The cross-domain interoperability described in Section 8 does not yet exist as a deployed system.** The Trust Layer Ledger (TLL) provides the identity substrate for multiple DI instances in principle. In practice, the integration of Meridian's energy routing with the Trust Layer Ledger (TLL)'s identity governance has not been fully implemented. The interoperability model is architectural, not operational.
+**The cross-domain interoperability described in Section 8 does not yet exist as a deployed system.** The Trust Layer provides the identity substrate for multiple DI instances in principle. In practice, the integration of Meridian's energy routing with the Trust Layer's identity governance has not been fully implemented. The interoperability model is architectural, not operational.
 
 **The organism classification of future DI instances in Section 9 is prediction, not specification.** The classification of Transportation DMI as Type 3 and Ambient Computation DII as Type 2–3 is based on the general theory and the requirements of those domains. Formal specifications of those instances do not yet exist.
 
@@ -6245,7 +6245,7 @@ This paper synthesizes these contributions into a general framework. The general
 
 Three papers built a system. This paper explains what that system is a part of.
 
-Meridian is not a wireless energy router that happens to have some interesting theoretical properties. It is the first formally specified instance of a general class — Deterministic Infrastructure — defined by four properties that together make autonomous physical operation safe, scalable, and governable without central authority. The Trust Layer Ledger (TLL) is another instance in the identity domain. DAIGS is another in the computation domain. Four more domains — transportation, manufacturing, emergency coordination, and ambient computation — are predicted on the basis of the general theory and the character of those domains.
+Meridian is not a wireless energy router that happens to have some interesting theoretical properties. It is the first formally specified instance of a general class — Deterministic Infrastructure — defined by four properties that together make autonomous physical operation safe, scalable, and governable without central authority. The Trust Layer is another instance in the identity domain. DAIGS is another in the computation domain. Four more domains — transportation, manufacturing, emergency coordination, and ambient computation — are predicted on the basis of the general theory and the character of those domains.
 
 The properties that define this class are not arbitrary. They are the minimum requirements for any autonomous physical system that must operate in an adversarial environment without human supervision over an extended time horizon. Verified identity, explicit routing, invariant homeostasis, and organism-like self-maintenance are the properties that biological organisms evolved because they faced the same requirements. Deterministic Infrastructure systems exhibit those properties because they are built on axioms — the 42 Assumptions — that encode them at the foundational level.
 
@@ -6253,7 +6253,7 @@ The Lume ecosystem is the first complete framework for building Deterministic In
 
 The world needs Deterministic Infrastructure. The gap between the autonomous device density that is coming — a trillion nodes, across every physical domain, operating at millisecond timescales without human supervisors — and the infrastructure paradigms that currently exist — best-effort delivery, central coordination, passive components, human-timescale failure recovery — is not a gap that can be closed by improving existing infrastructure. It requires a new paradigm.
 
-Deterministic Infrastructure is that paradigm. The Lume ecosystem is its foundation. Meridian, the Trust Layer Ledger (TLL), and DAIGS are its first instances. The Energy Internet is its first protocol standard. And this paper is its first formal statement as a general theory.
+Deterministic Infrastructure is that paradigm. The Lume ecosystem is its foundation. Meridian, the Trust Layer, and DAIGS are its first instances. The Energy Internet is its first protocol standard. And this paper is its first formal statement as a general theory.
 
 The work that remains is vast. But the theory now exists. The instances now exist. The foundation now exists. What comes next is construction.
 
@@ -6316,8 +6316,8 @@ All four functions must be implemented. Partial implementation produces the corr
 
 | Domain | DI Instance | Resource Routed | Identity Substrate | Invariant Set | Current Classification |
 |---|---|---|---|---|---|
-| Energy | Meridian | Electrical energy (RF bursts) | MC 64-bit / Trust Layer Ledger (TLL) PKI | INV-1 to INV-5 | Type 3+ structural |
-| Identity/Data | Trust Layer Ledger (TLL) | Trust relationships, credentials | Cryptographic entity identity | No revoked credential active; no unauthorized governance | Type 3 confirmed |
+| Energy | Meridian | Electrical energy (RF bursts) | MC 64-bit / Trust Layer PKI | INV-1 to INV-5 | Type 3+ structural |
+| Identity/Data | Trust Layer | Trust relationships, credentials | Cryptographic entity identity | No revoked credential active; no unauthorized governance | Type 3 confirmed |
 | Multi-Agent Computation | DAIGS | Computation allocation | Agent role identity | No capability scope exceeded; no unresolved coordination conflict | Type 2–3 |
 | Transportation (predicted) | DMI | Right-of-way | Vehicle capability identity | No spatial collision; no speed envelope violation | Type 3 predicted |
 | Manufacturing (predicted) | DPI | Production capacity | Resource capability profile | No capability mismatch; no material expiration violation | Type 3–4 predicted |
@@ -6358,7 +6358,7 @@ For each future DI domain, this matrix predicts when organism-like properties wi
 | EBGP inter-mesh federation | Energy Internet, 2026 | §5 |
 | Emergency Priority Override | Energy Internet, 2026 | §6.4 |
 | EIRA governance model | Energy Internet, 2026 | §9.2 |
-| Trust Layer Ledger (TLL) as DI instance | Trust Layer Ledger (TLL) Ecosystem [16] | — |
+| Trust Layer as DI instance | Trust Layer Ecosystem [16] | — |
 | DAIGS as DI instance | DAIGS Framework [17] | — |
 | Lume-V formal verification | Lume-V Verification Suite [18] | — |
 | Lume-X control runtime | Lume-X Multi-Agent Cognition [19] | — |
@@ -6426,7 +6426,7 @@ For each future DI domain, this matrix predicts when organism-like properties wi
 
 [15] Andrews, J. (2026). *Lume Language Specification.* DarkWave Studios LLC. DOI: 10.5281/zenodo.19382282
 
-[16] Andrews, J. (2026). *Trust Layer Ledger (TLL) Ecosystem.* DarkWave Studios LLC. DOI: 10.5281/zenodo.19560674
+[16] Andrews, J. (2026). *Trust Layer Ecosystem.* DarkWave Studios LLC. DOI: 10.5281/zenodo.19560674
 
 [17] Andrews, J. (2026). *DAIGS Framework.* DarkWave Studios LLC. DOI: 10.5281/zenodo.19491784
 
@@ -6752,10 +6752,10 @@ Fusion Hub
 The Tier 1 layer introduces two new node types in the energy routing architecture:
 
 **T1-TX: Tier 1 Transmitter Node**
-Located at the generation facility. Receives DC power from the generator bus, converts to 2.45 GHz via solid-state power amplifier array, and feeds a phased array antenna. The phased array beam-steers to the designated T1-RX receiver, locking to the retrodirective pilot tone (Section 6.2). Registered with the Trust Layer Ledger (TLL) under a T1-TX capability profile. Lume-X governs the output power modulation and invariant enforcement.
+Located at the generation facility. Receives DC power from the generator bus, converts to 2.45 GHz via solid-state power amplifier array, and feeds a phased array antenna. The phased array beam-steers to the designated T1-RX receiver, locking to the retrodirective pilot tone (Section 6.2). Registered with the Trust Layer under a T1-TX capability profile. Lume-X governs the output power modulation and invariant enforcement.
 
 **T1-RX: Tier 1 Receiver Node**
-Located at the district boundary receiver site. A rectenna array collects the incoming microwave beam and converts it to DC. Transmits a retrodirective pilot tone that the T1-TX uses for beam locking. Registered with the Trust Layer Ledger (TLL) under a T1-RX capability profile. The DC output feeds the local distribution bus that supplies Meridian source nodes. The T1-RX node monitors received power and reports delivery confirmation to the T1-TX via the data channel (standard 802.11 or 5G communication link, separate from the power beam).
+Located at the district boundary receiver site. A rectenna array collects the incoming microwave beam and converts it to DC. Transmits a retrodirective pilot tone that the T1-TX uses for beam locking. Registered with the Trust Layer under a T1-RX capability profile. The DC output feeds the local distribution bus that supplies Meridian source nodes. The T1-RX node monitors received power and reports delivery confirmation to the T1-TX via the data channel (standard 802.11 or 5G communication link, separate from the power beam).
 
 **T1-REL: Tier 1 Relay Node (optional)**
 For configurations where direct T1-TX to T1-RX line-of-sight is unavailable due to terrain or building obstruction, a relay node receives the T1-TX beam, reconverts to DC, and retransmits to the T1-RX. Each relay hop introduces an additional conversion loss cycle. T1-REL nodes are avoided by siting selection wherever possible.
@@ -6807,7 +6807,7 @@ At the Tier 1 transmission layer, the T1-TX converts DC power to 2.45 GHz RF wit
 At the Tier 2 mesh layer, the full Meridian architecture applies: addressed delivery, quality-of-service guarantees, BSL safety enforcement, Guardian-E security, and Lume-X invariant enforcement.
 
 Every layer from plasma to device is:
-- Identity-verified (Trust Layer Ledger (TLL) identity at every node, T1-TX through leaf device)
+- Identity-verified (Trust Layer identity at every node, T1-TX through leaf device)
 - Explicitly routed (beam routing at Tier 1, mesh routing at Tier 2)
 - Invariant-enforced (Lume-X at generation, T1 control at transmission, Lume-X at mesh)
 - Self-maintaining (deterministic fusion control auto-recovers from plasma perturbation; Meridian SHDCL auto-recovers from mesh perturbation)
@@ -6972,7 +6972,7 @@ The physical electrical grid is vulnerable to four classes of disruption, each o
 
 **Class 3 — Physical attack.** The U.S. Federal Energy Regulatory Commission (FERC) warned in a 2014 report that coordinated physical attacks on a small number of critical transmission substations could cause a nationwide blackout lasting weeks. Physical attacks on grid infrastructure are increasing globally. A wireless architecture has no transmission substations to attack — the transmitter and receiver are not single points of failure (multiple T1-TX nodes serve each district, and loss of one redirects to others), and the beam path itself has no physical infrastructure at all.
 
-**Class 4 — Cyber attacks on control systems.** Grid SCADA systems are known attack targets. A cyber attack that causes incorrect switching in a transmission substation can trigger cascading failures across the grid. The Lume-X invariant enforcement and Trust Layer Ledger (TLL) identity verification of the wireless architecture make the equivalent attack — causing a T1-TX to redirect its beam to an unintended receiver — impossible without physical compromise of the pilot-tone system. Software commands alone cannot redirect the beam.
+**Class 4 — Cyber attacks on control systems.** Grid SCADA systems are known attack targets. A cyber attack that causes incorrect switching in a transmission substation can trigger cascading failures across the grid. The Lume-X invariant enforcement and Trust Layer identity verification of the wireless architecture make the equivalent attack — causing a T1-TX to redirect its beam to an unintended receiver — impossible without physical compromise of the pilot-tone system. Software commands alone cannot redirect the beam.
 
 ### 8.2 Dynamic Rerouting
 
@@ -7015,20 +7015,20 @@ The seven preceding papers in this series established Meridian as a complete las
 The Deterministic Infrastructure general theory (Paper 4) defined four properties that any DI system must satisfy: verified identity at every node, explicitly routed resources, invariant-enforced homeostasis, and organism-like self-maintenance. I now verify that each layer of the complete stack satisfies all four properties:
 
 **Deterministic Fusion Control layer:**
-- Verified identity: the fusion control system registers with the Trust Layer Ledger (TLL) as a T1-TX source node; its identity is verified before it is permitted to transmit
+- Verified identity: the fusion control system registers with the Trust Layer as a T1-TX source node; its identity is verified before it is permitted to transmit
 - Explicitly routed: output power is explicitly allocated to a designated T1-TX node based on demand routing from the Energy Internet protocol layer
 - Invariant-enforced: four plasma invariants (INV-F1 through INV-F4) enforced by Lume-X at the plasma control timescale
 - Self-maintaining: automated recovery from plasma perturbation (disruption prevention, ramp-down and ramp-up sequences) without operator intervention
 
 **Tier 1 Wireless Transmission layer:**
-- Verified identity: T1-TX and T1-RX nodes registered with Trust Layer Ledger (TLL); pilot-tone provides physical identity verification (only the authorized receiver has the pilot transmitter)
+- Verified identity: T1-TX and T1-RX nodes registered with Trust Layer; pilot-tone provides physical identity verification (only the authorized receiver has the pilot transmitter)
 - Explicitly routed: beam directed to a specific T1-RX node based on routing table; cannot be redirected without changing pilot-tone direction
 - Invariant-enforced: T1 control invariants (pilot signal strength ≥ threshold, power density ≤ limit, intruder detection clear) enforced in hardware; violation triggers beam cutoff
 - Self-maintaining: automatic failover to backup T1-TX node on primary failure; automatic beam power adjustment for Fresnel-regime optimization
 
 **Tier 2 Meridian Mesh layer:**
 - All four properties fully specified in Papers 1–7
-- Verified identity: Trust Layer Ledger (TLL) MC addressing
+- Verified identity: Trust Layer MC addressing
 - Explicitly routed: DRMA multi-hop routing
 - Invariant-enforced: Lume-X INV-1 through INV-5
 - Self-maintaining: SHDCL self-healing
@@ -7041,13 +7041,13 @@ The complete stack relies on three components of the Lume ecosystem that appear 
 
 **Lume-X** operates at two timescales: the fusion control timescale (1–10ms for plasma stability) and the Meridian mesh timescale (13.7ms per control cycle). The Tier 1 layer operates at 100ms. All three use the same Lume-X invariant enforcement model; only the cycle time and invariant definitions differ.
 
-**Trust Layer Ledger (TLL)** provides identity verification for every node in the stack, from the fusion reactor's T1-TX capability profile through the Meridian relay nodes to the leaf device's endpoint identity. A device that receives power through this full stack can cryptographically verify the provenance of its energy — that it originated from an authorized generation source, was transmitted through authorized relay nodes, and was delivered by the authorized last-mile mesh.
+**Trust Layer** provides identity verification for every node in the stack, from the fusion reactor's T1-TX capability profile through the Meridian relay nodes to the leaf device's endpoint identity. A device that receives power through this full stack can cryptographically verify the provenance of its energy — that it originated from an authorized generation source, was transmitted through authorized relay nodes, and was delivered by the authorized last-mile mesh.
 
 **Guardian Security (Guardian-E)** extends from the Meridian mesh (where it is specified fully in Paper 5) upward into the Tier 1 layer. The Tier 1 threat model is a proper superset of the Meridian threat taxonomy — it includes all eleven Meridian threat categories plus three additional categories specific to large-scale beaming: T12 (exclusion zone breach), T13 (pilot-tone spoofing), and T14 (regulatory fraudulent operation). The Guardian Security framework's two-tier innate/adaptive defense structure applies at both layers.
 
 ### 10.3 The Stack in Three Sentences
 
-A fusion reactor, governed by deterministic plasma control and formally registered in the Trust Layer Ledger (TLL), converts thermal energy to electricity and feeds a phased array transmitter that locks its beam to a pilot tone transmitted from an authorized district receiver array ten kilometers away, where the received microwave power is converted to DC and delivered to the Meridian mesh that routes it — addressed, authenticated, quality-of-service-guaranteed — to every device in the buildings the district serves.
+A fusion reactor, governed by deterministic plasma control and formally registered in the Trust Layer, converts thermal energy to electricity and feeds a phased array transmitter that locks its beam to a pilot tone transmitted from an authorized district receiver array ten kilometers away, where the received microwave power is converted to DC and delivered to the Meridian mesh that routes it — addressed, authenticated, quality-of-service-guaranteed — to every device in the buildings the district serves.
 
 No transmission towers. No high-voltage cables. No substations.
 
@@ -7099,7 +7099,7 @@ The argument of this paper is simple, even if the engineering is not: a world wi
 
 The argument has two parts. The first part is that the physics permits it. Fresnel-regime microwave power beaming at 2.45 GHz, with 10–20 meter aperture arrays, achieves 80–87% collection efficiency at the district distances (1–5 km) relevant for urban energy delivery. Retrodirective pilot-tone locking provides a physically robust safety mechanism that cannot be bypassed by software attacks. Hardware-enforced intruder detection and automatic beam cutoff satisfy the public safety requirements for operation in uncontrolled airspace. The physics is not speculative.
 
-The second part is that the architecture connects. The Tier 1 long-haul beam layer interfaces cleanly with the Tier 2 Meridian mesh at the DC bus of the district rectenna array. The Meridian mesh routes the delivered energy to every device in the district without wires. The fusion control system below the Tier 1 layer provides a deterministically governed generation source whose output is formally bounded and formally modulated. The Trust Layer Ledger (TLL) identity system, Lume-X control runtime, and Guardian Security framework operate across all three layers, providing a unified DI governance framework from generation to device.
+The second part is that the architecture connects. The Tier 1 long-haul beam layer interfaces cleanly with the Tier 2 Meridian mesh at the DC bus of the district rectenna array. The Meridian mesh routes the delivered energy to every device in the district without wires. The fusion control system below the Tier 1 layer provides a deterministically governed generation source whose output is formally bounded and formally modulated. The Trust Layer identity system, Lume-X control runtime, and Guardian Security framework operate across all three layers, providing a unified DI governance framework from generation to device.
 
 The efficiency penalty is real. The regulatory path is long. The fusion source is not yet commercially available. These are honest limitations stated without minimization. They are the engineering and policy problems that Phase 1–3 experimental work and regulatory engagement will address.
 
@@ -7149,7 +7149,7 @@ Pilot spoofing defense:
   Pilot frequency is encrypted using ECDH key exchange between T1-TX and T1-RX
   at session establishment. Pilot carrier is modulated with a 64-bit rolling code
   that T1-TX verifies. An unkeyed pilot source cannot produce a valid rolling code.
-  Key rotation: every 24 hours via Trust Layer Ledger (TLL) key exchange.
+  Key rotation: every 24 hours via Trust Layer key exchange.
 ```
 
 ---
@@ -7175,18 +7175,18 @@ Public exposure is below ICNIRP limits at the beam edge (10m from centerline). E
 
 | Layer | Technology | DI Property: Identity | DI Property: Routing | DI Property: Invariants | DI Property: Self-Maintenance |
 |---|---|---|---|---|---|
-| Generation | Deterministic Fusion Control | Trust Layer Ledger (TLL) T1-TX profile | Demand allocation via EI protocol | INV-F1 through INV-F4 (plasma) | Plasma disruption avoidance + ramp sequences |
-| Long-haul TX | T1-TX phased array | Trust Layer Ledger (TLL) identity, pilot-tone physical auth | Beam directed to T1-RX via pilot lock | Pilot signal ≥ threshold, P ≤ P_max | Auto failover to backup T1-TX |
-| Long-haul RX | T1-RX rectenna | Trust Layer Ledger (TLL) identity, pilot transmitter | n/a (passive receive) | Received power ≥ P_min | Alert and reroute on underpower |
+| Generation | Deterministic Fusion Control | Trust Layer T1-TX profile | Demand allocation via EI protocol | INV-F1 through INV-F4 (plasma) | Plasma disruption avoidance + ramp sequences |
+| Long-haul TX | T1-TX phased array | Trust Layer identity, pilot-tone physical auth | Beam directed to T1-RX via pilot lock | Pilot signal ≥ threshold, P ≤ P_max | Auto failover to backup T1-TX |
+| Long-haul RX | T1-RX rectenna | Trust Layer identity, pilot transmitter | n/a (passive receive) | Received power ≥ P_min | Alert and reroute on underpower |
 | District mesh | Meridian Tier 2 | MC 64-bit address | DRMA multi-hop routing | INV-1 through INV-5 | SHDCL self-healing |
-| Device | Leaf node / SSD | Trust Layer Ledger (TLL) endpoint identity | Addressed final-hop delivery | Delivery confirmation protocol | Self-report on failure via mesh |
+| Device | Leaf node / SSD | Trust Layer endpoint identity | Addressed final-hop delivery | Delivery confirmation protocol | Self-report on failure via mesh |
 
 ---
 
 ## References
 
 [15] Andrews, J. (2026). *Lume Language Specification.* DOI: 10.5281/zenodo.19382282
-[16] Andrews, J. (2026). *Trust Layer Ledger (TLL) Ecosystem.* DOI: 10.5281/zenodo.19560674
+[16] Andrews, J. (2026). *Trust Layer Ecosystem.* DOI: 10.5281/zenodo.19560674
 [17] Andrews, J. (2026). *DAIGS Framework.* DOI: 10.5281/zenodo.19491784
 [18] Andrews, J. (2026). *Lume-V Verification Suite.* DOI: 10.5281/zenodo.19645097
 [19] Andrews, J. (2026). *Lume-X Multi-Agent Cognition.* DOI: 10.5281/zenodo.19443968
@@ -7363,7 +7363,7 @@ The work ahead is long. The foundation is now laid.
 
 **TDMA (Time-Division Multiple Access):** The scheduling protocol used in the Meridian mesh to coordinate simultaneous transmissions from multiple relay nodes without collision. Each node transmits only within its assigned time slot; the schedule is cryptographically sealed by Guardian-E at each epoch.
 
-**Trust Layer Ledger (TLL):** The DarkWave Studios identity and governance framework. A Deterministic Infrastructure instance in the identity and data domain. Provides the PKI substrate (TLPKI) used by Guardian Security for node identity verification.
+**Trust Layer:** The DarkWave Studios identity and governance framework. A Deterministic Infrastructure instance in the identity and data domain. Provides the PKI substrate (TLPKI) used by Guardian Security for node identity verification.
 
 **UEDM (Unified Energy-Data Mesh):** The architecture in which the same Meridian node infrastructure routes both energy and data under a unified 128-bit addressing scheme, co-routing arbitration framework, and Guardian Security authentication system. Specified in Chapter Five.
 
@@ -7377,9 +7377,9 @@ The work ahead is long. The foundation is now laid.
 
 **Retrodirective Pilot-Tone Locking:** The primary Tier 1 safety mechanism. The T1-RX receiver transmits a low-power pilot tone from a phase-reference element; the T1-TX transmitter locks its beam to the direction from which the pilot arrives and emits power only while the pilot is actively received above threshold. Loss of pilot signal immediately and hardware-enforces beam cutoff within 100 μs, without any software command.
 
-**T1-RX (Tier 1 Receiver Node):** A district-boundary rectenna array that collects the Tier 1 microwave beam, converts it to DC, transmits the retrodirective pilot tone, and feeds the local Meridian mesh. Registered with the Trust Layer Ledger (TLL) under a T1-RX capability profile.
+**T1-RX (Tier 1 Receiver Node):** A district-boundary rectenna array that collects the Tier 1 microwave beam, converts it to DC, transmits the retrodirective pilot tone, and feeds the local Meridian mesh. Registered with the Trust Layer under a T1-RX capability profile.
 
-**T1-TX (Tier 1 Transmitter Node):** A phased array transmitter located at the fusion generation site, converting DC power to 2.45 GHz RF and beam-steering to the designated T1-RX node via retrodirective pilot-tone locking. Registered with the Trust Layer Ledger (TLL) under a T1-TX capability profile.
+**T1-TX (Tier 1 Transmitter Node):** A phased array transmitter located at the fusion generation site, converting DC power to 2.45 GHz RF and beam-steering to the designated T1-RX node via retrodirective pilot-tone locking. Registered with the Trust Layer under a T1-TX capability profile.
 
 **Tier 1 (Long-Haul Beam Layer):** The upper layer of the two-tier wireless energy architecture. Routes bulk energy from fusion generation hubs to district receiver arrays via directed 2.45 GHz microwave beams, operating over distances of 500m–5km with projected collection efficiency of 75–87% in Fresnel-regime geometry.
 
@@ -7539,7 +7539,7 @@ The work ahead is long. The foundation is now laid.
 
 [L1] Andrews, J. (2026). *Lume Language Specification.* DarkWave Studios LLC. DOI: 10.5281/zenodo.19382282
 
-[L2] Andrews, J. (2026). *Trust Layer Ledger (TLL) Ecosystem.* DarkWave Studios LLC. DOI: 10.5281/zenodo.19560674
+[L2] Andrews, J. (2026). *Trust Layer Ecosystem.* DarkWave Studios LLC. DOI: 10.5281/zenodo.19560674
 
 [L3] Andrews, J. (2026). *DAIGS Framework.* DarkWave Studios LLC. DOI: 10.5281/zenodo.19491784
 
@@ -7613,7 +7613,7 @@ The work ahead is long. The foundation is now laid.
 
 **Jason Andrews** is the founder of DarkWave Studios LLC, a Nashville-based technology research and development company working at the intersection of deterministic systems, wireless energy routing, and autonomous physical infrastructure.
 
-Andrews is the architect of the Lume ecosystem — a suite of technologies including the Lume language specification, the Trust Layer Ledger (TLL) identity and governance framework, the DAIGS multi-agent cognition framework, the Lume-V formal verification suite, and the Lume-X deterministic control runtime — all published under the Canon² technical paper series and available at lume-lang.org.
+Andrews is the architect of the Lume ecosystem — a suite of technologies including the Lume language specification, the Trust Layer identity and governance framework, the DAIGS multi-agent cognition framework, the Lume-V formal verification suite, and the Lume-X deterministic control runtime — all published under the Canon² technical paper series and available at lume-lang.org.
 
 The Meridian architecture, Guardian Security, and the Unified Energy-Data Mesh are DarkWave Studios LLC products. The associated provisional patent covers systems and methods for deterministic multi-layer wireless energy routing using ambient harvesting, mesh coordination, and directional transmission. Lume-X is separately provisionally patented.
 

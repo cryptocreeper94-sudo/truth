@@ -12,7 +12,7 @@
 
 **Related Works:**
 Lume Language Specification (DOI: 10.5281/zenodo.19382282)
-Trust Layer Ledger (TLL) Ecosystem (DOI: 10.5281/zenodo.19560674)
+Trust Layer Ecosystem (DOI: 10.5281/zenodo.19560674)
 Lume-V Deterministic Wrapper (DOI: 10.5281/zenodo.19645097)
 Lume-X Multi-Organism Substrate (DOI: 10.5281/zenodo.19443968)
 HydroCore Physical — L-SOC Physical Instantiation Vol. I (DOI pending)
@@ -31,7 +31,7 @@ The Lume Synthetic Organism architecture has been applied, independently and in 
 
 This paper provides that description. The Lume Organism Stack is a seven-layer deterministic governance architecture in which each layer is a Lume 4/42 synthetic organism governing its domain — Physical, Biological, Cognitive, Social, Governance, Infrastructure, and Language — and all layers are formally coupled through a deterministic inter-organism protocol. The stack is not a metaphor or an analogy. It is a specifiable, implementable, certifiable architecture in which the same governance primitives, mode hierarchy, and hard constraint enforcement that govern a steam turbine also govern the words used to describe its operating state.
 
-The paper establishes: the formal layer definition and coupling topology; the vertical coupling protocol between adjacent layers; the Trust Layer Ledger (TLL) as the identity and session fabric that spans all layers; Lume-Cortex as the meta-operating system that hosts the stack; the DLA as the unified language output interface for the entire stack; and the full-stack guarantees — what properties hold for any system built on this architecture, regardless of domain.
+The paper establishes: the formal layer definition and coupling topology; the vertical coupling protocol between adjacent layers; the Trust Layer as the identity and session fabric that spans all layers; Lume-Cortex as the meta-operating system that hosts the stack; the DLA as the unified language output interface for the entire stack; and the full-stack guarantees — what properties hold for any system built on this architecture, regardless of domain.
 
 ---
 
@@ -58,7 +58,7 @@ This is not the claim that "AI can govern everything." It is the more precise cl
 1. The formal definition of the Lume Organism Stack as a seven-layer architecture
 2. The layer coupling topology — which layers couple to which, with what directionality and what timing
 3. The vertical coupling protocol as it applies across all layer boundaries
-4. The Trust Layer Ledger (TLL) as the cross-cutting identity and session fabric
+4. The Trust Layer as the cross-cutting identity and session fabric
 5. Lume-Cortex as the meta-operating system hosting the stack
 6. The DLA as the language output interface for the complete stack
 7. The full-stack formal guarantees — properties of any system built on this architecture
@@ -170,23 +170,23 @@ The timing hierarchy reflects the natural timescales of each domain. Physical sy
 
 ---
 
-## 4. The Trust Layer Ledger (TLL) as Cross-Cutting Fabric
+## 4. The Trust Layer as Cross-Cutting Fabric
 
 ### 4.1 Identity and Session Across the Stack
 
-The Trust Layer Ledger (TLL) (DOI: 10.5281/zenodo.19560674) is the identity and authentication fabric that spans all seven organism layers. It is not part of any single layer — it is a cross-cutting concern that every layer depends on for three functions:
+The Trust Layer (DOI: 10.5281/zenodo.19560674) is the identity and authentication fabric that spans all seven organism layers. It is not part of any single layer — it is a cross-cutting concern that every layer depends on for three functions:
 
-**Function 1 — Identity:** Every organism instance is associated with an identity — a user, a device, or a system principal. The Trust Layer Ledger (TLL) maintains these identity records and provides authenticated identity to each organism layer on request. An organism that does not know who is operating it cannot enforce role-based hard constraints.
+**Function 1 — Identity:** Every organism instance is associated with an identity — a user, a device, or a system principal. The Trust Layer maintains these identity records and provides authenticated identity to each organism layer on request. An organism that does not know who is operating it cannot enforce role-based hard constraints.
 
-**Function 2 — Session:** Organism states are session-bound. The Trust Layer Ledger (TLL) maintains session context across layers — when a user's session ends, all organism states for that session are cleanly terminated. When a session resumes (a user returns to a vehicle, re-authenticates to a workplace system), organism states can be restored from the Trust Layer Ledger (TLL)'s session store.
+**Function 2 — Session:** Organism states are session-bound. The Trust Layer maintains session context across layers — when a user's session ends, all organism states for that session are cleanly terminated. When a session resumes (a user returns to a vehicle, re-authenticates to a workplace system), organism states can be restored from the Trust Layer's session store.
 
-**Function 3 — Authorization:** The Trust Layer Ledger (TLL) enforces what each identity is authorized to do within each organism layer. A technician may be authorized to override certain advisory states in L1 Physical; a standard user may not. A senior decision-maker may be authorized to override GovernanceCore escalation recommendations; a junior operator may not. These authorization rules are maintained in the Trust Layer Ledger (TLL), not in any individual organism.
+**Function 3 — Authorization:** The Trust Layer enforces what each identity is authorized to do within each organism layer. A technician may be authorized to override certain advisory states in L1 Physical; a standard user may not. A senior decision-maker may be authorized to override GovernanceCore escalation recommendations; a junior operator may not. These authorization rules are maintained in the Trust Layer, not in any individual organism.
 
-### 4.2 Trust Layer Ledger (TLL) as Hard Constraint Enforcement Point
+### 4.2 Trust Layer as Hard Constraint Enforcement Point
 
-The Trust Layer Ledger (TLL) provides a cross-layer hard constraint enforcement mechanism: any hard constraint that involves identity or authorization is enforced at the Trust Layer Ledger (TLL) level, not at the individual organism level. This prevents a scenario where a misconfigured organism grants an unauthorized identity access to a hard constraint override.
+The Trust Layer provides a cross-layer hard constraint enforcement mechanism: any hard constraint that involves identity or authorization is enforced at the Trust Layer level, not at the individual organism level. This prevents a scenario where a misconfigured organism grants an unauthorized identity access to a hard constraint override.
 
-The Trust Layer Ledger (TLL)'s authorization check is the first step in any hard constraint override request — before the organism evaluates whether the override is physically permissible, the Trust Layer Ledger (TLL) confirms whether the requesting identity is authorized to request it.
+The Trust Layer's authorization check is the first step in any hard constraint override request — before the organism evaluates whether the override is physically permissible, the Trust Layer confirms whether the requesting identity is authorized to request it.
 
 ---
 
@@ -248,7 +248,7 @@ For regulatory and compliance purposes, the DLA serves as the audit interface fo
 
 **Theorem (Full-Stack Determinism):** A system built on the Lume Organism Stack satisfies the following: for any sequence of inputs I₁, I₂, ..., Iₙ presented to the stack in the same order, the stack produces the same sequence of outputs O₁, O₂, ..., Oₙ on every execution.
 
-*Argument:* Each organism is a deterministic pure function of its inputs (organism architecture). Each coupling channel is a deterministic pure function of the exporting organism's state (coupling protocol). The Trust Layer Ledger (TLL)'s authorization logic is deterministic (explicit role-permission mappings). The Cortex orchestration logic is deterministic (explicit configuration). The DLA composition function is deterministic (D2 of the DLA definition). No component in the stack introduces non-determinism. Therefore the stack as a whole is deterministic. ∎
+*Argument:* Each organism is a deterministic pure function of its inputs (organism architecture). Each coupling channel is a deterministic pure function of the exporting organism's state (coupling protocol). The Trust Layer's authorization logic is deterministic (explicit role-permission mappings). The Cortex orchestration logic is deterministic (explicit configuration). The DLA composition function is deterministic (D2 of the DLA definition). No component in the stack introduces non-determinism. Therefore the stack as a whole is deterministic. ∎
 
 ### 7.2 The Transparency Guarantee
 
@@ -265,9 +265,9 @@ No component of the stack has hidden internal state that is not surfaced to an a
 
 Hard constraints in the Lume stack are enforced at two levels:
 1. Within each organism (organism-level hard constraints)
-2. At the Trust Layer Ledger (TLL) (cross-layer authorization constraints)
+2. At the Trust Layer (cross-layer authorization constraints)
 
-No governance decision made by any organism can violate any hard constraint. No user override of any organism state can bypass the Trust Layer Ledger (TLL) authorization check. This double-layer enforcement means hard constraints are guaranteed to hold even in the presence of misconfigured individual organisms — the Trust Layer Ledger (TLL)'s authorization check is independent of and prior to any organism-level logic.
+No governance decision made by any organism can violate any hard constraint. No user override of any organism state can bypass the Trust Layer authorization check. This double-layer enforcement means hard constraints are guaranteed to hold even in the presence of misconfigured individual organisms — the Trust Layer's authorization check is independent of and prior to any organism-level logic.
 
 ### 7.4 The Grounding Guarantee
 
@@ -357,7 +357,7 @@ The current specification assumes a single user or small team in L2–L5 and a s
 
 - **Multiple physical systems:** L1 instances run in parallel; L6 (Meridian) already governs multiple vehicles simultaneously
 - **Multiple users:** L2–L4 run per-user; L5 aggregates across users at the governance layer
-- **Multiple Cortex instances:** Cortex federation across facilities or organizations, with Trust Layer Ledger (TLL) SSO spanning all instances
+- **Multiple Cortex instances:** Cortex federation across facilities or organizations, with Trust Layer SSO spanning all instances
 
 These scaling configurations do not change the organism architecture — they change the deployment topology. The formal properties hold at any scale where the organism architecture is preserved.
 
@@ -369,7 +369,7 @@ The Lume Organism Stack is the formal architecture underlying the DarkWave Studi
 Lume-Cortex (OS shell)
 ├── lume42.com (organism stack — L1–L6)
 └── axiom42.com (DLA — L7)
-     Trust Layer Ledger (TLL) (cross-cutting identity fabric)
+     Trust Layer (cross-cutting identity fabric)
 ```
 
 The AXIOM consumer product suite (Neuro, Bio, Social, Daily, Work) is a partial stack deployment. AXIOM Daily (BioCore + NeuroCore + SocioCore) is an L2–L3–L4 deployment with DLA. AXIOM Work (GovernanceCore + SocioCore) is an L4–L5 deployment with DLA. The full seven-layer stack is the long-horizon product architecture.
@@ -382,7 +382,7 @@ The Lume Organism Stack is a unified architecture for deterministic governance f
 
 The stack's formal guarantees — determinism, transparency, hard constraint enforcement, language grounding — hold not just within each organism but across the full composition. A system built on this architecture cannot hallucinate its own state. It cannot behave differently given identical inputs. It cannot hide its reasoning. It cannot violate its hard constraints.
 
-The stack is not a future system. Its components exist. HydroCore Physical, HydroCore Drive, HydroCore Steam, and Meridian Infrastructure demonstrate L1 and L6. AXIOM and the DLA definition demonstrate L7. BioCore, NeuroCore, SocioCore, and GovernanceCore provide L2–L5. The coupling protocol connects them. The Trust Layer Ledger (TLL) provides identity. Lume-Cortex provides orchestration.
+The stack is not a future system. Its components exist. HydroCore Physical, HydroCore Drive, HydroCore Steam, and Meridian Infrastructure demonstrate L1 and L6. AXIOM and the DLA definition demonstrate L7. BioCore, NeuroCore, SocioCore, and GovernanceCore provide L2–L5. The coupling protocol connects them. The Trust Layer provides identity. Lume-Cortex provides orchestration.
 
 The full stack is assembled. This paper is its formal specification.
 
@@ -399,7 +399,7 @@ The full stack is assembled. This paper is its formal specification.
 | L5 Governance | GovernanceCore | Canon² Series | Pending |
 | L6 Infrastructure | Meridian | Infrastructure Vol. I | Pending |
 | L7 Language | AXIOM / DLA | Language Architecture Vol. I | Pending |
-| Cross-cutting | Trust Layer Ledger (TLL) | DOI: 10.5281/zenodo.19560674 | Live |
+| Cross-cutting | Trust Layer | DOI: 10.5281/zenodo.19560674 | Live |
 | Orchestration | Lume-Cortex | Pending paper | Pending |
 
 ---
@@ -407,7 +407,7 @@ The full stack is assembled. This paper is its formal specification.
 ## References
 
 Andrews, J. (2026). Lume Language Specification. Zenodo. DOI: 10.5281/zenodo.19382282
-Andrews, J. (2026). Trust Layer Ledger (TLL) Ecosystem. Zenodo. DOI: 10.5281/zenodo.19560674
+Andrews, J. (2026). Trust Layer Ecosystem. Zenodo. DOI: 10.5281/zenodo.19560674
 Andrews, J. (2026). Lume-V. Zenodo. DOI: 10.5281/zenodo.19645097
 Andrews, J. (2026). Lume-X. Zenodo. DOI: 10.5281/zenodo.19443968
 Andrews, J. (2026). HydroCore Physical. L-SOC Physical Instantiation Vol. I. DarkWave Studios LLC.

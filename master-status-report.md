@@ -9,23 +9,23 @@
 | Item | Canonical Value | Source |
 |---|---|---|
 | Lume DOI | 10.5281/zenodo.19382282 | Multiple later papers |
-| Trust Layer Ledger (TLL) DOI | 10.5281/zenodo.19560674 | Multiple later papers |
+| Trust Layer DOI | 10.5281/zenodo.19560674 | Multiple later papers |
 | Lume-V DOI | 10.5281/zenodo.19645097 | Multiple later papers |
 | DAIGS DOI | 10.5281/zenodo.19491784 | Multiple later papers |
 | **Deterministic Dissolution (P-SDSP) DOI** | **10.5281/zenodo.15065493** | AXIOM-SPEC-SE-2026-0423 |
 | Patent number (all papers) | 64/032,339 | User-confirmed |
 
-**Phantom DOI 19430898:** This value is NOT canonical for any paper. It has appeared incorrectly in two documents: the Dissolution book bibliography (as Trust Layer Ledger (TLL)) and the DDA whitepaper References [2] (as Lume). Both must be corrected to their respective canonical DOIs above.
+**Phantom DOI 19430898:** This value is NOT canonical for any paper. It has appeared incorrectly in two documents: the Dissolution book bibliography (as Trust Layer) and the DDA whitepaper References [2] (as Lume). Both must be corrected to their respective canonical DOIs above.
 
 ---
 
-## Series-Wide Issue: Trust Layer Ledger (TLL) DOI Split
+## Series-Wide Issue: Trust Layer DOI Split
 
 **This is the most important finding in this report.**
 
-The eight earliest papers (ZK-SRP through Dynamic Arbitration) cite the Trust Layer Ledger (TLL) as DOI **10.5281/zenodo.19571978**. Every paper from GUPAS onward cites it as DOI **10.5281/zenodo.19560674**. The canonical value (confirmed by the later papers and the scratchpad) is **19560674**.
+The eight earliest papers (ZK-SRP through Dynamic Arbitration) cite the Trust Layer as DOI **10.5281/zenodo.19571978**. Every paper from GUPAS onward cites it as DOI **10.5281/zenodo.19560674**. The canonical value (confirmed by the later papers and the scratchpad) is **19560674**.
 
-**All six of the following papers need their Trust Layer Ledger (TLL) DOI corrected before deposit:**
+**All six of the following papers need their Trust Layer DOI corrected before deposit:**
 
 | Paper | Current (wrong) | Should Be |
 |---|---|---|
@@ -54,7 +54,7 @@ This is a single find-replace in each paper. It does not require re-auditing pro
 | REMAINING-3 | SHOULD | §8.3 typo: "bandwith" → "bandwidth" |
 | VERIFY-1 | MUST | Abstract: confirm fragment fixed and "Turing-complete" removed |
 | VERIFY-2 | MUST | Abstract: confirm "general-purpose runtime rollbacks" replaces prior phrasing |
-| SERIES | MUST | Trust Layer Ledger (TLL) DOI: 19571978 → 19560674 |
+| SERIES | MUST | Trust Layer DOI: 19571978 → 19560674 |
 
 ---
 
@@ -63,10 +63,10 @@ This is a single find-replace in each paper. It does not require re-auditing pro
 
 | ID | Severity | Issue |
 |---|---|---|
-| VERIFY-1 | SHOULD | Confirm reference [5] Trust Layer Ledger (TLL) entry is present and has correct DOI |
+| VERIFY-1 | SHOULD | Confirm reference [5] Trust Layer entry is present and has correct DOI |
 | COSMETIC-1 | Optional | §4.5 duplicate SHA3 paragraph — merge |
 | COSMETIC-2 | Optional | §13 conclusion: trim stacked adverbs in novelty claim |
-| SERIES | MUST | Trust Layer Ledger (TLL) DOI: 19571978 → 19560674 |
+| SERIES | MUST | Trust Layer DOI: 19571978 → 19560674 |
 
 ---
 
@@ -78,65 +78,65 @@ This is a single find-replace in each paper. It does not require re-auditing pro
 | MINOR-1 | SHOULD | Appendix C.2: trim adverb chain — ends cleanly at "rollback" |
 | MINOR-2 | SHOULD | Appendix C.3: trim adverb chain — ends cleanly at "triggering validators" |
 | MINOR-3 | SHOULD | §8.4: duplicate "cleanly" — remove first occurrence |
-| SERIES | MUST | Trust Layer Ledger (TLL) DOI: 19571978 → 19560674 |
+| SERIES | MUST | Trust Layer DOI: 19571978 → 19560674 |
 
 ---
 
-### 4. Proof-of-Intent (Trust Layer Ledger (TLL) Consensus Mechanisms)
-**Status: READY (pending Trust Layer Ledger (TLL) DOI fix)**
+### 4. Proof-of-Intent (Trust Layer Consensus Mechanisms)
+**Status: READY (pending Trust Layer DOI fix)**
 
 | ID | Severity | Issue |
 |---|---|---|
-| SERIES | MUST | Trust Layer Ledger (TLL) DOI: 19571978 → 19560674 |
+| SERIES | MUST | Trust Layer DOI: 19571978 → 19560674 |
 
 All seven original issues confirmed fixed. No prose issues outstanding.
 
 ---
 
 ### 5. Taxonomy of Synthetic Organisms (Types 0–5)
-**Status: READY (pending Trust Layer Ledger (TLL) DOI fix + two word trims)**
+**Status: READY (pending Trust Layer DOI fix + two word trims)**
 
 | ID | Severity | Issue |
 |---|---|---|
 | MINOR-A | Optional | Appendix F.2: drop "algorithmically securely" |
 | MINOR-B | Optional | Appendix D.2: drop "seamlessly" |
-| SERIES | MUST | Trust Layer Ledger (TLL) DOI: 19571978 → 19560674 |
+| SERIES | MUST | Trust Layer DOI: 19571978 → 19560674 |
 
 All seven original issues confirmed fixed.
 
 ---
 
 ### 6. Behavioral Homeostasis (Type-4 Synthetic Organisms)
-**Status: READY (pending Trust Layer Ledger (TLL) DOI fix + two word trims)**
+**Status: READY (pending Trust Layer DOI fix + two word trims)**
 
 | ID | Severity | Issue |
 |---|---|---|
 | TRIVIAL-1 | Optional | §4.5 first sentence: drop "precisely logically" |
 | TRIVIAL-2 | Optional | §3.4: drop trailing "seamlessly" |
-| SERIES | MUST | Trust Layer Ledger (TLL) DOI: 19571978 → 19560674 |
+| SERIES | MUST | Trust Layer DOI: 19571978 → 19560674 |
 
 All nine original issues confirmed fixed.
 
 ---
 
 ### 7. Real-Time Healing Patterns (Distributed States)
-**Status: READY (pending Trust Layer Ledger (TLL) DOI fix + 8 cosmetic residuals)**
+**Status: READY (pending Trust Layer DOI fix + 8 cosmetic residuals)**
 
 | ID | Severity | Issue |
 |---|---|---|
 | RESIDUALS | Optional | §§9.1, 9.4, 9.5, 10.1 ¶1, 11.1, 11.2, 11.3, G.1 — adverb noise, detailed in audit |
-| SERIES | MUST | Trust Layer Ledger (TLL) DOI: 19571978 → 19560674 |
+| SERIES | MUST | Trust Layer DOI: 19571978 → 19560674 |
 
 All 16 original issues confirmed fixed, including 6 critical rewrites.
 
 ---
 
 ### 8. Dynamic Arbitration (Competing Ecosystem Intents)
-**Status: READY (pending Trust Layer Ledger (TLL) DOI fix)**
+**Status: READY (pending Trust Layer DOI fix)**
 
 | ID | Severity | Issue |
 |---|---|---|
-| SERIES | MUST | Trust Layer Ledger (TLL) DOI: 19571978 → 19560674 |
+| SERIES | MUST | Trust Layer DOI: 19571978 → 19560674 |
 
 All 10 original issues confirmed fixed. Patent number correction (→ 64/032,339) was the major correction from this audit cycle.
 
@@ -218,7 +218,7 @@ All 10 original issues confirmed fixed. Patent number correction (→ 64/032,339
 | ID | Severity | Issue |
 |---|---|---|
 | MUST-1 | MUST | Reference [4] is a self-citation: the paper lists its own title ("Deterministic Healing & Drift-Stabilization in Multi-Agent Systems") as a reference and [4] is never cited in the body. Delete [4]; renumber all subsequent body-text citations [5]→[4] through [22]→[21] (work in descending order to avoid double-decrement). |
-| SHOULD-1 | SHOULD | Reference [6] Trust Layer Ledger (TLL): year "2025" → "2026"; title "The Trust Layer Ledger (TLL) Protocol Paper" → "The Trust Layer Ledger (TLL): A Deterministic Correctness Substrate for Autonomous Systems with Proof-of-Intent" |
+| SHOULD-1 | SHOULD | Reference [6] Trust Layer: year "2025" → "2026"; title "The Trust Layer Protocol Paper" → "The Trust Layer: A Deterministic Correctness Substrate for Autonomous Systems with Proof-of-Intent" |
 
 ---
 
@@ -231,7 +231,7 @@ All 10 original issues confirmed fixed. Patent number correction (→ 64/032,339
 | SHOULD-2 | FIXED | §11.3 citation corrected: [4] (RT-Healing) → [8] (SOR) |
 | CONSIDER-1 | FIXED | [4] title "and" → "&" for consistency with RT-Healing canonical title |
 
-All four header DOIs correct. Patent 64/032,339 consistent in all internal references, header, and footer. No early-series Trust Layer Ledger (TLL) DOI split error. Synchronization Index weights (0.5/0.3/0.2) consistent across §5.1, B.1, D.2, and H.3.
+All four header DOIs correct. Patent 64/032,339 consistent in all internal references, header, and footer. No early-series Trust Layer DOI split error. Synchronization Index weights (0.5/0.3/0.2) consistent across §5.1, B.1, D.2, and H.3.
 
 ---
 
@@ -355,7 +355,7 @@ New external references: [29] A. Smith, "An Inquiry into the Nature and Causes o
 ## Quick-Fix Summary (All Papers)
 
 ### MUST fix before any paper is deposited:
-1. Trust Layer Ledger (TLL) DOI 19571978 → 19560674 in: ZK-SRP, AST, Sandbox, PoI, Taxonomy, Behavioral Homeostasis, RT Healing, Dynamic Arbitration
+1. Trust Layer DOI 19571978 → 19560674 in: ZK-SRP, AST, Sandbox, PoI, Taxonomy, Behavioral Homeostasis, RT Healing, Dynamic Arbitration
 2. ZK-SRP: citation renumbering (full table in ZK-SRP audit)
 3. ZK-SRP: add RFC 5280 as reference [9]
 4. ZK-SRP: verify abstract fragment fix and "Turing-complete" removal
@@ -373,7 +373,7 @@ New external references: [29] A. Smith, "An Inquiry into the Nature and Causes o
 13. Quantum-Resistant: verify [15] body-text citation in §11
 14. DAIGS Expansions: typo "arbitation" → "arbitration" in §8.2
 15. Sandbox Guardrails: three minor adverb/duplicate fixes in C.2, C.3, §8.4
-16. RT-Healing: [6] Trust Layer Ledger (TLL) year "2025" → "2026"; title → full canonical title
+16. RT-Healing: [6] Trust Layer year "2025" → "2026"; title → full canonical title
 ~~17. G-DRSP: §11.3 citation [4] → [8]~~ — fixed
 ~~18. G-DRSP: resolve dangling [15]~~ — fixed
 ~~19. D-COCP: add [15] citation; add [23] citation~~ — fixed
@@ -398,7 +398,7 @@ New external references: [29] A. Smith, "An Inquiry into the Nature and Causes o
 
 ---
 
-## Papers Genuinely Ready Now (after Trust Layer Ledger (TLL) DOI fix only)
+## Papers Genuinely Ready Now (after Trust Layer DOI fix only)
 - Proof-of-Intent
 - Dynamic Arbitration
 - G-DRSP (no DOI fix needed; all issues confirmed fixed)
@@ -442,7 +442,7 @@ New external references: [29] A. Smith, "An Inquiry into the Nature and Causes o
 
 | ID | Severity | Issue |
 |---|---|---|
-| MUST-1 | MUST | Bibliography Trust Layer Ledger (TLL) entry conflicts with canonical citation. Book lists DOI **10.5281/zenodo.19430898** with title *"Certified-at-Birth Deterministic Consensus"*; canonical is **10.5281/zenodo.19560674** with title *"A Deterministic Correctness Substrate for Autonomous Systems with Proof-of-Intent."* Either reconcile to canonical, or confirm 19430898 is a separately deposited companion paper and document it. |
+| MUST-1 | MUST | Bibliography Trust Layer entry conflicts with canonical citation. Book lists DOI **10.5281/zenodo.19430898** with title *"Certified-at-Birth Deterministic Consensus"*; canonical is **10.5281/zenodo.19560674** with title *"A Deterministic Correctness Substrate for Autonomous Systems with Proof-of-Intent."* Either reconcile to canonical, or confirm 19430898 is a separately deposited companion paper and document it. |
 | SHOULD-1 | SHOULD | Add "principal sources only" disclaimer at head of Bibliography (~10 substantive in-text references not catalogued: Saussure, Derrida, Heisenberg, Hofstadter, Everett/Pirahã, Winawer/siniy-goluboy, etc.) |
 | SHOULD-2 | SHOULD | Preface: one sentence acknowledging that later layers compress (Locality, Temporality, Ontology, etc. are 2-chapter layers vs. 5-chapter early layers) |
 | SHOULD-3 | SHOULD | Appendix B: dependency entries for D23 (Continuity) and D25 (Adjacency) simplify what the body actually claims. Either expand table or add "primary dependencies only" note |
@@ -456,9 +456,9 @@ New external references: [29] A. Smith, "An Inquiry into the Nature and Causes o
 - Negation Trap pattern fires at every predicted location (12 instances, Ch 2–40)
 - Late-chapter thinning is real: Ch 40 ≈ 24 lines, fulfilling preface promise
 - Self-consuming closure (Ch 41 dissolves dependency chain; Ch 42 dissolves dissolution; Appendix C closes with self-undermining note) — Wittgenstein-ladder move executed cleanly
-- Engineering grounding via Lume / Trust Layer Ledger (TLL) references is consistent with canonical protocol terminology throughout (only conflict is the DOI)
+- Engineering grounding via Lume / Trust Layer references is consistent with canonical protocol terminology throughout (only conflict is the DOI)
 
-**This is the second-most-public surface in the Andrews corpus after the protocol papers. The MUST-1 DOI fix is the same Trust Layer Ledger (TLL) thread already on the protocol-corpus MUST list — the book either resolves or extends that thread.**
+**This is the second-most-public surface in the Andrews corpus after the protocol papers. The MUST-1 DOI fix is the same Trust Layer thread already on the protocol-corpus MUST list — the book either resolves or extends that thread.**
 
 ---
 

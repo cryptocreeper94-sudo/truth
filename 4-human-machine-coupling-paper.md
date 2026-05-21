@@ -295,7 +295,7 @@ Continuous biological monitoring produces sensitive personal health data. The hu
 
 The human-machine coupling never removes the operator's authority over the physical system. Coupling adjusts thresholds and mode sensitivity — it does not lock the operator out of any control. The operator can always command the physical system directly; the coupling's effect is to make protective mode transitions happen earlier, not to prevent operator commands.
 
-The one exception is the Power Mode restriction under HMC-1. This restriction is explicitly disclosed to the operator through the DLA interface when it activates, and the operator can request a manual override through the Trust Layer Ledger (TLL) authorization process. The override is logged and requires supervisor authorization in safety-critical contexts.
+The one exception is the Power Mode restriction under HMC-1. This restriction is explicitly disclosed to the operator through the DLA interface when it activates, and the operator can request a manual override through the Trust Layer authorization process. The override is logged and requires supervisor authorization in safety-critical contexts.
 
 ---
 

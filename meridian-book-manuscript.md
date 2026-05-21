@@ -501,7 +501,7 @@ Part Five names that class.
 
 Six chapters describe a specific system. This chapter describes what that system is a member of.
 
-Meridian routes energy. The Trust Layer Ledger (TLL) routes trust. The DAIGS framework routes computation. These are three systems in three different physical domains, built on the same foundational axioms, exhibiting the same organizational structure, and satisfying the same four formal properties. They are three instances of the same class.
+Meridian routes energy. The Trust Layer routes trust. The DAIGS framework routes computation. These are three systems in three different physical domains, built on the same foundational axioms, exhibiting the same organizational structure, and satisfying the same four formal properties. They are three instances of the same class.
 
 The class is Deterministic Infrastructure. The properties are: verified identity at every node, explicitly routed resources, invariant-enforced homeostasis, and organism-like self-maintenance. Any autonomous physical system that satisfies all four properties — in any physical domain, at any scale — is a Deterministic Infrastructure system.
 
@@ -713,7 +713,7 @@ The work ahead is long. The foundation is now laid.
 
 **TDMA (Time-Division Multiple Access):** The scheduling protocol used in the Meridian mesh to coordinate simultaneous transmissions from multiple relay nodes without collision. Each node transmits only within its assigned time slot; the schedule is cryptographically sealed by Guardian-E at each epoch.
 
-**Trust Layer Ledger (TLL):** The DarkWave Studios identity and governance framework. A Deterministic Infrastructure instance in the identity and data domain. Provides the PKI substrate (TLPKI) used by Guardian Security for node identity verification.
+**Trust Layer:** The DarkWave Studios identity and governance framework. A Deterministic Infrastructure instance in the identity and data domain. Provides the PKI substrate (TLPKI) used by Guardian Security for node identity verification.
 
 **UEDM (Unified Energy-Data Mesh):** The architecture in which the same Meridian node infrastructure routes both energy and data under a unified 128-bit addressing scheme, co-routing arbitration framework, and Guardian Security authentication system. Specified in Chapter Five.
 
@@ -727,9 +727,9 @@ The work ahead is long. The foundation is now laid.
 
 **Retrodirective Pilot-Tone Locking:** The primary Tier 1 safety mechanism. The T1-RX receiver transmits a low-power pilot tone from a phase-reference element; the T1-TX transmitter locks its beam to the direction from which the pilot arrives and emits power only while the pilot is actively received above threshold. Loss of pilot signal immediately and hardware-enforces beam cutoff within 100 μs, without any software command.
 
-**T1-RX (Tier 1 Receiver Node):** A district-boundary rectenna array that collects the Tier 1 microwave beam, converts it to DC, transmits the retrodirective pilot tone, and feeds the local Meridian mesh. Registered with the Trust Layer Ledger (TLL) under a T1-RX capability profile.
+**T1-RX (Tier 1 Receiver Node):** A district-boundary rectenna array that collects the Tier 1 microwave beam, converts it to DC, transmits the retrodirective pilot tone, and feeds the local Meridian mesh. Registered with the Trust Layer under a T1-RX capability profile.
 
-**T1-TX (Tier 1 Transmitter Node):** A phased array transmitter located at the fusion generation site, converting DC power to 2.45 GHz RF and beam-steering to the designated T1-RX node via retrodirective pilot-tone locking. Registered with the Trust Layer Ledger (TLL) under a T1-TX capability profile.
+**T1-TX (Tier 1 Transmitter Node):** A phased array transmitter located at the fusion generation site, converting DC power to 2.45 GHz RF and beam-steering to the designated T1-RX node via retrodirective pilot-tone locking. Registered with the Trust Layer under a T1-TX capability profile.
 
 **Tier 1 (Long-Haul Beam Layer):** The upper layer of the two-tier wireless energy architecture. Routes bulk energy from fusion generation hubs to district receiver arrays via directed 2.45 GHz microwave beams, operating over distances of 500m–5km with projected collection efficiency of 75–87% in Fresnel-regime geometry.
 
@@ -889,7 +889,7 @@ The work ahead is long. The foundation is now laid.
 
 [L1] Andrews, J. (2026). *Lume Language Specification.* DarkWave Studios LLC. DOI: 10.5281/zenodo.19382282
 
-[L2] Andrews, J. (2026). *Trust Layer Ledger (TLL) Ecosystem.* DarkWave Studios LLC. DOI: 10.5281/zenodo.19560674
+[L2] Andrews, J. (2026). *Trust Layer Ecosystem.* DarkWave Studios LLC. DOI: 10.5281/zenodo.19560674
 
 [L3] Andrews, J. (2026). *DAIGS Framework.* DarkWave Studios LLC. DOI: 10.5281/zenodo.19491784
 
@@ -963,7 +963,7 @@ The work ahead is long. The foundation is now laid.
 
 **Jason Andrews** is the founder of DarkWave Studios LLC, a Nashville-based technology research and development company working at the intersection of deterministic systems, wireless energy routing, and autonomous physical infrastructure.
 
-Andrews is the architect of the Lume ecosystem — a suite of technologies including the Lume language specification, the Trust Layer Ledger (TLL) identity and governance framework, the DAIGS multi-agent cognition framework, the Lume-V formal verification suite, and the Lume-X deterministic control runtime — all published under the Canon² technical paper series and available at lume-lang.org.
+Andrews is the architect of the Lume ecosystem — a suite of technologies including the Lume language specification, the Trust Layer identity and governance framework, the DAIGS multi-agent cognition framework, the Lume-V formal verification suite, and the Lume-X deterministic control runtime — all published under the Canon² technical paper series and available at lume-lang.org.
 
 The Meridian architecture, Guardian Security, and the Unified Energy-Data Mesh are DarkWave Studios LLC products. The associated provisional patent covers systems and methods for deterministic multi-layer wireless energy routing using ambient harvesting, mesh coordination, and directional transmission. Lume-X is separately provisionally patented.
 

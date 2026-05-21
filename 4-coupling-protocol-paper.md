@@ -71,7 +71,7 @@ Two Lume 4/42 organisms O_A and O_B may couple if and only if:
 
 **C3 — Timing Coherence:** The coupling interval must be at least as long as the slower organism's governance cycle. An organism cannot receive state updates faster than it can process them.
 
-**C4 — Authorization:** The Trust Layer Ledger (TLL) has authorized the coupling relationship between O_A and O_B for the principals operating them. Unauthorized coupling is rejected at the Trust Layer Ledger (TLL) before reaching the organism.
+**C4 — Authorization:** The Trust Layer has authorized the coupling relationship between O_A and O_B for the principals operating them. Unauthorized coupling is rejected at the Trust Layer before reaching the organism.
 
 ### 2.2 Coupling Directionality
 
@@ -154,7 +154,7 @@ NSEPs are transmitted at the coupling interval defined in the CNT. Transmission 
 
 - **Deterministic:** NSEPs are sent at fixed intervals from a shared clock reference. Both organisms use the same clock source (GPS time or NTP-synchronized system clock, depending on deployment context).
 - **Reliable:** NSEP transmission uses a reliable delivery mechanism (TCP or equivalent). A missed NSEP is not substituted with interpolated values — the importing organism holds its last valid imported values until a new NSEP arrives.
-- **Authenticated:** Each NSEP is authenticated by the Trust Layer Ledger (TLL) before delivery to the importing organism. An unauthenticated NSEP is rejected silently.
+- **Authenticated:** Each NSEP is authenticated by the Trust Layer before delivery to the importing organism. An unauthenticated NSEP is rejected silently.
 
 ### 4.3 Sequence Number Handling
 
@@ -255,7 +255,7 @@ On conflict detection:
 1. **Log the conflict** — record both values, the timestamp, and the node identifiers in the organism's conflict log
 2. **Trust local sensors** — the integrated value uses local sensor data only for the conflicting node (effective α = 0 for that node)
 3. **Raise an advisory** — the organism transitions to Advisory mode if not already there or higher, and flags the conflicting node in its advisory output
-4. **Notify the Trust Layer Ledger (TLL)** — the conflict is reported to the Trust Layer Ledger (TLL) with both values for cross-system audit
+4. **Notify the Trust Layer** — the conflict is reported to the Trust Layer with both values for cross-system audit
 5. **Re-evaluate at next cycle** — at the next NSEP arrival, if the conflict persists for three consecutive cycles, it is escalated to Caution mode and the conflict is flagged for human review
 
 ### 7.3 Conflict vs. Gradient

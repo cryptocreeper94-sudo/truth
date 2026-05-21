@@ -28,7 +28,7 @@
 
 **Related Work:**
 - Lume Language Specification — DOI: 10.5281/zenodo.19382282
-- Trust Layer Ledger (TLL) Ecosystem — DOI: 10.5281/zenodo.19560674
+- Trust Layer Ecosystem — DOI: 10.5281/zenodo.19560674
 - DAIGS Framework — DOI: 10.5281/zenodo.19491784
 - Lume-V Verification Suite — DOI: 10.5281/zenodo.19645097
 - Lume-X Multi-Agent Cognition — DOI: 10.5281/zenodo.19443968
@@ -46,11 +46,11 @@ The Meridian mesh already carries two kinds of traffic. The first kind is the en
 
 The Meridian mesh is already a unified energy-data fabric. It just has not been formally recognized as one.
 
-This paper formalizes the co-routing architecture of the Meridian mesh — the simultaneous routing of energy and data through the same physical node infrastructure under a shared addressing and governance framework. I define the Unified Energy-Data Mesh (UEDM) as a formal architecture in which the same addressed nodes, the same topology-aware routing fabric, and the same Trust Layer Ledger (TLL) identity substrate serve both energy delivery and data communication simultaneously. I show that the UEDM is not a new design — it is a formal recognition and extension of what Meridian already does.
+This paper formalizes the co-routing architecture of the Meridian mesh — the simultaneous routing of energy and data through the same physical node infrastructure under a shared addressing and governance framework. I define the Unified Energy-Data Mesh (UEDM) as a formal architecture in which the same addressed nodes, the same topology-aware routing fabric, and the same Trust Layer identity substrate serve both energy delivery and data communication simultaneously. I show that the UEDM is not a new design — it is a formal recognition and extension of what Meridian already does.
 
 I define the co-routing arbitration rules that govern how energy bursts and data packets share TDMA capacity without conflict. I define the UEDM addressing scheme that unifies energy delivery addresses (EIP) and data communication addresses under the same 128-bit namespace. I show that the UEDM collapses two infrastructure problems — where does this device get its power, and how does this device communicate — into one, simplifying deployment, reducing infrastructure cost, and enabling a class of self-sustaining autonomous devices that power themselves and communicate through the same wireless fabric.
 
-I propose the Unified Energy-Data Mesh as the convergence point of the Energy Internet [Energy Internet, 2026] and the Trust Layer Ledger (TLL) communication infrastructure [16]: a single fabric that routes both resources and information under a unified governance framework, providing the complete infrastructure substrate for autonomous physical systems operating in the Deterministic Infrastructure paradigm [DI Theory, 2026].
+I propose the Unified Energy-Data Mesh as the convergence point of the Energy Internet [Energy Internet, 2026] and the Trust Layer communication infrastructure [16]: a single fabric that routes both resources and information under a unified governance framework, providing the complete infrastructure substrate for autonomous physical systems operating in the Deterministic Infrastructure paradigm [DI Theory, 2026].
 
 **Keywords:** unified energy-data mesh, co-routing, wireless power and communication, SWIPT, Meridian, deterministic infrastructure, TDMA co-scheduling, ambient IoT, self-sustaining networks, simultaneous wireless information and power transfer
 
@@ -417,7 +417,7 @@ Communication capacity at this budget: the RF transceiver in receive mode is alw
 
 An SSD has three operational states:
 
-**BOOTSTRAPPING:** The SSD has just been deployed and has not yet established UEDM identity. It broadcasts a NODE_ANNOUNCE with a provisioning credential (a temporary credential issued during manufacture). A source node or gateway node receives the announcement and initiates the Guardian Security provisioning protocol. Once the SSD receives its full Trust Layer Ledger (TLL) identity credential, it transitions to OPERATIONAL.
+**BOOTSTRAPPING:** The SSD has just been deployed and has not yet established UEDM identity. It broadcasts a NODE_ANNOUNCE with a provisioning credential (a temporary credential issued during manufacture). A source node or gateway node receives the announcement and initiates the Guardian Security provisioning protocol. Once the SSD receives its full Trust Layer identity credential, it transitions to OPERATIONAL.
 
 **OPERATIONAL:** The SSD participates fully in the UEDM — receiving energy, routing control messages, and conducting application data communication. It monitors its supercapacitor charge state and requests supplementation when charge falls below V_min + margin.
 
@@ -526,7 +526,7 @@ A building equipped with UEDM infrastructure requires no per-device wiring for e
 The UEDM mesh provides:
 - Power to every device from UEDM source nodes installed in ceiling panels or wall outlets
 - Data communication from every device to the building management system through the same mesh
-- Identity verification for every device through the Trust Layer Ledger (TLL), enabling granular access control and audit
+- Identity verification for every device through the Trust Layer, enabling granular access control and audit
 - Self-healing around device or mesh node failures, maintaining coverage without manual intervention
 
 The cost comparison against conventional smart building infrastructure (wired power + separate wireless communication) is significant: eliminating two separate infrastructure installations and replacing them with one unified mesh reduces material cost, installation labor, and ongoing maintenance complexity simultaneously.
@@ -579,7 +579,7 @@ The UEDM's anycast addressing (Section 6.3) is a limited form of NDN content rou
 
 ### 11.5 The Lume Ecosystem
 
-The UEDM is the convergence of two Lume ecosystem trajectories: the energy routing trajectory (Meridian [Meridian Architecture, 2026], Energy Internet [Energy Internet, 2026]) and the identity and communication trajectory (Trust Layer Ledger (TLL) [16], DAIGS [17]). The UEDM is the physical instantiation of the cross-domain interoperability model described in [DI Theory, 2026 §8] — the single fabric in which energy, data, and identity are governed under one framework.
+The UEDM is the convergence of two Lume ecosystem trajectories: the energy routing trajectory (Meridian [Meridian Architecture, 2026], Energy Internet [Energy Internet, 2026]) and the identity and communication trajectory (Trust Layer [16], DAIGS [17]). The UEDM is the physical instantiation of the cross-domain interoperability model described in [DI Theory, 2026 §8] — the single fabric in which energy, data, and identity are governed under one framework.
 
 ---
 
@@ -726,7 +726,7 @@ Reserved Ports:
 **Lume Ecosystem:**
 
 [15] Andrews, J. (2026). *Lume Language Specification.* DOI: 10.5281/zenodo.19382282
-[16] Andrews, J. (2026). *Trust Layer Ledger (TLL) Ecosystem.* DOI: 10.5281/zenodo.19560674
+[16] Andrews, J. (2026). *Trust Layer Ecosystem.* DOI: 10.5281/zenodo.19560674
 [17] Andrews, J. (2026). *DAIGS Framework.* DOI: 10.5281/zenodo.19491784
 [18] Andrews, J. (2026). *Lume-V Verification Suite.* DOI: 10.5281/zenodo.19645097
 [19] Andrews, J. (2026). *Lume-X Multi-Agent Cognition.* DOI: 10.5281/zenodo.19443968

@@ -268,7 +268,7 @@ Either:
 - TypeScript throughout with proper interface definitions
 - Drizzle ORM with schema validation (not raw SQL strings for main data access)
 - Open-Meteo for weather (free, no API key — sensible for a beta)
-- Trust Layer Ledger (TLL) SSO integration is cleaner than rolling custom JWT auth
+- Trust Layer SSO integration is cleaner than rolling custom JWT auth
 
 ---
 

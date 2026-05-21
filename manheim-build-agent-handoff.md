@@ -512,7 +512,7 @@ The platform adds a governance layer **on top of** existing Manheim systems. Not
 ### What It Is
 The Fractal Trust Mesh generalizes CAL into a reusable Enterprise PoA Network template. Each enterprise (Manheim, transport vendors, reconditioning partners, insurers, dealers) receives its own sovereign, private, deterministic PoA chain. A Bridge Service allows cross-enterprise verification without exchanging raw data — only SHA-256 hashes, timestamps, and custody signatures are shared.
 
-Trust Layer Ledger (TLL) becomes the neutral verifier between chains. LUME-V governs policy, validator rotation, and privacy tiering across all chains.
+The Trust Layer Ledger (TLL) becomes the neutral verifier between chains — a service within the Trust Layer ecosystem that issues CrossChainProof certificates without either party exposing internal records. LUME-V governs policy, validator rotation, and privacy tiering across all chains.
 
 ### Why It Matters for Manheim
 Manheim cannot share raw condition data, employee records, or internal pricing with transport vendors or reconditioning partners — legal and competitive constraints make that impossible. The Fractal Trust Mesh solves this: both parties verify the same asset, the same custody chain, and the same time window through cryptographic proofs — without either side seeing the other's internal data.
@@ -535,7 +535,7 @@ This collapses a major class of vendor arbitration disputes (transport damage cl
 
 ### Sequencing Guidance for Build Agent
 - **Phase 1 (CAL):** Already built and live. This is what the Manheim pilot runs on.
-- **Phase 2 (Bridge Service):** Build after pilot validates CAL. Required components: Bridge Service module, CrossChainProof certificate type on Trust Layer Ledger (TLL), LUME-V cross-chain governance rules.
+- **Phase 2 (Bridge Service):** Build after pilot validates CAL. Required components: Bridge Service module, CrossChainProof certificate type on the Trust Layer Ledger (TLL), LUME-V cross-chain governance rules.
 - **Phases 3–4:** Driven by enterprise adoption, not by build schedule. Build when contracts are signed.
 
 ### Guiding Principles
