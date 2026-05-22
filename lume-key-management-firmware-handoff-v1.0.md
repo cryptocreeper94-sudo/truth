@@ -586,7 +586,78 @@ as a digital product and upload it to their existing dongle.
    - Firmware version included in every key programming event record
      for auditability.
 
-6. Consumer Onboarding Flow:
+6. State-Aware Disclaimer — Implementation Requirement:
+
+   The app must display a one-line compliance notice to users in the
+   15 states with locksmith licensing laws before Mode 05 is accessed
+   for the first time, and again on first use after app reinstall.
+
+   API endpoint (live on LUME API server):
+     GET /api/key-management/state-disclaimer?state={STATE_CODE}
+
+   Response fields:
+     - disclaimer_required: boolean
+     - enforcement_level:   "HIGH" | "MODERATE" | "LOW" | "NONE"
+     - licensing_body:      string | null
+     - notes:               string (internal, not shown to user)
+     - disclaimer_text:     string | null
+
+   App behavior:
+     a. On first launch of Key Management tab: detect device state
+        from OS location permission OR prompt user to confirm their
+        state (fallback if location denied).
+     b. Call GET /api/key-management/state-disclaimer?state={code}.
+     c. If disclaimer_required = false: proceed silently. No banner.
+        Do not show a disclaimer to users in unregulated states —
+        unnecessary friction for 35 states that don't need it.
+     d. If disclaimer_required = true: display a modal before the
+        Key Management tab opens. One-time acknowledgment stored
+        in app preferences. Not shown again until app reinstall.
+
+   Disclaimer modal (regulated states only):
+   ┌─────────────────────────────────────────────────────────┐
+   │  Key Programming — State Notice                         │
+   │                                                         │
+   │  [state_name] requires a locksmith license for some     │
+   │  key programming activities. LUME is a professional     │
+   │  diagnostic tool. You are responsible for complying     │
+   │  with your state's licensing requirements.              │
+   │                                                         │
+   │  [Learn more]          [I understand — Continue]        │
+   └─────────────────────────────────────────────────────────┘
+
+   High-enforcement states (CA, TX, NJ, NC, TN, VA):
+     - Display the modal above.
+     - "Learn more" links to state licensing body URL.
+     - enforcement_level = "HIGH" from API — app can use this
+       to decide whether to show the "Learn more" link.
+
+   Moderate/Low enforcement states:
+     - Display the modal above.
+     - "Learn more" is optional at app's discretion.
+
+   Secondary endpoint (for admin/dashboard use):
+     GET /api/key-management/regulated-states
+     Returns: full list of 15 regulated states with enforcement
+     levels and licensing bodies. Used for internal reporting,
+     not shown to end users.
+
+   State detection priority order:
+     1. Device OS location (if permission granted) — most accurate.
+     2. User-selected state in app settings.
+     3. Billing/account state on file (if available).
+     4. Default to showing the disclaimer if state cannot be
+        determined — err on the side of caution.
+
+   Terms of Service requirement:
+     The following sentence must appear in the LUME Terms of Service
+     and on the Mode 05 product purchase page:
+     "Key Management (Mode 05) is a professional diagnostic feature.
+      Users are responsible for complying with applicable state and
+      local licensing requirements for automotive key programming
+      in their jurisdiction."
+
+7. Consumer Onboarding Flow:
    a. Customer purchases firmware upgrade (app or web store).
    b. LUME app prompts: "Update your dongle to unlock Key Management."
    c. Customer plugs dongle into OBD-II port (or powers it via USB
