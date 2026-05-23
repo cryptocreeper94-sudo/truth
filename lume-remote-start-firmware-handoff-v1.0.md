@@ -707,5 +707,178 @@ Terms of Service:
   - Updated state disclaimer sentence covering both Mode 05 and 06
 
 ------------------------------------------------------------
+SECTION 15 — FOUNDER TIER ONBOARDING AND FEEDBACK FORM
+------------------------------------------------------------
+CONTEXT AND PURPOSE
+-------------------
+The first 100 users of LUME are designated Founders. Founders pay
+$10 (one-time) instead of the standard $39.99 base price. This is
+not a promotional discount — it is a deliberate acquisition strategy.
+The goal is not $1,000 in revenue. The goal is 100 verified users
+who have seen real results and can describe them in their own words.
+
+Their responses become:
+  - Social proof for the next wave of users
+  - Word-of-mouth language the marketing team cannot write
+  - Real-world validation of each Mode's value proposition
+
+Founders who know they are among the first 100 take pride in that
+status. The feedback form must make that identity explicit and give
+them a structured, dignified way to contribute — not a vague
+"leave a review" prompt.
+
+------------------------------------------------------------
+FOUNDER ONBOARDING FLOW
+------------------------------------------------------------
+1. After a founder completes registration and first activation:
+   - App or web confirmation screen displays:
+     ┌──────────────────────────────────────────────────────┐
+     │  You are Founder #[N]                                │
+     │  LUME · DarkWave Studios LLC                         │
+     │                                                      │
+     │  Thank you for being one of the first 100.           │
+     │  Your feedback shapes what LUME becomes.             │
+     └──────────────────────────────────────────────────────┘
+   - Founder number [N] is assigned sequentially from 1 to 100.
+   - Founder number is stored on the user's account and displayed
+     permanently in their profile: "Founder #[N]"
+   - Founders numbered 1–100 only. After 100 registrations, the
+     founder tier closes and standard pricing applies automatically.
+
+2. The feedback form is presented immediately after the founder
+   confirmation screen — not as a separate email, not as a later
+   prompt. It is part of the onboarding flow.
+
+3. The form is not mandatory. There is a clear "Skip for now"
+   option. However, the form should feel like a privilege, not a
+   chore: "You have something to say that nobody else can say yet."
+
+------------------------------------------------------------
+FOUNDER FEEDBACK FORM — THREE QUESTIONS
+------------------------------------------------------------
+All three questions use open text response boxes. No star ratings.
+No multiple choice. The value is in the language they use, not a
+score.
+
+QUESTION 1:
+  Label:   "What were you trying to fix or do?"
+  Sub-text: "A sentence or two is plenty."
+  Purpose:  Captures the use case in their words. This becomes the
+            top-of-funnel acquisition language: "mechanics who need
+            to do X" — described by someone who actually did X.
+
+QUESTION 2:
+  Label:   "What happened when you used it?"
+  Sub-text: "Tell us what the experience was actually like."
+  Purpose:  This is the testimonial. No coaching, no suggested
+            language. Whatever they write is more credible than
+            anything written for them. Store verbatim.
+
+QUESTION 3:
+  Label:   "What would you tell another mechanic or car owner
+            about LUME?"
+  Sub-text: "Imagine you're recommending it to someone you know."
+  Purpose:  This is the word-of-mouth sentence. Forces distillation.
+            A mechanic answering this question writes the copy that
+            converts the next mechanic. This is the highest-value
+            response of the three.
+
+------------------------------------------------------------
+BUILD REQUIREMENTS — FOUNDER FEEDBACK FORM
+------------------------------------------------------------
+API Endpoints (add to key-management route or create founder route):
+
+  POST /api/founder/register
+    Body:    { user_id, email, activation_timestamp }
+    Returns: { founder_number: int, is_founder: boolean }
+    Logic:   If total founder registrations < 100: assign next
+             sequential number, store, return. If >= 100: return
+             is_founder = false. Standard pricing flow applies.
+
+  POST /api/founder/feedback
+    Body:    {
+               founder_number:  int,
+               user_id:         string,
+               question_1:      string,  -- "What were you trying to fix or do?"
+               question_2:      string,  -- "What happened when you used it?"
+               question_3:      string,  -- "What would you tell another mechanic...?"
+               submitted_at:    ISO 8601 UTC,
+               firmware_modes:  ["05" | "06"] -- which modes they actually used
+             }
+    Returns: { received: true, founder_number: int }
+    Storage: Persist to database. Do not discard. Every response
+             is retained permanently.
+
+  GET /api/founder/responses
+    Auth:    Admin only (API key gated — not public).
+    Returns: Array of all submitted feedback responses, ordered
+             by founder_number ascending.
+    Purpose: Build team / founder (Jason) can pull and read all
+             responses at any time without a database query.
+
+  GET /api/founder/count
+    Returns: { registered: int, remaining: int, founder_tier_open: boolean }
+    Purpose: App can display "47 of 100 Founder spots remaining"
+             on the registration/pricing page to create urgency.
+             This is public — no auth required.
+
+Data model — founder record:
+  {
+    "founder_number":    int,       -- 1 to 100, sequential
+    "user_id":           string,
+    "email":             string,
+    "registered_at":     ISO 8601 UTC,
+    "firmware_modes":    ["05", "06"],
+    "feedback": {
+      "question_1":      string | null,
+      "question_2":      string | null,
+      "question_3":      string | null,
+      "submitted_at":    ISO 8601 UTC | null
+    }
+  }
+
+UI Requirements (app and/or web):
+
+  Founder confirmation screen:
+    - Display founder number prominently: "You are Founder #[N]"
+    - DarkWave Studios LLC branding
+    - Brief statement: "Thank you for being one of the first 100.
+      Your feedback shapes what LUME becomes."
+    - CTA: "Share your experience" (proceeds to feedback form)
+    - Secondary: "Skip for now" (stores feedback_submitted = false,
+      can return to form from profile settings)
+
+  Feedback form screen:
+    - Header: "Founder #[N] — Your Experience"
+    - Three labeled text boxes, each with sub-text as specified above
+    - No character limits enforced (but suggest "a sentence or two")
+    - Submit button: "Submit Feedback"
+    - Responses are submitted to POST /api/founder/feedback
+    - On success: brief confirmation — "Your response is in.
+      Thank you, Founder #[N]."
+
+  Pricing/registration page:
+    - If founder_tier_open = true: display founder pricing ($10) and
+      "Founder #[registered + 1] of 100 spots remaining"
+    - If founder_tier_open = false: display standard pricing ($39.99)
+      with no mention of the founder tier (clean transition)
+
+------------------------------------------------------------
+TONE REQUIREMENTS FOR ALL FOUNDER-FACING COPY
+------------------------------------------------------------
+  - Treat the founder as a contributor, not a customer doing a favor.
+  - Never say "leave a review." The form is a contribution, not a
+    review request.
+  - Founder number is a badge of identity, not a gimmick. Treat it
+    that way in all UI copy.
+  - No pressure language. No "only X spots left" countdown timers.
+    The GET /api/founder/count endpoint supplies the number —
+    display it factually, not as manufactured urgency.
+  - Consistent with the project-wide tone rule:
+    "This doesn't replace anything. It wraps what already exists."
+    The founder tier wraps the standard registration flow. It does
+    not replace it.
+
+------------------------------------------------------------
 END OF HANDOFF — LUME MODE 06 REMOTE START FIRMWARE v1.0
 ------------------------------------------------------------
