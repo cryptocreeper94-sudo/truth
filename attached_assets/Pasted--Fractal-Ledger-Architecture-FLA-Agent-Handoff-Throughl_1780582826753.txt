@@ -1,0 +1,271 @@
+# Fractal Ledger Architecture (FLA) — Agent Handoff
+
+> **Throughline: "Private but Verified."**
+> Every record is private to the entity that created it. Every claim is mathematically verifiable by any authorized party. No raw data crosses boundaries — only cryptographic proof.
+
+---
+
+## 1. What is the FLA?
+
+The **Fractal Ledger Architecture (FLA)** is a hub-and-spoke cryptographic trust topology designed by DarkWave Studios LLC (founder: Jason). It solves a fundamental enterprise tension: **divisions need data autonomy, but the enterprise needs assurance.**
+
+The word "fractal" is precise — the same architectural pattern repeats at every level of scope:
+
+```
+Enterprise → Division → Facility → Asset
+```
+
+Each node at every level is a self-similar replica of the whole system. This is not a monolithic ledger with access controls bolted on. It is a **structurally compartmentalized trust fabric** where isolation is a _mathematical property_ of the topology, not a policy decision.
+
+### Key Properties
+- **Not a blockchain.** No tokens, no cryptocurrency, no mining, no gas fees.
+- **Not AI.** Deterministic, rules-based. Same input → same output, every time.
+- **Proof-of-Authority (PoA)** consensus — each facility operates as a validator node.
+- **Hash-only anchoring** — the root never sees raw data, only SHA-256 proof of integrity.
+- **Ed25519 cryptographic signatures** on all certificates.
+
+---
+
+## 2. The Three-Layer Stack
+
+The FLA has exactly three layers. Every deployment (Cox, government, or future clients) follows this pattern:
+
+```
+┌─────────────────────────────────┐
+│         CORE Root Fabric        │  ← Universal trust anchor
+│   (hash-only, zero data exposure)│
+├─────────────────────────────────┤
+│      Private Ledger (per div)   │  ← Internal operational records
+│   (full data, compartmentalized) │
+├─────────────────────────────────┤
+│   Verification Ledger (per div) │  ← External proof layer
+│  (certificates, public-facing)   │
+└─────────────────────────────────┘
+```
+
+### Layer Naming by Deployment
+
+| Layer | Cox (CEP) | Government (Gov-Site) | Generic |
+|-------|-----------|----------------------|---------|
+| **Root Fabric** | CORE | CORE | CORE |
+| **Private Ledger** | CAL (Cox Automotive Ledger) | APL (Agency Private Ledger) | Private Ledger |
+| **Verification Ledger** | VET (Verified Enterprise Trust) | AVL (Agency Verification Ledger) | Verification Ledger |
+| **Architecture Name** | FLA | FLA | FLA |
+
+> [!IMPORTANT]
+> **CORE is universal** — it is the same acronym and concept on every deployment. It stands for "Certified Operational Record Engine." It is NOT a Cox-specific term. Both Cox and government builds use CORE as the root.
+
+---
+
+## 3. How Data Flows
+
+```
+Raw Event (OBD-II scan, lot move, custody transfer, field report)
+    │
+    ▼
+Private Ledger (CAL or APL)
+    │  Sealed immediately with SHA-256 hash + Ed25519 signature
+    │  Full operational data stored here — never leaves this ledger
+    │
+    ▼
+Verification Ledger (VET or AVL)
+    │  Issues verifiable certificates to external parties
+    │  Contains: certificate ID, hash, timestamp, status
+    │  Does NOT contain raw operational data
+    │
+    ▼
+CORE Root Fabric
+    │  Receives hash anchors from all division ledgers
+    │  Never sees raw data — only cryptographic proof
+    │  Provides cross-division integrity verification
+    └── "Did this event happen?" → Yes/No (mathematically provable)
+```
+
+### The Key Insight
+A breach of one division's ledger **cannot propagate** to any other division or to CORE. Each dual-ledger pair is cryptographically isolated. CORE only stores hashes — even if CORE were compromised, no operational data would be exposed.
+
+---
+
+## 4. Cox Deployment (CEP) — Live at cox.tlid.io
+
+### Operational Sections (all live)
+
+| Section | Route | Purpose |
+|---------|-------|---------|
+| **COP** (Core Operating Platform) | `/cop` | Enterprise command center — real-time KPIs, facility status, vehicle state grid, live activity feed. Auto-refreshes every 30s. |
+| **CAL** (Cox Automotive Ledger) | `/cal` | Full on-chain block explorer. Browse blocks, certificates, vehicles. Search by VIN, certificate ID, agent, or hash. |
+| **VET** (Verified Enterprise Trust) | `/vet` | Public verification portal. Enter certificate ID or VIN to verify integrity. Complete vehicle digital passport. |
+| **CORE** (Root Fabric) | `/core` | Fractal topology visualization. Shows all 5 Cox divisions and their isolated ledger pairs anchoring to CORE. |
+| **COG** (Governance Engine) | `/cog` | Real-time governance health — compliance rates, policy violations, governance scores. |
+| **Lot Ops Pro** | External: lotopspro.com | Full workforce management platform — Command Center, Ops Manager, Driver Dashboard, Scanner, Live Map, Analytics, Crew Manager, Lane Config, Smart Lot Planner, Safety Dashboard. |
+
+### Cox Divisions (each with its own CAL + VET pair)
+1. **Manheim** — Auction operations, vehicle moves, condition certificates
+2. **Autotrader** — Listing verification, dealer certification
+3. **Kelley Blue Book (KBB)** — Valuation anchoring
+4. **Dealer.com** — Dealership operations records
+5. **NextGear Capital** — Floor plan financing, collateral verification
+
+### COP Desktop (Electron)
+- Windows .exe wrapping all CEP sections + Lot Ops Pro as native app
+- Menu: `Navigate` (Ctrl+1–8 for CEP sections) + `Lot Ops Pro` (Ctrl+Shift+1–3)
+- Points to `lotopspro.com` for Lot Ops routes
+- Download: `/downloads/COP_Setup_1.0.0.exe` (72.8 MB)
+
+### Key Codebase Files (CEP — `D:\CEP`)
+```
+src/
+├── pages/
+│   ├── ManheimPitch.tsx          ← Main landing/pitch page
+│   ├── COPDashboard.tsx          ← COP command center
+│   ├── CALExplorer.tsx           ← On-chain block explorer
+│   ├── VETVerify.tsx             ← Public verification portal
+│   ├── COREExplorer.tsx          ← Fractal topology visualization
+│   ├── EngineeringBrief.tsx      ← Technical architecture document
+│   ├── Whitepaper.tsx            ← Full whitepaper (FLA Section 2)
+│   └── DownloadPage.tsx          ← APK + .EXE downloads
+├── components/
+│   ├── manheim/
+│   │   ├── HeroSection.tsx       ← Hero with FLA headline
+│   │   ├── FractalLedgerSection.tsx ← FLA deep-dive with topology
+│   │   ├── PlainEnglish.tsx      ← Non-technical FLA explainer
+│   │   └── PersonalNote.tsx      ← Jason's personal note
+│   └── engineering/
+│       ├── StackComparison.tsx   ← React vs Lume build comparison
+│       ├── TechDeepDive.tsx      ← 14 subsystem technical cards
+│       └── LumeVAPIOnboarding.tsx ← Lume-V API integration guide
+└── public/
+    ├── assets/videos/cep_hero.mp4 ← Hero video (1:53)
+    └── downloads/COP_Setup_1.0.0.exe ← Electron desktop app
+```
+
+### GitHub: `cryptocreeper94-sudo/CEP` → branch `master`
+### Render: cox.tlid.io
+
+---
+
+## 5. Government Deployment (Gov-Site) — Live on Render
+
+### Ledger Naming
+- **CORE** — Same universal root (Certified Operational Record Engine)
+- **APL** — Agency Private Ledger (equivalent of CAL)
+- **AVL** — Agency Verification Ledger (equivalent of VET)
+
+### Key Pages
+
+| Page | Purpose |
+|------|---------|
+| **Home** | Landing page with deterministic engine pitch |
+| **Explorer** | AVL explorer portal (template for per-agency portals) |
+| **PolicyFramework** | Federal policy white paper — FLA Section IV |
+| **Whitepaper** | Technical whitepaper referencing CORE + APL + AVL |
+| **FMPPitch** | Federal Modernization Protocol pitch |
+| **MeridianPitch** | Meridian Energy Protocol (wireless charging) |
+| **OrganismApp** | Diagnostic scan interface (CORE-Node) |
+
+### Key Codebase Files (Gov-Site — `D:\gov-site`)
+```
+src/
+├── telemetry/
+│   ├── AnchorService.ts          ← CORE/AVL anchoring logic
+│   │   anchoredTo: 'CORE' | 'AVL' | 'local'
+│   │   CORE_API_URL → cox-automotive-ledger.onrender.com
+│   │   VET_API_URL  → vet-ledger.onrender.com
+│   ├── SimulatedEngine.ts        ← 42-signal deterministic engine
+│   ├── WiFiConnector.ts          ← OBD-II WiFi adapter interface
+│   └── BLEConnector.ts           ← OBD-II Bluetooth LE interface
+├── pages/
+│   ├── Home.tsx                  ← Landing page
+│   ├── Explorer.tsx              ← AVL explorer (FLA reference)
+│   ├── PolicyFramework.tsx       ← Federal policy (FLA Section IV)
+│   ├── Whitepaper.tsx            ← Technical whitepaper
+│   ├── FMPPitch.tsx              ← Federal Modernization Protocol
+│   └── OrganismApp.tsx           ← Diagnostic scan UI
+├── components/
+│   └── organism/
+│       └── OrganismReport.tsx    ← Scan report with CORE/AVL anchoring
+└── public/
+    └── assets/videos/
+        ├── gov_hero.mp4          ← Hero video (1:23)
+        └── federal_pitch.mp4     ← Pitch video (1:16)
+```
+
+### GitHub: `cryptocreeper94-sudo/Gov-Site` → branch `main`
+
+---
+
+## 6. Lot Ops Pro (WLOPS) — Live at lotopspro.com
+
+The workforce management platform. NOT a ledger system — it's the operational layer that sits on top of the FLA and generates the events that get anchored.
+
+### Key Sections
+Command Center, Operations Manager, Driver Dashboard, Scanner, Live Map, Analytics, Crew Manager, Lane Configuration, Smart Lot Planner, Safety Dashboard
+
+### Key Implementation Notes
+- Built with React + Vite + Tailwind
+- Uses `wouter` for routing (not react-router)
+- Footer component uses **named export** (`export function Footer()`)
+- Missing pages were stubbed: `CoxEngineerDashboard`, `SmsOptIn`, `SmsSend`, `UserManagement`, `DriverFile`
+
+### GitHub: `cryptocreeper94-sudo/WLOPS` → branch `main`
+### Render: lotopspro.com
+
+---
+
+## 7. Terminology Reference
+
+| Acronym | Full Name | Scope |
+|---------|-----------|-------|
+| **FLA** | Fractal Ledger Architecture | Universal — the architecture itself |
+| **CORE** | Certified Operational Record Engine | Universal — the root fabric |
+| **CAL** | Cox Automotive Ledger | Cox only — private operational ledger |
+| **VET** | Verified Enterprise Trust | Cox only — public verification ledger |
+| **APL** | Agency Private Ledger | Gov only — private operational ledger |
+| **AVL** | Agency Verification Ledger | Gov only — public verification ledger |
+| **COP** | Core Operating Platform | Cox — enterprise dashboard |
+| **COG** | Governance Engine | Cox — compliance monitoring |
+| **FMP** | Federal Modernization Protocol | Gov — modernization pitch |
+| **TLL** | Trust Layer Ledger | DarkWave internal — dwtl.io |
+| **CEP** | Cox Enterprise Platform | Cox — the full platform name |
+
+---
+
+## 8. Build & Deploy
+
+| Project | Build Command | Start Command | Branch |
+|---------|--------------|---------------|--------|
+| **CEP** | `npm install; npm run build` | `npx vite preview --host 0.0.0.0 --port $PORT` | `master` |
+| **Gov-Site** | `npm install; npm run build` | `npx vite preview --host 0.0.0.0 --port $PORT` | `main` |
+| **WLOPS** | `npm install; npm run build` | `npm run start` | `main` |
+
+### TypeScript Strictness
+All three builds use **strict TypeScript** with `tsc -b` before Vite build. This means:
+- Unused imports → **build failure** (TS6133)
+- Type mismatches → **build failure** (TS2367)
+- Missing exports → **build failure**
+
+Always run `npx vite build` locally before pushing to catch these.
+
+---
+
+## 9. Patent & IP
+
+- **US Provisional Patent 64/032,339** — Fractal Ledger Architecture, deterministic governance
+- **US Provisional Patent 64/056,378** — Meridian Energy Protocol
+- **Published Research** — Zenodo DOI 10.5281/zenodo.19645097 (Lume-V)
+- **Owner** — DarkWave Studios LLC
+
+---
+
+## 10. Rules for Any Agent Working on This
+
+1. **FLA is the canonical acronym.** Use it in all new text. Spell out "Fractal Ledger Architecture (FLA)" on first mention, then "FLA" after.
+2. **CORE is universal.** Never rename it per-deployment. Both Cox and Gov use CORE.
+3. **CAL/VET are Cox-only.** Never use on gov-site. Use APL/AVL instead.
+4. **APL/AVL are Gov-only.** Never use on CEP. Use CAL/VET instead.
+5. **"Private but Verified"** is the throughline for all marketing, narration, and pitch copy.
+6. **No AI claims.** The platform is deterministic, not AI-powered. Explicitly say "not AI" when relevant.
+7. **No blockchain/crypto language.** Say "ledger" not "blockchain." No tokens, no mining.
+8. **Build locally before pushing.** `npx vite build` catches TS errors that will fail on Render.
+9. **Lot Ops Pro is integrated into COP Desktop** — no separate .exe needed.
+10. **LumeScan** is the diagnostic hardware/app layer (42 OBD-II PIDs, condition certificates).
