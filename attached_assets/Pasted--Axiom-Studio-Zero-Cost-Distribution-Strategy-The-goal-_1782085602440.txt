@@ -1,0 +1,38 @@
+# Axiom Studio Zero-Cost Distribution Strategy
+
+The goal is to safely and professionally distribute the Axiom Studio and Lume-Cortex ecosystem to your initial user base *without* paying the $300-$800 "gatekeeper tax" for a Windows EV Code Signing Certificate. 
+
+Here is the exact technical and operational plan to make this happen flawlessly:
+
+## 1. Web-First "Cloud" Portal (The Primary Entry Point)
+Instead of forcing users to download an `.exe` immediately, we drive all traffic to the hosted web version (currently deploying to Render/Coolify). 
+- **Action:** Ensure the landing page directs users to "Launch Web App" as the primary Call to Action. This guarantees zero friction, zero warnings, and instant access to the lightweight "Replit-style" interface.
+
+## 2. Progressive Web App (PWA) Installation
+We can turn the web portal into a fully installable Desktop application via Chrome/Edge.
+- **Action:** Update the `vite-plugin-pwa` configuration in the web build to ensure it prompts users to "Install Axiom Studio". 
+- **Why this matters:** When a user installs a PWA, it creates a native Windows desktop shortcut and runs in its own standalone window. **PWAs completely bypass Windows SmartScreen** because they are sandboxed by the browser. No EV certificate required, but it feels like a native app.
+
+## 3. The "Developer Bypass" for the Heavyweight `.exe`
+For power users who *need* the heavyweight Desktop/Laptop (dt/lt) `.exe` to run local AI models or terminal commands, we still distribute the unsigned `.exe` we just built via GitHub Releases.
+- **Action:** Create a sleek, branded "How to Install" UI component on your download page.
+- **Messaging:** We frame the SmartScreen warning as a badge of honor for developers: *"Axiom Studio is a powerful local execution engine. Microsoft Defender will flag unrecognized developer tools. When prompted, click **More Info** ➔ **Run Anyway** to unlock the local engine."*
+- **Why this works:** Developers and power users do this every day for open-source tools. By addressing it transparently with clean UI instructions, it stops looking like a virus and starts looking like an exclusive developer tool.
+
+## 4. Mobile APK Distribution
+For the mobile orchestration side, we bypass the Google Play Store (and its fees/reviews) by offering direct APK downloads.
+- **Action:** Host the `.apk` securely on your own servers. Modern Android handles side-loading gracefully. We just provide a 2-step visual guide on how to click "Allow from this source" when installing the APK.
+
+---
+
+## User Review Required
+
+> [!IMPORTANT]
+> **Action Required:** Please review this 4-step distribution strategy. 
+> 
+> If you approve, I can immediately start implementing **Step 2 (PWA Configuration)** and **Step 3 (Download Page Instructions)** into the codebase so your web app is fully ready to handle this zero-cost distribution model.
+
+## Open Questions
+
+1. **PWA Support:** Do you want me to configure the web app so users can "Install" it directly from their browser as a native-feeling app?
+2. **Download Page:** Do you already have a download page in mind where you want me to inject the "How to bypass SmartScreen" visual instructions, or should I create a new `/download` route in the React app?
