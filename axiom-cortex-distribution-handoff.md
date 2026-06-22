@@ -52,9 +52,19 @@ There is no cold public `.exe` download page anywhere in this ecosystem.
 
 ## Current State of Cortex
 
-**Cortex is already live.** It has existing `.exe` and `.apk` builds in production. Do not rebuild it. Do not replace it. Work with what exists.
+**Cortex has been built but has not been publicly released yet.** It has existing `.exe` and `.apk` builds. The `.exe` build is being set aside — it will not be part of the launch. The strategy going forward is **cloud + APK only.**
 
-The discussion in this handoff may inform changes to how those builds are distributed (moving away from public direct downloads toward the in-app ecosystem model described below), but Cortex itself is not a greenfield project.
+### The .exe — Scrap It
+The Windows `.exe` build of Cortex is not being utilized and should be treated as scrapped to avoid confusion. Do not reference it, link to it, or include it in any build pipeline going forward.
+
+### Cleanup Required (Do These First)
+Before anything else, remove all references to the `.exe` download:
+
+1. **lume-cortex.com** — Remove the `.exe` download link from the site entirely
+2. **GitHub README** — Remove any mention of a Windows `.exe` download or installer
+3. **GitHub Release description** — Remove or update the release description if it references the `.exe`
+
+These removals are the first priority. A user should not be able to find or download the `.exe` through any public-facing channel.
 
 ---
 
