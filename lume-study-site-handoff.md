@@ -107,7 +107,11 @@ The site should feel like it belongs to the Lume ecosystem — not like a generi
 >
 > You can stop at any time by closing the browser.
 
-**Checkbox:** `[ ] I have read the above and agree to participate`
+**Checkbox 1 (required first):** `[ ] I confirm I am 18 years of age or older`
+
+If they attempt to proceed without checking this: show inline message — *"This study is open to participants aged 18 and over."* Do not allow progression.
+
+**Checkbox 2:** `[ ] I have read the above and agree to participate`
 
 **Screener question** (shown after checkbox is checked):
 > Have you ever written computer code of any kind — including HTML, Python, JavaScript, Excel formulas, or anything similar?
