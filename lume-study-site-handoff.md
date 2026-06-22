@@ -48,7 +48,7 @@ lume/
 
 Add `study/data/` to the repo's `.gitignore` — participant data must never be committed.
 
-**URL:** Once deployed, accessible at `lume-lang.org/study` (if the main site reverse-proxies it) or as a standalone Render service at `lume-study.onrender.com`. Either works — confirm with Jason before wiring the reverse proxy.
+**URL:** `study.tlid.io` — deploy as a standalone Render service (free tier) and point the `study` subdomain DNS A-record or CNAME to the Render deployment. No reverse proxy through lume-lang.org needed. Render will handle TLS automatically once the custom domain is added in the Render dashboard.
 
 ## Tech Stack
 
