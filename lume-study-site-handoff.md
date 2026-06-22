@@ -21,11 +21,42 @@ That's the complete product. No accounts, no auth for participants, no complex i
 
 ---
 
+## Repo and Location
+
+**Repo:** `cryptocreeper94-sudo/lume`  
+**Add as:** `study/` directory at the repo root
+
+```
+lume/
+  study/
+    server.js          ← Express server
+    public/
+      index.html       ← consent + screener
+      orientation.html
+      task.html        ← single template, task number passed via query param
+      survey.html
+      done.html
+      admin.html
+      style.css
+      app.js           ← shared client-side JS
+    data/
+      responses.json   ← auto-created on first submission, gitignored
+    package.json       ← study-specific deps (express only)
+    .env.example
+    README.md          ← one paragraph: how to run, how to access admin
+```
+
+Add `study/data/` to the repo's `.gitignore` — participant data must never be committed.
+
+**URL:** Once deployed, accessible at `lume-lang.org/study` (if the main site reverse-proxies it) or as a standalone Render service at `lume-study.onrender.com`. Either works — confirm with Jason before wiring the reverse proxy.
+
 ## Tech Stack
 
-Simple Node.js + Express backend. Single HTML file per page. No framework needed — vanilla JS, clean CSS. Data stored in a flat JSON file on the server (`/data/responses.json`). This is a research tool for ~16 participants, not a production app.
+Simple Node.js + Express backend. Single HTML file per page. No framework needed — vanilla JS, clean CSS. Data stored in a flat JSON file on the server (`study/data/responses.json`). This is a research tool for ~16 participants, not a production app.
 
-Deploy to Render (free tier) or add as a route in the existing LumeCortex backend (`lume-cortex.onrender.com`). The admin password is set via environment variable `STUDY_ADMIN_PASSWORD`.
+The Lume repo already uses Node ≥18 and has `marked` as a dependency. Add Express as the only new dependency, scoped to the `study/` subdirectory's own `package.json` so it doesn't pollute the main package.
+
+The admin password is set via environment variable `STUDY_ADMIN_PASSWORD`.
 
 ---
 
