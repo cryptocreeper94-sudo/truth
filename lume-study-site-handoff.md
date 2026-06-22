@@ -101,7 +101,9 @@ The site should feel like it belongs to the Lume ecosystem — not like a generi
 **Consent text** (display in a card, full width, readable):
 > This is a research study for an academic paper about a new way to write computer instructions using plain English. The session takes about 30 minutes. I'm not testing you — I'm testing the system. There are no wrong answers.
 >
-> Your responses will be recorded and stored securely. Nothing will be shared publicly with your name attached. Results appear only as group averages in the research paper.
+> **We do not collect your name, email address, or any information that identifies you.** You are assigned a random participant code when you begin. That code is the only identifier attached to your responses. Results appear in the research paper only as group averages and anonymous quotes.
+>
+> The only free-text field in the study is an optional comments box at the end. If you use it, avoid writing anything you'd prefer not to appear in a research paper — it is stored as you type it.
 >
 > You can stop at any time by closing the browser.
 
@@ -151,7 +153,7 @@ show "I am learning Lume"
 - Task number indicator: `TASK 1 OF 4`
 - Time remaining: large countdown timer, starts at `4:00`, counts down. Turns amber at 1:00, red at 0:30.
 - Task description (large, readable):
-  - Task 1: *"Tell the computer your name and your favorite number. Then have it display a message that includes both."*
+  - Task 1: *"Tell the computer your favorite color and your favorite number. Then have it display a message that includes both."*
   - Task 2: *"Write instructions that check if a number is bigger than 50. If it is, have the computer say 'large.' If it isn't, have it say 'small.'"*
   - Task 3: *"You have three friends: Alex, Sam, and Jordan. Write something that says hello to each of them."*
   - Task 4: *"Create a reusable instruction called 'welcome' that takes a person's name and produces a greeting. Use it to welcome someone named 'Chris.'"*
@@ -275,6 +277,24 @@ participantId,date,task1_completed,task1_seconds,task1_outcome,task1_code,task2_
 
 ---
 
+## Anonymity Requirements
+
+These are not optional. The CHI paper's ethics statement depends on them.
+
+**Do not store IP addresses.** Express has access to `req.ip` on every request — never write it to `responses.json` or any log file. If Morgan or any other request logger is added, configure it explicitly to omit IP fields.
+
+**Do not collect names.** No name field anywhere in the UI. No name field in any API payload. The participant ID (`LM-XXXX`) is the only identifier in the dataset.
+
+**Do not link participant IDs to real identities in the app.** If the researcher needs a mapping of "who took the study" for scheduling or follow-up purposes, that list lives in a notebook or spreadsheet the researcher maintains offline — never in `responses.json`.
+
+**Task 1 uses "favorite color" not "name."** Participants writing their actual name into the code editor would store it verbatim in `task1_code`. The task is designed to avoid this.
+
+**Free-text comments are stored as-is.** The consent form warns participants of this. No further sanitization needed, but do not display raw comments in the admin view next to identifiers without a clear label: `"Optional comment (may contain personal information — handle with care)"`.
+
+**The `responses.json` file must be gitignored.** Add `study/data/` to the root `.gitignore`. Participant data must never be committed to the repo.
+
+---
+
 ## Backend API Routes
 
 ```
@@ -285,6 +305,8 @@ POST /api/admin/auth      — validate admin password
 GET  /api/admin/results   — return all results JSON (protected)
 GET  /api/admin/csv       — return results as CSV download (protected)
 ```
+
+**All routes:** strip and ignore any IP or user-agent data before writing to disk. The only fields written to `responses.json` are those explicitly listed in the API payloads above.
 
 All data written to `/data/responses.json` as an append array. No database needed.
 
