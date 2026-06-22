@@ -50,15 +50,17 @@ There is no cold public `.exe` download page anywhere in this ecosystem.
 
 ---
 
-## What Needs to Be Built
+## Current State of Cortex
 
-### Priority 1 — Cortex Web Portal
-- This is the entry point for all 500 initial signups
-- Primary CTA on landing page: **"Launch Cortex"** (web app)
-- Secondary CTA: **"Install Desktop Apps"** (only visible after login, inside Cortex)
-- No download links on the public-facing marketing page
+**Cortex is already live.** It has existing `.exe` and `.apk` builds in production. Do not rebuild it. Do not replace it. Work with what exists.
 
-### Priority 2 — PWA Configuration
+The discussion in this handoff may inform changes to how those builds are distributed (moving away from public direct downloads toward the in-app ecosystem model described below), but Cortex itself is not a greenfield project.
+
+---
+
+## What Needs to Be Built / Changed
+
+### Priority 1 — PWA Configuration
 - Configure `vite-plugin-pwa` so Cortex prompts users to install it as a desktop app via Chrome/Edge
 - PWA install creates a native desktop shortcut, runs in standalone window, bypasses SmartScreen entirely
 - This is the primary "desktop feel" experience for users who don't need local execution
