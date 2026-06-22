@@ -1,0 +1,38 @@
+# Lume CHI Study Facilitation Site
+
+The autonomous CHI study facilitation web application has been fully implemented, tested, and pushed to `origin main`. It is designed to run silently within the main Lume API monolith.
+
+## Architecture & Integration
+To avoid incurring new $500/mo web service charges on Render, the study site is built using an **Express Virtual Host (vhost)** strategy. 
+
+1. **Self-Contained Logic**: The study routing, static file serving, and API logic all remain tightly scoped to the `/study` directory (acting as a sub-app module).
+2. **Monolithic Routing**: The main `server/server.js` imports the study app and uses a hostname interception middleware. If a request arrives with the header `Host: study.tlid.io`, the main server routes it exclusively to the study logic rather than serving the main Lume website.
+
+## What Was Implemented
+
+1. **Lightweight Backend**
+   - Built a flat-file JSON datastore (`responses.json`) to persist participant state without requiring an external database.
+   - Wired protected API routes for the admin dashboard leveraging `cookie-parser`.
+
+2. **Frontend UI & Flow**
+   - Created the core participant flow across 5 distinct HTML pages: `/`, `/orientation`, `/task/:n`, `/survey`, and `/done`.
+   - Replicated the Lume visual branding in `style.css` (#050505 background, #06b6d4 cyan accents, and the requested font stacks: Outfit, Inter, Space Mono).
+   - Engineered the dynamic Task page layout, complete with an automated countdown timer that enforces the 4:00 time limit and automatically submits if the timer expires.
+   - Wired up the mock code editor and "Run" capability, designed to fetch from `lume-lang.org/api/run` and fallback to a static "Execution not available" message.
+   - Implemented the 10-question SUS survey with precise wording.
+
+3. **Admin Dashboard**
+   - Built the password-protected `/admin` interface for researchers.
+   - Dashboard automatically calculates average SUS scores (accounting for odd/even question weighting), per-task completion rates, and average time-on-task.
+   - Added a direct CSV export capability that escapes raw comments and formats all boolean metrics for data processing.
+
+## Anonymity Safeguards Enforced
+> [!IMPORTANT]
+> The study's ethical requirements for data privacy are strictly enforced at the infrastructure level.
+
+- **No IPs or User Agents**: The backend logic actively ignores and discards `req.ip` and header information. It only extracts explicitly requested keys from the JSON payload.
+- **Participant Hashes Only**: Participants are strictly tracked using `sessionStorage` containing the randomized `LM-XXXX` identifier.
+- **Git Ignore Safeguards**: `study/data/` has been appended to the root `.gitignore` in the `lume` repo to guarantee that `responses.json` is never accidentally tracked by git.
+
+## Deployment Status
+The vhost integration is pushed to `origin main`. Once your Render service finishes its automatic build cycle, `study.tlid.io` will instantly begin routing to the study interface!
