@@ -89,6 +89,8 @@ LumeCortex has been built but has NOT been publicly released. The `.exe` build e
 
 These must be completed before any other work begins. A user should not be able to find or download the `.exe` through any public channel.
 
+> **Note on naming:** Jason confirmed that TrustVault has been renamed to **Axiom42Suite**. All `TrustVault` references in the codebase need to be updated as part of this cleanup pass — see Cleanup-4 below.
+
 ### Cleanup-1: Remove .exe from index.html
 **File:** `index.html` line 173
 
@@ -117,7 +119,35 @@ Replace the Downloads section with:
 | 📱 **Android** | [Download APK](https://github.com/cryptocreeper94-sudo/lume-cortex/releases/latest/download/Lume-Cortex.apk) |
 ```
 
-### Cleanup-3: Update cortex-bridge.js domain
+### Cleanup-4: Rename TrustVault → Axiom42Suite Throughout Codebase
+
+Jason confirmed TrustVault is now **Axiom42Suite** with domain `axiom42suite.com` (update domain as directed). Every reference in the following files needs to be updated:
+
+| File | What to change |
+|---|---|
+| `src/lume/03_shell.lume` line 233 | `name: 'TrustVault'` → `name: 'Axiom42Suite'`, `url: 'https://trustvault.studio'` → `url: 'https://axiom42suite.com'` |
+| `src/lume/10_admin.lume` line 158 | `name: 'TrustVault'`, `url: 'trustvault.studio'` → updated name and domain |
+| `src/lume/11_ecosystem.lume` line 10 | `id: 'trustvault'` → `id: 'axiom42suite'`, `name: 'TrustVault'` → `name: 'Axiom42Suite'`, `domain: 'trustvault.studio'` → new domain, `desc: 'AES-256 Media Vault'` → update if needed |
+| `src/lume/11_ecosystem.lume` lines 230, 232 | Update orchestration preset descriptions that reference TrustVault |
+| `src/lume/11b_repl_knowledge.lume` line 28 | Update REPL example code |
+| `README.md` line 159 | Update ecosystem list entry |
+
+**Also update the icon** — TrustVault used 🔐. Axiom42Suite can keep 🔐 or Jason may want a different emoji. Confirm before changing.
+
+### Cleanup-5: Disable Windows .exe Build in GitHub Actions
+
+**File:** `.github/workflows/hybrid-build.yml`
+
+The workflow currently has a `build-windows` job that runs `electron-builder --win` and uploads the `.exe` as an artifact on every push to main. This will keep generating `.exe` builds even after you remove the download links. Disable it by removing the `build-windows` job entirely, or comment it out. Keep only the `build-android` job.
+
+```yaml
+# Remove or comment out the entire build-windows job:
+#  build-windows:
+#    runs-on: windows-latest
+#    ...
+```
+
+### Cleanup-6: Update cortex-bridge.js domain
 **File:** `cortex-bridge.js` line 9
 
 Change `"lume-cortex.onrender.com"` to the new Coolify domain when the Render → Coolify migration completes. Mark as a TODO if migration hasn't happened yet.
@@ -166,10 +196,12 @@ The weather widget derives temperature and conditions from a hash of the city na
 - Add a `"(Demo)"` label to the widget title until real data is connected
 - Remove weather from the default enabled widgets until real data is available
 
-### ISSUE-2: Metric Inconsistency
-README says **60,600 topics / 74 domains**. The OS UI says **181,282 topics / 149 domains**. The Explore page header says **181,282 topics · 149 domains · 42 ecosystem apps · 17 specialty agents**. The Trust Center says **11 active agents**.
+### ISSUE-2: README Metrics Are Outdated (Not an OS Bug)
+The README says **60,600 topics / 74 domains**. This number appears nowhere in the Lume source files. Every single `.lume` file consistently uses **181,282 topics / 149 domains** — in the boot sequence, chat agent intro, status widget, Trust Center, Explore page, and Ecosystem header.
 
-**Ask Jason which numbers are correct** and apply them consistently to: README, index.html, app.html stat displays, Explore page header, Trust Center Overview, cockpit status bar, and Ecosystem page header.
+The OS is correct. The README is outdated.
+
+**Fix:** Update README to match the OS — replace all instances of `60,600` with `181,282` and `74 domains` / `74 packs` with `149 domains`. Also update the architecture diagram in README from `60,600 topics / 74 domains` to `181,282 topics / 149 domains`. No need to ask Jason — the OS code is the source of truth.
 
 ### ISSUE-3: AI Chat Widget Disabled on Home Screen
 **File:** `src/lume/05_dashboard.lume` lines 287–300
@@ -340,16 +372,30 @@ These elements are genuinely differentiated. Protect them in every edit:
 ## Execution Order for Gemini
 
 ```
-1. Part 2 — Cleanup (.exe removal from index.html + README + badge)
-2. Part 3 — Critical bugs (Ronald fix, VOID duplicate, 6/23 date — confirm with Jason on date)
-3. Part 4 ISSUE-2 — Confirm metric numbers with Jason, then apply consistently
-4. Part 5 — PWA configuration (install prompt + service worker)
-5. Part 4 ISSUE-1 — Weather (real API or demo label — confirm approach with Jason)
-6. Part 4 ISSUE-3 — AI Chat widget (enable or remove from defaults)
-7. Part 4 ISSUE-5 — Signal Chat (connect or hide)
-8. Part 6 — In-app native download modal
-9. Part 4 ISSUE-6 — Replace prompt() in bookmarks with modal
-10. Part 7 — Feature gaps per priority
+CLEANUP PASS (do all of these before touching anything else):
+1.  Cleanup-1 — Remove .exe button from index.html (line 173)
+2.  Cleanup-2 — Update README.md (remove Downloads table, fix platform badge)
+3.  Cleanup-3 — Update README metrics: 60,600 → 181,282 topics, 74 → 149 domains everywhere in README
+4.  Cleanup-4 — Rename TrustVault → Axiom42Suite in all 6 files listed above (confirm domain URL with Jason first)
+5.  Cleanup-5 — Disable build-windows job in .github/workflows/hybrid-build.yml
+6.  Cleanup-6 — Update cortex-bridge.js domain (or mark TODO if Coolify migration pending)
+
+CRITICAL BUGS (after cleanup):
+7.  BUG-1 — Delete Ronald → Jason name swap from shell.lume line 479 and dashboard.lume line 48
+8.  BUG-2 — Remove duplicate THE VOID entry from shell.lume
+9.  BUG-3 — Confirm 6/23 date with Jason: if still valid, leave; if not, replace all 6/23 references with "Coming Soon"
+
+HIGH PRIORITY ISSUES:
+10. ISSUE-1 — Weather widget: connect real API or add "(Demo)" label (confirm approach with Jason)
+11. ISSUE-3 — AI Chat widget: enable via Axiom API or remove from defaults
+12. ISSUE-4 — Conversations backend: clarify with Jason whether this server should persist chats or leave to axiom42.com
+13. ISSUE-5 — Signal Chat: connect backend or remove bubble from shell
+14. ISSUE-6 — Replace prompt() bookmarks with in-OS modal
+
+FEATURES:
+15. Part 5 — PWA install prompt + service worker
+16. Part 6 — In-app native download modal for Axiom Studio / Axiom42Suite / TrustGen-3D
+17. Part 7 — Feature gaps per priority tier
 ```
 
 Do not skip steps. Do not reorder without checking with Jason. Do not invent features not listed here.
