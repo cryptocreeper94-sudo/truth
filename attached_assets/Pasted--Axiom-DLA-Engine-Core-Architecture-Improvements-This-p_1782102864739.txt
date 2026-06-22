@@ -1,0 +1,67 @@
+# Axiom DLA Engine Core Architecture Improvements
+
+This plan outlines the surgical upgrades to the Axiom DLA (Deterministic Linguistic Architecture) engine located at `D:\dda`, finalizing the cognitive upgrades listed in the ecosystem verification audit (Section 4).
+
+## User Review Required
+
+> [!IMPORTANT]
+> Because you confirmed the Axiom Studio mobile version is fully operational, it means the `FIREBASE_SERVICE_ACCOUNT` and Neon Database whitelist keys are **already securely injected** into your live production environment. You do **not** need to manually inject anything! My previous `~ PARTIAL` status was simply a reflection of the blank `.env` file in my local scratch directory. We can completely cross #4 off the list.
+
+## Proposed Changes
+
+We will systematically upgrade the DLA engine across four critical systems to increase determinism and fallback tracking.
+
+### 1. Pre-Decomposition Build Step
+
+#### [NEW] `D:\dda\scripts\predecompose-packs.mjs`
+A build-time script that preemptively analyzes the dynamic domain JSON packs and compiles them into a flattened `data/fact-cache.json` to bypass runtime decomposition latency.
+
+#### [MODIFY] `D:\dda\src\composition\composition-engine.js`
+Update the runtime engine to detect and load `this.factCache?.[domain]?.[topicKey]`. If a cache hit occurs, it skips decomposition.
+
+#### [MODIFY] `D:\dda\package.json`
+Add the `"predecompose": "node scripts/predecompose-packs.mjs"` command to the `scripts` block to automate cache generation during the CI pipeline.
+
+---
+
+### 2. Fallback Telemetry
+
+#### [MODIFY] `D:\dda\src\engines\cognitive-engine.js`
+Wrap the core execution in a strict `try/catch`. On failure, invoke a non-blocking `this._logFallback({domain, intentKey, error, timestamp})` method that appends the trace to `logs/composition-fallbacks.log`.
+
+#### [NEW] `D:\dda\scripts\fallback-report.mjs`
+A utility script that parses `composition-fallbacks.log`, groups failures by `domain` and `intentKey`, and outputs the top 10 most frequent engine faults for rapid debugging.
+
+---
+
+### 3. Thesaurus Expansion
+
+#### [NEW] `D:\dda\data\domain-thesaurus.json`
+Create a localized, domain-specific synonym map (e.g., `trust vault` -> `Axiom42Suite`, `meridian` -> `ecosystem core`) to prevent generic WordNet drift.
+
+#### [MODIFY] `D:\dda\src\composition\composition-engine.js`
+Intercept synonym lookups to check `domain-thesaurus.json` first, strictly prioritizing local ontology before falling back to the generic `moby-thesaurus` or `WordNet` structures.
+
+---
+
+### 4. Correction Confidence Layer & Tone
+
+#### [MODIFY] `D:\dda\src\knowledge\learning-memory.js`
+Upgrade the memory schema to include `{ original, correction, timestamp, confirmed: false, sessionsSeen: 0 }`. Implement a `verify()` trigger that upgrades `confirmed = true` only when `sessionsSeen >= 2`.
+
+#### [NEW] `D:\dda\scripts\audit-corrections.mjs`
+A script that lists unconfirmed vs. confirmed corrections side-by-side to allow the Governance Authority to manually review the learning memory's drift.
+
+#### [MODIFY] `D:\dda\src\composition\tone-adapter.js`
+Refactor the `detectTone()` function to follow a rigid, cascading priority hierarchy:
+1. Learned user preference
+2. Explicit query signals via regex (e.g., "be blunt")
+3. Domain-based defaults (e.g., "analytical" for finance)
+4. Fallback: `conversational`
+
+## Verification Plan
+
+### Automated Tests
+- Run `npm run predecompose` to verify `fact-cache.json` outputs correctly.
+- Execute `node scripts/fallback-report.mjs` to ensure the logging schema parses successfully.
+- Trigger `node scripts/audit-corrections.mjs` to confirm the confidence schema outputs a clean diff.
