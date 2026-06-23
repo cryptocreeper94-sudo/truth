@@ -66,3 +66,9 @@ id = "hcQzn6YrkaZZRJTCWFJ7x"
 uri = "file://lumescan-gemini-final.md"
 type = "text"
 title = "LumeScan Native — Final Gemini Handoff"
+
+[[outputs]]
+id = "fDKf2L-W0pCPbmPIBocmK"
+uri = "file://lumescan-badge-fix.md"
+type = "text"
+title = "LumeScan — Final Fix for Gemini"
