@@ -54,3 +54,9 @@ id = "nc7Jn95SfzY_IQgoZ4RLT"
 uri = "file://lumeauto-gemini-verify.md"
 type = "text"
 title = "LumeAuto — Gemini Verification + Implementation Handoff"
+
+[[outputs]]
+id = "GsEKQ7O_SzU_qamVFLvS6"
+uri = "file://lumescan-native-audit.md"
+type = "text"
+title = "LumeScan Native — Hardware Connection Audit"
