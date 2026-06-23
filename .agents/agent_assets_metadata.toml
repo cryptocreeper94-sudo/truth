@@ -60,3 +60,9 @@ id = "GsEKQ7O_SzU_qamVFLvS6"
 uri = "file://lumescan-native-audit.md"
 type = "text"
 title = "LumeScan Native — Hardware Connection Audit"
+
+[[outputs]]
+id = "hcQzn6YrkaZZRJTCWFJ7x"
+uri = "file://lumescan-gemini-final.md"
+type = "text"
+title = "LumeScan Native — Final Gemini Handoff"
