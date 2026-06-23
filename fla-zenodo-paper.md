@@ -11,7 +11,7 @@
 
 ## Abstract
 
-This paper presents the Fractal Ledger Architecture (FLA), a three-layer, hub-and-spoke cryptographic trust topology designed to resolve the fundamental tension in large-scale operational environments: the simultaneous need for divisional data autonomy and enterprise-level assurance. The FLA achieves this through structural compartmentalization — not policy-based access controls — by organizing cryptographic proof propagation in a self-similar pattern that repeats at every scope level from individual asset to enterprise root. Each division operates a dual-ledger pair: a Private Ledger containing full operational records sealed with SHA-256 hashing and Ed25519 signatures, and a Verification Ledger that issues externally-verifiable certificates without exposing raw data. Both ledgers anchor to a universal root layer — the Certified Operational Record Engine (CORE) — which receives only cryptographic hashes, never operational content. A breach of any division's ledger mathematically cannot propagate to adjacent divisions or to CORE. The architecture is not a blockchain, carries no tokens or cryptocurrency, and is not AI-powered. It is a deterministic, rules-based system: identical inputs produce identical, verifiable outputs every time. Two production deployments are described — an enterprise deployment serving Cox Automotive's five operational divisions, and a federal deployment serving as a template for multi-agency government modernization. The throughline of the FLA in every context is: *Private but Verified.*
+This paper presents the Fractal Ledger Architecture (FLA), a three-layer, hub-and-spoke cryptographic trust topology designed to resolve the fundamental tension in large-scale operational environments: the simultaneous need for divisional data autonomy and enterprise-level assurance. The FLA achieves this through structural compartmentalization — not policy-based access controls — by organizing cryptographic proof propagation in a self-similar pattern that repeats at every scope level from individual asset to enterprise root. Each division operates a dual-ledger pair: a Private Ledger containing full operational records sealed with SHA-256 hashing and Ed25519 signatures, and a Verification Ledger that issues externally-verifiable certificates without exposing raw data. Both ledgers anchor to a universal root layer — the Certified Operational Record Engine (CORE) — which receives only cryptographic hashes, never operational content. A breach of any division's ledger mathematically cannot propagate to adjacent divisions or to CORE. The architecture is not a blockchain, carries no tokens or cryptocurrency, and is not AI-powered. It is a deterministic, rules-based system: identical inputs produce identical, verifiable outputs every time. Two production deployments are described — an enterprise deployment serving a multi-division automotive enterprise, and a federal deployment serving as a template for multi-agency government modernization. The throughline of the FLA in every context is: *Private but Verified.*
 
 ---
 
@@ -87,7 +87,7 @@ Each division operates a Private Ledger that stores full operational records. Re
 
 The Private Ledger is the operational source of truth for its division. It is never directly accessible to external parties, parallel divisions, or CORE. It communicates upward only through hash anchors sent to its paired Verification Ledger.
 
-In the Cox enterprise deployment, the division-level Private Ledger is named the **Cox Automotive Ledger (CAL)**. In the federal deployment, it is named the **Agency Private Ledger (APL)**. The architecture is identical; only the naming adapts to deployment context.
+In the automotive enterprise deployment, the division-level Private Ledger is named the **Enterprise Ledger (EL)**. In the federal deployment, it is named the **Agency Private Ledger (APL)**. The architecture is identical; only the naming adapts to deployment context.
 
 **Layer 3: Verification Ledger**
 
@@ -97,7 +97,7 @@ A certificate allows an external party to confirm: "This record exists, was crea
 
 The Verification Ledger also forwards hash anchors to CORE, extending the chain of integrity from individual record to enterprise root.
 
-In the Cox deployment, the Verification Ledger is named the **Verified Enterprise Trust (VET)**. In the federal deployment, it is the **Agency Verification Ledger (AVL)**.
+In the automotive enterprise deployment, the Verification Ledger is named the **Verified Enterprise Trust (VET)**. In the federal deployment, it is the **Agency Verification Ledger (AVL)**.
 
 ### 3.3 Topology Diagram
 
@@ -202,31 +202,31 @@ Validator credentials are issued and rotated by the enterprise root authority. C
 
 ---
 
-## 5. Enterprise Deployment: Cox Automotive (CEP)
+## 5. Enterprise Deployment: Automotive Enterprise Reference (AER)
 
 ### 5.1 Deployment Overview
 
-The first production deployment of the FLA is the Cox Enterprise Platform (CEP), serving Cox Automotive's five operational divisions. Each division operates a CAL (Cox Automotive Ledger) and VET (Verified Enterprise Trust) pair. All five pairs anchor to the shared CORE Root Fabric.
+The first production deployment of the FLA is the Automotive Enterprise Reference (AER), a multi-division automotive enterprise implementation. Each division operates an EL (Enterprise Ledger) and VET (Verified Enterprise Trust) pair. All division pairs anchor to the shared CORE Root Fabric.
 
 ### 5.2 Divisions and Operational Scope
 
 | Division | Operational Records Anchored |
 |---|---|
-| **Manheim** | Vehicle custody events, auction moves, condition certificates, lot operations |
-| **Autotrader** | Listing verifications, dealer certifications, inventory state |
-| **Kelley Blue Book** | Valuation anchors, market price records |
-| **Dealer.com** | Dealership operational records, digital marketing events |
-| **NextGear Capital** | Floor plan financing records, collateral verifications |
+| **Auction Division** | Vehicle custody events, auction moves, condition certificates, lot operations |
+| **Listings Division** | Listing verifications, dealer certifications, inventory state |
+| **Valuation Division** | Valuation anchors, market price records |
+| **Dealer Operations Division** | Dealership operational records, digital transaction events |
+| **Financing Division** | Floor plan financing records, collateral verifications |
 
-Each division's operational data is fully compartmentalized. A Manheim lot technician's vehicle scan record is not visible to NextGear Capital's financing system, and vice versa. Yet both records are anchored to the same CORE, allowing Cox Automotive's enterprise compliance layer to verify the integrity of either record without accessing its content.
+Each division's operational data is fully compartmentalized. An auction division lot technician's vehicle scan record is not visible to the financing division's system, and vice versa. Yet both records are anchored to the same CORE, allowing the enterprise compliance layer to verify the integrity of either record without accessing its content.
 
-### 5.3 CEP Platform Components
+### 5.3 AER Platform Components
 
-The CEP provides a full operational interface alongside the underlying FLA infrastructure:
+The AER provides a full operational interface alongside the underlying FLA infrastructure:
 
 **COP — Core Operating Platform:** Enterprise command center providing real-time KPIs, facility status, vehicle state grids, and live operational activity feeds. Updates at 30-second intervals.
 
-**CAL Explorer:** Full on-chain block explorer for the Cox Automotive Ledger. Supports search by VIN, certificate ID, agent identifier, or hash value.
+**EL Explorer:** Full on-chain block explorer for the Enterprise Ledger. Supports search by VIN, certificate ID, agent identifier, or hash value.
 
 **VET Portal:** Public verification interface. External parties — dealers, buyers, regulators, partners — enter a certificate ID or VIN to receive verification status without accessing raw operational data.
 
@@ -236,9 +236,9 @@ The CEP provides a full operational interface alongside the underlying FLA infra
 
 ### 5.4 LumeScan Integration
 
-The FLA's operational records in the automotive context originate from LumeScan — the deterministic OBD-II diagnostic interface that reads 42 standardized vehicle parameters and generates condition certificates anchored to CAL. This integration makes every vehicle scan a tamper-evident record that can be verified by any authorized party through the VET portal without accessing the full diagnostic data.
+The FLA's operational records in the automotive context originate from LumeScan — the deterministic OBD-II diagnostic interface that reads 42 standardized vehicle parameters and generates condition certificates anchored to the Enterprise Ledger. This integration makes every vehicle scan a tamper-evident record that can be verified by any authorized party through the VET portal without accessing the full diagnostic data.
 
-The LumeScan → CAL → VET → CORE chain means that a vehicle's condition at time of scan is mathematically attestable. No administrative action can alter a scan record after it is sealed.
+The LumeScan → EL → VET → CORE chain means that a vehicle's condition at time of scan is mathematically attestable. No administrative action can alter a scan record after it is sealed.
 
 ---
 
@@ -286,7 +286,7 @@ This property — integrity verification without content access — is novel in 
 
 ### 7.1 Compartmentalization Guarantee
 
-The FLA's compartmentalization guarantee is structural, not policy-based. Consider a full compromise of Division A's Private Ledger: an adversary with complete read access to Division A's CAL or APL.
+The FLA's compartmentalization guarantee is structural, not policy-based. Consider a full compromise of Division A's Private Ledger: an adversary with complete read access to Division A's EL or APL.
 
 Under the FLA topology, this adversary has access to:
 - Division A's operational records
@@ -366,11 +366,11 @@ This design principle extends to all DarkWave Studios LLC products built on the 
 
 | Deployment | URL | Status | Ledger Naming |
 |---|---|---|---|
-| Cox Enterprise Platform | cox.tlid.io | Live (production) | CAL + VET + CORE |
+| Automotive Enterprise Reference | fla.tlid.io | Live (production) | EL + VET + CORE |
 | National Digital Infrastructure Protocol | gov.tlid.io | Live (production) | APL + AVL + CORE |
-| LUME Firmware Stack | — | Monday release | TLL + CAL (dual context) |
+| LUME Firmware Stack | — | Released | TLL + EL (dual context) |
 
-Both production deployments are live and accessible. The CEP deployment includes a full block explorer, verification portal, fractal topology visualization, and governance engine. The NDIP deployment serves as the federal architecture reference and pitch environment.
+Both production deployments are live and accessible. The AER deployment includes a full block explorer, verification portal, fractal topology visualization, and governance engine. The NDIP deployment serves as the federal architecture reference and pitch environment.
 
 ---
 

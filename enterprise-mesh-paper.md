@@ -15,7 +15,7 @@ Lume Language Specification (DOI: 10.5281/zenodo.19382282)
 Lume-V: Deterministic Governance for Non-Deterministic AI Systems (DOI: 10.5281/zenodo.19645097)
 DAIGS: Deterministic Autonomous Infrastructure Governance System (DOI: 10.5281/zenodo.19491784)
 The Routed World — Meridian and Deterministic Physical Infrastructure (DOI: 10.5281/zenodo.20028362)
-Cox Automotive Ledger — Reference Implementation (cox-automotive-ledger.onrender.com)
+Enterprise Ledger — Reference Implementation (fla.tlid.io)
 
 **DOI:** Pending Zenodo assignment
 
@@ -25,7 +25,7 @@ Cox Automotive Ledger — Reference Implementation (cox-automotive-ledger.onrend
 
 I propose the Enterprise Mesh — a sovereign-chain network architecture in which every enterprise in a shared operational ecosystem operates its own private proof-of-authority ledger, and cross-enterprise verification is accomplished through cryptographic proof exchange alone, with no raw operational data ever leaving the originating chain. I call the formal property this architecture produces the Verified but Private invariant: two enterprises can resolve a contested custody event, confirm a shared asset's condition, or certify a transaction — without either party exposing internal records, personnel data, or operational telemetry to the other.
 
-I establish this architecture through the deployed reference implementation: the Cox Automotive Ledger (CAL), a proof-of-authority blockchain anchoring vehicle condition records, custody chains, and arbitration events at Manheim auction facilities. I extend the CAL architecture to its logical network form, in which every participant in the automotive supply chain — auction houses, transport vendors, reconditioning partners, fleet operators — operates a sovereign CAL node governed by the same organism architecture, coupled through hash-only proof channels.
+I establish this architecture through the deployed reference implementation: the Enterprise Ledger (EL), a proof-of-authority blockchain anchoring vehicle condition records, custody chains, and arbitration events at a pilot auction facility. I extend the EL architecture to its logical network form, in which every participant in the automotive supply chain — auction houses, transport vendors, reconditioning partners, fleet operators — operates a sovereign EL node governed by the same organism architecture, coupled through hash-only proof channels.
 
 The paper establishes: the theoretical failure of shared-ledger enterprise architectures; the formal definition of a sovereign chain node; the Verified but Private invariant and its enforcement mechanism; the Vehicle Asset Passport as the cross-chain asset identity record; the Employee Hash Receipt as the human-layer certification primitive; the Lume-Auto vertical as the organism substrate governing each node; the formal network topology from pilot to industry-scale mesh; and the full set of guarantees that hold for any system built on this architecture.
 
@@ -46,7 +46,7 @@ The paper establishes: the theoretical failure of shared-ledger enterprise archi
    - 9.2 The Mesh Topology
    - 9.3 Deployment Path
 10. Formal Guarantees
-11. The Cox Automotive Ledger as Reference Implementation
+11. The Enterprise Ledger as Reference Implementation
 12. Prior Work and Differentiation
 13. Novel Contributions
 14. Future Work
@@ -58,11 +58,11 @@ The paper establishes: the theoretical failure of shared-ledger enterprise archi
 
 Enterprise trust is currently solved by exposure. When two companies need to verify a shared fact — the condition of a vehicle that changed hands, the chain of custody on a transported asset, the outcome of an arbitration event — the standard resolution mechanism requires one or both parties to show the other their records. The party with more complete records has the advantage. The party with a privacy interest has the disadvantage. Disputes routinely escalate to litigation precisely because the mechanism for establishing shared truth requires a level of disclosure that neither party is willing to provide voluntarily.
 
-I began building the Cox Automotive Ledger to address a specific instance of this problem in the automotive auction industry. Manheim processes approximately 8 million vehicles per year. Every vehicle that moves through a Manheim facility passes through a custody chain: inspection, reconditioning, transport, arbitration. At every handoff, the risk of a disputed fact is real. A buyer claims the vehicle was in worse condition than reported. A transport vendor disputes a damage claim. A seller disputes a post-sale arbitration. Each dispute is resolved by whoever has the most credible paper record — or by whoever has the most litigation stamina.
+I began building the Enterprise Ledger to address a specific instance of this problem in the automotive auction industry. Large-scale auction facilities process millions of vehicles per year. Every vehicle that moves through a facility passes through a custody chain: inspection, reconditioning, transport, arbitration. At every handoff, the risk of a disputed fact is real. A buyer claims the vehicle was in worse condition than reported. A transport vendor disputes a damage claim. A seller disputes a post-sale arbitration. Each dispute is resolved by whoever has the most credible paper record — or by whoever has the most litigation stamina.
 
-The Cox Automotive Ledger solves this for a single facility. It anchors vehicle condition records, custody events, and arbitration outcomes to a cryptographic ledger at the moment they occur. Records become tamper-evident. The condition report that was sealed on the lot cannot be altered after the sale. The custody event that was signed by the transport driver cannot be disputed after delivery. The ledger is the record of truth, and it is not controlled by either party to the dispute.
+The Enterprise Ledger solves this for a single facility. It anchors vehicle condition records, custody events, and arbitration outcomes to a cryptographic ledger at the moment they occur. Records become tamper-evident. The condition report that was sealed on the lot cannot be altered after the sale. The custody event that was signed by the transport driver cannot be disputed after delivery. The ledger is the record of truth, and it is not controlled by either party to the dispute.
 
-But CAL as currently deployed is a centralized ledger. It is Cox Automotive's ledger. A transport vendor asking to verify a custody record is trusting Cox Automotive's infrastructure to report accurately. A reconditioning partner asking to confirm a condition baseline is trusting that the same entity that benefits from a positive assessment is reporting honestly.
+But the EL as currently deployed is a centralized ledger. It is the enterprise's ledger. A transport vendor asking to verify a custody record is trusting the enterprise's infrastructure to report accurately. A reconditioning partner asking to confirm a condition baseline is trusting that the same entity that benefits from a positive assessment is reporting honestly.
 
 The Enterprise Mesh eliminates this trust dependency. When every enterprise in the ecosystem operates its own sovereign chain — governed by the same organism architecture, producing the same class of cryptographic anchors — cross-enterprise verification becomes a mathematical operation rather than a business negotiation. I prove a fact to you by presenting a hash. You verify it against my chain's published root. Neither of us sees the other's records. The fact is verified. The private data remains private.
 
@@ -299,15 +299,15 @@ The Enterprise Mesh is not a ring, a hub-and-spoke, or a fully-connected graph. 
 - E ⊆ V × V — directed edges representing verification permissions
 - (eᵢ, eⱼ) ∈ E  ↔  eᵢ accepts verification requests from eⱼ
 
-G need not be complete or symmetric. An auction house may accept verification requests from any registered transport vendor but not from competitors. A reconditioning partner may accept requests from any auction house in the Cox Automotive ecosystem but not from independent dealers.
+G need not be complete or symmetric. An auction house may accept verification requests from any registered transport vendor but not from competitors. A reconditioning partner may accept requests from any auction house in the automotive vertical but not from independent dealers.
 
-**The local topology of the automotive vertical:** For the Cox Automotive vertical, the natural verification topology follows the operational relationships:
+**The local topology of the automotive vertical:** The natural verification topology follows the operational relationships:
 
 ```
-Manheim (auction) ←→ Transport Vendors
-Manheim (auction) ←→ Reconditioning Partners
-Manheim (auction) ←→ Fleet Operators
-Manheim (auction) ←→ Dealer Network
+Anchor Facility (auction) ←→ Transport Vendors
+Anchor Facility (auction) ←→ Reconditioning Partners
+Anchor Facility (auction) ←→ Fleet Operators
+Anchor Facility (auction) ←→ Dealer Network
 Transport Vendors ←→ Reconditioning Partners (shared custody events)
 ```
 
@@ -317,19 +317,19 @@ No participant in this topology requires access to another participant's interna
 
 **Phase 1 — The Pilot Node (Months 1–12)**
 
-The Cox Automotive Ledger at the first Manheim pilot facility is Phase 1. A single sovereign chain, governed by the Lume-Auto organism, anchoring condition reports, custody events, and arbitration outcomes for vehicles processed at one facility. No cross-chain verification in this phase — the value is internal: tamper-evident records, deterministic condition certification, arbitration reduction.
+The Enterprise Ledger at the pilot facility is Phase 1. A single sovereign chain, governed by the Lume-Auto organism, anchoring condition reports, custody events, and arbitration outcomes for vehicles processed at one facility. No cross-chain verification in this phase — the value is internal: tamper-evident records, deterministic condition certification, arbitration reduction.
 
 **Phase 2 — The First Edge (Months 12–24)**
 
-When the first transport vendor joins the mesh, the first cross-chain verification edge exists. The transport vendor anchors custody intake and delivery events on their sovereign chain. Manheim can verify delivery confirmation without phone calls, emails, or disputed paper records. The transport vendor can verify pre-transport condition without access to Manheim's full inspection records. Two sovereign chains. One verified fact. Zero shared data.
+When the first transport vendor joins the mesh, the first cross-chain verification edge exists. The transport vendor anchors custody intake and delivery events on their sovereign chain. The anchor facility can verify delivery confirmation without phone calls, emails, or disputed paper records. The transport vendor can verify pre-transport condition without access to the facility's full inspection records. Two sovereign chains. One verified fact. Zero shared data.
 
 **Phase 3 — The Automotive Vertical (Years 2–4)**
 
-All major transport vendors, reconditioning partners, and dealer groups in the Cox Automotive ecosystem join the mesh. The Vehicle Asset Passport becomes a complete provenance record spanning the full supply chain. Arbitration events that previously required legal escalation are resolved by cross-chain verification in hours. The chain is not a proposal. It is the record of truth that every participant independently verified before contributing to.
+All major transport vendors, reconditioning partners, and dealer groups in the automotive vertical join the mesh. The Vehicle Asset Passport becomes a complete provenance record spanning the full supply chain. Arbitration events that previously required legal escalation are resolved by cross-chain verification in hours. The chain is not a proposal. It is the record of truth that every participant independently verified before contributing to.
 
 **Phase 4 — The Industry Standard (Years 4–10)**
 
-The mesh expands beyond the Cox Automotive ecosystem. Independent auction houses, fleet operators, insurance carriers, and regulatory bodies join as observer or full nodes. The Vehicle Asset Passport becomes a vehicle-lifetime record that follows the asset regardless of which enterprise currently holds it. A vehicle with a complete VAP carries provably complete provenance from first sale through every subsequent transaction.
+The mesh expands across the broader automotive industry. Independent auction houses, fleet operators, insurance carriers, and regulatory bodies join as observer or full nodes. The Vehicle Asset Passport becomes a vehicle-lifetime record that follows the asset regardless of which enterprise currently holds it. A vehicle with a complete VAP carries provably complete provenance from first sale through every subsequent transaction.
 
 I do not claim Phase 4 is an inevitable outcome of deploying Phase 1. I claim it is the natural scaling path for an architecture that solves a problem every enterprise in the automotive supply chain has. The architecture does not require persuasion at scale — it requires a working reference implementation at pilot. Phase 1 is that reference.
 
@@ -363,11 +363,11 @@ I do not claim Phase 4 is an inevitable outcome of deploying Phase 1. I claim it
 
 ---
 
-## 11. The Cox Automotive Ledger as Reference Implementation
+## 11. The Enterprise Ledger as Reference Implementation
 
-The Cox Automotive Ledger (CAL) is the deployed reference implementation of Phase 1 of the Enterprise Mesh. It is not a prototype or a simulation. It is a running proof-of-authority blockchain accessible at cox-automotive-ledger.onrender.com.
+The Enterprise Ledger (EL) is the deployed reference implementation of Phase 1 of the Enterprise Mesh. It is not a prototype or a simulation. It is a running proof-of-authority blockchain accessible at fla.tlid.io.
 
-The CAL API implements the following endpoints, which directly correspond to the formal protocol operations specified in Section 5:
+The EL API implements the following endpoints, which directly correspond to the formal protocol operations specified in Section 5:
 
 | Endpoint | Protocol Operation |
 |---|---|
@@ -381,7 +381,7 @@ The CAL API implements the following endpoints, which directly correspond to the
 
 The `POST /api/demo/tamper` endpoint is operationally significant for demonstrating Theorem 2. It accepts a submitted record, alters a field, and demonstrates that the verification endpoint correctly rejects the altered record's inclusion proof. The demonstration is live, repeatable, and requires no trust in the demonstrator's description of what happened.
 
-The CAL currently serves verified access to whitelisted domains including coxautoinc.com and darkwavestudios.com. It has processed condition reports, custody chains, and arbitration records across the 2,358 test cases validating the governance and anchoring architecture. The ledger is live. The organisms are running. The verification protocol is implemented.
+The EL currently serves verified access to whitelisted domains including darkwavestudios.com and fla.tlid.io. It has processed condition reports, custody chains, and arbitration records across the 2,358 test cases validating the governance and anchoring architecture. The ledger is live. The organisms are running. The verification protocol is implemented.
 
 ---
 
@@ -435,7 +435,7 @@ The current specification assumes fixed validator sets for each sovereign chain.
 
 **Mesh Directory Governance**
 
-The mesh directory — the registry of chain roots and validator public keys — is specified as a coordination layer without formal governance in this paper. Who operates the mesh directory? What happens when a participant's root registration is disputed? What is the process for removing a participant who fails to maintain chain root publication schedules? These governance questions are intentionally deferred here — the CAL reference implementation demonstrates that the technical architecture works before the governance architecture is specified. I plan to address mesh directory governance in a subsequent paper.
+The mesh directory — the registry of chain roots and validator public keys — is specified as a coordination layer without formal governance in this paper. Who operates the mesh directory? What happens when a participant's root registration is disputed? What is the process for removing a participant who fails to maintain chain root publication schedules? These governance questions are intentionally deferred here — the EL reference implementation demonstrates that the technical architecture works before the governance architecture is specified. I plan to address mesh directory governance in a subsequent paper.
 
 **Cross-Vertical Mesh Instances**
 

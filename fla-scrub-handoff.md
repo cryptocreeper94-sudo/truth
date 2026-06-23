@@ -1,0 +1,266 @@
+# FLA — Full Cox/Manheim Scrub Handoff
+**For:** Gemini Implementation Agent  
+**Repos:** All `cryptocreeper94-sudo/*` repos  
+**Date:** June 23, 2026  
+**Priority:** URGENT — complete before morning
+
+Cox Automotive has withdrawn. All references to Cox, Manheim, and related entities must be eliminated from every repo, every config, every README, and every deployed surface. The site is now `fla.tlid.io`. The repo is `cryptocreeper94-sudo/FLA`. Nothing with Cox's name should be discoverable.
+
+---
+
+## Canonical Replacements
+
+Apply these consistently across all files in all repos:
+
+| Old | New |
+|---|---|
+| Cox Automotive Ledger | Enterprise Ledger |
+| Cox Automotive Ledger (CAL) | Enterprise Ledger (EL) |
+| CAL (when referring to the ledger) | EL |
+| Cox Enterprise Platform | Automotive Enterprise Reference |
+| Cox Enterprise Platform (CEP) | Automotive Enterprise Reference (AER) |
+| CEP (when referring to the platform) | AER |
+| Cox Automotive | the automotive enterprise |
+| cox.tlid.io | fla.tlid.io |
+| cox-automotive-ledger.onrender.com | fla.tlid.io |
+| coxautoinc.com | (remove from whitelist — keep only darkwavestudios.com) |
+| Manheim | the pilot facility |
+| NextGear Capital | Financing Division |
+| Autotrader | Listings Division |
+| Kelley Blue Book | Valuation Division |
+| Dealer.com | Dealer Operations Division |
+
+---
+
+## Repo 1: `cryptocreeper94-sudo/FLA`
+
+### Step 1 — Audit
+
+Run these greps. Each should return zero matches. If any match, apply the fix below.
+
+```bash
+grep -r "cox" . --include="*.js" --include="*.ts" --include="*.json" --include="*.md" --include="*.html" --include="*.env*" --include="*.yml" --include="*.yaml" -i
+grep -r "manheim" . -i
+grep -r "coxautoinc" . -i
+grep -r "cox-automotive" . -i
+grep -r "nextgear" . -i
+grep -r "autotrader" . -i
+grep -r "kelley" . -i
+grep -r "dealer\.com" . -i
+grep -r "cox\.tlid" . -i
+```
+
+### Step 2 — Priority Files
+
+Check these files specifically (most likely to contain remnants):
+
+**CORS / Whitelist configs:**
+Any file with `.whitelist`, `allowedOrigins`, `CORS_ORIGINS`, or `cors()` call — remove `coxautoinc.com`. Keep `darkwavestudios.com` and `fla.tlid.io`.
+
+```javascript
+// CORRECT after scrub:
+const allowedOrigins = [
+  'https://fla.tlid.io',
+  'https://darkwavestudios.com',
+  'https://localhost:3000'
+];
+```
+
+**README.md / docs:**
+Search for any mention of Cox, Manheim, or the old Render URL. Replace with FLA-neutral language describing the system as a general-purpose automotive enterprise trust fabric.
+
+**package.json / package name:**
+If the package name contains "cox" or "cal", rename it. Example:
+```json
+// WRONG:
+{ "name": "cox-automotive-ledger" }
+
+// CORRECT:
+{ "name": "fractal-ledger-architecture" }
+```
+
+**Environment files (`.env`, `.env.example`, `.env.production`):**
+Remove any variable that contains "COX", "MANHEIM", "CAL" in the key name. Rename to neutral equivalents:
+```
+# WRONG:
+COX_API_KEY=...
+CAL_DB_URL=...
+
+# CORRECT:
+FLA_API_KEY=...
+EL_DB_URL=...
+```
+
+**Database / Prisma / schema:**
+If any table or model is named `CoxLedger`, `CAL`, `ManheimRecord` etc., rename:
+- `CoxLedger` → `EnterpriseLedger`
+- `CALRecord` → `ELRecord`
+- `ManheimFacility` → `PilotFacility`
+
+Check migration files too — if the migration creates a table with a Cox name, add a rename migration.
+
+**API endpoint paths:**
+If any route contains `/cal/`, `/cox/`, or `/manheim/`, rename:
+- `/api/cal/` → `/api/el/`
+- `/api/cox/` → `/api/fla/`
+
+**Any UI / frontend text:**
+Search all `.html`, `.jsx`, `.tsx`, `.vue` files for displayed text. Replace any "Cox Automotive Ledger" displayed to users with "Enterprise Ledger". Replace any "CAL Explorer" labels with "EL Explorer". Replace "CEP" labels with "AER".
+
+### Step 3 — Verify Domain
+
+Confirm these are the ONLY domains referenced in configs:
+- `fla.tlid.io` — production
+- `darkwavestudios.com` — whitelisted
+- `localhost:*` — development only
+
+Zero matches for:
+- `cox.tlid.io`
+- `cox-automotive-ledger.onrender.com`
+- `coxautoinc.com`
+
+---
+
+## Repo 2: `cryptocreeper94-sudo/invariant`
+
+The Invariant site's carousel, ENGINE_MAP, and status bar may contain a `cox.tlid.io` entry. This is the highest-visibility risk — Invariant is Jason's public-facing ecosystem site.
+
+### Audit
+
+```bash
+grep -r "cox" . -i
+grep -r "coxautoinc" . -i
+```
+
+### Fix — Remove Cox from ENGINE_MAP
+
+**File:** `index.html`
+
+If `ENGINE_MAP` contains:
+```javascript
+'cox': { url: 'https://cox.tlid.io', title: 'COX ENTERPRISE PLATFORM' },
+```
+
+Remove this entry entirely. Do not replace with an FLA entry in ENGINE_MAP (FLA is not part of the Invariant engine overlay — it is its own product at fla.tlid.io). 
+
+If you need to add FLA as a carousel card, that is a separate task. For now: just remove the cox entry.
+
+### Fix — Remove Cox from Carousel eco_items
+
+**File:** `src/lume/main.lume`
+
+If `eco_items` contains an entry with `link: "https://cox.tlid.io"` or title containing "Cox" or "CAL", remove it entirely.
+
+### Fix — Remove Cox from Status Bar
+
+**File:** `index.html` — `buildStatusBar()` cores array
+
+If cores contains `{ key: 'COX', label: 'COX', static: true }` or similar, remove it.
+
+### Verify
+
+After applying:
+```bash
+grep -r "cox" . -i  # zero matches
+```
+
+---
+
+## Repo 3: `cryptocreeper94-sudo/lume`
+
+The main Lume server may have Cox-related vhost configuration or CORS whitelist if `cox.tlid.io` was ever served from it.
+
+### Audit
+
+```bash
+grep -r "cox" . -i
+grep -r "coxautoinc" . -i
+grep -r "cox\.tlid" . -i
+```
+
+### Fix — Remove Cox vhost (if present)
+
+If the Express server has a vhost or route handler for `cox.tlid.io`, remove it. The DNS record for `cox.tlid.io` is already gone — the server handler is dead code at best, a discoverable remnant at worst.
+
+```javascript
+// REMOVE any block like:
+if (req.hostname === 'cox.tlid.io') { ... }
+// or:
+app.use(vhost('cox.tlid.io', coxRouter));
+```
+
+---
+
+## Repo 4: Any Other Repos
+
+Check all other `cryptocreeper94-sudo/*` repos for the same patterns:
+
+```bash
+grep -r "cox" . -i --include="*.md" --include="*.js" --include="*.ts" --include="*.json" --include="*.html"
+grep -r "manheim" . -i
+grep -r "coxautoinc" . -i
+```
+
+Any match: apply the canonical replacements from the table at the top of this document.
+
+---
+
+## Render (Already Stopped — Confirm Clean)
+
+Jason has already stopped the Render static site. Confirm:
+1. The service `cox-automotive-ledger` (or similar) is deleted from Render, not just stopped. Stopped services still appear in Render dashboards and could be discovered.
+2. Any Render environment variables containing Cox credentials or domain names are deleted.
+3. The Render project itself is deleted if it was named anything Cox-related.
+
+---
+
+## Verification Checklist
+
+Run this final audit across all repos before marking complete:
+
+```bash
+# In each repo:
+grep -r "cox" . -i --include="*.js" --include="*.ts" --include="*.json" --include="*.md" --include="*.html" --include="*.env" --include="*.yml"
+grep -r "manheim" . -i
+grep -r "coxautoinc" . -i
+grep -r "cox-automotive" . -i
+grep -r "cox\.tlid" . -i
+grep -r "nextgear" . -i
+grep -r "autotrader" . -i  
+grep -r "kelley blue" . -i
+```
+
+All must return zero matches.
+
+Additionally, do a live check:
+- Navigate to `https://fla.tlid.io` — site loads, no Cox branding visible anywhere
+- Navigate to `https://cox.tlid.io` — should return nothing (DNS removed, site stopped)
+- Check page source / view-source of fla.tlid.io — grep the HTML for "cox" — zero matches
+
+---
+
+## What NOT to Change
+
+- `CORE` — this is a generic term (Certified Operational Record Engine), not Cox-specific. Keep it.
+- `VET` (Verified Enterprise Trust) — generic, keep it.
+- `APL` / `AVL` — federal deployment naming, not Cox. Keep.
+- `EHR` (Employee Hash Receipt) — generic, keep.
+- `VAP` (Vehicle Asset Passport) — generic, keep.
+- `Lume-Auto` — DarkWave product, not Cox. Keep.
+- The FLA paper's "automotive remarketing" context language — keep, it's industry-generic.
+- `gov.tlid.io` — the federal NDIP deployment, not Cox. Keep.
+
+---
+
+## Push
+
+After all fixes across all repos:
+
+```bash
+# In each modified repo:
+git add -A
+git commit -m "scrub: remove all cox/manheim references, rename to fla.tlid.io"
+git push origin main
+```
+
+Do not mark complete until every grep in the verification checklist returns zero matches and `fla.tlid.io` loads cleanly.
