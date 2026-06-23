@@ -72,3 +72,9 @@ id = "fDKf2L-W0pCPbmPIBocmK"
 uri = "file://lumescan-badge-fix.md"
 type = "text"
 title = "LumeScan — Final Fix for Gemini"
+
+[[outputs]]
+id = "2d6XE48OjWp0X6RSpbi5Z"
+uri = "file://lumescan-hardware-test-handoff.md"
+type = "text"
+title = "LumeScan — Hardware Test Handoff for Gemini"
