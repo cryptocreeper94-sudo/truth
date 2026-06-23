@@ -42,3 +42,9 @@ id = "hJ7ywBrMfGWoTeC0DP77t"
 uri = "file://lume-auto-product.md"
 type = "text"
 title = "Lume-Auto Product Package (Commercial)"
+
+[[outputs]]
+id = "rNvpMXDQ1t5qvy_-_Kei2"
+uri = "file://lumeauto-gemini-fixes.md"
+type = "text"
+title = "LumeAuto — Gemini Fix Handoff"
