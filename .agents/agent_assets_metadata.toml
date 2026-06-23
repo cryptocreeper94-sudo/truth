@@ -48,3 +48,9 @@ id = "rNvpMXDQ1t5qvy_-_Kei2"
 uri = "file://lumeauto-gemini-fixes.md"
 type = "text"
 title = "LumeAuto — Gemini Fix Handoff"
+
+[[outputs]]
+id = "nc7Jn95SfzY_IQgoZ4RLT"
+uri = "file://lumeauto-gemini-verify.md"
+type = "text"
+title = "LumeAuto — Gemini Verification + Implementation Handoff"
