@@ -60,7 +60,7 @@ and the <div> containing the Start Task 1 button:
 
   <div class="card" style="margin-top: 2rem;">
     <h3>Try it yourself</h3>
-    <p>No timer, no pressure — just see what happens. Type a Lume instruction and click Run.</p>
+    <p>No pressure — just see what happens. Type a Lume instruction and click Run.</p>
     <textarea
       id="practice-editor"
       class="editor"
@@ -77,7 +77,12 @@ and the <div> containing the Start Task 1 button:
     </div>
   </div>
 
-The Start Task 1 button div stays exactly where it is, after this new block.
+Also INSERT this sentence into the existing <div class="card"> (the one that says
+"That's all Lume is..."), at the END of that card, as a new <p> tag:
+
+  <p style="margin-top: 1.25rem; color: var(--text-secondary);">Each task has a 4-minute limit — don't worry about it, the page moves on automatically when time's up.</p>
+
+The Start Task 1 button div stays exactly where it is, after the practice sandbox block.
 
 Do NOT change anything else in orientation.html.
 
@@ -207,33 +212,38 @@ The bootstrap block at the bottom of app.js should look like this after your cha
       initAdminPage();
   });
 
-#### 3B — Fix the timer in initTaskPage()
+#### 3B — Make the timer invisible (background infrastructure only)
 
-CURRENT timer behavior: timer displays immediately, counts from 4:00, giant font.
-For non-coders this is stressful. Fix: hide the timer until 60 seconds remain.
+The timer should NEVER appear on screen. Participants are told upfront on the
+orientation page that the page auto-advances after 4 minutes. The countdown
+exists only to trigger that auto-advance — it is not a UI element.
 
-In initTaskPage(), find the timer element and the updateTimer function.
+STEP 1 — In task.html, find the timer div and the paragraph below it:
 
-CHANGE the timer div's initial display by adding this line immediately after
-  const timerEl = document.getElementById('timer');
-
-ADD:
-  timerEl.style.opacity = '0';
-  timerEl.style.transition = 'opacity 0.5s ease';
-
-Then inside updateTimer(), find the line:
-  if (timeLeft <= 60) timerEl.classList.add('warning');
-
-REPLACE that entire line with:
-  if (timeLeft <= 60) {
-      timerEl.style.opacity = '1';
-      timerEl.classList.add('warning');
-  }
-
-Also find and REMOVE this line from task.html (the paragraph below the timer):
+  <div class="timer" id="timer">4:00</div>
   <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: -1rem;">Time remaining — don't rush, just do your best</p>
 
-That sentence contradicts the countdown and should not be shown.
+REPLACE BOTH LINES with just the timer div, hidden:
+
+  <div class="timer" id="timer" style="display: none;">4:00</div>
+
+Remove the <p> tag entirely. Do not keep it.
+
+STEP 2 — In app.js inside initTaskPage(), find this line:
+  const timerEl = document.getElementById('timer');
+
+ADD immediately after it:
+  timerEl.style.display = 'none';
+
+STEP 3 — In app.js inside the updateTimer() function, find and DELETE these lines
+(they reference timer visual states that no longer apply):
+
+  if (timeLeft <= 60) timerEl.classList.add('warning');
+  if (timeLeft <= 15) timerEl.classList.add('danger');
+
+The updateTimer() function should still update timerEl.textContent (that's fine,
+it just won't be visible) and still call submitTask(false) when timeLeft hits 0.
+Only the classList lines need to be removed.
 
 #### 3C — Soften Task 4 in initTaskPage()
 
@@ -285,12 +295,14 @@ The check only requires 3 lines of output — no code inspection needed.
 ## VERIFICATION STEPS (do these after making changes)
 
 1. Open study.tlid.io — confirm both checkboxes work and screener appears
-2. Click through to orientation — confirm the "Try it yourself" textarea and Run button appear
-3. Type:  show "test"  in the practice box and click Run — confirm output shows "test"
-4. Click Start Task 1 — confirm you land on the task page and the timer is NOT visible initially
-5. Wait 3:01 (or temporarily set timeLeft = 65 in code to test) — confirm timer fades in amber
-6. On Task 4 — confirm the new prompt reads "Display three things"
-7. Type three show lines, click Run — confirm task auto-completes
+2. Click through to orientation — confirm the card reads "Each task has a 4-minute limit..."
+3. Confirm the "Try it yourself" textarea and Run button appear on the orientation page
+4. Type:  show "test"  in the practice box and click Run — confirm output shows "test"
+5. Click Start Task 1 — confirm the timer div is completely invisible (no countdown visible at any point)
+6. To test auto-advance: temporarily change timeLeft = 5 in app.js, let it count down,
+   confirm the page records the task and shows the Continue button. Then revert to 240.
+7. On Task 4 — confirm the prompt reads "Display three things"
+8. Type three show lines, click Run — confirm task auto-completes
 
 ---
 
