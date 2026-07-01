@@ -501,6 +501,311 @@ After making all changes, verify each item:
 
 ---
 
+## CHANGE 11 — server/src/index.ts: Add real availability endpoint
+
+The server already has a working POST /api/bookings that saves to the DB correctly.
+What is missing is a GET /api/availability endpoint so the booking sheet can show
+only genuinely open time slots instead of calculating them with no knowledge of
+existing bookings.
+
+FILE: server/src/index.ts
+
+FIND the line:
+```
+app.get('/api/reviews', async (req, res) => {
+```
+
+INSERT the following block IMMEDIATELY BEFORE that line:
+
+```typescript
+// GET /api/availability?date=YYYY-MM-DD&serviceId=N&isMobile=false
+// Returns array of available time strings for that date and service
+app.get('/api/availability', async (req, res) => {
+  try {
+    const { date, serviceId, isMobile } = req.query;
+
+    if (!date || !serviceId) {
+      return res.status(400).json({ error: 'date and serviceId are required' });
+    }
+
+    // Load the service to know its duration
+    const [service] = await db.select().from(services).where(eq(services.id, Number(serviceId)));
+    if (!service) return res.status(404).json({ error: 'Service not found' });
+
+    // Ariel's working window: 9:00 AM to 12:00 PM
+    const WINDOW_START = 9 * 60;  // minutes from midnight
+    const WINDOW_END   = 12 * 60;
+
+    // Required slot duration in minutes
+    let slotMinutes = service.durationMinutes;
+    if (isMobile === 'true') slotMinutes = Math.max(slotMinutes, 120);
+
+    // Load existing bookings for this date that are not cancelled
+    const dateStr = date as string; // YYYY-MM-DD
+    const dayStart = `${dateStr}T00:00:00.000Z`;
+    const dayEnd   = `${dateStr}T23:59:59.999Z`;
+
+    const existingBookings = await db
+      .select({ startTime: bookings.startTime, endTime: bookings.endTime })
+      .from(bookings)
+      .where(
+        and(
+          gte(bookings.startTime, dayStart),
+          lte(bookings.startTime, dayEnd),
+          sql`${bookings.status} != 'cancelled'`
+        )
+      );
+
+    // Convert existing bookings to blocked minute ranges
+    const blockedRanges = existingBookings.map(b => {
+      const start = new Date(b.startTime);
+      const end   = new Date(b.endTime);
+      const startMins = start.getUTCHours() * 60 + start.getUTCMinutes();
+      const endMins   = end.getUTCHours()   * 60 + end.getUTCMinutes();
+      return { start: startMins, end: endMins };
+    });
+
+    // Generate candidate slots every 30 minutes within Ariel's window
+    const availableSlots: string[] = [];
+    let cursor = WINDOW_START;
+
+    while (cursor + slotMinutes <= WINDOW_END) {
+      const slotEnd = cursor + slotMinutes;
+
+      // Check if this slot overlaps any blocked range
+      const isBlocked = blockedRanges.some(range => cursor < range.end && slotEnd > range.start);
+
+      if (!isBlocked) {
+        const hours   = Math.floor(cursor / 60);
+        const mins    = cursor % 60;
+        const ampm    = hours >= 12 ? 'PM' : 'AM';
+        const display = hours > 12 ? hours - 12 : hours;
+        availableSlots.push(
+          `${String(display).padStart(2, '0')}:${String(mins).padStart(2, '0')} ${ampm}`
+        );
+      }
+
+      cursor += 30; // offer every 30-minute start time
+    }
+
+    res.json({ slots: availableSlots });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to fetch availability' });
+  }
+});
+```
+
+---
+
+## CHANGE 12 — client/src/components/BottomSheetBooking.tsx: Wire to real API
+
+The booking sheet currently uses a fake `setTimeout` instead of calling the real
+backend. The server's POST /api/bookings is fully built and working — it just isn't
+being called. This change connects them.
+
+FILE: client/src/components/BottomSheetBooking.tsx
+
+### Part A — Replace the fake handleBook with a real API call
+
+FIND the existing handleBook function:
+```typescript
+const handleBook = async () => {
+  setIsSubmitting(true);
+  try {
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    setIsSuccess(true);
+  } catch (e) {
+    console.error(e);
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+```
+
+REPLACE WITH:
+```typescript
+const handleBook = async () => {
+  if (!service || !selectedDate || !selectedTime) return;
+  setIsSubmitting(true);
+  try {
+    // Build ISO start and end times from selectedDate + selectedTime string
+    const [timePart, ampm] = selectedTime.split(' ');
+    const [hStr, mStr] = timePart.split(':');
+    let hours = parseInt(hStr, 10);
+    const minutes = parseInt(mStr, 10);
+    if (ampm === 'PM' && hours !== 12) hours += 12;
+    if (ampm === 'AM' && hours === 12) hours = 0;
+
+    const startDate = new Date(selectedDate);
+    startDate.setHours(hours, minutes, 0, 0);
+
+    const durationMinutes = isMobile
+      ? Math.max(service.durationMinutes, 120)
+      : service.durationMinutes;
+
+    const endDate = new Date(startDate.getTime() + durationMinutes * 60 * 1000);
+
+    const res = await fetch('/api/bookings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        clientName: clientInfo.name,
+        clientEmail: clientInfo.email,
+        clientPhone: clientInfo.phone,
+        serviceId: service.id,
+        isMobile,
+        address: isMobile ? address : null,
+        startTime: startDate.toISOString(),
+        endTime: endDate.toISOString(),
+      }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || 'Booking failed');
+    }
+
+    setIsSuccess(true);
+  } catch (e: any) {
+    console.error(e);
+    alert(e.message || 'Something went wrong. Please try again.');
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+```
+
+### Part B — Fetch real availability slots when a date is selected
+
+FIND the getAvailableTimes function and the availableTimes variable:
+```typescript
+// Dynamically calculate available times based on duration and mobile status
+const getAvailableTimes = () => {
+  if (!service) return [];
+  ...
+};
+
+const availableTimes = getAvailableTimes();
+```
+
+REPLACE THE ENTIRE BLOCK (from the comment through `const availableTimes = getAvailableTimes();`) WITH:
+
+```typescript
+const [availableTimes, setAvailableTimes] = useState<string[]>([]);
+const [loadingSlots, setLoadingSlots] = useState(false);
+
+// Fetch real availability from server when date changes
+useEffect(() => {
+  if (!selectedDate || !service) {
+    setAvailableTimes([]);
+    return;
+  }
+  setLoadingSlots(true);
+  setSelectedTime(null);
+  const dateStr = selectedDate.toISOString().split('T')[0];
+  fetch(`/api/availability?date=${dateStr}&serviceId=${service.id}&isMobile=${isMobile}`)
+    .then(r => r.json())
+    .then(data => setAvailableTimes(data.slots || []))
+    .catch(() => setAvailableTimes([]))
+    .finally(() => setLoadingSlots(false));
+}, [selectedDate, service, isMobile]);
+```
+
+NOTE: This adds `useEffect` usage. Make sure `useEffect` is imported at the top of
+BottomSheetBooking.tsx. The current import line is:
+```typescript
+import { useState } from 'react';
+```
+Change it to:
+```typescript
+import { useState, useEffect } from 'react';
+```
+
+### Part C — Show a loading state while slots are being fetched
+
+FIND the time slot grid that renders after selectedDate is chosen:
+```tsx
+{selectedDate && (
+  <div className="grid grid-cols-2 gap-3 mt-6">
+    {availableTimes.length > 0 ? (
+```
+
+REPLACE the opening of that block with:
+```tsx
+{selectedDate && (
+  <div className="grid grid-cols-2 gap-3 mt-6">
+    {loadingSlots ? (
+      <div className="col-span-2 text-center text-white/50 text-xs py-4 animate-pulse">
+        Checking availability...
+      </div>
+    ) : availableTimes.length > 0 ? (
+```
+
+And make sure the closing of the block still properly closes. The full conditional
+structure should be:
+```tsx
+{loadingSlots ? (
+  <div className="col-span-2 ...">Checking availability...</div>
+) : availableTimes.length > 0 ? (
+  availableTimes.map(time => ( ... ))
+) : (
+  <div className="col-span-2 text-center text-white/50 text-xs py-4">
+    No available slots for this duration today.
+  </div>
+)}
+```
+
+---
+
+## UPDATED SUMMARY — ALL FILES AND CHANGES
+
+### client/tailwind.config.js
+- Change 6: Add spin-slow animation
+
+### client/src/App.tsx
+- Change 1: Fix hero image paths
+- Change 2: Fix hero text position (over face on mobile)
+- Change 3: Fix Mobile badge overflow
+- Change 4: Fix service name overflow
+- Change 5: Add spacing above Availability section
+- Change 7: Add loading skeleton to Book tab
+- Change 8: Use real category images as service card fallback
+- Change 9: Rebuild Connect tab with photos and contact info
+- Change 10: Add credentials strip to Explore tab
+
+### server/src/index.ts
+- Change 11: Add GET /api/availability endpoint
+
+### client/src/components/BottomSheetBooking.tsx
+- Change 12A: Replace setTimeout simulation with real POST /api/bookings
+- Change 12B: Replace client-side slot math with real GET /api/availability fetch
+- Change 12C: Show "Checking availability..." while slots load
+- Add useEffect to imports
+
+---
+
+## UPDATED VERIFICATION CHECKLIST
+
+[ ] heroImages array: /hero2.png and /hero3.png (no underscores)
+[ ] Hero outer div: justify-end everywhere, pb-8 md:pb-12
+[ ] Hero text div: no mt-16, just `relative z-10 text-center px-6`
+[ ] Mobile badge: whitespace-nowrap, reads "✈ Mobile"
+[ ] Service name h4: line-clamp-2, text-xl
+[ ] Availability div: has mt-10
+[ ] tailwind.config.js: spin-slow defined
+[ ] Book tab: services.length === 0 shows skeleton
+[ ] Service card fallback: uses /services/*.png
+[ ] Connect tab: photo grid + contact card + Instagram button
+[ ] Credentials strip: at bottom of Explore tab
+[ ] server/src/index.ts: GET /api/availability route exists before GET /api/reviews
+[ ] BottomSheetBooking: imports useEffect alongside useState
+[ ] BottomSheetBooking: handleBook calls POST /api/bookings (no setTimeout)
+[ ] BottomSheetBooking: slots fetched from /api/availability on date select
+[ ] BottomSheetBooking: "Checking availability..." shows while loading
+
+---
+
 ## NOTES FOR GEMINI
 
 - Read each change's FIND block carefully. Search for the unique quoted strings
@@ -511,5 +816,8 @@ After making all changes, verify each item:
   Preserve the AnimatePresence/motion.div wrapper exactly.
 - Change 8's fallback img tag is inside the service card button, inside a
   categories.map. The variable `category` is in scope from the outer map.
+- Change 11 goes in server/src/index.ts BEFORE the GET /api/reviews route.
+- Change 12B introduces a useEffect — the import line at the top of
+  BottomSheetBooking.tsx must be updated to include useEffect.
 - Do not rewrite whole files. Surgical edits only.
-- Commit message when done: "UI polish: fix hero, connect page, service cards, overflow"
+- Commit message when done: "feat: real availability, live booking API, UI polish"
