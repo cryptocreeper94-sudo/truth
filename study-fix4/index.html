@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lume CHI Study</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <header>
+        <div class="logo">LUME <span class="badge">RESEARCH</span></div>
+    </header>
+    <main>
+        <h2>Welcome to the Lume Study</h2>
+        <div class="card">
+            <p>This is a research study for an academic paper about a new way to write computer instructions using plain English. The session takes about 15–20 minutes. I'm not testing you — I'm testing the system. There are no wrong answers.</p>
+            <p>We do not collect your name, email address, or any information that identifies you. You are assigned a random participant code when you begin. That code is the only identifier attached to your responses. Results appear in the research paper only as group averages and anonymous quotes.</p>
+            <p>The only free-text field in the study is an optional comments box at the end. If you use it, avoid writing anything you'd prefer not to appear in a research paper — it is stored as you type it.</p>
+            <p>You can stop at any time by closing the browser.</p>
+
+            <label class="checkbox-label" style="margin-top: 2rem; margin-bottom: 0;">
+                <input type="checkbox" id="age-check">
+                <span>I confirm I am 18 years of age or older</span>
+            </label>
+            <p id="age-error" style="color: #ef4444; font-size: 0.85rem; margin-left: 2rem; display: none;">This study is open to participants aged 18 and over.</p>
+
+            <label class="checkbox-label" style="margin-top: 0.5rem;">
+                <input type="checkbox" id="consent-check">
+                <span>I have read the above and agree to participate</span>
+            </label>
+        </div>
+
+        <div id="screener-section" style="display: none;">
+            <div class="card">
+                <h3>Screener Question</h3>
+                <p>Have you ever written computer code of any kind — including HTML, Python, JavaScript, Excel formulas, or anything similar?</p>
+                <div class="radio-group">
+                    <label class="checkbox-label"><input type="radio" name="screener" value="no"> No — I have never written code</label>
+                    <label class="checkbox-label"><input type="radio" name="screener" value="yes"> Yes — I have some coding experience</label>
+                </div>
+            </div>
+
+            <div id="screener-yes-msg" class="card" style="display: none; border-color: #ef4444;">
+                <p style="color: #ef4444; margin: 0;">Thank you — this study is specifically for people with no prior coding experience. We appreciate your time!</p>
+            </div>
+
+            <div id="screener-no-msg" style="display: none; margin-top: 2rem;">
+                <button id="begin-btn" class="btn btn-primary" style="font-size: 1.1rem; padding: 1rem 2.5rem;">Begin Study →</button>
+            </div>
+        </div>
+    </main>
+
+    <script src="/app.js"></script>
+</body>
+</html>
