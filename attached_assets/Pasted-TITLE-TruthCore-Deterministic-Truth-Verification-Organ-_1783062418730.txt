@@ -1,0 +1,178 @@
+TITLE: TruthCore — Deterministic Truth Verification Organ
+AUTHOR: Jason Andrews / DarkWave Studios LLC
+TARGET AGENT: Build Agent (Claude)
+OBJECTIVE: Build, formalize, and prepare publication materials for the Deterministic Truth Engine (“TruthCore”), an extension of the Deterministic Language Architecture (DLA) and the Lume synthetic organism ecosystem.
+
+------------------------------------------------------------
+SECTION 1 — PURPOSE OF THIS HANDOFF
+------------------------------------------------------------
+This directive provides everything needed to:
+1. Architect and implement the TruthCore deterministic truth-verification organ.
+2. Integrate TruthCore into the existing DLA + AXIOM stack.
+3. Extend the knowledge corpus with verified fact registries.
+4. Prepare a full academic paper for Zenodo documenting TruthCore.
+5. Produce a polished, publication-ready version of the paper.
+6. Maintain strict compliance with DLA constraints (D1–D5).
+7. Ensure deterministic, reproducible, provenance-backed truth evaluation.
+
+TruthCore is NOT a probabilistic classifier.  
+TruthCore is a deterministic fact-verification engine.
+
+------------------------------------------------------------
+SECTION 2 — HIGH-LEVEL DESCRIPTION OF TRUTHCORE
+------------------------------------------------------------
+TruthCore is a deterministic system that evaluates ANY user-provided input:
+- text claims
+- quotes
+- rumors
+- news headlines
+- images (metadata + signature verification)
+- documents
+- social media posts
+- “I heard this on the internet” statements
+
+TruthCore returns one of five deterministic outputs:
+- TRUE — matches verified fact in K
+- FALSE — contradicts verified fact in K
+- UNKNOWN — no matching fact in K
+- UNVERIFIABLE — insufficient data in K
+- CONFLICTING — verified sources disagree
+
+Every output includes a provenance path:
+- source fact ID
+- document reference
+- timestamp
+- verification chain
+- confidence markers (deterministic, not probabilistic)
+
+TruthCore NEVER guesses, estimates, or assigns probabilities.
+
+------------------------------------------------------------
+SECTION 3 — ARCHITECTURE OVERVIEW
+------------------------------------------------------------
+TruthCore extends DLA and AXIOM using the following layers:
+
+1. **Input Normalization Layer**
+   - Canonicalizes user input into structured claims.
+   - Extracts entities, events, dates, and relationships deterministically.
+
+2. **Deterministic Lookup Layer**
+   - Queries the verified fact corpus (K).
+   - Queries verified image/document signature registries.
+   - Queries verified event timelines.
+   - All lookups are deterministic and bounded.
+
+3. **Deterministic Matching Layer**
+   - Matches normalized claims against K.
+   - Uses deterministic rule-based matching (no embeddings, no neural nets).
+   - Produces one of the five truth states.
+
+4. **Governance Layer (Lume Organism)**
+   - Governs presentation, not content.
+   - Ensures consistent tone, register, and template.
+   - Cannot introduce new facts (D4).
+
+5. **Hard Constraint Layer**
+   - Enforces:
+     - Knowledge boundary (cannot answer outside K)
+     - Correction integrity (conflicts logged, not overwritten)
+     - Provenance traceability (mandatory)
+
+6. **Output Layer**
+   - Returns deterministic truth classification + provenance.
+
+------------------------------------------------------------
+SECTION 4 — KNOWLEDGE CORPUS REQUIREMENTS
+------------------------------------------------------------
+TruthCore requires a verified, bounded, enumerated corpus (K) containing:
+- fact registry (structured claims)
+- event timeline registry
+- quote registry
+- document signature registry
+- image signature registry
+- scientific fact registry
+- public record registry
+- legislative/regulatory registry (optional)
+
+All entries must:
+- be human-verifiable
+- be explicitly authored
+- include provenance metadata
+- satisfy D1 (bounded knowledge)
+
+------------------------------------------------------------
+SECTION 5 — DLA COMPLIANCE REQUIREMENTS
+------------------------------------------------------------
+TruthCore MUST satisfy all DLA conditions:
+
+- **D1:** Knowledge base is finite, enumerated, verified.
+- **D2:** Composition function is deterministic.
+- **D3:** No stochastic components.
+- **D4:** Every output element traceable to K.
+- **D5:** Governance logic fully inspectable.
+
+TruthCore MUST NOT:
+- use neural networks
+- use embeddings
+- use probabilistic classifiers
+- use confidence scores
+- interpolate or extrapolate beyond K
+
+------------------------------------------------------------
+SECTION 6 — ACADEMIC PAPER FOR ZENODO (OUTLINE)
+------------------------------------------------------------
+TITLE:
+TruthCore: A Deterministic Truth Verification Organ for the Lume Synthetic Organism
+
+ABSTRACT:
+Introduce TruthCore as the first deterministic truth-verification engine, built on DLA principles, providing reproducible, provenance-backed truth evaluation for public claims, images, documents, and digital content.
+
+SECTIONS:
+1. Introduction
+2. Motivation: The Crisis of Probabilistic Truth Systems
+3. Background: DLA, AXIOM, and Deterministic Governance
+4. Formal Definition of TruthCore
+5. Truth Classification Function (T)
+6. Deterministic Matching Algorithm
+7. Provenance Model
+8. Hard Constraints and Safety Guarantees
+9. Implementation in AXIOM
+10. Comparison with LLM-based Fact Checkers
+11. Regulatory Applications (Financial, Legal, Safety)
+12. Conclusion
+13. References
+
+The paper MUST:
+- follow DLA formalism
+- include diagrams
+- include pseudocode for T(q, K)
+- emphasize deterministic guarantees
+- contrast with probabilistic systems
+
+------------------------------------------------------------
+SECTION 7 — IMPLEMENTATION DIRECTIVES FOR BUILD AGENT
+------------------------------------------------------------
+The build agent must:
+1. Create the TruthCore organ as a deterministic module.
+2. Implement the truth classification function T(q, K).
+3. Build the fact corpus schemas.
+4. Build deterministic matching rules.
+5. Build provenance generation logic.
+6. Integrate TruthCore into AXIOM’s governance pipeline.
+7. Prepare the full academic paper draft.
+8. Prepare diagrams (ASCII or description).
+9. Produce a summary of improvements and gaps.
+
+------------------------------------------------------------
+SECTION 8 — OUTPUT REQUIREMENTS
+------------------------------------------------------------
+The build agent must produce:
+1. Full TruthCore architecture specification.
+2. Full academic paper draft (Zenodo-ready).
+3. Diagram(s) describing TruthCore.
+4. Implementation notes for AXIOM integration.
+5. A list of any ambiguities requiring author confirmation.
+
+------------------------------------------------------------
+END OF DIRECTIVE
+------------------------------------------------------------
