@@ -78,3 +78,9 @@ id = "2d6XE48OjWp0X6RSpbi5Z"
 uri = "file://lumescan-hardware-test-handoff.md"
 type = "text"
 title = "LumeScan — Hardware Test Handoff for Gemini"
+
+[[outputs]]
+id = "sjpGmu7T3zu7S7rbcpMCA"
+uri = "file://AXIOM_DDA_GEMINI_HANDOFF.md"
+type = "text"
+title = "Axiom DDA — Gemini Handoff (Root Causes + Fixes)"
