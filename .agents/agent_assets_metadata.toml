@@ -90,3 +90,9 @@ id = "MLFvUFaYCccKO73qfS9hy"
 uri = "file://LUME_STUDY_CONSENT_FIX_HANDOFF.md"
 type = "text"
 title = "Lume Study — Consent Checkbox Fix Handoff"
+
+[[outputs]]
+id = "wwr1QUrloDOylL7MZLgvf"
+uri = "file://AXIOM_STUDIO_EMPTY_SHELL_FIX_HANDOFF.md"
+type = "text"
+title = "Axiom Studio — Empty Shell Fix Handoff"
