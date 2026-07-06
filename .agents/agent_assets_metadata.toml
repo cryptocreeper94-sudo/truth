@@ -84,3 +84,9 @@ id = "sjpGmu7T3zu7S7rbcpMCA"
 uri = "file://AXIOM_DDA_GEMINI_HANDOFF.md"
 type = "text"
 title = "Axiom DDA — Gemini Handoff (Updated: Real Root Cause Found)"
+
+[[outputs]]
+id = "MLFvUFaYCccKO73qfS9hy"
+uri = "file://LUME_STUDY_CONSENT_FIX_HANDOFF.md"
+type = "text"
+title = "Lume Study — Consent Checkbox Fix Handoff"
