@@ -9,13 +9,84 @@ This has been attempted multiple times over ~3 months. The instructions below st
 
 ---
 
-## SUMMARY OF ROOT CAUSES (3 issues, ranked by likely impact)
+## UPDATE (2026-07-06): PRIORITY-0 ROOT CAUSE FOUND — READ THIS FIRST
 
-1. **The LLM gateway is very likely silently disabled in production** — because the environment variable it depends on (`ANTHROPIC_API_KEY` or `OPENAI_API_KEY`) is missing, blank, or invalid in Coolify's environment settings. When disabled, the code doesn't crash or error visibly — it just quietly serves worse answers. This is the most likely explanation for "not grounding to an LLM" and a large share of "not picking up knowledge packs."
-2. **"Lume-V governance" does not exist anywhere in the runtime code path.** It is currently only a declarative manifest file (`src/knowledge/local/local-lumev.js`) describing intents/inputs/outputs/constraints — but nothing in `gateway.js`, `grounded-rag.js`, or `orchestrator.js` ever imports or calls it. Comments say "governed by Lume-V" but no code enforces anything. This needs to be built, not patched.
-3. **Voice narration lags ~20 seconds behind text** because `/api/speak/voice` reruns the ENTIRE 42-module + knowledge pipeline a second time (duplicating the work already done by `/api/speak`), and only starts the ElevenLabs TTS call after that second run finishes — three slow things stacked sequentially instead of one.
+Everything below this section was diagnosed and (per commit history) largely already applied. It was real and worth doing, but it did NOT fix the core problem, because there is a bigger gate sitting upstream of all of it. **Confirmed live against production** (`https://axiom42.com/api/speak`) on 2026-07-06: ordinary questions like "what size tire does a 2014 ram truck have" and "explain the difference between a Roth IRA and a traditional IRA" both come back with `"pipelineStatus":"GATE_REQUEST"`, `"gatedAt":"M-15"`, `"knowledgeHit":null`, `"groundedFacts":null`. **The request never reaches the knowledge packs, GroundedRAG, or the LLM at all.** This is FIX 0 — apply it before anything else; it explains "not picking up knowledge packs" far more completely than the LLM-key issue did.
 
-None of these are "knowledge packs failing to load." `loader.js` registers 270+ packs unconditionally and `DomainKnowledgeEngine.register()` throws immediately if a pack is malformed — if packs weren't loading, the server would crash on boot, not run silently degraded. Confirm this is still true if you're re-diagnosing (see Ruled Out section).
+### FIX 0 — Module 15 (`ReferenceResolver`) is gating almost every real question before knowledge lookup ever runs
+
+**File:** `src/modules/layer3-constraint/13-17-constraint.js`
+
+**Root cause:** Every input goes through a fixed 42-module deterministic pipeline (`DDAOrchestrator.process()` in `src/runtime/orchestrator.js`) BEFORE the knowledge engine or GroundedRAG is ever consulted. `orchestrator.js`'s `speak()`/`speakDeterministic()` only proceed to knowledge lookup / GroundedRAG / LLM if `pipelineResult.status === "COMPLETE"` — if the pipeline returns `GATE_REQUEST` at any module, the whole knowledge/LLM section is skipped entirely and a generic canned response is returned instead.
+
+Module 15 (`ReferenceResolver`) checks what fraction of the user's words match a **tiny 19-entity ontology** in `src/ontology/core-ontology.js` (entities like `USER`, `AGENT`, `INPUT`, `FRAME`, `RESPONSE`, `DOMAIN`, `SIGNAL`, `CERT` — pipeline bookkeeping concepts, not knowledge). If more than 85% of the words in an input (for inputs over 3 words) aren't found in that tiny ontology, it hard-stops the request:
+
+```js
+    if (unresolvedRatio > 0.85 && tokens.length > 3) {
+      return {
+        action: "GATE_REQUEST",
+        reason: "M-15: High unresolved reference ratio — input may be outside agent domain.",
+        gateType: "REFERENCE_RESOLUTION",
+      };
+    }
+```
+
+The actual knowledge lives in 270+ packs covering 120,000+ topics — completely separate from this 19-entity ontology. Since almost no everyday question (tires, IRAs, recipes, symptoms, anything) uses the pipeline's bookkeeping vocabulary, nearly every real question gets a near-100% "unresolved" ratio and is blocked here, regardless of whether the knowledge packs or the LLM could have answered it. Module 16 (`DomainMapper`) compounds this the same way, gating again if `domainConfidence < 0.15`, which is partly derived from this same unresolved ratio.
+
+**Fix — make M-15/M-16 advisory instead of a hard gate, and let actual knowledge/LLM availability decide domain fit:**
+
+In `ReferenceResolver._execute()`, replace the hard gate:
+
+```js
+    if (unresolvedRatio > 0.85 && tokens.length > 3) {
+      return {
+        action: "GATE_REQUEST",
+        reason: "M-15: High unresolved reference ratio — input may be outside agent domain.",
+        gateType: "REFERENCE_RESOLUTION",
+      };
+    }
+
+    return { action: "PROCEED", data: { referencesResolved: resolved.length } };
+```
+
+with:
+
+```js
+    // NOTE: This module's ontology only covers ~19 pipeline-bookkeeping entities
+    // (USER, AGENT, FRAME, etc.) — it does NOT cover the 120,000+ topics in the
+    // knowledge packs. A high unresolvedRatio here means "not pipeline jargon,"
+    // NOT "outside the agent's knowledge." Do not hard-gate on it. Let the
+    // knowledge engine / GroundedRAG in orchestrator.speak() make the real
+    // "do we know this" decision — that's the system with the actual domain
+    // coverage. This module just annotates ctx.references for downstream use.
+    return { action: "PROCEED", data: { referencesResolved: resolved.length, unresolvedRatio } };
+```
+
+In `DomainMapper._execute()` (Module 16, same file), find the equivalent hard gate on `domainConfidence < 0.15` and apply the same change: keep computing and attaching `ctx.domain` (other modules and the DPCL response formatter may read it), but change its `return` from `{ action: "GATE_REQUEST", ... }` to `{ action: "PROCEED", data: { domainConfidence } }`. Do NOT delete the confidence computation — only remove the hard `GATE_REQUEST` return so it stops blocking the pipeline. Downstream, `orchestrator.speak()`/`speakDeterministic()` already have a well-designed fallback chain (live data → GroundedRAG → Wikipedia → honest "I don't know" template) that is a much better arbiter of "do we actually know this" than a 19-entity keyword check. Let that chain run instead of preempting it.
+
+**Why this is safe:** `M-38` (PreStructureMonitor) and the Layer 6 safety modules (M-35 through M-42 — CollapseDetection, DissolutionGuard, NullBoundaryGuard, etc.) remain fully intact and still run at the end of the pipeline as the actual safety envelope. This change only stops M-15/M-16 from pre-emptively blocking ordinary factual questions before the knowledge/LLM layer gets a chance to answer them.
+
+**Verify this fix first, before re-testing anything else in this document:**
+```bash
+curl -X POST https://axiom42.com/api/speak -H "Content-Type: application/json" \
+  -d '{"input":"what size tire does a 2014 ram truck have","mode":"auto"}'
+```
+Before the fix: `"pipelineStatus":"GATE_REQUEST"`, `"gatedAt":"M-15"`, `"knowledgeHit":null`.
+After the fix: `"pipelineStatus":"COMPLETE"`, `"gatedAt":null`, and `"knowledgeHit"` should be truthy (or at minimum the response should attempt a real answer instead of the generic "i don't have a specific knowledge match" template).
+
+---
+
+## SUMMARY OF ADDITIONAL ROOT CAUSES (secondary — apply after FIX 0)
+
+These were diagnosed earlier and, per commit history, largely already applied to the repo (see commits `3263f4f`, `7485c9f`, `4a7dfd1`). They are still worth confirming, but none of them matter until FIX 0 above is applied — a gated request never reaches any of this code.
+
+1. **The LLM gateway may still be silently disabled in production** — because the environment variable it depends on (`ANTHROPIC_API_KEY` or `OPENAI_API_KEY`) is missing, blank, or invalid in Coolify's environment settings. When disabled, the code doesn't crash or error visibly — it just quietly serves worse answers.
+2. **"Lume-V governance" did not exist anywhere in the runtime code path** prior to commit `3263f4f` — confirm the `LumeVGate` described below is actually present and wired into `gateway.js` on the current `main`.
+3. **Voice narration lag** — confirm the `/api/speak/voice` fast-path (accepting precomputed `{ text }` instead of re-running the pipeline) described below is present and that the frontend actually calls it that way.
+
+Separately (already partially addressed by commits `7485c9f` / `4a7dfd1` / VPS upgrade to 8GB RAM on Hetzner): the app was previously OOM-crashing on a 4GB VPS while loading thousands of knowledge packs (`--max-old-space-size=6144` was set on a box smaller than that ceiling, which is actively counterproductive — it lets V8 grow memory further before collecting, making an OS-level SIGKILL more likely, not less). The VPS has since been upgraded to 8GB, which resolves the immediate mismatch. If OOM symptoms return, re-check that `--max-old-space-size` stays meaningfully below actual available RAM (leave 1.5–2GB headroom for the OS, Postgres, and the background `knowledge_expansion_daemon.mjs` process), rather than raising the ceiling indefinitely.
+
+None of these are "knowledge packs failing to load" in the sense of registration failing. `loader.js` registers 270+ packs unconditionally and `DomainKnowledgeEngine.register()` throws immediately if a pack is malformed — if packs weren't loading, the server would crash on boot, not run silently degraded. Confirm this is still true if you're re-diagnosing (see Ruled Out section).
 
 ---
 
