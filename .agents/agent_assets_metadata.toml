@@ -102,3 +102,9 @@ id = "LrRxVgonP24ZLVK92vSb7"
 uri = "file://HR4801_DETERMINISTIC_AI_LEGISLATIVE_BRIEFING.md"
 type = "text"
 title = "HR 4801 Legislative Briefing — Deterministic AI Compliance Pathway"
+
+[[outputs]]
+id = "Vkl8JMMgtsc41esY6kXCJ"
+uri = "file://CANONICAL_TERMINOLOGY_INDEX_AGENT_BRIEFING.md"
+type = "text"
+title = "Agent Briefing — Canonical Terminology Index"
