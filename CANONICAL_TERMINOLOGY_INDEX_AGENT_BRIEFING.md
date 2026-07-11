@@ -1,6 +1,6 @@
 # Agent Briefing: Canonical Terminology Index — DarkWave Studios
 
-**Issued by:** Jason Andrews, DarkWave Studios LLC
+**Issued by:** Ronald "Jason" Andrews, DarkWave Studios LLC
 **Priority:** IMMEDIATE — gap closure task
 **Output destination:** Government build site, lume-lang.com, axiom42.com, and all future DarkWave properties
 
@@ -66,7 +66,7 @@ Produce a single Markdown file: `DARKWAVE_CANONICAL_TERMINOLOGY_INDEX.md`
 
 ```markdown
 # DarkWave Studios — Canonical Terminology Index
-**Maintained by:** Jason Andrews, DarkWave Studios LLC
+**Maintained by:** Ronald "Jason" Andrews, DarkWave Studios LLC
 **Last updated:** [date]
 **Source corpus:** 93 papers + 4 books, Zenodo (Andrews, Ronald Jason)
 

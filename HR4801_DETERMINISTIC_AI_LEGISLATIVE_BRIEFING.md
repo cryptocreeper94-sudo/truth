@@ -1,7 +1,7 @@
 # Legislative Briefing: Deterministic AI Architectures as a Compliance Pathway Under H.R. 4801
 
 **Prepared for:** House Financial Services Committee staff (Attn: Mia Real)
-**Prepared by:** Jason Andrews, Founder — DarkWave Studios LLC
+**Prepared by:** Ronald "Jason" Andrews, Founder — DarkWave Studios LLC
 **Re:** H.R. 4801, "Unleashing AI Innovation in Financial Services Act" (Ordered Reported, 33–19, 119th Congress)
 **Date:** July 6, 2026
 
@@ -64,4 +64,4 @@ As Innovation Lab application guidance is developed under H.R. 4801, we recommen
 
 H.R. 4801 correctly identifies that current AI regulation can be unduly burdensome relative to actual risk. The missing piece is a clear way for regulators to distinguish AI systems that carry genuine unpredictability risk from those that don't. Deterministic architectures like the one described here are built specifically to remove that unpredictability — making them a natural fit for the exact compliance test H.R. 4801 already writes into the bill. We'd welcome the opportunity to walk the Committee or its staff through a live demonstration of the system's audit trail on a sample financial-services use case.
 
-**Contact:** Jason Andrews, DarkWave Studios LLC
+**Contact:** Ronald "Jason" Andrews, DarkWave Studios LLC
