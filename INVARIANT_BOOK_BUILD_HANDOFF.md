@@ -80,15 +80,20 @@ With that understanding established, let us begin.
 
 ---
 
-## Task 3: Add Three New Chapters
+## Task 3: Add Four New Chapters
 
-These three chapters are a cohesive unit and should be added together as a new section near the end of the book, before the existing Closing Thoughts. They are titled and ordered as follows:
+**BEFORE INSERTING: re-read the Structural Placement Map above. These chapters do NOT all go in the same place and do NOT go at the end of the book.**
 
-1. **The Narrowing** — Lo Tirtzach, the commandment without a qualifier, scribal corruption
-2. **The Agent** — Paul/Saul as controlled opposition, the contradictions with Yahusha's direct teaching
-3. **The Filter** — The epistemological foundation: five tests for determining what is invariant in a corrupted text
+The four chapters and their exact insertion points:
+
+1. **The Empire That Never Fell** — Insert after Chapter 13B (Constantine and the Council of Nicaea), within Part Four-B
+2. **The Narrowing** — Insert after Chapter 17 (Religious Inversions), within Part Five
+3. **The Agent** — Insert immediately after The Narrowing, within Part Five
+4. **The Filter** — Insert after Chapter 42 (The Path Forward), within Part Twelve
 
 Each chapter is formatted in the same style as the existing chapters (Merriweather font, chapter-title class heading, paragraph text, blockquotes for scripture).
+
+**NOTE: The Narrowing chapter contains a section called "A Note on Sources" near its opening. Since Task 2 adds a standalone "A Note on Sources" before Part One, REMOVE that embedded section from The Narrowing chapter text. The content is the same — it only needs to appear once, at the front of the book.**
 
 **Scripture citation format used throughout:** Book name in English with Hebrew name in parentheses, e.g.: *Yirmeyahu (Jeremiah) 8:8*. Hebrew names are used first where given (Yahuah, Yahusha, Yirmeyahu, Yeshayahu, Mattithyahu, Kepha, Daniyl, Eliyahu, Ysharal, Avraham, Mosheh, Yahudah).
 
@@ -624,21 +629,34 @@ The site is a React/Vite SPA. The chapter content is embedded in the JS bundle. 
 
 1. Update all title/subtitle references from "Through the Veil" to "INVARIANT" and "What the Lying Pen Could Not Change"
 2. Update the meta tags, og:title, og:description, page title
-3. Add the three new chapters to the chapters array (lY array in the JS) in order, before Closing Thoughts
+3. Add all four new chapters to the chapters array (lY array in the JS) at their correct positions per the Structural Placement Map — they do NOT all go before Closing Thoughts
 4. Update the copyright year to 2026
 5. Rebuild and deploy
 
-**The three new chapters as JS objects for the array:**
-Add in this format, in order, before the existing "Closing Thoughts" entry:
+**The four new chapters as JS objects — insert at their correct array positions:**
+
+The Empire That Never Fell → after the Chapter 13B object:
+```javascript
+{
+  title: "The Empire That Never Fell",
+  content: `[full text of The Empire That Never Fell chapter above]`
+}
+```
+
+The Narrowing and The Agent → after the Chapter 17 object, in order:
 ```javascript
 {
   title: "The Narrowing",
-  content: `[full text of The Narrowing chapter above]`
+  content: `[full text of The Narrowing chapter above, with the embedded "A Note on Sources" section removed]`
 },
 {
   title: "The Agent",
   content: `[full text of The Agent chapter above]`
-},
+}
+```
+
+The Filter → after the Chapter 42 object:
+```javascript
 {
   title: "The Filter",
   content: `[full text of The Filter chapter above]`
@@ -697,10 +715,12 @@ Before considering this build complete, confirm:
 - [ ] Subtitle reads "What the Lying Pen Could Not Change"
 - [ ] Copyright reads "© 2026 Ronald 'Jason' Andrews"
 - [ ] "A Note on Sources" section appears before Part One of existing content
-- [ ] "The Narrowing" chapter appears and renders correctly
-- [ ] "The Agent" chapter appears and renders correctly
-- [ ] "The Filter" chapter appears and renders correctly
-- [ ] All three new chapters appear before Closing Thoughts
+- [ ] "The Empire That Never Fell" appears after Chapter 13B (Part Four-B)
+- [ ] "The Narrowing" appears after Chapter 17 (Part Five)
+- [ ] "The Agent" appears immediately after The Narrowing (Part Five)
+- [ ] "The Filter" appears after Chapter 42 (Part Twelve)
+- [ ] The embedded "A Note on Sources" section has been removed from The Narrowing chapter (it exists as a standalone intro instead)
+- [ ] All four new chapters render correctly with correct formatting
 - [ ] All Hebrew names are used correctly throughout (Yahuah, Yahusha, Yirmeyahu, etc.)
 - [ ] All scripture references follow format: Book (Hebrew name) chapter:verse
 - [ ] Site loads correctly at throughtheveil.tlid.io after deploy
