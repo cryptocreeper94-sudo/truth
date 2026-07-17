@@ -473,9 +473,11 @@ People speak of the fall of Rome as though it was an ending.
 
 It was not an ending. It was a rebranding.
 
-In 476 CE, the last Western Roman Emperor — a teenager named Romulus Augustulus — was deposed by a Germanic chieftain named Odoacer. No battle. No siege. He was simply removed from power and sent into exile. History books record this as the fall of the Western Roman Empire and treat it as one of the great turning points of civilization — the end of the ancient world, the beginning of the Dark Ages.
+In 476 CE, the last Western Roman Emperor — a teenager named Romulus Augustulus — was deposed by a Germanic chieftain named Odoacer. No battle. No siege. He was simply removed from power and sent into exile. History books call what followed the "Dark Ages" — a thousand years of supposed stagnation, sparse records, and arrested progress.
 
-But the institution did not fall. The apparatus did not collapse. The bureaucracy, the legal framework, the land, the wealth, the mechanisms of control — none of it disappeared. It transferred. Over the preceding century and a half, a parallel power structure had been carefully constructed within the empire, using the empire's own infrastructure, legitimized by the empire's own authority.
+But as this book has already established: those thousand years were not dark. They were the Millennial Reign. The records are sparse because they were deliberately obscured. The memory was erased as part of the same pattern of suppression this entire investigation traces. The institution that presided over that era had every reason to make sure future generations could not clearly see what actually happened during it.
+
+What is certain is this: the institution did not fall. The apparatus did not collapse. The bureaucracy, the legal framework, the land, the wealth, the mechanisms of control — none of it disappeared. It transferred. Over the preceding century and a half, a parallel power structure had been carefully constructed within the empire, using the empire's own infrastructure, legitimized by the empire's own authority.
 
 It was called the Church.
 
@@ -616,6 +618,48 @@ Add in this format, in order, before the existing "Closing Thoughts" entry:
   content: `[full text of The Filter chapter above]`
 }
 ```
+
+---
+
+## Critical Redundancy Warning — Read Before Building
+
+The existing book (Through-The-Veil-COMPLETE.html) already covers several topics that appear in or near the new chapters. The build agent MUST cross-reference before finalizing placement to avoid repeating content the reader has already encountered.
+
+**Topics already covered in the existing book — do NOT repeat, only cross-reference:**
+
+| Topic | Status in existing book | Action |
+|---|---|---|
+| Dark Ages = Millennial Reign | Already argued (twice) | New Empire chapter references this — do NOT re-argue it, treat as established |
+| The Rapture / Staged Rapture | Full chapter already exists | Do NOT add new rapture content — cross-reference only |
+| The Little Season | Already referenced | Cross-reference only |
+| Second Coming already happened | Developed in existing book | Do NOT re-argue — reference as established |
+| The Councils (Nicaea, Laodicea, Carthage) | Full chapter already exists | Empire chapter references councils — do NOT duplicate council detail |
+| Controlled Opposition | Chapter already exists | The Agent chapter connects to it — do NOT duplicate |
+| The Name Substitution | Full chapter already exists | The Narrowing references it — do NOT re-explain the Name erasure in full |
+| Book of Enoch exclusion | Already covered | The Filter references it — do NOT re-argue |
+
+**Topics NOT yet in the existing book — safe to add:**
+
+| Topic | New chapter | Status |
+|---|---|---|
+| Lo Tirtzach carries no human qualifier | The Narrowing | NEW — not in existing book |
+| Jeremiah 8:8 / scribal corruption of Torah | The Narrowing | NEW — not in existing book |
+| Animal sacrifice never commanded (5 witnesses) | The Narrowing | NEW — not in existing book |
+| Bible etymology / Byblos / Baalat Gebal | The Narrowing | NEW — not in existing book |
+| Paul as controlled opposition / contradictions with Yahusha | The Agent | NEW — not in existing book |
+| Damascus road contradictions (Acts 9 vs 22) | The Agent | NEW — not in existing book |
+| Peter's warning about Paul (2 Peter 3:15-16) | The Agent | NEW — not in existing book |
+| Revelation 2:2 / Ephesus / false apostles | The Agent | NEW — not in existing book |
+| Five-test filter for invariant truth | The Filter | NEW — not in existing book |
+| Origin of deterministic thinking in this investigation | The Filter | NEW — not in existing book |
+| Constantine as absorber not convert | The Empire | NEW — not in existing book |
+| Vatican as sovereign nation-state | The Empire | NEW — not in existing book |
+| Roman bloodlines (Orsini, Colonna, Farnese) in Vatican | The Empire | NEW — not in existing book |
+| Roman law preserved and transmitted by Church | The Empire | NEW — not in existing book |
+| Body as the temple (Yahusha first, John 2:19-21) | The Filter or standalone | NEW — not in existing book |
+| Third temple already exists (your body) | The Filter or standalone | NEW — not in existing book |
+
+**If during the build the agent identifies any other overlap with existing content, DO NOT silently drop the new content. Flag it in a build note for the author to review.**
 
 ---
 
