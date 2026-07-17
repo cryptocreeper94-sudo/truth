@@ -11,6 +11,8 @@
 
 This is not a simple content update. This is a meaningful second edition of a book that is the author's most personal and foundational work — the origin of his entire intellectual and technical philosophy. Every decision must preserve the voice, the conviction, and the precision of the original.
 
+The word INVARIANT is not arbitrary. The author operates `invariant.tlid.io` as the Deterministic Nexus — the home of his DarkWave Studios technical architecture, built on the principle that truth in a deterministic system cannot change regardless of transformation. The book title uses the same word deliberately: what was given in stone is invariant — it cannot be changed by scribal manipulation, institutional rebranding, or manufactured doctrine, any more than a deterministic output can be changed by the layers built on top of it. The book and the technical work are two expressions of the same core conviction. The build agent should understand this so that any descriptive copy, meta descriptions, or contextual text preserves that weight.
+
 The book is currently titled **"Through the Veil"** — a title the author has decided to replace. The new title is **INVARIANT**. This rename touches every place the title appears: the HTML file, all cover/header content, meta tags, the site title, and any navigation text.
 
 Four new chapters have been fully drafted and must be added to the manuscript. They are new material, not revisions to existing chapters. They form a cohesive new layer of the book — a "second edition" addition that goes deeper than the original investigation.
