@@ -108,3 +108,9 @@ id = "Vkl8JMMgtsc41esY6kXCJ"
 uri = "file://CANONICAL_TERMINOLOGY_INDEX_AGENT_BRIEFING.md"
 type = "text"
 title = "Agent Briefing — Canonical Terminology Index"
+
+[[outputs]]
+id = "cWC2zYUjQq8tHXZuhwHA7"
+uri = "file://VEIL_NEW_CHAPTER_LO_TIRTZACH.md"
+type = "text"
+title = "Draft Chapter — “The Narrowing”"
