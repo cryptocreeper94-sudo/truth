@@ -13,7 +13,33 @@ This is not a simple content update. This is a meaningful second edition of a bo
 
 The book is currently titled **"Through the Veil"** — a title the author has decided to replace. The new title is **INVARIANT**. This rename touches every place the title appears: the HTML file, all cover/header content, meta tags, the site title, and any navigation text.
 
-Three new chapters have been fully drafted and must be added to the manuscript. They are new material, not revisions to existing chapters. They form a cohesive new layer of the book — a "second edition" addition that goes deeper than the original investigation.
+Four new chapters have been fully drafted and must be added to the manuscript. They are new material, not revisions to existing chapters. They form a cohesive new layer of the book — a "second edition" addition that goes deeper than the original investigation.
+
+**CRITICAL: Do not add a fifth chapter on "The Script" or any staged rapture content.** This is already fully developed in the existing Chapter 37 ("The Great Deception Is Here") under the section "THE SCRIPT THEY WROTE." It is excellent and must not be duplicated.
+
+---
+
+## Structural Placement Map — Read Before Inserting Anything
+
+The existing book has 46 chapters across 12 parts. The four new chapters are NOT to be appended at the end. They must be inserted at specific points within the existing structure to maintain the book's documentary flow (evidence → pattern recognition → conclusion).
+
+**Exact insertion order:**
+
+| Chapter | Insert After | Part |
+|---|---|---|
+| **The Narrowing** | Chapter 17 (Religious Inversions — What Popular Religion Claims Without Scripture) | Part Five: The Great Substitution |
+| **The Agent** | The Narrowing (new sequence) | Part Five: The Great Substitution |
+| **The Empire That Never Fell** | Chapter 13B (Constantine and the Council of Nicaea) | Part Four-B: The Institutionalization of the Deception |
+| **The Filter** | Chapter 42 (The Path Forward) | Part Twelve: The Restoration |
+
+**Rationale:**
+- The Narrowing and The Agent deepen Part Five's existing investigation into how the text and theology were corrupted — they belong there, not at the end
+- The Empire belongs in Part Four-B alongside the Constantine chapter — it is the direct sequel to what 13B establishes
+- The Filter belongs in The Restoration — it is the practical tool the reader needs after the full investigation is complete
+- This ordering means a reader encounters: Empire (how the institution formed) → Narrowing + Agent (how the text was corrupted) → Filter (how to find what's invariant) — a clean escalation
+
+**IMPORTANT NOTE on The Empire chapter and Chapter 13B overlap:**
+Chapter 13B already covers Constantine's absorption strategy and the Council of Nicaea in detail. The Empire chapter's opening Constantine section is intentionally brief — it functions as a bridge that says "13B established how Constantine absorbed the movement; what follows is what the institution became after Rome's nominal collapse." Do NOT merge or consolidate these chapters — they each have a distinct scope. Do NOT remove the Constantine references from The Empire chapter; they are necessary connective tissue. Simply ensure the two chapters cross-reference each other cleanly.
 
 ---
 
