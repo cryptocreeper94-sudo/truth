@@ -126,3 +126,9 @@ id = "KjBi2Wzl3ykYbccV8xvwN"
 uri = "file://VEIL_NEW_CHAPTER_FILTER.md"
 type = "text"
 title = "Draft Chapter — “The Filter”"
+
+[[outputs]]
+id = "vp9qNlqb0R044j_5K2Ksq"
+uri = "file://INVARIANT_BOOK_BUILD_HANDOFF.md"
+type = "text"
+title = "INVARIANT — Second Edition Build Handoff"
