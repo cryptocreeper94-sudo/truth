@@ -138,3 +138,9 @@ id = "Xz0jdStGFqpui-0lCRfdd"
 uri = "file://VEIL_NEW_CHAPTER_EMPIRE.md"
 type = "text"
 title = "Draft Chapter — “The Empire That Never Fell”"
+
+[[outputs]]
+id = "L3z-at5UnkakKXrX1PFjg"
+uri = "file://INVARIANT_BUILD_HANDOFF.zip"
+type = "unspecified"
+title = "INVARIANT — Build Handoff (HTML, download)"
