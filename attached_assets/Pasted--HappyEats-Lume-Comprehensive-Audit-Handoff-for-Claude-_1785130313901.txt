@@ -1,0 +1,71 @@
+# HappyEats Lume - Comprehensive Audit Handoff for Claude
+
+**Repository:** `cryptocreeper94-sudo/happyeats-lume`
+
+This document provides a highly detailed, comprehensive synthesis of approximately **16 hours of consecutive development and architectural pivoting** on the HappyEats platform. This handoff is structured specifically for Claude to conduct an objective, systemic audit of the platform's viability, logic structure, margin health, and codebase architecture.
+
+We have deliberately pivoted away from a typical B2C food aggregator approach to a robust B2B-friendly, transparent pricing model, deeply integrated with the Invariant Ecosystem's principles (no hidden service fees, honest markup, deterministic UI).
+
+---
+
+## 1. The 16-Hour Implementation Summary
+
+Below is an exhaustive log of all features, fixes, and logic rewrites executed over the past 16 hours, categorized by operational impact.
+
+### A. Billing Engine & Margin Protection
+**Goal:** Establish an unapologetically transparent pricing model that remains scalable and profitable, stripping out hidden fees and replacing them with a flat markup.
+
+*   **30% Platform Markup:** Entirely removed legacy "Service Fees" arrays and replaced them with a hardcoded `SERVICE_FEE_RATE = 0.30`. This is explicitly presented to the user on checkout pages and emailed receipts as "Platform Markup (30%) - Replaces hidden Big App fees for full transparency".
+*   **State Tax Independence:** Fixed a critical billing flaw where the 9.75% Tennessee Prepared Food Tax was being applied incorrectly. The tax is now strictly decoupled and applied independently of the 30% markup.
+*   **Stripe Connect Overhaul:** Ripped out previous Stripe Connect split-payment structures and redefined the internal revenue split logic directly within the application tier to protect margins.
+*   **Small Order Fee:** Integrated a flat $0.99 small order fee under specific thresholds alongside raw Stripe card integrations.
+*   **Dynamic Delivery Fee Waiver:** Hardcoded a flat `$2.99` delivery fee, which automatically drops to `$0.00` if a cart's subtotal hits `$40.00` or above.
+
+### B. Group Carts & Split Payment Architecture
+**Goal:** Accommodate B2B corporate lunches and decentralized friend groups by allowing multiple individuals to pool orders into a single delivery, while solving the payment friction.
+
+*   **Database Schema (`sharedCarts`):** Injected a new column `paymentType: text("payment_type").default("host")` to support 'split' vs 'host' workflows.
+*   **Host Payment Flow:** The creator of the group cart assumes financial responsibility, swiping their card for the aggregate total of all participants.
+*   **Split Payment Flow:** 
+    *   The backend's `GET /api/group-carts/:uuid` endpoint was heavily modified. When `paymentType === 'split'`, the system actively polls the `orders` table for all distinct orders holding the shared `sharedCartId`.
+    *   It recursively aggregates the individual subtotals. If the collective B2B group surpasses the `$40.00` threshold, the **delivery fee is waived for all participants**.
+    *   The frontend `zone-order.tsx` intelligently disables the "Pay" button for the host in Split Mode, instead showing "Waiting for Participants" and instructing the host to share the group link so each individual can pay for their own items.
+
+### C. Tax Exemption Lifecycle for B2B
+**Goal:** Reduce friction for corporate entities and tax-exempt organizations while capturing the necessary compliance paperwork.
+
+*   **Registration Frontend (`customer-auth.tsx`):** Added conditional React state listening for the "Business" account type toggle. When activated, a "My business is tax exempt" checkbox appears.
+*   **Certificate Upload:** Checking the box reveals an automatic file upload dropzone. The frontend converts the uploaded tax exemption certificate into a Base64 payload.
+*   **Database Schema (`customers`):** Added `taxExempt: boolean("tax_exempt").default(false)` and `taxCertificateUrl: text("tax_certificate_url")`. 
+*   **Payload Execution:** The file URL and boolean flag are passed through the `POST /api/customers/register` payload, immediately granting the organization tax-exempt status in the billing engine for all future checkout flows.
+
+### D. 5% Sustainable Cashback Program
+**Goal:** Completely remove a dangerous margin-killer ("Buy 10 orders get 1 free", costing ~10% off the top) and replace it with a highly sustainable, automated point system that incentivizes volume without gutting profitability.
+
+*   **Point Accumulation (`routes.ts`):** In `POST /api/orders`, the system now automatically runs `Math.floor(order.subtotal)` and executes an independent `db.update` to grant the user 1 point per $1 spent on food.
+*   **Database Schema:** Added `rewardPoints: integer("reward_points").notNull().default(0)` directly to the core `customers` table.
+*   **The Translation Layer:** The UI previously relied on `customer_rewards.rewardBalance` (which stored raw dollar values). Rather than rewriting the entire UI component tree, we intercepted `GET /api/rewards/:customerId`. The backend dynamically pulls `rewardPoints`, multiplies them by `0.05` (5% cashback value), and injects the resulting dollar amount into the `rewardBalance` property sent to the client.
+
+### E. Tenant Expansion & Onboarding
+*   **Gyro & Philly Integration:** Fully onboarded a new tenant `gyroandphilly`.
+    *   Mapped the subdomain routing securely to the `gyro-philly-2` slug to prevent data pollution.
+    *   Added custom splash screens, manifest icons, and a comprehensive hero/emblem asset pipeline for this tenant.
+    *   Fixed a database seeding flaw where the `seed-gyro` route was inserting data into the wrong table.
+*   **Twilio SMS Restoration:** Restored critical Twilio SMS routing logic for driver and customer coordination, overriding flawed legacy setups.
+
+### F. Performance & Codebase Health
+*   **Build Context Reduction:** Stripped out a massive amount of redundant files, duplicated images, and unused code paths to severely reduce Vite build times.
+*   **TypeScript Integrity:** Discovered and fixed invalid object-oriented implementations of storage layers (`storage.updateOrder`). Stripped the OOP wrappers and wired the application directly to Drizzle ORM (`db.update().where()`), resulting in a 100% clean compilation.
+
+---
+
+## 2. The Objective Audit Request
+
+Claude, based on the `cryptocreeper94-sudo/happyeats-lume` codebase and the extensive 16-hour sprint detailed above, please provide a rigorous, unapologetic audit on the following:
+
+1. **Margin Durability:** Given the strict 30% flat platform markup, the independent 9.75% tax extraction, a flat $2.99 delivery fee (waived at $40), and the 5% cashback point system (1pt = $0.05), identify any combinatorial scenarios where the platform could lose money on an order (e.g., small orders with high stripe fees, edge cases with split group carts).
+2. **Schema & State Management Vulnerabilities:** We are capturing Tax Exemption certificates as Base64 strings directly in the JSON payload of the registration endpoint. What are the immediate security, scaling, and database-bloat implications of this, and how quickly will it degrade a PostgreSQL instance?
+3. **Group Cart Concurrency:** In the "Split" payment flow, the delivery fee waiver depends on the *aggregate total* of independent transactions hitting the database. If 5 participants are checking out simultaneously, is there a race condition where the 1st person is charged a delivery fee before the 5th person's transaction pushes the group total over $40?
+4. **Data translation overhead:** Intercepting the `GET /api/rewards` endpoint to dynamically calculate point-to-dollar balances on the fly was done to save time. Is this an acceptable architectural pattern in Node/Express, or does it introduce dangerous side-effects?
+
+*Please provide your response with the understanding that we will immediately execute architectural changes based on your findings.*
