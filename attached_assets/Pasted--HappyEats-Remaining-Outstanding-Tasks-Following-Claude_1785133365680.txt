@@ -1,0 +1,49 @@
+# HappyEats Remaining Outstanding Tasks
+
+Following Claude's audit and your extensive 16-hour sprint integrating everything into `server/routes.js`, there are 3 distinct tasks remaining. 
+
+This plan addresses all three, and I'm prepared to execute them sequentially upon your approval.
+
+---
+
+## Proposed Changes
+
+### 1. Admin Tax Exemption Verification Table
+**Goal:** Create a simple interface in the Admin Dashboard to review and approve/reject businesses that self-reported as `taxExempt = true`.
+
+#### [MODIFY] [client/src/pages/admin/dashboard.tsx](file:///D:/happyeats-lume/client/src/pages/admin/dashboard.tsx)
+- Add a new "Tax Exceptions" tab inside the existing `Tabs` component.
+- Implement a `useQuery` hook to fetch `GET /api/admin/tax-exemptions`.
+- Render a table showing customers with `taxExempt = true`.
+- Include "Approve" and "Reject" buttons that trigger a `useMutation` to `PATCH /api/admin/tax-exemptions/:id`. Rejecting will toggle the user's `taxExempt` flag back to `false`.
+
+#### [MODIFY] [server/routes.js](file:///D:/happyeats-lume/server/routes.js)
+- Add `GET /api/admin/tax-exemptions` to fetch `SELECT * FROM customers WHERE tax_exempt = true` via raw `pool.query()`.
+- Add `PATCH /api/admin/tax-exemptions/:id` to execute `UPDATE customers SET tax_exempt = $1 WHERE id = $2` via raw `pool.query()`.
+
+### 2. Concierge Order Page Tax Exemption
+**Goal:** Apply the tax exemption logic to the single-order Concierge page just like it was applied in the group order page.
+
+#### [MODIFY] [client/src/pages/order.tsx](file:///D:/happyeats-lume/client/src/pages/order.tsx)
+- Extract the `taxExempt` status from the logged-in customer via `localStorage.getItem("customer")` on component mount (similar to `zone-order.tsx`).
+- Apply the boolean to the `tax` calculation: `menuTotal * (isTaxExempt ? 0 : TAX_RATE)`.
+
+### 3. Split Payment for Group Carts
+**Goal:** Give group cart participants the ability to pay for their individual sub-orders without relying on the Host.
+
+#### [MODIFY] [client/src/pages/zone-order.tsx](file:///D:/happyeats-lume/client/src/pages/zone-order.tsx)
+- Expose the "Split vs Host" toggle during Cart Creation to pass `paymentType` to the backend.
+- When an individual participant adds items to a "Split" cart, the standard `Continue to Checkout` button will appear for them *personally*, allowing them to pay via Stripe immediately for their share.
+- The host view will simply monitor the total aggregate and wait for participants to complete checkout.
+
+---
+
+## Open Questions
+
+> [!CAUTION]
+> **Product Decision on Split Payment:** 
+> Regarding your question on which path to take for the Split Payment (Option A, B, or C), **I strongly recommend Option B (Per-participant standard checkout)**, but with a slight twist to make it even easier:
+> Since users are ALREADY on the web app when adding items via the group link, they don't need SMS payment links. They can just hit the standard "Checkout via Stripe" button directly on the web app for their specific items.
+> We simply bypass the group "Hold" and just insert their items as standard independent orders linked by `sharedCartId`.
+> 
+> *Do you approve this approach for Split Payments, or would you rather use Stripe Connect splits?*
