@@ -1,0 +1,14 @@
+2026-Jul-28 15:19:09.383014
+Importing cryptocreeper94-sudo/DDA:main (commit sha a721c7476b37b078b3d69b1b66c9868585a20f4b) to /artifacts/mjraz05gbhxc9sa91k4i4hcn.
+2026-Jul-28 15:19:14.281741
+========================================
+2026-Jul-28 15:19:14.288597
+Deployment failed: Command execution failed (exit code 255): docker exec mjraz05gbhxc9sa91k4i4hcn bash -c 'git -c '\''url.https://x-access-token:<REDACTED>@github.com/.insteadOf=https://github.com/'\'' -c http.version=HTTP/1.1 clone --depth=1 --recurse-submodules --shallow-submodules -b '\''main'\'' '\''https:<REDACTED>@github.com/cryptocreeper94-sudo/DDA.git'\'' '\''/artifacts/mjraz05gbhxc9sa91k4i4hcn'\'' && cd '\''/artifacts/mjraz05gbhxc9sa91k4i4hcn'\'' && GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" git -c '\''url.https://x-access-token:<REDACTED>@github.com/.insteadOf=https://github.com/'\'' -c http.version=HTTP/1.1 fetch --depth=1 origin '\''a721c7476b37b078b3d69b1b66c9868585a20f4b'\'' && git -c '\''url.https:<REDACTED>@github.com/.insteadOf=https://github.com/'\'' -c http.version=HTTP/1.1 -c advice.detachedHead=false checkout '\''a721c7476b37b078b3d69b1b66c9868585a20f4b'\'' >/dev/null 2>&1 && cd '\''/artifacts/mjraz05gbhxc9sa91k4i4hcn'\'' && if [ -f .gitmodules ]; then git -c '\''url.https:<REDACTED>@github.com/.insteadOf=https://github.com/'\'' -c http.version=HTTP/1.1 submodule sync && GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" git -c '\''url.https:<REDACTED>@github.com/.insteadOf=https://github.com/'\'' -c http.version=HTTP/1.1 submodule update --init --recursive --depth=1; fi && cd '\''/artifacts/mjraz05gbhxc9sa91k4i4hcn'\'' && GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" git -c '\''url.https:<REDACTED>@github.com/.insteadOf=https://github.com/'\'' -c http.version=HTTP/1.1 lfs pull'
+2026-Jul-28 15:19:14.288597
+Error: Cloning into '/artifacts/mjraz05gbhxc9sa91k4i4hcn'...
+2026-Jul-28 15:19:14.378753
+========================================
+2026-Jul-28 15:19:14.387052
+Deployment failed. Removing the new version of your application.
+2026-Jul-28 15:19:14.725749
+Gracefully shutting down build container: mjraz05gbhxc9sa91k4i4hcn
