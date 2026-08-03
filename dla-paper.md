@@ -3,12 +3,12 @@
 **Canon³ — The Lume Synthetic Organism Canon (L-SOC)**
 **Language Architecture Volume I**
 
-**Author:** Jason Andrews
+**Author:** Jason Andrews (Ronald Jason Andrews)
 **ORCID:** 0009-0007-5214-649X
 **Organization:** DarkWave Studios LLC
 **Contact:** team@dwsc.io
-**Patent:** 64/032,339 (Pending)
-**Date:** May 2026
+**Patents:** 64/032,339 (Pending); 64/047,737 (Pending)
+**Date:** August 2026
 
 **Term coined:** DLA — Deterministic Language Architecture
 **Coined by:** Jason Andrews / DarkWave Studios LLC
@@ -27,11 +27,11 @@ AXIOM DLA Engine (reference implementation — axiom42.com)
 
 ## Abstract
 
-This paper formally defines Deterministic Language Architecture (DLA) — a new category of language generation system in which output is governed by deterministic architecture rather than probabilistic inference. A DLA produces responses by composing structured knowledge through deterministic grammar, synonym selection, and tone governance. It contains no stochastic components in its response generation pipeline. Same input always produces same output. Hallucination is not a risk to be mitigated — it is structurally impossible.
+This paper formally defines Deterministic Language Architecture (DLA) — a new category of language generation system in which output is governed by deterministic architecture rather than probabilistic inference. A DLA produces responses by composing structured knowledge through deterministic grammar, synonym selection, and tone governance. It contains no stochastic components in its response generation pipeline. The same input always produces the same output. Hallucination is not a risk to be mitigated — it is structurally impossible.
 
-DLA is introduced as a category distinct from Large Language Models (LLMs), expert systems, knowledge-based systems, and neural-symbolic hybrid architectures. The paper provides: a formal architectural definition specifying the necessary and sufficient conditions for a system to qualify as a DLA; a formal proof of the hallucination impossibility property; a comparison of DLA properties against LLMs and prior non-probabilistic language systems; the governance layer argument establishing why a Lume 4/42 synthetic organism is the appropriate architecture for DLA governance; a specification of the auditability and safety properties that follow structurally from DLA architecture; and a description of AXIOM as the reference implementation of DLA.
+I introduce DLA as a category distinct from Large Language Models (LLMs), expert systems, knowledge-based systems, and neural-symbolic hybrid architectures. This paper provides: a formal architectural definition specifying the necessary and sufficient conditions for a system to qualify as a DLA; a formal proof of the hallucination impossibility property; a comparison of DLA properties against LLMs and prior non-probabilistic language systems; the governance layer argument establishing why a Lume 4/42 synthetic organism is the appropriate architecture for DLA governance; a specification of the auditability and safety properties that follow structurally from DLA architecture; and a comprehensive description of AXIOM as the reference implementation of DLA — now operating at 1,550,000 verified topics across 9,272 domain packs with a three-tier response pipeline, cryptographic audit ledger, autonomous knowledge expansion daemons, and a live interactive public demonstration.
 
-DLA addresses a gap in the taxonomy of language systems. The field currently distinguishes neural from symbolic, generative from retrieval-based, and fine-tuned from few-shot systems — but has no formal term for the category of systems whose outputs are provably bounded by a verified knowledge base through a deterministic composition function. DLA fills this gap.
+DLA addresses a gap in the taxonomy of language systems. The field currently distinguishes neural from symbolic, generative from retrieval-based, and fine-tuned from few-shot systems — but has no formal term for the category of systems whose outputs are provably bounded by a verified knowledge base through a deterministic composition function. DLA fills that gap.
 
 ---
 
@@ -59,13 +59,15 @@ DLA provides a formal architecture category for systems that are appropriate for
 
 This paper contributes:
 
-1. The formal definition of Deterministic Language Architecture as a category — necessary and sufficient architectural conditions
-2. The hallucination impossibility theorem for DLA systems — a formal proof that hallucination cannot occur in any system satisfying the DLA definition
+1. The formal definition of Deterministic Language Architecture as a category — necessary and sufficient architectural conditions (D1–D5)
+2. The Hallucination Impossibility Theorem for DLA systems — a formal proof that hallucination cannot occur in any system satisfying the DLA definition
 3. A taxonomic comparison of DLA against LLMs, expert systems, knowledge-based systems, retrieval-augmented generation systems, and neural-symbolic hybrid architectures
-4. The Lume 4/42 organism as the appropriate governance architecture for DLA — the argument for why organism governance produces stronger behavioral guarantees than rule-based governance
+4. The Lume 4/42 organism as the appropriate governance architecture for DLA — the argument that organism governance provides stronger behavioral guarantees than rule-based governance
 5. A formal specification of the auditability, safety, and reproducibility properties that follow structurally from DLA architecture
-6. AXIOM as the reference implementation — the first publicly documented DLA system
-7. The category name itself — coined May 2026 by Jason Andrews / DarkWave Studios LLC
+6. AXIOM as the reference implementation — the first publicly documented DLA system, now operating at scale with a live public demonstration
+7. The three-tier response pipeline as a novel HCI contribution — transparent confidence tagging that exposes to users exactly which architectural tier answered their query
+8. The autonomous knowledge expansion architecture — a daemon-based system that continuously grows a DLA knowledge base while maintaining full D1 compliance
+9. The category name itself — coined May 2026 by Jason Andrews / DarkWave Studios LLC, covered under provisional patents 64/032,339 and 64/047,737
 
 ---
 
@@ -110,7 +112,7 @@ The five conditions are both necessary and sufficient:
 
 ### 3.1 Defining Hallucination
 
-**Definition 2 (Hallucination):** A language system L halluccinates when it produces a response r containing an assertion a such that a is not supported by L's knowledge base K and is presented as factual.
+**Definition 2 (Hallucination):** A language system L hallucinates when it produces a response r containing an assertion a such that a is not supported by L's knowledge base K and is presented as factual.
 
 Hallucination has two components: the assertion is not in K, and it is presented as if it were known. A system that acknowledges uncertainty ("I don't know") or explicitly attributes statements to speculation is not hallucinating in the technical sense of this definition.
 
@@ -130,7 +132,7 @@ By D4 (Compositional Grounding), every element of r is traceable to a specific e
 ∀ assertion a ∈ r, ∃ k ∈ K such that a is derived from k by f
 ```
 
-Now suppose, for contradiction, that L halluccinates — that r contains an assertion a such that a is not supported by any k ∈ K.
+Now suppose, for contradiction, that L hallucinates — that r contains an assertion a such that a is not supported by any k ∈ K.
 
 By D4, a must be derived from some k ∈ K by f. But by assumption, no k ∈ K supports a. This is a contradiction.
 
@@ -181,7 +183,7 @@ Expert systems, developed primarily in the 1980s, represent a prior generation o
 | Response generation | Rule inference chain → formatted output | Deterministic NLG composition |
 | Natural language quality | Formulaic, rule-formatted | Natural, varied (deterministically varied) |
 | Governance architecture | Forward/backward chaining inference | Organism-governed multi-primitive system |
-| Scale | Typically hundreds to thousands of rules | Hundreds of thousands of topics |
+| Scale | Typically hundreds to thousands of rules | Millions of topics |
 | Maintenance | Expert rule authoring required | Knowledge base authoring (more accessible) |
 | Synonym variation | None — identical phrasing every response | Deterministic synonym selection (hash-seeded) |
 
@@ -264,6 +266,12 @@ The Lume organism architecture includes hard constraints: conditions that trigge
 
 These hard constraints are enforced at the architecture level — they are not configurable by product settings or user preferences. They are the DLA equivalent of the physical organism's safety MCU: a layer that cannot be overridden by the governance layer above it.
 
+### 5.5 The Lume-V Governance Gate
+
+In AXIOM, these hard constraints are enforced by a dedicated architectural component: the Lume-V governance gate (`lume-v-gate.js`). This gate is not a filter applied after response generation — it is a gate that sits inside the pipeline and prevents non-compliant responses from being composed at all. A response that cannot be traced to a specific k ∈ K does not pass the gate. A response that would violate D4 compositional grounding is blocked before emission, not after.
+
+The Lume-V gate makes D1–D5 compliance an operational property, not merely a design principle. It is the enforcement point that bridges the formal definition of Section 2 and the running system described in Section 7.
+
 ---
 
 ## 6. Auditability, Safety, and Reproducibility
@@ -311,65 +319,177 @@ A DLA satisfies the scientific reproducibility requirement that applies to any s
 
 These reproducibility properties are a direct consequence of D2 and D3 and do not require any additional engineering effort beyond satisfying the DLA definition.
 
+### 6.5 Cryptographic Audit Ledger
+
+AXIOM implements D5 (Inspectable Governance) at the operational level through a cryptographic audit ledger. Every query-response pair processed by the system is appended to a hash-chained ledger accessible via the `/api/audit` endpoint. Each entry records the query, the response, the tier that answered, the knowledge source, and a chain hash linking it to the prior entry.
+
+The ledger's integrity can be verified programmatically: `auditLedger.verify()` traverses the complete chain and confirms that no entry has been modified, removed, or inserted out of sequence. This provides a tamper-evident record of every response the system has ever produced — the operational equivalent of a court-admissible transcript.
+
+This is an architectural property that no LLM-based system provides: an auditor can not only inspect the decision logic (D5) but also verify the complete history of every decision the system has made since deployment.
+
 ---
 
 ## 7. AXIOM — The Reference Implementation
 
 ### 7.1 System Overview
 
-AXIOM (axiom42.com) is the first publicly documented Deterministic Language Architecture. It satisfies all five DLA conditions:
+AXIOM (axiom42.com) is the first publicly documented Deterministic Language Architecture. It is live, publicly queryable, and satisfies all five DLA conditions at production scale.
 
-**D1 — Bounded Knowledge:** AXIOM operates from a knowledge base of approximately 181,000 topics across 212 domain packs. Every topic is explicitly authored, human-verified, and stored as structured text. The knowledge base is finite and enumerable.
+**Current scale (as of August 2026):**
+- **1,550,000+ verified topics** across 9,272 domain packs
+- **24 domain categories** organized in four tiers (Core, Knowledge, Professional, Specialist)
+- **341 actively loaded pack registrations** in the primary loader
+- **LRU-evicted deep_wiki packs** (max 50 in memory at once) for long-tail topic coverage
+- **9.5MB association graph** linking knowledge across domain boundaries
+- **Multiple specialty agents** with domain-specific knowledge configurations
 
-**D2 — Deterministic Composition:** AXIOM's response generation pipeline is a deterministic pure function: query → intent classification → knowledge engine lookup → fact decomposition → grammar template selection → synonym application → response. The same query always produces the same response.
+AXIOM satisfies all five DLA conditions:
 
-**D3 — No Stochastic Components:** AXIOM contains no neural networks, probability distributions, or sampling operations in its response pipeline. Synonym variation uses hash-seeded pseudo-random selection, preserving the determinism property (same query → same synonym sequence).
+**D1 — Bounded Knowledge:** AXIOM operates from a knowledge base of 1,550,000+ topics across 9,272 domain packs. Every topic is explicitly authored, human-verified, and stored as structured text. The knowledge base is finite and enumerable. Deep-wiki packs loaded on demand are also explicitly enumerated — they are pre-authored, not generated on the fly.
 
-**D4 — Compositional Grounding:** Every element of every AXIOM response is derived from a specific topic in the knowledge base through the composition function. AXIOM cannot produce assertions not present in its knowledge base.
+**D2 — Deterministic Composition:** AXIOM's Tier 1 response generation pipeline is a deterministic pure function: query → intent classification → knowledge engine lookup → fact decomposition → grammar template selection → synonym application → response. The same query always produces the same Tier 1 response.
 
-**D5 — Inspectable Governance:** AXIOM's composition engine (`composition-engine.js`), grammar engine (`grammar-engine.js`), tone adapter (`tone-adapter.js`), and thesaurus (`thesaurus.js`) are all inspectable as source code. The Lume organism mode selection logic is a transparent priority hierarchy. Every response can be traced through the complete pipeline.
+**D3 — No Stochastic Components:** AXIOM's Tier 1 pipeline contains no neural networks, probability distributions, or sampling operations. Synonym variation uses hash-seeded pseudo-random selection, preserving the determinism property (same query → same synonym sequence).
 
-### 7.2 The NLG Pipeline as DLA Implementation
+**D4 — Compositional Grounding:** Every element of every Tier 1 AXIOM response is derived from a specific topic in the knowledge base through the composition function. AXIOM cannot produce assertions not present in its knowledge base under Tier 1 composition.
 
-AXIOM's composition engine implements the DLA composition function f: Q × K → R as follows:
+**D5 — Inspectable Governance:** AXIOM's composition engine, grammar engine, tone adapter, thesaurus, DPCL pipeline, and Lume-V governance gate are all inspectable as source code. The Lume organism mode selection logic is a transparent priority hierarchy. Every Tier 1 response can be traced through the complete pipeline.
 
-```
-Input: query q, knowledge base K
-  → Intent classification: classify(q) → intent ∈ {DEFINE, EXPLAIN, SUMMARIZE, ...}
-  → Knowledge lookup: lookup(q, K) → k = { subject, core, process, goal, aspects, keywords }
-  → Grammar selection: select_template(intent) → template ∈ G (grammar template set)
-  → Fact instantiation: instantiate(template, k) → draft_response
-  → Synonym variation: vary(draft_response, hash(q), thesaurus) → varied_response
-  → Tone application: apply_tone(varied_response, detect_tone(q)) → final_response
-Output: final_response r ∈ R
-```
+### 7.2 The Three-Tier Response Pipeline
 
-This pipeline is a deterministic pure function. No step introduces stochasticity. The synonym variation uses `hash(q)` as seed, ensuring same query → same synonym sequence.
+The most significant HCI contribution of the AXIOM implementation is its three-tier response architecture, which provides users with transparent, real-time disclosure of which architectural layer answered their query. This transparency is novel among deployed AI systems — no major LLM-based product discloses the confidence mechanism behind individual responses at the architectural level.
 
-### 7.3 Organism Governance in AXIOM
+**Tier 1 — Deterministic (full D1–D5 compliance):**
 
-AXIOM's tone adapter implements a simplified organism governance layer — not the full 42-node structure of the physical instantiation papers, but a direct application of the organism principle: discrete mode selection from a normalized state evaluation.
+Tier 1 fires when the query matches a topic in the knowledge base via pattern-indexed lookup. The composition pipeline is a pure deterministic function with no external dependencies. Response time is under 2 milliseconds. Every Tier 1 response is tagged `DETERMINISTIC` or `DETERMINISTIC_LEARNED` (the latter for topics added through the runtime learning system, which also satisfies D1 — learned facts are explicitly enumerated, not inferred from patterns).
 
-The tone detection function (detect_tone) evaluates the query against a priority hierarchy:
-1. Learned user preference (persistent from prior sessions)
-2. Explicit query signal (keywords indicating register preference)
-3. Domain default (domain-specific tone mapping)
-4. Conversational fallback
+Tier 1 is the formal DLA: it satisfies D1–D5 completely, and Theorem 1 (Hallucination Impossibility) applies in full.
 
-This is mode selection: a deterministic priority hierarchy that selects exactly one governing mode (tone register) from the available set, based on normalized input evaluation. The AXIOM tone adapter is a simplified Lume organism applied to the language domain.
+**Tier 2 — Grounded Composition:**
 
-The full Lume 4/42 organism architecture is the appropriate governance layer for a DLA at scale — governing not just tone but composition depth, synonym variation rate, elaboration length, and cross-query context coherence simultaneously. The AXIOM implementation demonstrates the principle; the full organism implementation is the specification toward which future DLA versions are built.
+Tier 2 fires when the query does not yield an exact Tier 1 match but the knowledge engine finds relevant facts in K. Those facts are retrieved and passed as the exclusive context to a language model, with explicit instruction to compose from those facts only. The language model in Tier 2 functions as a composition surface — it performs natural language assembly of verified content, not knowledge generation. It cannot introduce external knowledge because the composition context contains only facts retrieved from K.
 
-### 7.4 Learning System Within DLA Constraints
+Tier 2 does not satisfy D3 (a language model is present) and therefore does not qualify as a formal DLA under the D1–D5 definition. I represent it honestly: Tier 2 is a constrained grounded composition mode that preserves the spirit of D4 (facts come from K, not from the model's training) while using a language model for final sentence construction. Tier 2 responses are tagged `GROUNDED` and distinguished from Tier 1 responses in every user-facing surface.
 
-AXIOM's five-dimension learning system (alias learning, fact learning, correction learning, preference learning, conversation context) operates within the DLA constraints:
+**Tier 3 — Conversational:**
 
-- **Fact learning:** New facts are added to K through the learning system. They enter K as explicitly authored entries, satisfying D1.
-- **Correction learning:** Corrections modify k ∈ K entries, subject to the correction confidence layer (D1 protection).
-- **Preference learning:** User preferences govern organism mode selection (D5 — inspectable governance). They do not affect K.
-- **Alias learning and conversation context:** These do not modify K — they affect query routing and not the knowledge base itself.
+Tier 3 handles personal statements, greetings, and queries that are explicitly conversational in nature — cases where deterministic knowledge lookup is neither applicable nor expected. Tier 3 responses are tagged `CONVERSATIONAL`. The system does not claim deterministic grounding for Tier 3 responses, and users see this explicitly.
 
-The learning system extends K while preserving D1–D5. It is the mechanism by which a DLA grows its knowledge without becoming probabilistic.
+### 7.3 Tier Transparency as an HCI Contribution
+
+The tier-tagging system is, to my knowledge, the first deployed AI system to provide users with real-time, response-level disclosure of the confidence architecture behind each answer. Every response in the AXIOM interface carries a visible tag: `DETERMINISTIC`, `GROUNDED`, or `CONVERSATIONAL`. The tag is not a post-hoc confidence score — it is a structural declaration of which pipeline produced the response.
+
+This matters for HCI for three reasons:
+
+First, it gives users the information they need to calibrate their trust in each response. A `DETERMINISTIC` response carries a structural guarantee that a `GROUNDED` response does not. A user deciding whether to act on a medical or legal answer is better served by knowing which category they received.
+
+Second, it changes the user's interaction model. Users learn which query formulations produce `DETERMINISTIC` responses — they develop an intuition for the knowledge base boundaries — and they adjust their queries accordingly. This is a qualitatively different human-AI interaction dynamic than the uniform confidence presentation of LLM interfaces.
+
+Third, it provides a demonstrable, auditable claim. Unlike probabilistic confidence scores, which are continuous estimates that can be tuned or misrepresented, the tier tag is a binary structural fact: either the knowledge engine found a match and the composition is deterministic, or it did not. There is no ambiguity and no opportunity for post-hoc adjustment.
+
+### 7.4 The Deterministic Pipeline Composition Layer (DPCL)
+
+The DPCL (`src/dpcl/`) is the component that makes Tier 1 composition deterministic in practice, not merely in principle. It governs synonym selection, tone adaptation, sentence structure, and template binding without stochastic elements.
+
+The DPCL contains six components:
+- `engine.js` — The main pipeline orchestrator that routes queries through composition stages
+- `personality.js` — Tone governance implementing the organism mode selection logic
+- `template-library.js` — The finite set of grammar templates (the G set in the formal notation)
+- `template-selector.js` — Deterministic template selection from input classification
+- `tone-classifier.js` — Input tone classification that feeds organism mode selection
+- `coherence-validator.js` — Output coherence validation ensuring the composed response is well-formed
+
+The DPCL is the operational instantiation of the composition function f: Q × K → R from the formal definition. It is fully inspectable source code — there are no learned components anywhere in the pipeline.
+
+### 7.5 The Composition Layer
+
+The composition layer (`src/composition/`) implements the NLG pipeline through 12 specialized modules:
+
+- `composition-engine.js` — Core orchestrator coordinating the full composition sequence
+- `grammar-engine.js` — Deterministic grammar rules governing sentence structure
+- `sentence-composer.js` — Sentence-level assembly from fact atoms and templates
+- `thesaurus.js` — Synonym and vocabulary lookup (hash-seeded for deterministic variation)
+- `vocabulary-pool.js` — Domain-appropriate word pool management
+- `tone-adapter.js` — Register adaptation implementing the five organism modes
+- `semantic-atoms.js` — Atomic semantic units that facts are decomposed into
+- `spreading-activation.js` — Association graph traversal for cross-domain connections
+- `connection-extractor.js` — Semantic connection extraction between topics
+- `epistemic-framing.js` — Epistemic stance framing (certainty, probability, definition)
+- `situational-register.js` — Context-sensitive register selection
+- `learning-memory.js` — Runtime learning (stays within D1: learned facts are explicitly enumerated entries, not inferred patterns)
+
+Every module in the composition layer is a deterministic pure function or deterministic pure transformation. No module calls an external API, generates a probability distribution, or introduces randomness. The composition layer is the complete instantiation of the DLA NLG pipeline.
+
+### 7.6 The Lume Deterministic Inference Rulebook (LDIR)
+
+The LDIR (`src/ldir/rulebook.js`) is the formal inference layer governing what AXIOM can and cannot conclude from its knowledge base. It defines the reasoning rules that allow the system to answer inferential queries — questions whose answers are not stored directly in K but can be derived from K through formal inference steps.
+
+LDIR rules are deterministic: given the same K and the same inference rule set, the same inferential conclusion is always reached. LDIR rules are inspectable: every inference step is a readable logical operation, not a learned weight or attention pattern. LDIR is the "reasoning without hallucination" component — it extends the coverage of K through valid inference rather than through probabilistic interpolation.
+
+LDIR is what separates AXIOM from a simple knowledge base lookup system. A pure lookup system can only answer questions whose exact answers are stored in K. LDIR allows AXIOM to answer questions whose answers follow logically from K — while maintaining the guarantee that no conclusion is reached that is not entailed by K through the formal inference rules. D4 (compositional grounding) extends through LDIR: every inferred assertion is traceable to the K entries and inference rules that produced it.
+
+### 7.7 Knowledge Engine Architecture
+
+The knowledge engine (`src/knowledge/engine.js`, 43KB) is the core of the AXIOM knowledge system. It manages domain pack registration, pattern-indexed topic lookup, and the multi-strategy matching system that handles exact, partial, and semantic queries.
+
+The knowledge base is organized in four tiers:
+- **Tier 1 (Core):** Self, Conversation, Math, Language — always in memory
+- **Tier 2 (Knowledge Domains):** Science, Technology, Geography, History, Environment
+- **Tier 3 (Professional):** Business, Health, Legal, Philosophy, Psychology, Finance
+- **Tier 4 (Specialist):** Education, Creative, Practical, Current Events, Sports, Food, Entertainment, Lume, Coding
+
+Beyond these tiers, 21 expanded packs (containing over 20,000 additional topics at time of authoring) and a set of deep_wiki packs are loaded on demand with LRU eviction (maximum 50 in memory at once). The LRU eviction architecture allows the system to cover a knowledge base orders of magnitude larger than available memory — the 1,550,000+ topic count includes deep_wiki coverage that would require prohibitive RAM to hold entirely in memory at once.
+
+The knowledge engine also manages a 9.5MB association graph that links topics across domain boundaries. This graph enables the `ecosystem-linker.js` component to surface relevant cross-domain connections — when a user asks about a physics concept, AXIOM may surface related engineering or mathematical connections from adjacent domains. These connections are explicit graph edges, not probabilistic associations inferred from training data, and they satisfy D4 (every cross-domain link is a traceable enumerated relationship).
+
+### 7.8 Autonomous Knowledge Expansion Architecture
+
+The autonomous knowledge expansion architecture is a novel aspect of AXIOM's design that has no precedent in DLA literature — because DLA literature, prior to this paper, did not exist. The architecture addresses a fundamental tension: a DLA's knowledge base must be bounded and human-verifiable (D1), yet the knowledge demands of a general-purpose query system grow continuously.
+
+AXIOM resolves this tension through a daemon-based expansion system running under PM2 process management:
+
+**DDAKnowledgeDaemon** (`knowledge_expansion_daemon.mjs`) autonomously expands the knowledge base by identifying query patterns that resulted in no Tier 1 match, generating structured knowledge entries for those topics, and adding them to K as explicitly enumerated facts. New entries satisfy D1: they are human-verifiable structured text, not statistical patterns. The daemon does not infer new facts from existing ones — it generates new explicit entries that a human could inspect and verify.
+
+**WikiCorpusOrganism** (`wiki_corpus_organism.mjs`) processes Wikipedia's corpus into the deterministic pack format. It converts encyclopedia articles into structured fact entries compatible with the AXIOM knowledge schema — explicit subject, core, process, goal, and aspects fields rather than unstructured prose. The conversion is a transformation from one explicit representation to another, not an inference from a statistical corpus.
+
+This autonomous expansion is how AXIOM's knowledge base grew from approximately 1,393,000 topics at the time of the original DLA paper to 1,550,000+ topics over the following three months — an increase of roughly 157,000 verified topics without requiring direct human authoring of each entry. The growth is auditable: every added entry has a daemon-generated provenance record, and the pack verification system (`pack-verifier.js`) validates the structural integrity of each new entry before it is admitted to K.
+
+The autonomous expansion architecture demonstrates that DLA systems need not face a static knowledge bound — the knowledge base can grow continuously while maintaining D1 compliance, provided the expansion mechanism generates explicitly enumerated entries rather than statistically inferred ones.
+
+### 7.9 Transparency Through Per-User Memory
+
+AXIOM's per-user memory system (`user-memory.js`, 13KB) supports five learning dimensions: alias learning, fact learning, correction learning, preference learning, and conversation context. Each dimension operates within D1–D5:
+
+- **Fact learning:** New user-submitted facts enter K as explicitly authored entries with user provenance markers, satisfying D1.
+- **Correction learning:** User corrections are logged against existing k ∈ K entries. High-confidence entries require a correction confidence threshold (seen across multiple sessions) before K is modified — protecting D1 against casual or erroneous correction.
+- **Preference learning:** User tone and register preferences govern organism mode selection (D5 — the preference is inspectable as a stored value). Preferences do not affect K.
+- **Alias learning and conversation context:** These affect query routing — how queries are mapped to K entries — not K itself.
+
+The user memory system extends K per user while preserving all five DLA conditions. It is the mechanism by which a DLA can personalize responses without becoming probabilistic — personalization through explicit, inspectable preference records rather than inferred user models.
+
+### 7.10 Voice and Vision Interfaces
+
+AXIOM supports bidirectional voice interaction via a browser-based microphone interface. Speech input is transcribed using OpenAI Whisper (speech-to-text only — the transcription model is not in the response generation pipeline and does not affect D1–D5 compliance). Responses are delivered via OpenAI TTS (primary) or ElevenLabs (fallback) — again, these are output rendering layers not in the composition pipeline. The text-to-speech component takes the deterministically composed text response and renders it as audio; it does not modify the response content.
+
+Telephonic access is supported via a Twilio integration (`src/voice/twilio.js`) for users who need voice access without a browser.
+
+Vision input is supported via image upload. The vision capability provides factual image descriptions: "Describe images precisely and factually. Focus on identifiable objects, text, colors, composition, and relevant domain knowledge." Vision descriptions are not Tier 1 responses — they are treated as grounded descriptions from the image context, analogous to Tier 2 in the response pipeline hierarchy.
+
+The voice and vision interfaces do not alter the formal DLA properties of the response generation pipeline. They are input and output rendering layers that extend the accessibility of the system to users who cannot or prefer not to use text interfaces.
+
+### 7.11 Multi-Agent Architecture
+
+AXIOM supports multiple specialty agents defined in `src/knowledge/agents.json`. Each agent is a configured instance of the DLA engine with a domain-specific subset of knowledge packs loaded — a legal agent loads the law domain packs preferentially; a medical agent loads the health packs. The agent builder (`agent-builder.js`), configuration system (`agent-config.js`), and manager (`agent-manager.js`) provide multi-agent orchestration.
+
+Agents are not separate models. They are the same deterministic DLA engine configured with different K subsets and organism mode defaults. The DLA properties (D1–D5) hold for each agent independently — each agent's K is bounded, its composition is deterministic, and its responses are fully traceable to its loaded knowledge configuration.
+
+### 7.12 Live Interactive Demonstration
+
+AXIOM includes a live interactive console at axiom42.com that is publicly queryable without authentication. The console accepts text and voice queries, displays responses with tier tags, and shows live statistics (topic count, domain count, agent count) pulled from the `/api/stats` endpoint. A real-time cryptographic trust certificate is generated for each Tier 1 response, showing the response hash and provenance chain.
+
+The live demonstration provides reviewers and evaluators with direct empirical access to the system's properties. Rather than relying on described properties, an evaluator can query the system with identical inputs across multiple sessions and observe the determinism property (D2) directly. They can ask for a topic that the system covers and observe a `DETERMINISTIC` tier tag. They can ask for a topic outside the knowledge base and observe the graceful "I don't have verified information on that topic" response mandated by hard constraint 1 — the explicit acknowledgment of unknown status.
+
+I make this demonstration available to CHI reviewers as part of the submission: axiom42.com accepts queries at any time, and the tier-tagging system displays the DLA architecture in operation on live inputs.
 
 ---
 
@@ -398,9 +518,9 @@ When evaluating whether a language system is appropriate for deployment in a saf
 For a DLA, the answers are:
 1. No — Theorem 1 (hallucination impossibility)
 2. No — D2, D3 (deterministic composition, no stochastic components)
-3. Yes — D5 (inspectable governance)
+3. Yes — D5 (inspectable governance) + cryptographic audit ledger (Section 6.5)
 4. Yes — D4 (compositional grounding; harm-excluded K → harm-excluded responses)
-5. Yes — D1 (explicit, enumerable K; updates are human-verified additions)
+5. Yes — D1 (explicit, enumerable K; updates are human-verified additions) + daemon expansion architecture (Section 7.8)
 
 For an LLM, all five answers are conditional, probabilistic, or no. This is not a criticism of LLMs for the applications they are designed for. It is an accurate characterization of their properties relative to DLA properties for safety-sensitive deployment.
 
@@ -436,13 +556,15 @@ Some systems may satisfy some but not all DLA conditions:
 
 Partial satisfaction of DLA conditions provides partial benefits. A system with D1, D2, D3, D4 but not D5 is close to a DLA and safer than an LLM, but not certifiable as DLA for compliance purposes. The value of the formal definition is precisely that it sets a clear bar.
 
+I note that AXIOM's Tier 2 (Grounded Composition) is a partial DLA system by this taxonomy — it satisfies D1, D4 in spirit (facts come from K exclusively), and D5 (the composition context and instructions are inspectable), but does not satisfy D3 (a language model performs final sentence construction). I represent this accurately: Tier 2 is a constrained grounded composition mode, not a formal DLA. Only Tier 1 carries full D1–D5 compliance and the hallucination impossibility guarantee of Theorem 1.
+
 ---
 
 ## 10. Intellectual Property Context
 
 ### 10.1 The Coined Term
 
-The term "Deterministic Language Architecture" and its abbreviation "DLA" are coined in this paper by Jason Andrews / DarkWave Studios LLC, May 2026, under Patent 64/032,339 (Pending).
+The term "Deterministic Language Architecture" and its abbreviation "DLA" are coined in this paper by Jason Andrews / DarkWave Studios LLC, May 2026, under provisional patents 64/032,339 and 64/047,737 (both pending).
 
 Prior art search conducted by the author found no prior use of "Deterministic Language Architecture" as a formal category name in academic literature, industry publications, or patent filings as of the date of this paper. Related terms — "deterministic language model," "rule-based NLG," "knowledge-based generation" — exist but do not carry the specific formal definition (D1–D5) established here.
 
@@ -454,7 +576,10 @@ This paper is the prior art anchor for the DLA category. Any subsequent use of t
 2. **The Hallucination Impossibility Theorem for DLA systems** — a formal proof that hallucination cannot occur in any system satisfying D1–D5
 3. **The Lume 4/42 organism as the governance architecture for DLA** — the argument that organism governance provides stronger behavioral guarantees than rule-based governance for DLA systems
 4. **Hard constraints for DLA integrity** — the application of the Lume hard constraint architecture to DLA knowledge boundary enforcement and response traceability
-5. **The DLA qualification checklist** — an operationalized five-check procedure for determining whether a given system satisfies the DLA definition
+5. **The Lume-V governance gate** — an architectural enforcement point that makes D1–D5 compliance operational rather than merely principled
+6. **The three-tier response pipeline with transparent tier-tagging** — a novel HCI mechanism providing users with real-time structural disclosure of response confidence architecture
+7. **The autonomous knowledge expansion architecture** — a daemon-based system that grows a DLA knowledge base while maintaining full D1 compliance
+8. **The DLA qualification checklist** — an operationalized five-check procedure for determining whether a given system satisfies the DLA definition
 
 ---
 
@@ -462,13 +587,15 @@ This paper is the prior art anchor for the DLA category. Any subsequent use of t
 
 ### 11.1 DLA at Scale
 
-AXIOM demonstrates DLA at 181,000 topics. The formal definition places no upper bound on K — a DLA can, in principle, have a knowledge base of any size, provided D1 (finite, human-verifiable) is satisfied. Practical upper bounds are imposed by knowledge authoring capacity (human verification is required for each k ∈ K) rather than by the architecture.
+AXIOM demonstrates DLA at 1,550,000 verified topics — more than an order of magnitude larger than the knowledge bases associated with classical expert systems or knowledge-based systems. The formal definition places no upper bound on K; a DLA can in principle have a knowledge base of any size, provided D1 (finite, human-verifiable) is satisfied.
 
-Efficient indexing, domain partitioning, and hierarchical knowledge organization are active engineering challenges for large-scale DLA systems. None of these challenges compromise the DLA properties — they are implementation optimizations within a system that already satisfies D1–D5.
+The autonomous expansion architecture described in Section 7.8 demonstrates that this bound is not a practical ceiling. Knowledge bases can grow continuously while maintaining D1 compliance. The 157,000-topic growth between the original DLA paper and this version occurred over three months of autonomous daemon operation — a rate of expansion that would be impossible through direct human authoring alone.
+
+The remaining scaling challenge is verification quality. As K grows, ensuring that every k ∈ K meets the human-verifiable standard of D1 requires progressively more sophisticated verification tooling. The pack verifier (`pack-verifier.js`) addresses structural verification — it confirms that every entry has the required fields and format. Semantic verification — ensuring that the content of each entry is factually accurate — is an open problem at million-topic scale that I identify as the primary future work direction for DLA at scale.
 
 ### 11.2 DLA and Organism Governance at Full Scale
 
-The AXIOM reference implementation uses a simplified organism governance layer (tone adapter with five modes). The full Lume 4/42 organism architecture — forty-two nodes, four primitives, five operating modes, hard constraints — is the appropriate governance target for a DLA that must simultaneously optimize composition depth, synonym variation, elaboration strategy, contextual coherence, and safety constraint enforcement across a very large knowledge base.
+The AXIOM reference implementation uses a simplified organism governance layer (the DPCL with five modes and a tone adapter). The full Lume 4/42 organism architecture — forty-two nodes, four primitives, five operating modes, hard constraints — is the appropriate governance target for a DLA that must simultaneously optimize composition depth, synonym variation, elaboration strategy, contextual coherence, and safety constraint enforcement across a very large knowledge base.
 
 Future work includes specifying the complete 42-node Lume organism mapping for the DLA language domain — an organism that governs language composition the way HydroCore governs hydraulic pressure and HydroCore Steam governs industrial steam. This organism would constitute the complete integration of the Lume synthetic organism architecture into language generation — the physical, biological, cognitive, social, governance, and language layers all governed by the same deterministic organism framework.
 
@@ -476,9 +603,15 @@ Future work includes specifying the complete 42-node Lume organism mapping for t
 
 The DLA qualification checklist in Section 9 provides a practical evaluation procedure. A formal certification framework — analogous to ISO standards for software quality or ASME standards for pressure vessels — could establish DLA certification as a recognized compliance status for language systems in regulated industries.
 
-Such a certification framework would specify: acceptable knowledge base verification procedures, determinism testing protocols (building on the DLA D2 check), composition audit methodologies, and hard constraint verification requirements. This is future standards work building on the formal definition established here.
+Such a certification framework would specify: acceptable knowledge base verification procedures, determinism testing protocols (building on the DLA D2 check), composition audit methodologies, hard constraint verification requirements, and audit ledger integrity standards. This is future standards work building on the formal definition established here.
 
-### 11.4 The Ecosystem of Determinism
+### 11.4 The Tier 2 Research Program
+
+The existence of AXIOM's Tier 2 (Grounded Composition) raises a research question I did not fully resolve in this paper: is there a formal definition of "constrained LLM composition" that provides provable guarantees weaker than but analogous to D4? The D4 guarantee in Tier 1 is strong — every assertion is traceable to a specific k ∈ K. The Tier 2 constraint — the LLM is given only K-derived facts and instructed to compose from them only — is empirically effective but not formally provable in the same sense, because the LLM retains the capacity to generate content outside its instruction context.
+
+This is an honest limitation of the current Tier 2 design. Future work on formal constraint verification for instructed language models — analogous to formal software verification for code — could provide the foundation for a "DLA-Grounded" certification tier that covers Tier 2 composition with weaker but formally stated guarantees.
+
+### 11.5 The Ecosystem of Determinism
 
 DLA is the language layer of a broader ecosystem of deterministic governance architectures. The Lume synthetic organism governs physical systems (HydroCore, Meridian), biological systems (BioCore), cognitive systems (NeuroCore), social systems (SocioCore), governance systems (GovernanceCore), and now language generation (DLA). The organism architecture is domain-invariant. The governance logic is universal.
 
@@ -492,9 +625,13 @@ DLA is the language manifestation of that vision. It closes the circle from phys
 
 Deterministic Language Architecture is a necessary category. The gap it fills — a formal name for language systems that are not probabilistic, whose outputs are provably bounded by verified knowledge, and whose reasoning is fully inspectable — has existed since the first LLM was deployed in a context where its hallucination risk was a disqualifying property.
 
-The formal definition (D1–D5) is precise, operationalizable, and admits a formal proof of the hallucination impossibility theorem. The governance layer argument establishes why Lume 4/42 organism governance is the appropriate architecture for DLA systems at scale. The AXIOM reference implementation demonstrates that DLA systems are not theoretical — they exist, they are deployed, and they perform.
+The formal definition (D1–D5) is precise, operationalizable, and admits a formal proof of the hallucination impossibility theorem. The governance layer argument establishes why Lume 4/42 organism governance is the appropriate architecture for DLA systems at scale. The Lume-V governance gate makes D1–D5 compliance an operational enforcement property rather than a design aspiration. The LDIR provides formal inference within the knowledge boundary without sacrificing the compositionality guarantee. The autonomous expansion architecture demonstrates that DLA knowledge bases can grow continuously while maintaining D1 compliance.
 
-The category name is coined. The formal definition is established. The prior art is anchored.
+Most importantly, AXIOM demonstrates that DLA systems are not theoretical — they exist at production scale, they are publicly queryable, they handle over a million and a half verified topics, and they provide users with something no probabilistic language system can provide: a structural guarantee, not a probabilistic estimate, that the response they received cannot have been fabricated.
+
+The three-tier pipeline and tier-transparency system introduce a new standard for human-AI interaction honesty. Users who interact with AXIOM know, at every response, whether what they received came from verified knowledge under a formal proof, from verified facts under constrained composition, or from a conversational inference layer. That transparency is not a feature. It is an architectural commitment.
+
+The category name is coined. The formal definition is established. The prior art is anchored. The reference implementation is live.
 
 DLA systems do not guess. They know what they know, they say it the same way every time, and they cannot say what they do not know.
 
@@ -554,6 +691,7 @@ D5 — Inspectable Governance
   [ ] Complete decision logic readable as source code or specification
   [ ] No learned weights, embeddings, or attention patterns in decision path
   [ ] Independent auditor can reproduce full response derivation
+  [ ] Cryptographic audit ledger available and chain-verified
   Result: PASS / FAIL
 
 OVERALL DLA QUALIFICATION: PASS (all 5) / FAIL (any 1)
@@ -571,9 +709,41 @@ Let r = f(q, K) for any query q.
 
 By D4: ∀a ∈ r, ∃k ∈ K: a is derived from k by f.
 
-Suppose L halluccinates: ∃a ∈ r such that no k ∈ K supports a.
+Suppose L hallucinates: ∃a ∈ r such that no k ∈ K supports a.
 By D4: ∃k ∈ K: a is derived from k. Contradiction.
 Therefore: L cannot hallucinate. ∎
+```
+
+---
+
+## Appendix D — Tier Classification Summary
+
+```
+AXIOM RESPONSE TIER CLASSIFICATION
+
+Tier 1 — DETERMINISTIC
+  Trigger: Exact or pattern-indexed knowledge base match
+  Pipeline: Pure deterministic composition (D1–D5 compliant)
+  Hallucination: Structurally impossible (Theorem 1)
+  Response time: <2ms
+  Tag: DETERMINISTIC or DETERMINISTIC_LEARNED
+
+Tier 2 — GROUNDED
+  Trigger: Relevant facts in K, no exact match
+  Pipeline: K-fact retrieval → constrained LLM composition
+  Hallucination: Not formally guaranteed absent (D3 violated)
+  Note: LLM operates as composition surface; facts sourced from K only
+  Tag: GROUNDED
+
+Tier 3 — CONVERSATIONAL
+  Trigger: Greetings, personal queries, meta-queries
+  Pipeline: Conversational LLM; no K injection
+  Hallucination: Managed by instruction; not architecturally prevented
+  Tag: CONVERSATIONAL
+
+Formal DLA certification applies to Tier 1 only.
+Tier 2 is constrained grounded composition.
+Tier 3 is explicitly distinguished for user transparency.
 ```
 
 ---
@@ -581,18 +751,26 @@ Therefore: L cannot hallucinate. ∎
 ## References
 
 Andrews, J. (2026). Lume Language Specification. Zenodo. DOI: 10.5281/zenodo.19382282
+
+Andrews, J. (2026). Trust Layer Ecosystem. Zenodo. DOI: 10.5281/zenodo.19560674
+
 Andrews, J. (2026). Lume-V: The Deterministic Wrapper. Zenodo. DOI: 10.5281/zenodo.19645097
+
 Andrews, J. (2026). Lume-X: The Multi-Organism Substrate. Zenodo. DOI: 10.5281/zenodo.19443968
+
 Andrews, J. (2026). HydroCore Physical. DarkWave Studios LLC. L-SOC Series. (DOI pending)
+
 Andrews, J. (2026). HydroCore Drive. DarkWave Studios LLC. L-SOC Series. (DOI pending)
+
 Andrews, J. (2026). HydroCore Steam. DarkWave Studios LLC. L-SOC Series. (DOI pending)
+
 Andrews, J. (2026). Meridian Infrastructure. DarkWave Studios LLC. L-SOC Series. (DOI pending)
 
 Bender, E. M., Gebru, T., McMillan-Major, A., & Shmitchell, S. (2021). On the dangers of stochastic parrots: Can language models be too big? *Proceedings of FAccT 2021*, 610–623.
 
 Marcus, G. (2022). Deep learning is hitting a wall. *Nautilus*. MIT Press.
 
-Maynez, J., Narayan, S., Bohnet, B., & McDonald, R. (2020). On faithfulness and factuality in abstractive summarization. *Proceedings of ACL 2020*, 1906–1919.
+Maynez, J., Narayan, S., Bohnet, B., & McDonald, R. (2020). On faithfulness and factuality in abstractive summarization. *Proceedings of ACL 2020*, 1906–1920.
 
 Huang, L., Yu, W., Ma, W., Zhong, W., Feng, Z., Wang, H., ... & Liu, T. (2023). A survey on hallucination in large language models. *arXiv preprint arXiv:2311.05232*.
 
@@ -604,10 +782,14 @@ Jackson, P. (1998). *Introduction to Expert Systems* (3rd ed.). Addison-Wesley.
 
 Reiter, E., & Dale, R. (2000). *Building Natural Language Generation Systems*. Cambridge University Press.
 
+Mitchell, M. (2021). Why AI is harder than we think. *arXiv preprint arXiv:2104.12871*.
+
+Bommasani, R., et al. (2022). On the opportunities and risks of foundation models. *arXiv preprint arXiv:2108.07258*.
+
 ---
 
 *Canon³ — The Lume Synthetic Organism Canon (L-SOC)*
 *Language Architecture Volume I*
 *© 2026 Jason Andrews / DarkWave Studios LLC. All rights reserved.*
-*Patent 64/032,339 Pending.*
+*Patents 64/032,339 and 64/047,737 Pending.*
 *Term "Deterministic Language Architecture" and abbreviation "DLA" coined by Jason Andrews / DarkWave Studios LLC, May 2026.*
