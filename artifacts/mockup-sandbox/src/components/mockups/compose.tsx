@@ -16,7 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Copy, Download, Share2, Check, Loader2, Sparkles, ImagePlus, ArrowUpCircle, Target, Link, X } from "lucide-react";
+import { Copy, Download, FileDown, Share2, Check, Loader2, Sparkles, ImagePlus, ArrowUpCircle, Target, Link, X } from "lucide-react";
 
 // ── sample composed output ──────────────────────────────────────────────────
 const SAMPLE_COVER_LETTER = `Dear Hiring Manager,
@@ -291,6 +291,66 @@ export default function Compose() {
     a.download = `axiom-${docType}.txt`;
     a.click();
     URL.revokeObjectURL(url);
+  }
+
+  // ── download as .docx ─────────────────────────────────────────────────────
+  async function buildAndDownloadDocx(text: string, filename: string) {
+    const { Document, Packer, Paragraph, TextRun, HeadingLevel } = await import("docx");
+
+    const lines = text.split("\n");
+    const children: InstanceType<typeof Paragraph>[] = [];
+    let firstNonEmpty = true;
+
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed) {
+        children.push(new Paragraph({ children: [] }));
+        continue;
+      }
+      // First non-empty line → document title (H1)
+      if (firstNonEmpty) {
+        firstNonEmpty = false;
+        children.push(
+          new Paragraph({
+            heading: HeadingLevel.HEADING_1,
+            children: [new TextRun(trimmed)],
+          }),
+        );
+        continue;
+      }
+      // ALL-CAPS short lines (≤ 40 chars) → section header (H2), e.g. "EXPERIENCE"
+      if (
+        trimmed === trimmed.toUpperCase() &&
+        trimmed.length <= 40 &&
+        /[A-Z]/.test(trimmed)
+      ) {
+        children.push(
+          new Paragraph({
+            heading: HeadingLevel.HEADING_2,
+            children: [new TextRun(trimmed)],
+          }),
+        );
+        continue;
+      }
+      children.push(new Paragraph({ children: [new TextRun(trimmed)] }));
+    }
+
+    const doc = new Document({ sections: [{ children }] });
+    const blob = await Packer.toBlob(doc);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function handleDownloadDocx() {
+    void buildAndDownloadDocx(resultText, `axiom-${docType}.docx`);
+  }
+
+  function handleFixDownloadDocx() {
+    void buildAndDownloadDocx(fixResultText, "axiom-tailored-resume.docx");
   }
 
   // ── share — calls POST /api/v1/compose/share ──────────────────────────────
@@ -879,7 +939,7 @@ export default function Compose() {
                       )}
                     </Button>
 
-                    {/* Download */}
+                    {/* Download .txt */}
                     <Button
                       variant="ghost"
                       size="sm"
@@ -887,7 +947,18 @@ export default function Compose() {
                       className="h-8 px-3 text-white/60 hover:text-white hover:bg-white/8 gap-1.5"
                     >
                       <Download className="w-3.5 h-3.5" />
-                      <span className="text-xs">Download</span>
+                      <span className="text-xs">.txt</span>
+                    </Button>
+
+                    {/* Download .docx */}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleFixDownloadDocx}
+                      className="h-8 px-3 text-white/60 hover:text-white hover:bg-white/8 gap-1.5"
+                    >
+                      <FileDown className="w-3.5 h-3.5" />
+                      <span className="text-xs">.docx</span>
                     </Button>
 
                     {/* Share */}
@@ -1146,7 +1217,7 @@ export default function Compose() {
                     )}
                   </Button>
 
-                  {/* Download */}
+                  {/* Download .txt */}
                   <Button
                     variant="ghost"
                     size="sm"
@@ -1154,7 +1225,18 @@ export default function Compose() {
                     className="h-8 px-3 text-white/60 hover:text-white hover:bg-white/8 gap-1.5"
                   >
                     <Download className="w-3.5 h-3.5" />
-                    <span className="text-xs">Download</span>
+                    <span className="text-xs">.txt</span>
+                  </Button>
+
+                  {/* Download .docx */}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleDownloadDocx}
+                    className="h-8 px-3 text-white/60 hover:text-white hover:bg-white/8 gap-1.5"
+                  >
+                    <FileDown className="w-3.5 h-3.5" />
+                    <span className="text-xs">.docx</span>
                   </Button>
 
                   {/* Share */}
