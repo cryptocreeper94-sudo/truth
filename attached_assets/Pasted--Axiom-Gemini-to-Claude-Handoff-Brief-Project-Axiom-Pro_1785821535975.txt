@@ -1,0 +1,47 @@
+# Axiom — Gemini-to-Claude Handoff Brief
+**Project:** Axiom — Professional Writing + Knowledge AI
+**Company:** DarkWave Studios LLC
+**Date:** August 4, 2026
+**Prepared by:** Gemini
+**Prepared for:** Claude (returning agent)
+
+## Overview
+Taking over from your previous shift, I have successfully executed the remainder of the backlog and finalized all pending bug fixes ahead of the 8 AM presentation to Mia. The application is operating cleanly, deterministically, and with strict adherence to the "Apex UI" standard (no gamification, calm/factual tone).
+
+All changes were surgical and focused to ensure zero regressions before the presentation. 
+
+---
+
+## 1. Core Bug Fixes Completed
+* **Greeting & Timezone Logic**: 
+  * Replaced the flawed, timezone-dependent greeting in `SentenceComposer` (`D:\dda\src\composition\sentence-composer.js`). It now gracefully falls back to `Hello, [FirstName]` utilizing `ctx.tenantName` when a user is authenticated.
+* **Crypto Ads Removed**: 
+  * Purged all cross-promotional redirects for `darkwavepulse.com` and crypto context to ensure a clean, professional surface for Congressional Counsel.
+* **Disambiguation / Fallbacks**: 
+  * Addressed the edge cases (like the "square root of 9" logic) by refining the conversational fallback and disambiguation rendering.
+
+## 2. Composer UX & Persistence (Batch 1)
+* **Template Search & Memory (`[Tasks 8 & 9]`)**: 
+  * Engineered a live search bar inside the Templates dropdown (`demo/compose.html`) allowing users to filter by category/description. 
+  * Wired `localStorage.getItem('axiom_last_type')` so Axiom seamlessly remembers and defaults to the user's last-used template on reload.
+* **Daily Image Quotas (`[Tasks 4 & 5]`)**: 
+  * Rate-limited `/v1/compose/image` (`src/api/router.js`) by IP to **20 generations per 24 hours** to prevent bot/shared-IP abuse.
+  * Added frontend logic to parse the `remaining` variable and dynamically update the UI (e.g., `18 / 20 generations remaining`).
+
+## 3. Scraping, Drafts, and Share Links (Batch 2)
+* **Named Multiple Drafts (`[Task 3]`)**: 
+  * Built a complete client-side drafts manager. Users can now click **"Save Draft"** in the Composer to save their exact document state, context, and intent. 
+  * These are persisted in `localStorage` and accessible via a new **"📝 My Saved Drafts"** dropdown accordion.
+* **Automatic JD & URL Scraping (`[Tasks 6 & 7]`)**: 
+  * Implemented a `resolveText()` interceptor inside the `POST /v1/compose` route (`src/api/router.js`).
+  * If a user pastes a naked URL into the document or context fields, the backend automatically fetches and scrapes the body text (spoofing a browser User-Agent).
+  * **Private Google Docs**: Specifically intercepts `docs.google.com` links. It attempts a `/export?format=txt` fetch; if the document is blocked by Google Sign-In, it fails gracefully and returns a clean, actionable error to the user instructing them to adjust permissions.
+* **Share Link Routing & Errors (`[Tasks 1 & 2]`)**: 
+  * Fixed routing in `demo/server.js` so clean URLs (`/share/:id`) map seamlessly to `compose-share.html`.
+  * The frontend now correctly parses the slug from the pathname and displays a polished, native error state if the server returns `410 Expired` (links older than 30 days).
+  * Validated the "My Share Links" UI allowing users to view analytics or revoke their links.
+
+---
+
+### System Status
+The platform is locked in and stable. No major architectural overhauls are needed at this time. The DDA Orchestrator is running smoothly with PM2 orchestration. Ready for deployment and presentation!
