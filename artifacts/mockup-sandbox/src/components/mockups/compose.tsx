@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
   Select,
@@ -15,7 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Copy, Download, Share2, Check, Loader2, Sparkles } from "lucide-react";
+import { Copy, Download, Share2, Check, Loader2, Sparkles, ImagePlus } from "lucide-react";
 
 // ── sample composed output ──────────────────────────────────────────────────
 const SAMPLE_COVER_LETTER = `Dear Hiring Manager,
@@ -32,6 +33,14 @@ Jordan Ellis`;
 type ComposeState = "idle" | "composing" | "done";
 type CopyState = "idle" | "copied";
 type ShareState = "idle" | "sharing" | "done" | "error";
+type ImageState = "idle" | "generating" | "done" | "error";
+type ImageSize = "square" | "wide" | "tall";
+
+const IMAGE_SIZE_LABELS: Record<ImageSize, string> = {
+  square: "Square (1024×1024)",
+  wide: "Wide (1536×1024)",
+  tall: "Tall (1024×1536)",
+};
 
 export default function Compose() {
   const [jobDescription, setJobDescription] = useState(
@@ -47,6 +56,17 @@ export default function Compose() {
   const [shareError, setShareError] = useState("");
   const [urlCopied, setUrlCopied] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+
+  // ── image generation state ─────────────────────────────────────────────────
+  const [imagePrompt, setImagePrompt] = useState(
+    "professional LinkedIn banner for a software engineer",
+  );
+  const [imageSize, setImageSize] = useState<ImageSize>("wide");
+  const [imageState, setImageState] = useState<ImageState>("idle");
+  const [imageData, setImageData] = useState<string>("");          // base64 data URL
+  const [imageError, setImageError] = useState("");
+  const [imageRemaining, setImageRemaining] = useState<number>(5);
+  const [imageSizeResult, setImageSizeResult] = useState<ImageSize>("wide");
 
   // ── simulate compose ──────────────────────────────────────────────────────
   function handleCompose() {
@@ -110,7 +130,55 @@ export default function Compose() {
     setTimeout(() => setUrlCopied(false), 2000);
   }
 
+  // ── generate image — calls POST /api/v1/image/generate ──────────────────
+  async function handleGenerateImage() {
+    if (!imagePrompt.trim()) return;
+    setImageState("generating");
+    setImageData("");
+    setImageError("");
+
+    try {
+      const res = await fetch("/api/v1/image/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: imagePrompt.trim(), size: imageSize }),
+      });
+
+      if (res.status === 429) {
+        throw new Error("Rate limit reached — you've used all 5 free image generations for this session.");
+      }
+      if (!res.ok) {
+        const body = (await res.json().catch(() => ({}))) as { error?: string; detail?: string };
+        throw new Error(body.detail ?? body.error ?? `Server error ${res.status}`);
+      }
+
+      const data = (await res.json()) as {
+        b64_json: string;
+        size: ImageSize;
+        remaining: number;
+      };
+
+      setImageData(`data:image/png;base64,${data.b64_json}`);
+      setImageSizeResult(data.size);
+      setImageRemaining(data.remaining);
+      setImageState("done");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Unknown error";
+      setImageError(message);
+      setImageState("error");
+    }
+  }
+
+  // ── download generated image ───────────────────────────────────────────────
+  function handleDownloadImage() {
+    const a = document.createElement("a");
+    a.href = imageData;
+    a.download = `axiom-visual-${imageSizeResult}.png`;
+    a.click();
+  }
+
   const hasResult = composeState === "done" && resultText.length > 0;
+  const hasImage = imageState === "done" && imageData.length > 0;
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white font-sans">
@@ -286,6 +354,132 @@ export default function Compose() {
             )}
           </section>
         )}
+
+        {/* ── add visual ── */}
+        <section className="space-y-5">
+          <div className="flex items-center gap-2">
+            <ImagePlus className="w-4 h-4 text-white/40" />
+            <span className="text-xs font-medium text-white/50 uppercase tracking-widest">
+              Add Visual
+            </span>
+            <span className="ml-auto text-xs text-white/25">
+              {imageRemaining} / 5 remaining
+            </span>
+          </div>
+
+          <div className="rounded-xl border border-white/8 bg-white/3 p-5 space-y-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-white/50 uppercase tracking-widest">
+                Description
+              </label>
+              <Input
+                className="bg-white/5 border-white/10 text-white placeholder:text-white/20 h-10 focus-visible:ring-1 focus-visible:ring-white/20"
+                placeholder="e.g. professional LinkedIn banner for a software engineer"
+                value={imagePrompt}
+                onChange={(e) => setImagePrompt(e.target.value)}
+                disabled={imageState === "generating" || imageRemaining === 0}
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-white/50 uppercase tracking-widest">
+                Size
+              </label>
+              <Select
+                value={imageSize}
+                onValueChange={(v) => setImageSize(v as ImageSize)}
+                disabled={imageState === "generating" || imageRemaining === 0}
+              >
+                <SelectTrigger className="bg-white/5 border-white/10 text-white h-10">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-[#1a1a1a] border-white/10 text-white">
+                  {(Object.entries(IMAGE_SIZE_LABELS) as [ImageSize, string][]).map(
+                    ([value, label]) => (
+                      <SelectItem key={value} value={value}>
+                        {label}
+                      </SelectItem>
+                    ),
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <Button
+              onClick={handleGenerateImage}
+              disabled={
+                imageState === "generating" ||
+                !imagePrompt.trim() ||
+                imageRemaining === 0
+              }
+              className="w-full h-10 bg-white/10 text-white font-medium border border-white/10 hover:bg-white/15 disabled:opacity-40"
+            >
+              {imageState === "generating" ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Generating…
+                </>
+              ) : imageRemaining === 0 ? (
+                "No generations remaining"
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Generate Image
+                </>
+              )}
+            </Button>
+
+            {/* ── generating skeleton ── */}
+            {imageState === "generating" && (
+              <div
+                className="rounded-lg bg-white/5 border border-white/8 animate-pulse"
+                style={{
+                  aspectRatio: imageSize === "square" ? "1 / 1" : imageSize === "wide" ? "1536 / 1024" : "1024 / 1536",
+                }}
+              />
+            )}
+
+            {/* ── result image ── */}
+            {hasImage && (
+              <div className="space-y-3">
+                <div className="relative rounded-lg overflow-hidden border border-white/8">
+                  <img
+                    src={imageData}
+                    alt={imagePrompt}
+                    className="w-full block"
+                    style={{
+                      aspectRatio:
+                        imageSizeResult === "square"
+                          ? "1 / 1"
+                          : imageSizeResult === "wide"
+                            ? "1536 / 1024"
+                            : "1024 / 1536",
+                    }}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-white/30">
+                    {IMAGE_SIZE_LABELS[imageSizeResult]}
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleDownloadImage}
+                    className="h-8 px-3 text-white/60 hover:text-white hover:bg-white/8 gap-1.5"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span className="text-xs">Download</span>
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* ── error ── */}
+            {imageState === "error" && imageError && (
+              <p className="text-sm text-red-400">{imageError}</p>
+            )}
+          </div>
+        </section>
       </main>
 
       {/* ── share dialog ── */}
