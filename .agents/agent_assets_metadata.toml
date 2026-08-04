@@ -144,3 +144,10 @@ id = "L3z-at5UnkakKXrX1PFjg"
 uri = "file://INVARIANT_BUILD_HANDOFF.zip"
 type = "unspecified"
 title = "INVARIANT — Build Handoff (HTML, download)"
+
+[[outputs]]
+id = "_eNF5feZcnwmDTeuZT5V-"
+uri = "file://GEMINI_HANDOFF.md"
+type = "text"
+title = "Axiom — Gemini Handoff Brief"
+description = "Full project state, env vars, what was built, task status, and things to check. Paste directly into Gemini."
