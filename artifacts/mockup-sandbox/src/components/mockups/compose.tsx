@@ -162,6 +162,7 @@ type ImageState = "idle" | "generating" | "done" | "error";
 type ImageSize = "square" | "wide" | "tall";
 type AtsState = "idle" | "matching" | "done";
 type FixState = "idle" | "fixing" | "done" | "error";
+type RecheckState = "idle" | "checking" | "done";
 
 interface MatchResult {
   score: number;
@@ -245,6 +246,17 @@ export default function Compose() {
   const [fixShareError, setFixShareError] = useState("");
   const [fixUrlCopied, setFixUrlCopied] = useState(false);
   const [fixDialogOpen, setFixDialogOpen] = useState(false);
+
+  // ── before/after ATS score state ──────────────────────────────────────────
+  const [beforeScore, setBeforeScore] = useState<number | null>(null);
+  const [recheckState, setRecheckState] = useState<RecheckState>("idle");
+  const [afterScore, setAfterScore] = useState<number | null>(null);
+  // Immutable snapshots captured atomically at match time — Fix Gaps and Re-check
+  // use these so later edits to the live inputs never skew the before/after delta.
+  const [jdSnapshot, setJdSnapshot] = useState<string>("");
+  const [resumeSnapshot, setResumeSnapshot] = useState<string>("");
+  // True when the AI wasn't available and buildRevisionTemplate was used (resume unchanged)
+  const [isFallbackResult, setIsFallbackResult] = useState(false);
 
   // ── simulate compose ──────────────────────────────────────────────────────
   function handleCompose() {
@@ -377,13 +389,25 @@ export default function Compose() {
     setMatchResult(null);
     setFixState("idle");
     setFixResultText("");
+    // Reset any pending re-check state so stale deltas don't survive a new match
+    setBeforeScore(null);
+    setAfterScore(null);
+    setRecheckState("idle");
+    setIsFallbackResult(false);
+
+    // Capture exact resume + JD at match time so Fix Gaps and Re-check always
+    // operate on the same inputs regardless of later edits to the live fields.
+    const jdAtMatchTime = jobDescription;
+    const resumeAtMatchTime = resume;
 
     setTimeout(() => {
-      const keywords = extractKeywordsFromJd(jobDescription);
-      const { found, missing } = matchKeywords(keywords, resume);
+      const keywords = extractKeywordsFromJd(jdAtMatchTime);
+      const { found, missing } = matchKeywords(keywords, resumeAtMatchTime);
       const total = found.length + missing.length;
       const score = total > 0 ? Math.round((found.length / total) * 100) : 0;
       setMatchResult({ score, found, missing });
+      setJdSnapshot(jdAtMatchTime);
+      setResumeSnapshot(resumeAtMatchTime);
       setAtsState("done");
     }, 1600);
   }
@@ -396,6 +420,10 @@ export default function Compose() {
     setFixShareState("idle");
     setFixShareUrl("");
     setFixShareError("");
+    setBeforeScore(matchResult.score);
+    setIsFallbackResult(false);
+    setRecheckState("idle");
+    setAfterScore(null);
 
     try {
       const res = await fetch("/api/v1/compose", {
@@ -403,8 +431,8 @@ export default function Compose() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           intent: "tailor",
-          document: resume,
-          context: jobDescription,
+          document: resumeSnapshot,
+          context: jdSnapshot,
           missingKeywords: matchResult.missing,
         }),
       });
@@ -412,7 +440,8 @@ export default function Compose() {
       if (res.status === 503) {
         // AI not yet configured — show a revision guide (no fabricated text)
         await new Promise((r) => setTimeout(r, 1400));
-        setFixResultText(buildRevisionTemplate(resume, matchResult.missing));
+        setFixResultText(buildRevisionTemplate(resumeSnapshot, matchResult.missing));
+        setIsFallbackResult(true);
         setFixState("done");
         return;
       }
@@ -430,6 +459,22 @@ export default function Compose() {
       setFixResultText(message);
       setFixState("error");
     }
+  }
+
+  // ── re-check ATS score on the fixed resume ───────────────────────────────
+  function handleRecheckScore() {
+    if (!fixResultText.trim() || !jdSnapshot.trim()) return;
+    setRecheckState("checking");
+    setAfterScore(null);
+    setTimeout(() => {
+      // Always use the JD snapshot captured at fix time so edits don't skew comparison
+      const keywords = extractKeywordsFromJd(jdSnapshot);
+      const { found, missing } = matchKeywords(keywords, fixResultText);
+      const total = found.length + missing.length;
+      const score = total > 0 ? Math.round((found.length / total) * 100) : 0;
+      setAfterScore(score);
+      setRecheckState("done");
+    }, 1400);
   }
 
   // ── fix result actions ─────────────────────────────────────────────────────
@@ -769,9 +814,101 @@ export default function Compose() {
                       {fixResultText}
                     </pre>
                   </div>
-                  <p className="text-xs text-white/30 text-center">
-                    Run ATS Match again to verify your new score ↑
-                  </p>
+
+                  {/* ── before/after score panel ── */}
+                  <div className="rounded-xl border border-white/8 bg-white/3 p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-medium text-white/50 uppercase tracking-widest">
+                        ATS Score Check
+                      </span>
+                      {!isFallbackResult && recheckState !== "done" && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={handleRecheckScore}
+                          disabled={recheckState === "checking"}
+                          className="h-8 px-3 text-white/60 hover:text-white hover:bg-white/8 gap-1.5 disabled:opacity-40"
+                        >
+                          {recheckState === "checking" ? (
+                            <>
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                              <span className="text-xs">Checking…</span>
+                            </>
+                          ) : (
+                            <>
+                              <Target className="w-3.5 h-3.5" />
+                              <span className="text-xs">Re-check score</span>
+                            </>
+                          )}
+                        </Button>
+                      )}
+                    </div>
+
+                    {isFallbackResult && (
+                      <p className="text-xs text-white/35">
+                        Before fix: <span className={`font-semibold tabular-nums ${beforeScore !== null && beforeScore >= 70 ? "text-emerald-400" : beforeScore !== null && beforeScore >= 45 ? "text-amber-400" : "text-red-400"}`}>{beforeScore}%</span>
+                        {" "}· AI wasn't available — your resume above is unchanged. Apply the revision guide manually, then re-paste your resume and run ATS Match again.
+                      </p>
+                    )}
+
+                    {!isFallbackResult && recheckState === "idle" && beforeScore !== null && (
+                      <p className="text-xs text-white/35">
+                        Before fix: <span className={`font-semibold tabular-nums ${beforeScore >= 70 ? "text-emerald-400" : beforeScore >= 45 ? "text-amber-400" : "text-red-400"}`}>{beforeScore}%</span>
+                        {" "}· Click Re-check score to see the improvement.
+                      </p>
+                    )}
+
+                    {recheckState === "checking" && (
+                      <div className="flex gap-2">
+                        {[40, 60, 45].map((w, i) => (
+                          <div key={i} className="h-2.5 rounded-full bg-white/8 animate-pulse flex-1" style={{ maxWidth: `${w}%` }} />
+                        ))}
+                      </div>
+                    )}
+
+                    {recheckState === "done" && beforeScore !== null && afterScore !== null && (
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-3">
+                          <span className={`text-2xl font-bold tabular-nums ${beforeScore >= 70 ? "text-emerald-400" : beforeScore >= 45 ? "text-amber-400" : "text-red-400"}`}>
+                            {beforeScore}%
+                          </span>
+                          <span className="text-white/30 text-lg">→</span>
+                          <span className={`text-2xl font-bold tabular-nums ${afterScore >= 70 ? "text-emerald-400" : afterScore >= 45 ? "text-amber-400" : "text-red-400"}`}>
+                            {afterScore}%
+                          </span>
+                          {afterScore > beforeScore ? (
+                            <span className="ml-1 text-sm font-semibold text-emerald-400">
+                              +{afterScore - beforeScore} pts
+                            </span>
+                          ) : afterScore === beforeScore ? (
+                            <span className="ml-1 text-sm text-white/40">no change</span>
+                          ) : (
+                            <span className="ml-1 text-sm font-semibold text-red-400">
+                              {afterScore - beforeScore} pts
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex gap-2 items-center">
+                          <div className="flex-1 h-1.5 rounded-full bg-white/8 overflow-hidden">
+                            <div className={`h-full rounded-full transition-all duration-700 ${beforeScore >= 70 ? "bg-emerald-400/40" : beforeScore >= 45 ? "bg-amber-400/40" : "bg-red-400/40"}`} style={{ width: `${beforeScore}%` }} />
+                          </div>
+                          <span className="text-white/20 text-xs">→</span>
+                          <div className="flex-1 h-1.5 rounded-full bg-white/8 overflow-hidden">
+                            <div className={`h-full rounded-full transition-all duration-700 ${afterScore >= 70 ? "bg-emerald-400" : afterScore >= 45 ? "bg-amber-400" : "bg-red-400"}`} style={{ width: `${afterScore}%` }} />
+                          </div>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={handleRecheckScore}
+                          className="h-7 px-2 text-white/30 hover:text-white/60 hover:bg-white/5 gap-1 text-xs"
+                        >
+                          <Target className="w-3 h-3" />
+                          Re-check again
+                        </Button>
+                      </div>
+                    )}
+                  </div>
                 </>
               )}
 
