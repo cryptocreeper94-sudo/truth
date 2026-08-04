@@ -4,6 +4,7 @@ import keyManagementRouter from "./key-management";
 import composeRouter from "./compose";
 import composeShareRouter from "./compose-share";
 import imageGenRouter from "./image-gen";
+import demoRouter from "./demo";
 
 const router: IRouter = Router();
 
@@ -12,5 +13,6 @@ router.use(keyManagementRouter);
 router.use(composeRouter);
 router.use(composeShareRouter);
 router.use(imageGenRouter);
+router.use(demoRouter);
 
 export default router;
