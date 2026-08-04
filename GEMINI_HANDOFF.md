@@ -155,6 +155,32 @@ src/conversation/gateway.js
 
 ---
 
+## Final Session Status (end of Aug 4 session)
+
+**DDA repo push state: ✅ everything pushed.** `origin/main` HEAD is `a2dc611` (snippets library). Coolify has picked up all commits through that point. Nothing uncommitted or unpushed.
+
+**Important caveat — two codebases:**
+- The **DDA GitHub repo** (deployed to axiom42.com via Coolify) contains the real product: Express API + `demo/*.html` pages. Everything the main agent built (PDF export, snippets, Fix Gaps fix, templates from Task #8/#9) is in there and pushed.
+- The **Replit workspace** is a separate pnpm monorepo. Replit *task agents* merged several tasks (#9 templates, #11 image rate limit, #12 image persistence, #13 PDF export, #14 home page) into the **workspace**, not into DDA. If any of those merges contain product code that isn't already in DDA, it must be ported manually. Cross-check before assuming a task-agent merge is live in production.
+
+**Still open / worth doing next (priority order):**
+1. **Home page → axiom42.com** — the React home page only exists in the Replit workspace; see "Home Page Deployment — Action Required" section below. CTA paths must change from `/api/demo/...` to `/demo/...` for production.
+2. **Task #20 — draft autosave** — the biggest real product gap: compose drafts are lost on page refresh. localStorage save every few seconds is enough.
+3. **Task #16 — ATS score delta** ("you went from 61 → 89" after Fix Gaps) — a task agent was working on this at session end; check whether it finished and whether its output landed in the workspace or needs porting to DDA.
+4. **Task #29 — Word (.docx) export** — completes the text/PDF/Word trio; can be done client-side like the PDF exporter in `demo/compose.html`.
+5. **Tasks #5/#6/#7** — share-link polish (expired-link page, auto-cleanup, manage-links UI).
+6. **Tasks #22/#23/#25/#26** — image generation quality-of-life (daily count display, bot quota protection, old-image cleanup, delete individual images).
+
+**Verify on production (quick smoke test):**
+- Fix Gaps works end-to-end (the `lastMatchData` bug fix is in `c0fa22a`)
+- PDF download produces a valid file
+- Snippets save/insert/rename/delete
+- Image generation produces real images (OPENAI_API_KEY is set in Coolify)
+- Mobile: user has been using the product from their phone all day — it works; do not "add mobile support," it exists.
+- There is NO "coming soon" page in production — auto-proposed tasks claiming otherwise were based on Replit workspace placeholders and were cancelled.
+
+---
+
 ## Current Task Status
 
 | Task | State | Notes |
