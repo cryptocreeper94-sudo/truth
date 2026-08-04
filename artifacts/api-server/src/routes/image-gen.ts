@@ -1,6 +1,6 @@
 import { Router, type Request, type Response } from "express";
 import { z } from "zod";
-import { sql, desc, eq } from "drizzle-orm";
+import { sql, desc, eq, lt } from "drizzle-orm";
 import { db, imageGenUsageTable, generatedImagesTable } from "@workspace/db";
 import { randomUUID } from "crypto";
 
@@ -15,6 +15,60 @@ const DAILY_LIMIT = 5;
 
 // Maximum number of previously generated images returned in history
 const HISTORY_LIMIT = 10;
+
+// Images older than this many days are deleted by the scheduled cleanup job
+const IMAGE_MAX_AGE_DAYS = 30;
+
+// ── Image cleanup helpers ──────────────────────────────────────────────────────
+
+/**
+ * After inserting a new image for an IP, delete any rows beyond the most recent
+ * HISTORY_LIMIT for that IP. This caps per-IP storage regardless of age.
+ */
+async function pruneImagesForIp(ip: string): Promise<void> {
+  try {
+    await db.execute(
+      sql`DELETE FROM generated_images
+          WHERE ip = ${ip}
+            AND id NOT IN (
+              SELECT id FROM generated_images
+              WHERE ip = ${ip}
+              ORDER BY created_at DESC
+              LIMIT ${HISTORY_LIMIT}
+            )`
+    );
+  } catch (err) {
+    console.error("Failed to prune images for IP:", err);
+  }
+}
+
+/**
+ * Delete all generated images older than IMAGE_MAX_AGE_DAYS days.
+ * Called on startup and then on a daily interval.
+ */
+async function pruneOldImages(): Promise<void> {
+  try {
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - IMAGE_MAX_AGE_DAYS);
+
+    const result = await db
+      .delete(generatedImagesTable)
+      .where(lt(generatedImagesTable.created_at, cutoff))
+      .returning({ id: generatedImagesTable.id });
+
+    if (result.length > 0) {
+      console.log(
+        `[image-cleanup] Deleted ${result.length} generated image(s) older than ${IMAGE_MAX_AGE_DAYS} days.`
+      );
+    }
+  } catch (err) {
+    console.error("[image-cleanup] Failed to prune old images:", err);
+  }
+}
+
+// Run once at startup, then every 24 hours
+pruneOldImages();
+setInterval(pruneOldImages, 24 * 60 * 60 * 1000);
 
 /**
  * Atomically increment the usage counter for (ip, today).
@@ -184,6 +238,8 @@ router.post("/v1/image/generate", async (req: Request, res: Response) => {
       size,
       image_data_b64: b64Json,
     });
+    // Trim rows for this IP to the most recent HISTORY_LIMIT (non-fatal)
+    await pruneImagesForIp(clientIp);
   } catch (err) {
     // Non-fatal: generation succeeded, persistence failed — log and continue
     console.error("Failed to persist generated image:", err);
