@@ -220,4 +220,35 @@ Push to `main` via: `cd /tmp/DDA && git push origin main` (uses `GITHUB_PAT` sec
 
 ---
 
+## ⚠️ Home Page Deployment — Action Required
+
+The Axiom home page (`artifacts/axiom-home/`) is a **React + Vite app that lives in the Replit workspace monorepo**, not in the `cryptocreeper94-sudo/DDA` GitHub repo. Coolify only watches the DDA repo, so it has **not** been deployed to axiom42.com automatically.
+
+To get the home page live on axiom42.com, one of these approaches is needed:
+
+### Option A — Build and serve static files from the DDA repo (simplest)
+1. Run `pnpm --filter @workspace/axiom-home run build` in the Replit workspace — outputs to `artifacts/axiom-home/dist/`
+2. Copy the `dist/` contents into a `public/home/` folder (or root `public/`) in the DDA repo
+3. Add an Express route in `src/api/router.js` to serve those static files at `/`
+4. Push to `main` — Coolify deploys it with the rest of the app
+5. **Update CTA links:** change `/api/demo/compose.html` → `/demo/compose.html` and `/api/demo/index.html` → `/demo/index.html` for production
+
+### Option B — Deploy as a separate Coolify service
+1. Create a new Coolify service pointing to the Replit workspace repo (or a separate GitHub repo for the home page)
+2. Set it to serve at the root domain or a subdomain
+3. No CTA path changes needed if served from the same domain
+
+### Option C — Export built files from Replit and commit to DDA
+1. In Replit, run the build and download `artifacts/axiom-home/dist/`
+2. Commit those files into the DDA repo under `public/`
+3. Serve them via Express static middleware
+
+**Current CTA paths in the home page code** (need updating for production):
+- `OPEN DOCUMENT COMPOSER` → `/api/demo/compose.html` ← change to `/demo/compose.html`
+- `OPEN CHAT` → `/api/demo/index.html` ← change to `/demo/index.html`
+
+The home page file is at: `artifacts/axiom-home/src/pages/home.tsx`
+
+---
+
 *End of handoff. All env vars are in Coolify — do not prompt the user for API keys in the chat.*
