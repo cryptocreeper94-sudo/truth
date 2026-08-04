@@ -120,6 +120,38 @@ const SIZE_MAP: Record<ImageSize, "1024x1024" | "1536x1024" | "1024x1536"> = {
   tall: "1024x1536",
 };
 
+// ── DELETE /v1/image/:id ───────────────────────────────────────────────────
+// Deletes a single generated image by ID. Only the owning IP may delete it.
+router.delete("/v1/image/:id", async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const clientIp = req.ip ?? "unknown";
+
+  if (!id) {
+    res.status(400).json({ error: "Missing image id" });
+    return;
+  }
+
+  try {
+    const result = await db
+      .delete(generatedImagesTable)
+      .where(
+        sql`${generatedImagesTable.id} = ${id} AND ${generatedImagesTable.ip} = ${clientIp}`
+      )
+      .returning({ id: generatedImagesTable.id });
+
+    if (result.length === 0) {
+      // Either the image doesn't exist or it belongs to a different IP
+      res.status(404).json({ error: "Image not found" });
+      return;
+    }
+
+    res.json({ deleted: true, id });
+  } catch (err) {
+    console.error("Failed to delete image:", err);
+    res.status(503).json({ error: "Could not delete image" });
+  }
+});
+
 // ── GET /v1/image/history ──────────────────────────────────────────────────
 // Returns the most recent generated images for the requesting IP.
 router.get("/v1/image/history", async (req: Request, res: Response) => {

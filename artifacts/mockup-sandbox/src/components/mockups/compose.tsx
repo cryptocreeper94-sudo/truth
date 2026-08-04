@@ -16,7 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Copy, Download, Share2, Check, Loader2, Sparkles, ImagePlus, ArrowUpCircle, Target, Link } from "lucide-react";
+import { Copy, Download, Share2, Check, Loader2, Sparkles, ImagePlus, ArrowUpCircle, Target, Link, X } from "lucide-react";
 
 // ── sample composed output ──────────────────────────────────────────────────
 const SAMPLE_COVER_LETTER = `Dear Hiring Manager,
@@ -375,6 +375,34 @@ export default function Compose() {
       const message = err instanceof Error ? err.message : "Unknown error";
       setImageError(message);
       setImageState("error");
+    }
+  }
+
+  // ── delete image from history ─────────────────────────────────────────────
+  async function handleDeleteImage(id: string) {
+    // Optimistically remove from local state immediately
+    setImageHistory((prev) => prev.filter((img) => img.id !== id));
+
+    // If the deleted image is currently shown, clear the viewer
+    const deleted = imageHistory.find((img) => img.id === id);
+    if (deleted && imageData === `data:image/png;base64,${deleted.image_data_b64}`) {
+      const remaining = imageHistory.filter((img) => img.id !== id);
+      if (remaining.length > 0) {
+        const next = remaining[0]!;
+        setImageData(`data:image/png;base64,${next.image_data_b64}`);
+        setImageSizeResult(next.size);
+        setImagePrompt(next.prompt);
+        setImageSize(next.size);
+      } else {
+        setImageData("");
+        setImageState("idle");
+      }
+    }
+
+    try {
+      await fetch(`/api/v1/image/${id}`, { method: "DELETE" });
+    } catch {
+      // Non-fatal — the optimistic removal stays; the row will be pruned eventually
     }
   }
 
@@ -1313,33 +1341,48 @@ export default function Compose() {
               </span>
               <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
                 {imageHistory.map((img) => (
-                  <button
+                  <div
                     key={img.id}
-                    title={img.prompt}
-                    onClick={() => {
-                      setImageData(`data:image/png;base64,${img.image_data_b64}`);
-                      setImageSizeResult(img.size);
-                      setImagePrompt(img.prompt);
-                      setImageSize(img.size);
-                      setImageState("done");
-                      setImageError("");
-                    }}
-                    className={`shrink-0 rounded-md overflow-hidden border transition-all ${
-                      imageData === `data:image/png;base64,${img.image_data_b64}`
-                        ? "border-white/50 ring-1 ring-white/30"
-                        : "border-white/10 hover:border-white/30"
-                    }`}
+                    className="relative shrink-0 group"
                     style={{
                       width: img.size === "tall" ? 40 : 64,
                       height: img.size === "wide" ? 40 : 64,
                     }}
                   >
-                    <img
-                      src={`data:image/png;base64,${img.image_data_b64}`}
-                      alt={img.prompt}
-                      className="w-full h-full object-cover"
-                    />
-                  </button>
+                    <button
+                      title={img.prompt}
+                      onClick={() => {
+                        setImageData(`data:image/png;base64,${img.image_data_b64}`);
+                        setImageSizeResult(img.size);
+                        setImagePrompt(img.prompt);
+                        setImageSize(img.size);
+                        setImageState("done");
+                        setImageError("");
+                      }}
+                      className={`w-full h-full rounded-md overflow-hidden border transition-all ${
+                        imageData === `data:image/png;base64,${img.image_data_b64}`
+                          ? "border-white/50 ring-1 ring-white/30"
+                          : "border-white/10 hover:border-white/30"
+                      }`}
+                    >
+                      <img
+                        src={`data:image/png;base64,${img.image_data_b64}`}
+                        alt={img.prompt}
+                        className="w-full h-full object-cover"
+                      />
+                    </button>
+                    {/* delete button — visible on hover */}
+                    <button
+                      title="Delete image"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        void handleDeleteImage(img.id);
+                      }}
+                      className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-black/80 border border-white/20 text-white/70 hover:text-white hover:bg-red-600/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                    >
+                      <X className="w-2.5 h-2.5" />
+                    </button>
+                  </div>
                 ))}
               </div>
             </div>
