@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Axiom"
+description = "The public-facing home page and landing experience for Axiom — DarkWave Studios' professional writing intelligence tool. A rich, scroll-worthy single page that communicates what Axiom is, who it's for, and drives users to start using it via the Document Composer and Chat interfaces."
+version = "1.0.0"
+id = "artifacts/axiom-home"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 20774
+
+[services.development]
+run = "pnpm --filter @workspace/axiom-home run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/axiom-home", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/axiom-home/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "20774"
+BASE_PATH = "/"
