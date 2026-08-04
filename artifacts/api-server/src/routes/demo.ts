@@ -733,7 +733,7 @@ function intentToDocType(intent) {
 // ── Quota display ─────────────────────────────────────────────────────────────
 function updateQuota() {
   if (quotaRemaining !== null) {
-    quotaDisp.textContent = quotaRemaining + ' compose ops remaining this session';
+    quotaDisp.textContent = quotaRemaining + ' compose ops remaining today';
   }
 }
 
