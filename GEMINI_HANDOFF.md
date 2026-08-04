@@ -246,6 +246,59 @@ Push to `main` via: `cd /tmp/DDA && git push origin main` (uses `GITHUB_PAT` sec
 
 ---
 
+## Backlog for Gemini — 9 Approved Features (Build These)
+
+These are the remaining high-value features, spec'd explicitly. All work happens in the DDA repo (`cryptocreeper94-sudo/DDA`). The three files you'll touch most: `demo/compose.html` (the composer UI — standalone HTML/JS/CSS, no framework), `src/api/router.js` (all API endpoints), `src/database/db.js` (PostgreSQL tables + CRUD methods). Follow the existing code style in each file — plain JS, no build step for the demo pages. Push to `main` when done; Coolify auto-deploys to axiom42.com.
+
+### 1. Expired share link error page
+**Problem:** Visiting an expired or deleted share link shows a blank page.
+**Build:** In the share-link route in `src/api/router.js`, when the link is missing or expired, return a styled HTML error page (dark theme, matching `demo/axiom.css` tokens: bg `#0c0c14`, JetBrains Mono, cyan `#22d3ee` accent) saying "This link has expired or was removed" with a button linking to `/demo/compose.html`.
+**Done:** No shared link ever renders a blank page.
+
+### 2. Manage shared links
+**Problem:** Users can create share links but can't see or revoke them.
+**Build:** `GET /v1/compose/shares` (list current session/tenant's links with created date, expiry, view count if tracked) and `DELETE /v1/compose/shares/:id`. In `demo/compose.html`, add a "My Links" collapsible panel (copy the pattern from the existing "My Snippets" panel) listing each link with a copy button and a revoke button.
+**Done:** Users can list, copy, and revoke their own share links from the compose page.
+
+### 3. Daily image count display
+**Problem:** Users can't see how many image generations they have left today.
+**Build:** The rate limit logic already exists server-side (recently updated by Task #11 — find it near the image generation endpoint in `src/api/router.js`). Add remaining/limit numbers to the image generation response (or a small `GET /v1/images/quota` endpoint). In `demo/compose.html`, show "X of Y today" next to the image generation button, updating after each generation.
+**Done:** The user always knows their remaining daily image quota.
+
+### 4. Bot/shared-IP quota protection
+**Problem:** The image quota is keyed in a way bots or users behind shared IPs can exhaust.
+**Build:** Key the quota to session ID (and tenant ID when logged in) rather than IP alone; combine session+IP so a fresh anonymous session on a shared IP still gets a reasonable allowance while a single session can't bypass by rotating IPs. Add a simple honeypot/heuristic guard: reject image requests with no prior compose activity in the session.
+**Done:** One user's or bot's usage can't wipe out the quota for everyone on the same IP.
+
+### 5. Clear error for private Google Docs (resume URL import)
+**Problem:** The resume-URL import (Task #17, merged) fetches a URL; a private Google Doc returns a sign-in HTML page, which currently produces confusing output.
+**Build:** In the URL-fetch handler, detect Google's sign-in redirect (response URL contains `accounts.google.com` or body contains `ServiceLogin`) and return a friendly 422: "This Google Doc is private. Share it as 'Anyone with the link can view' and try again." Show that message in the compose UI.
+**Done:** Pasting a private Doc URL gives an actionable instruction, not garbage text.
+
+### 6. Paste a job description URL
+**Problem:** Users can paste a resume URL but must still paste job descriptions manually.
+**Build:** Reuse the exact resume-URL fetch pipeline (same endpoint or a twin) for the job description field in the match/ATS flow in `demo/compose.html`. Same URL validation, same private-doc error handling as item 5.
+**Done:** Both resume and job description accept a URL or pasted text interchangeably.
+
+### 7. Search/filter templates by category
+**Problem:** The template picker is a flat list; with 14+ doc types it's getting long.
+**Build:** Templates already have a doc type. In the template picker UI in `demo/compose.html`, add a text filter input and category chips (one per doc type present). Client-side filtering only — no API changes needed.
+**Done:** Users can narrow the template list by typing or clicking a category chip.
+
+### 8. Remember last-used template
+**Problem:** Returning users re-select the same template every visit.
+**Build:** On template load, write the template ID to `localStorage` (`axiom_last_template`). On page load, if present and still valid, pre-select it in the picker with a subtle "Last used" badge. Do NOT auto-load its content — just pre-select.
+**Done:** The previous template is pre-selected on return visits; one click to load.
+
+### 9. Named multiple drafts
+**Problem:** Autosave (Task #20, merged) protects one in-progress draft; users writing several documents in parallel can't switch between them.
+**Build:** Extend the autosave mechanism: a "Drafts" dropdown in the compose header. "Save as draft" prompts for a name and stores `{name, docType, brief, result, savedAt}` in `localStorage` (`axiom_drafts` array, cap ~20). Selecting a draft restores all fields. Include delete buttons per draft.
+**Done:** Users can name, switch between, and delete multiple working drafts.
+
+**Order of attack:** 1 and 5 are quick wins (error handling). 3, 7, 8 are small UI additions. 2, 6, 9 are medium. 4 is the only one needing design judgment on the quota keying.
+
+---
+
 ## ⚠️ Home Page Deployment — Action Required
 
 The Axiom home page (`artifacts/axiom-home/`) is a **React + Vite app that lives in the Replit workspace monorepo**, not in the `cryptocreeper94-sudo/DDA` GitHub repo. Coolify only watches the DDA repo, so it has **not** been deployed to axiom42.com automatically.
