@@ -122,6 +122,14 @@ function composeDemoHtml(): string {
     .url-hint { padding: 0 16px 10px; font-size: 11px; color: var(--dim); font-family: monospace; }
     .url-hint.err { color: #fca5a5; }
 
+    /* ── Draft banner ── */
+    #draft-banner { display: none; background: var(--surface2); border: 1px solid var(--accent-hi); border-radius: 7px; padding: 10px 16px; margin-bottom: 20px; display: none; align-items: center; justify-content: space-between; gap: 12px; }
+    .draft-banner-left { display: flex; align-items: center; gap: 10px; font-size: 12px; font-family: monospace; color: var(--muted); }
+    .draft-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+    .draft-banner-text { color: var(--text); }
+    .draft-clear-btn { background: transparent; border: 1px solid var(--border-hi); color: var(--muted); font-family: monospace; font-size: 11px; padding: 4px 12px; border-radius: 4px; cursor: pointer; transition: all .15s; white-space: nowrap; flex-shrink: 0; }
+    .draft-clear-btn:hover { border-color: var(--red); color: #fca5a5; }
+
     /* ── Footer ── */
     footer { border-top: 1px solid var(--border); padding: 20px 24px; text-align: center; font-size: 11px; color: var(--dim); font-family: monospace; }
 
@@ -215,6 +223,16 @@ function composeDemoHtml(): string {
       </div>
       <textarea id="ctx-input" placeholder="Paste the job description or describe the role, company, and position you're targeting. The more context you give, the sharper the output."></textarea>
     </div>
+  </div>
+
+  <!-- ── Draft banner ── -->
+  <div id="draft-banner">
+    <div class="draft-banner-left">
+      <div class="draft-dot"></div>
+      <span class="draft-banner-text">Draft restored</span>
+      <span>— your previous content has been loaded automatically.</span>
+    </div>
+    <button class="draft-clear-btn" id="draft-clear-btn">CLEAR DRAFT</button>
   </div>
 
   <!-- ── Action bar ── -->
@@ -676,6 +694,7 @@ function extractDocFromUrl() {
     docUrlHint.style.display = 'none';
     docUrlInput.value = '';
     showToast('Resume extracted — review and execute.', 'ok');
+    saveDraft();
   })
   .catch(function(err) {
     docUrlHint.classList.add('err');
@@ -800,7 +819,64 @@ function setIntent(intent) {
   document.querySelectorAll('.intent-pill').forEach(function(p) {
     p.classList.toggle('active', p.getAttribute('data-intent') === intent);
   });
+  scheduleSaveDraft();
 }
+
+// ── Draft persistence ─────────────────────────────────────────────────────────
+var DRAFT_KEY = 'axiom_compose_draft';
+var draftBanner = document.getElementById('draft-banner');
+var draftClearBtn = document.getElementById('draft-clear-btn');
+var draftSaveTimer = null;
+
+function saveDraft() {
+  try {
+    var draft = {
+      doc: docInput.value,
+      ctx: ctxInput.value,
+      intent: selectedIntent
+    };
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+  } catch (e) { /* storage unavailable */ }
+}
+
+function clearDraft() {
+  try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
+  draftBanner.style.display = 'none';
+}
+
+function scheduleSaveDraft() {
+  if (draftSaveTimer) clearTimeout(draftSaveTimer);
+  draftSaveTimer = setTimeout(saveDraft, 600);
+}
+
+function loadDraft() {
+  try {
+    var raw = localStorage.getItem(DRAFT_KEY);
+    if (!raw) return;
+    var draft = JSON.parse(raw);
+    var hasContent = (draft.doc && draft.doc.trim()) || (draft.ctx && draft.ctx.trim());
+    if (!hasContent) return;
+    if (draft.doc) docInput.value = draft.doc;
+    if (draft.ctx) ctxInput.value = draft.ctx;
+    if (draft.intent) setIntent(draft.intent);
+    draftBanner.style.display = 'flex';
+  } catch (e) { /* ignore corrupt data */ }
+}
+
+docInput.addEventListener('input', scheduleSaveDraft);
+ctxInput.addEventListener('input', scheduleSaveDraft);
+
+// Flush draft synchronously when the page is hidden (refresh, tab close, navigation)
+window.addEventListener('pagehide', saveDraft);
+window.addEventListener('beforeunload', saveDraft);
+
+draftClearBtn.addEventListener('click', function() {
+  clearDraft();
+  docInput.value = '';
+  ctxInput.value = '';
+  document.querySelectorAll('.tpl-card').forEach(function(c) { c.classList.remove('active'); });
+  activeTemplateId = null;
+});
 
 // ── Clear ─────────────────────────────────────────────────────────────────────
 clearBtn.addEventListener('click', function() {
@@ -809,6 +885,7 @@ clearBtn.addEventListener('click', function() {
   resultSec.style.display = 'none';
   document.querySelectorAll('.tpl-card').forEach(function(c) { c.classList.remove('active'); });
   activeTemplateId = null;
+  clearDraft();
 });
 
 // ── Compose ───────────────────────────────────────────────────────────────────
@@ -968,6 +1045,7 @@ function showToast(msg, type) {
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 renderTemplateGrid();
+loadDraft();
 </script>
 
 </body>
