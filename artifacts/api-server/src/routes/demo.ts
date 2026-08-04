@@ -194,7 +194,8 @@ function composeDemoHtml(): string {
         <span class="result-title" id="result-title">COMPOSED DOCUMENT</span>
         <div class="result-actions">
           <button class="btn btn-ghost" id="copy-btn" style="height:32px;font-size:11px;">📋 COPY</button>
-          <button class="btn btn-ghost" id="dl-btn" style="height:32px;font-size:11px;">⬇ DOWNLOAD</button>
+          <button class="btn btn-ghost" id="dl-btn" style="height:32px;font-size:11px;">⬇ TXT</button>
+          <button class="btn btn-ghost" id="dl-pdf-btn" style="height:32px;font-size:11px;">⬇ PDF</button>
           <button class="btn btn-ghost" id="share-btn" style="height:32px;font-size:11px;">🔗 SHARE</button>
         </div>
       </div>
@@ -546,6 +547,7 @@ var quotaDisp   = document.getElementById('quota-display');
 var toastEl     = document.getElementById('toast');
 var copyBtn     = document.getElementById('copy-btn');
 var dlBtn       = document.getElementById('dl-btn');
+var dlPdfBtn    = document.getElementById('dl-pdf-btn');
 var shareBtn    = document.getElementById('share-btn');
 
 // ── Template grid ─────────────────────────────────────────────────────────────
@@ -698,6 +700,42 @@ dlBtn.addEventListener('click', function() {
   var intentSlug = selectedIntent.replace('_', '-');
   a.href = url; a.download = 'axiom-' + intentSlug + '.txt'; a.click();
   URL.revokeObjectURL(url);
+});
+
+dlPdfBtn.addEventListener('click', function() {
+  var text = resultText.textContent;
+  if (!text) return;
+  var intentSlug = selectedIntent.replace(/_/g, '-');
+  var filename = 'axiom-' + intentSlug;
+  dlPdfBtn.textContent = '...';
+  dlPdfBtn.disabled = true;
+  fetch('/api/v1/export-pdf', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text: text, filename: filename })
+  })
+  .then(function(res) {
+    if (!res.ok) {
+      return res.json().then(function(body) {
+        throw new Error(body.detail || body.error || ('Error ' + res.status));
+      });
+    }
+    return res.arrayBuffer();
+  })
+  .then(function(buffer) {
+    var blob = new Blob([buffer], { type: 'application/pdf' });
+    var url  = URL.createObjectURL(blob);
+    var a    = document.createElement('a');
+    a.href = url; a.download = filename + '.pdf'; a.click();
+    URL.revokeObjectURL(url);
+  })
+  .catch(function(err) {
+    showToast(err.message || 'PDF export failed. Please try again.', 'err');
+  })
+  .finally(function() {
+    dlPdfBtn.textContent = '\u2b07 PDF';
+    dlPdfBtn.disabled = false;
+  });
 });
 
 shareBtn.addEventListener('click', function() {
