@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Terminal, Shield, Cpu, FileText, Crosshair, ChevronRight, Activity, Lock, Database } from "lucide-react";
+import { ArrowRight, Terminal, Shield, Cpu, FileText, Crosshair, ChevronRight, Activity, Lock, Database, ImageIcon } from "lucide-react";
 import heroBgPath from "@assets/generated_images/hero-bg.jpg";
 import dataDocPath from "@assets/generated_images/data-doc.jpg";
 import featureAnalysisPath from "@assets/generated_images/feature-analysis.jpg";
@@ -50,7 +50,12 @@ export default function Home() {
             <Activity className="w-5 h-5 text-[#22d3ee]" />
             <span className="font-mono text-sm tracking-widest font-bold">AXIOM<span className="text-[#22d3ee]">.SYS</span></span>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6">
+            <div className="hidden md:flex items-center gap-5">
+              <a href="/api/demo/compose.html" className="font-mono text-[11px] tracking-widest text-[rgba(255,255,255,0.55)] hover:text-[#22d3ee] transition-colors uppercase">Compose</a>
+              <a href="/api/demo/index.html" className="font-mono text-[11px] tracking-widest text-[rgba(255,255,255,0.55)] hover:text-[#22d3ee] transition-colors uppercase">Chat</a>
+              <a href="/api/demo/image.html" className="font-mono text-[11px] tracking-widest text-[rgba(255,255,255,0.55)] hover:text-[#22d3ee] transition-colors uppercase">Images</a>
+            </div>
             <div className="hidden md:flex items-center gap-2 px-3 py-1 bg-[rgba(26,26,46,0.80)] rounded-sm border border-[rgba(255,255,255,0.12)]">
               <div className="w-2 h-2 rounded-full bg-[#22d3ee] animate-pulse" />
               <span className="font-mono text-[10px] text-[rgba(255,255,255,0.60)]">SECURE CONNECTION</span>
@@ -162,22 +167,31 @@ export default function Home() {
             <span>SYSTEM CAPABILITIES</span>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               {
                 icon: Shield,
                 title: "ATS SCORING & EDITORIAL JUDGMENT",
-                desc: "Analyzes resumes and briefs against real-world filtering algorithms. Doesn't just find keywords—structures your narrative for maximum human and machine resonance."
+                desc: "Analyzes resumes and briefs against real-world filtering algorithms. Structures your narrative for maximum human and machine resonance.",
+                href: "/api/demo/compose.html"
               },
               {
                 icon: FileText,
-                title: "CONTEXT-AWARE ADAPTATION",
-                desc: "A press release is not a memo. A floor speech is not a tweet. Axiom adjusts syntax, tone, and structure to perfectly match the medium and audience."
+                title: "CONTEXT-AWARE DOCUMENT COMPOSER",
+                desc: "A press release is not a memo. A floor speech is not a tweet. Axiom adapts syntax, tone, and structure to match the medium and audience perfectly.",
+                href: "/api/demo/compose.html"
+              },
+              {
+                icon: ImageIcon,
+                title: "AI IMAGE GENERATION",
+                desc: "Generate high-fidelity visuals on demand. Produce professional imagery for presentations, reports, and social assets without leaving the platform.",
+                href: "/api/demo/image.html"
               },
               {
                 icon: Lock,
                 title: "CLASSIFIED-GRADE PRECISION",
-                desc: "Every surface designed to be read under pressure. No distracting UI elements. Just cold, precise, and purposeful output."
+                desc: "Every surface designed to be read under pressure. No distracting UI elements. Just cold, precise, and purposeful output.",
+                href: null
               }
             ].map((feature, i) => (
               <TiltCard key={i} maxDeg={6}>
@@ -186,11 +200,16 @@ export default function Home() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: i * 0.1 }}
-                  className="glass-panel p-8 h-full transition-colors hover:border-[#22d3ee]/50"
+                  className="glass-panel p-8 h-full transition-colors hover:border-[#22d3ee]/50 flex flex-col"
                 >
                   <feature.icon className="w-8 h-8 text-[#22d3ee] mb-6" />
                   <h3 className="font-mono text-xs font-bold tracking-widest mb-4 uppercase text-[#f0f0f8]">{feature.title}</h3>
-                  <p className="text-[rgba(255,255,255,0.6)] text-sm leading-relaxed font-mono">{feature.desc}</p>
+                  <p className="text-[rgba(255,255,255,0.6)] text-sm leading-relaxed font-mono flex-1">{feature.desc}</p>
+                  {feature.href && (
+                    <a href={feature.href} className="mt-6 inline-flex items-center gap-1 font-mono text-[10px] tracking-widest text-[#22d3ee] hover:text-[#2dd4bf] transition-colors uppercase font-bold">
+                      Launch <ChevronRight className="w-3 h-3" />
+                    </a>
+                  )}
                 </motion.div>
               </TiltCard>
             ))}
@@ -245,22 +264,33 @@ export default function Home() {
       <section className="section-dark py-32 border-t border-[rgba(255,255,255,0.12)]">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <Terminal className="w-8 h-8 text-[#fb7185] mx-auto mb-8" />
-          <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tight mb-10 leading-[0.95]">
+          <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tight mb-4 leading-[0.95]">
             READY TO DEPLOY?
           </h2>
-          <div className="flex flex-col sm:flex-row justify-center gap-6">
+          <p className="font-mono text-[rgba(255,255,255,0.5)] text-sm mb-12 tracking-wide">Select your operation.</p>
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
             <a 
               href="/api/demo/compose.html" 
-              className="group inline-flex items-center justify-center gap-2 px-10 py-5 bg-[#22d3ee] text-[#0c0c14] font-mono text-sm font-bold tracking-wider hover:bg-[#2dd4bf] transition-all"
+              className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#22d3ee] text-[#0c0c14] font-mono text-sm font-bold tracking-wider hover:bg-[#2dd4bf] transition-all"
             >
-              OPEN DOCUMENT COMPOSER
+              <FileText className="w-4 h-4" />
+              DOCUMENT COMPOSER
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </a>
             <a 
               href="/api/demo/index.html" 
-              className="group inline-flex items-center justify-center gap-2 px-10 py-5 bg-transparent text-[#f0f0f8] hover:text-[#22d3ee] font-mono text-sm font-bold tracking-wider border border-[rgba(255,255,255,0.2)] hover:border-[#22d3ee] transition-all"
+              className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-transparent text-[#f0f0f8] hover:text-[#22d3ee] font-mono text-sm font-bold tracking-wider border border-[rgba(255,255,255,0.2)] hover:border-[#22d3ee] transition-all"
             >
-              OPEN CHAT
+              <Terminal className="w-4 h-4" />
+              CHAT INTERFACE
+              <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </a>
+            <a 
+              href="/api/demo/image.html"
+              className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-transparent text-[#f0f0f8] hover:text-[#c084fc] font-mono text-sm font-bold tracking-wider border border-[rgba(255,255,255,0.2)] hover:border-[#c084fc] transition-all"
+            >
+              <ImageIcon className="w-4 h-4" />
+              IMAGE GENERATION
               <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </a>
           </div>

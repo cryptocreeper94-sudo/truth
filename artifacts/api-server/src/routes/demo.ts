@@ -819,6 +819,277 @@ function chatIndexHtml(): string {
 </html>`;
 }
 
+// ── Image Generation demo HTML ────────────────────────────────────────────────
+function imageGenDemoHtml(): string {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Image Generation — Axiom</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0a0a; --surface: #111; --surface2: #161616; --border: rgba(255,255,255,.08);
+      --border-hi: rgba(255,255,255,.18); --text: #e5e5e5; --muted: rgba(255,255,255,.4);
+      --dim: rgba(255,255,255,.22); --accent: #7c3aed; --accent-lo: rgba(124,58,237,.15);
+      --accent-hi: rgba(124,58,237,.35); --green: #22c55e; --red: #ef4444;
+      --cyan: #22d3ee; --cyan-lo: rgba(34,211,238,.12);
+    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; min-height: 100vh; }
+
+    /* ── Header ── */
+    header { border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: rgba(10,10,10,.92); backdrop-filter: blur(12px); z-index: 100; }
+    .logo { font-family: 'Courier New', monospace; font-size: 15px; font-weight: 700; letter-spacing: .12em; }
+    .logo span { color: var(--accent); }
+    .header-right { display: flex; align-items: center; gap: 16px; }
+    .status-pill { font-size: 11px; font-family: monospace; color: var(--muted); border: 1px solid var(--border-hi); padding: 3px 10px; border-radius: 4px; display: flex; align-items: center; gap: 6px; }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+    .nav-link { font-size: 12px; color: var(--muted); text-decoration: none; font-family: monospace; letter-spacing: .06em; }
+    .nav-link:hover { color: var(--text); }
+
+    /* ── Layout ── */
+    .page { max-width: 900px; margin: 0 auto; padding: 40px 24px 80px; }
+
+    /* ── Section label ── */
+    .section-label { font-family: monospace; font-size: 10px; letter-spacing: .16em; color: var(--cyan); text-transform: uppercase; display: flex; align-items: center; gap: 8px; margin-bottom: 20px; }
+    .section-label::before { content: ''; display: block; width: 3px; height: 3px; background: var(--cyan); border-radius: 50%; }
+
+    /* ── Page title ── */
+    .page-title { font-size: 28px; font-weight: 700; letter-spacing: -.02em; margin-bottom: 6px; }
+    .page-sub { font-size: 14px; color: var(--muted); margin-bottom: 40px; font-family: monospace; }
+
+    /* ── Prompt form ── */
+    .prompt-form { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 28px; margin-bottom: 32px; }
+    .prompt-label { font-family: monospace; font-size: 11px; letter-spacing: .12em; color: var(--muted); text-transform: uppercase; margin-bottom: 10px; display: block; }
+    textarea { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 14px; padding: 14px 16px; resize: vertical; min-height: 100px; outline: none; transition: border-color .15s; font-family: inherit; line-height: 1.6; }
+    textarea:focus { border-color: var(--cyan); }
+    textarea::placeholder { color: var(--muted); }
+
+    /* ── Size selector ── */
+    .size-row { display: flex; gap: 10px; margin: 20px 0 24px; flex-wrap: wrap; }
+    .size-btn { flex: 1; min-width: 80px; padding: 10px 14px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--muted); font-family: monospace; font-size: 11px; letter-spacing: .08em; cursor: pointer; transition: all .15s; text-align: center; }
+    .size-btn:hover { border-color: var(--border-hi); color: var(--text); }
+    .size-btn.active { border-color: var(--cyan); color: var(--cyan); background: var(--cyan-lo); }
+
+    /* ── Generate button ── */
+    .generate-btn { width: 100%; padding: 14px; background: var(--accent); color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; font-family: monospace; letter-spacing: .08em; cursor: pointer; transition: background .15s, opacity .15s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .generate-btn:hover:not(:disabled) { background: #6d28d9; }
+    .generate-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+    /* ── Quota bar ── */
+    .quota-row { display: flex; align-items: center; justify-content: space-between; margin-top: 16px; }
+    .quota-label { font-family: monospace; font-size: 11px; color: var(--muted); }
+    .quota-pips { display: flex; gap: 4px; }
+    .quota-pip { width: 18px; height: 6px; border-radius: 3px; background: var(--surface2); border: 1px solid var(--border); transition: background .3s; }
+    .quota-pip.used { background: var(--accent); border-color: var(--accent-hi); }
+
+    /* ── Result area ── */
+    #result-area { margin-bottom: 48px; }
+    .result-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+    .result-header { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; justify-between; align-items: center; font-family: monospace; font-size: 11px; color: var(--muted); letter-spacing: .1em; }
+    .result-header span { display: flex; align-items: center; gap: 8px; }
+    .result-img-wrap { padding: 24px; display: flex; justify-content: center; }
+    .result-img-wrap img { max-width: 100%; border-radius: 8px; display: block; }
+    .result-actions { padding: 0 24px 20px; display: flex; gap: 10px; }
+    .action-btn { padding: 8px 18px; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 12px; font-family: monospace; cursor: pointer; transition: border-color .15s; text-decoration: none; }
+    .action-btn:hover { border-color: var(--border-hi); }
+
+    /* ── Generating spinner ── */
+    .spinner-wrap { padding: 60px 24px; display: flex; flex-direction: column; align-items: center; gap: 16px; color: var(--muted); font-family: monospace; font-size: 12px; letter-spacing: .1em; }
+    .spinner { width: 32px; height: 32px; border: 2px solid var(--border); border-top-color: var(--cyan); border-radius: 50%; animation: spin .8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Error state ── */
+    .error-msg { padding: 16px 20px; background: rgba(239,68,68,.08); border: 1px solid rgba(239,68,68,.2); border-radius: 8px; color: #fca5a5; font-family: monospace; font-size: 13px; margin-bottom: 20px; line-height: 1.5; }
+
+    /* ── History ── */
+    #history-section { }
+    .history-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+    .history-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; transition: border-color .15s; }
+    .history-card:hover { border-color: var(--border-hi); }
+    .history-card img { width: 100%; display: block; aspect-ratio: 1; object-fit: cover; }
+    .history-card-body { padding: 12px; }
+    .history-card-prompt { font-size: 12px; color: var(--muted); line-height: 1.5; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+    .history-card-meta { font-family: monospace; font-size: 10px; color: var(--dim); margin-top: 6px; letter-spacing: .06em; }
+    .empty-history { font-family: monospace; font-size: 12px; color: var(--muted); padding: 24px 0; letter-spacing: .06em; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">AXIOM<span>.SYS</span></div>
+    <div class="header-right">
+      <a href="/" class="nav-link">HOME</a>
+      <a href="/api/demo/compose.html" class="nav-link">COMPOSE</a>
+      <a href="/api/demo/index.html" class="nav-link">CHAT</a>
+      <div class="status-pill"><span class="status-dot"></span>ONLINE</div>
+    </div>
+  </header>
+
+  <div class="page">
+    <div class="section-label">Image Generation</div>
+    <div class="page-title">Generate Visuals</div>
+    <p class="page-sub">Create professional imagery on demand. 5 free generations per day.</p>
+
+    <div class="prompt-form" id="prompt-form">
+      <label class="prompt-label" for="prompt-input">Describe your image</label>
+      <textarea id="prompt-input" placeholder="A photorealistic executive headshot with soft studio lighting, neutral gray background, professional attire…" rows="4"></textarea>
+
+      <div class="size-row">
+        <button class="size-btn active" data-size="square">■ Square<br><span style="font-size:9px;opacity:.6">1024×1024</span></button>
+        <button class="size-btn" data-size="wide">▬ Wide<br><span style="font-size:9px;opacity:.6">1536×1024</span></button>
+        <button class="size-btn" data-size="tall">▮ Tall<br><span style="font-size:9px;opacity:.6">1024×1536</span></button>
+      </div>
+
+      <button class="generate-btn" id="generate-btn">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3l14 9-14 9V3z"/></svg>
+        GENERATE IMAGE
+      </button>
+
+      <div class="quota-row" id="quota-row" style="display:none">
+        <span class="quota-label" id="quota-label">— / 5 used today</span>
+        <div class="quota-pips" id="quota-pips">
+          <div class="quota-pip"></div><div class="quota-pip"></div><div class="quota-pip"></div><div class="quota-pip"></div><div class="quota-pip"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="error-area"></div>
+    <div id="result-area"></div>
+
+    <div id="history-section">
+      <div class="section-label">Generation History</div>
+      <div class="history-grid" id="history-grid">
+        <div class="empty-history">Loading history…</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let selectedSize = 'square';
+    let isGenerating = false;
+
+    // Size buttons
+    document.querySelectorAll('.size-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedSize = btn.dataset.size;
+      });
+    });
+
+    // Update quota display
+    function updateQuota(used, limit) {
+      const row = document.getElementById('quota-row');
+      const label = document.getElementById('quota-label');
+      const pips = document.getElementById('quota-pips');
+      row.style.display = 'flex';
+      label.textContent = used + ' / ' + limit + ' used today';
+      pips.querySelectorAll('.quota-pip').forEach((pip, i) => {
+        pip.classList.toggle('used', i < used);
+      });
+    }
+
+    // Show error
+    function showError(msg) {
+      const area = document.getElementById('error-area');
+      area.innerHTML = '<div class="error-msg">' + msg.replace(/</g,'&lt;') + '</div>';
+    }
+    function clearError() {
+      document.getElementById('error-area').innerHTML = '';
+    }
+
+    // Generate
+    document.getElementById('generate-btn').addEventListener('click', async () => {
+      const prompt = document.getElementById('prompt-input').value.trim();
+      if (!prompt) { showError('Please enter a prompt to generate an image.'); return; }
+      if (isGenerating) return;
+
+      isGenerating = true;
+      clearError();
+      const btn = document.getElementById('generate-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px"></div> GENERATING…';
+
+      const resultArea = document.getElementById('result-area');
+      resultArea.innerHTML = '<div class="result-panel"><div class="spinner-wrap"><div class="spinner"></div>SYNTHESIZING IMAGE…</div></div>';
+
+      try {
+        const res = await fetch('/api/v1/image/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt, size: selectedSize })
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          resultArea.innerHTML = '';
+          showError((data.detail || data.error || 'Generation failed. Please try again.'));
+          if (data.remaining !== undefined) updateQuota(data.used ?? 5, 5);
+        } else {
+          updateQuota(data.used, data.limit);
+          const imgSrc = 'data:image/png;base64,' + data.b64_json;
+          resultArea.innerHTML = \`
+            <div class="result-panel" style="margin-bottom:32px">
+              <div class="result-header">
+                <span>
+                  <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 15l-5-5L5 21"/></svg>
+                  GENERATED · \${selectedSize.toUpperCase()}
+                </span>
+                <span style="color:var(--green)">COMPLETE</span>
+              </div>
+              <div class="result-img-wrap"><img src="\${imgSrc}" alt="Generated image" /></div>
+              <div class="result-actions">
+                <a class="action-btn" href="\${imgSrc}" download="axiom-image.png">↓ DOWNLOAD</a>
+              </div>
+            </div>\`;
+          loadHistory();
+        }
+      } catch (err) {
+        resultArea.innerHTML = '';
+        showError('Network error. Please check your connection and try again.');
+      } finally {
+        isGenerating = false;
+        btn.disabled = false;
+        btn.innerHTML = '<svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3l14 9-14 9V3z"/></svg> GENERATE IMAGE';
+      }
+    });
+
+    // Load history
+    async function loadHistory() {
+      const grid = document.getElementById('history-grid');
+      try {
+        const res = await fetch('/api/v1/image/history');
+        const data = await res.json();
+        if (!data.images || data.images.length === 0) {
+          grid.innerHTML = '<div class="empty-history">No images generated yet. Your history will appear here.</div>';
+          return;
+        }
+        grid.innerHTML = data.images.map(img => {
+          const src = 'data:image/png;base64,' + img.image_data_b64;
+          const date = new Date(img.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+          return \`
+            <div class="history-card">
+              <img src="\${src}" alt="\${img.prompt}" loading="lazy" />
+              <div class="history-card-body">
+                <div class="history-card-prompt">\${img.prompt.replace(/</g,'&lt;')}</div>
+                <div class="history-card-meta">\${img.size.toUpperCase()} · \${date}</div>
+              </div>
+            </div>\`;
+        }).join('');
+      } catch {
+        grid.innerHTML = '<div class="empty-history">Could not load history.</div>';
+      }
+    }
+
+    loadHistory();
+  </script>
+</body>
+</html>`;
+}
+
 // ── Routes ───────────────────────────────────────────────────────────────────
 router.get("/demo/compose.html", (_req: Request, res: Response) => {
   res.setHeader("Content-Type", "text/html; charset=utf-8");
@@ -830,6 +1101,12 @@ router.get("/demo/index.html", (_req: Request, res: Response) => {
   res.setHeader("Content-Type", "text/html; charset=utf-8");
   res.setHeader("Cache-Control", "no-store");
   res.send(chatIndexHtml());
+});
+
+router.get("/demo/image.html", (_req: Request, res: Response) => {
+  res.setHeader("Content-Type", "text/html; charset=utf-8");
+  res.setHeader("Cache-Control", "no-store");
+  res.send(imageGenDemoHtml());
 });
 
 export default router;
