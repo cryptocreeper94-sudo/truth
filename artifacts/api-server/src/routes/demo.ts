@@ -124,6 +124,24 @@ function composeDemoHtml(): string {
 
     /* ── Footer ── */
     footer { border-top: 1px solid var(--border); padding: 20px 24px; text-align: center; font-size: 11px; color: var(--dim); font-family: monospace; }
+
+    /* ── Template Preview Modal ── */
+    .tpl-preview-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.72); backdrop-filter: blur(4px); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity .2s; }
+    .tpl-preview-backdrop.open { opacity: 1; pointer-events: auto; }
+    .tpl-preview-modal { background: var(--surface); border: 1px solid var(--border-hi); border-radius: 12px; width: 100%; max-width: 680px; max-height: 88vh; display: flex; flex-direction: column; transform: translateY(12px); transition: transform .2s; overflow: hidden; }
+    .tpl-preview-backdrop.open .tpl-preview-modal { transform: translateY(0); }
+    .tpl-preview-head { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-shrink: 0; }
+    .tpl-preview-meta { display: flex; align-items: center; gap: 12px; }
+    .tpl-preview-icon { font-size: 26px; flex-shrink: 0; }
+    .tpl-preview-info {}
+    .tpl-preview-cat { font-size: 9px; font-family: monospace; letter-spacing: .14em; color: var(--accent); text-transform: uppercase; margin-bottom: 3px; }
+    .tpl-preview-name { font-size: 15px; font-weight: 700; line-height: 1.2; }
+    .tpl-preview-desc { font-size: 12px; color: var(--muted); margin-top: 3px; }
+    .tpl-preview-close { background: transparent; border: 1px solid var(--border); color: var(--muted); border-radius: 6px; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; flex-shrink: 0; line-height: 1; transition: border-color .15s, color .15s; }
+    .tpl-preview-close:hover { border-color: var(--border-hi); color: var(--text); }
+    .tpl-preview-body { padding: 20px; overflow-y: auto; flex: 1; }
+    .tpl-preview-code { white-space: pre-wrap; font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.75; color: rgba(255,255,255,.75); background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
+    .tpl-preview-foot { padding: 14px 20px; border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: flex-end; flex-shrink: 0; }
   </style>
 </head>
 <body>
@@ -230,6 +248,30 @@ function composeDemoHtml(): string {
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- ── Template Preview Modal ── -->
+<div class="tpl-preview-backdrop" id="tpl-preview-backdrop" role="dialog" aria-modal="true" aria-labelledby="tpl-preview-title">
+  <div class="tpl-preview-modal">
+    <div class="tpl-preview-head">
+      <div class="tpl-preview-meta">
+        <div class="tpl-preview-icon" id="tpl-preview-icon"></div>
+        <div class="tpl-preview-info">
+          <div class="tpl-preview-cat" id="tpl-preview-cat"></div>
+          <div class="tpl-preview-name" id="tpl-preview-title"></div>
+          <div class="tpl-preview-desc" id="tpl-preview-desc"></div>
+        </div>
+      </div>
+      <button class="tpl-preview-close" id="tpl-preview-close" aria-label="Close preview">✕</button>
+    </div>
+    <div class="tpl-preview-body">
+      <pre class="tpl-preview-code" id="tpl-preview-code"></pre>
+    </div>
+    <div class="tpl-preview-foot">
+      <button class="btn btn-ghost" id="tpl-preview-cancel">CANCEL</button>
+      <button class="btn btn-primary" id="tpl-preview-use">USE THIS TEMPLATE</button>
+    </div>
+  </div>
+</div>
 
 <footer>AXIOM<span style="color:var(--accent)">.SYS</span> COMPOSER · CLASSIFIED-GRADE PRECISION</footer>
 
@@ -660,10 +702,54 @@ function renderTemplateGrid() {
   grid.querySelectorAll('.tpl-card').forEach(function(card) {
     card.addEventListener('click', function() {
       var id = card.getAttribute('data-id');
-      applyTemplate(id);
+      openTemplatePreview(id);
     });
   });
 }
+
+// ── Template preview modal ────────────────────────────────────────────────────
+var previewTemplateId = null;
+
+function openTemplatePreview(id) {
+  var tpl = TEMPLATES.find(function(t) { return t.id === id; });
+  if (!tpl) return;
+  previewTemplateId = id;
+
+  document.getElementById('tpl-preview-icon').textContent  = tpl.icon;
+  document.getElementById('tpl-preview-cat').textContent   = tpl.category;
+  document.getElementById('tpl-preview-title').textContent = tpl.name;
+  document.getElementById('tpl-preview-desc').textContent  = tpl.desc;
+  document.getElementById('tpl-preview-code').textContent  = tpl.body;
+
+  document.getElementById('tpl-preview-backdrop').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeTemplatePreview() {
+  document.getElementById('tpl-preview-backdrop').classList.remove('open');
+  document.body.style.overflow = '';
+  previewTemplateId = null;
+}
+
+document.getElementById('tpl-preview-close').addEventListener('click', closeTemplatePreview);
+document.getElementById('tpl-preview-cancel').addEventListener('click', closeTemplatePreview);
+
+// Close on backdrop click (outside the modal card)
+document.getElementById('tpl-preview-backdrop').addEventListener('click', function(e) {
+  if (e.target === this) closeTemplatePreview();
+});
+
+// Close on Escape key
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeTemplatePreview();
+});
+
+document.getElementById('tpl-preview-use').addEventListener('click', function() {
+  if (previewTemplateId) {
+    closeTemplatePreview();
+    applyTemplate(previewTemplateId);
+  }
+});
 
 function applyTemplate(id) {
   var tpl = TEMPLATES.find(function(t) { return t.id === id; });
