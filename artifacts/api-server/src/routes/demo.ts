@@ -108,6 +108,20 @@ function composeDemoHtml(): string {
     .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,.2); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* ── URL input mode ── */
+    .doc-input-toggle { display: flex; gap: 2px; background: rgba(255,255,255,.05); border: 1px solid var(--border); border-radius: 5px; padding: 2px; }
+    .doc-toggle-btn { padding: 4px 12px; font-size: 11px; font-family: monospace; border: none; background: transparent; color: var(--muted); cursor: pointer; border-radius: 3px; transition: all .15s; }
+    .doc-toggle-btn.active { background: rgba(255,255,255,.12); color: var(--text); }
+    .url-input-row { display: flex; gap: 8px; padding: 12px 16px 8px; }
+    .url-input-row input { flex: 1; background: rgba(255,255,255,.06); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 13px; padding: 9px 12px; outline: none; transition: border-color .15s; font-family: inherit; }
+    .url-input-row input::placeholder { color: var(--dim); }
+    .url-input-row input:focus { border-color: var(--border-hi); }
+    .url-input-row button { background: rgba(255,255,255,.08); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: monospace; font-size: 12px; cursor: pointer; padding: 0 16px; white-space: nowrap; transition: all .15s; }
+    .url-input-row button:hover { border-color: var(--border-hi); background: rgba(255,255,255,.13); }
+    .url-input-row button:disabled { opacity: .45; cursor: not-allowed; }
+    .url-hint { padding: 0 16px 10px; font-size: 11px; color: var(--dim); font-family: monospace; }
+    .url-hint.err { color: #fca5a5; }
+
     /* ── Footer ── */
     footer { border-top: 1px solid var(--border); padding: 20px 24px; text-align: center; font-size: 11px; color: var(--dim); font-family: monospace; }
   </style>
@@ -164,9 +178,17 @@ function composeDemoHtml(): string {
     <div class="panel">
       <div class="panel-header">
         <span class="panel-title">YOUR DOCUMENT</span>
-        <span class="panel-hint">Resume, cover letter, or message</span>
+        <div class="doc-input-toggle">
+          <button class="doc-toggle-btn active" id="doc-mode-text">PASTE TEXT</button>
+          <button class="doc-toggle-btn" id="doc-mode-url">🔗 URL</button>
+        </div>
       </div>
       <textarea id="doc-input" placeholder="Paste your resume or document here — or pick a template above to get started quickly."></textarea>
+      <div id="doc-url-row" class="url-input-row" style="display:none">
+        <input id="doc-url-input" type="url" placeholder="https://docs.google.com/… or a PDF URL" />
+        <button id="doc-url-extract-btn">EXTRACT</button>
+      </div>
+      <div id="doc-url-hint" class="url-hint" style="display:none">Supports public Google Docs, PDFs, and most web pages.</div>
     </div>
     <div class="panel">
       <div class="panel-header">
@@ -535,20 +557,93 @@ var activeTemplateId = null;
 var quotaRemaining = null;
 
 // ── DOM refs ─────────────────────────────────────────────────────────────────
-var docInput    = document.getElementById('doc-input');
-var ctxInput    = document.getElementById('ctx-input');
-var composeBtn  = document.getElementById('compose-btn');
-var btnLabel    = document.getElementById('btn-label');
-var clearBtn    = document.getElementById('clear-btn');
-var resultSec   = document.getElementById('result-section');
-var resultText  = document.getElementById('result-text');
-var resultTitle = document.getElementById('result-title');
-var quotaDisp   = document.getElementById('quota-display');
-var toastEl     = document.getElementById('toast');
-var copyBtn     = document.getElementById('copy-btn');
-var dlBtn       = document.getElementById('dl-btn');
-var dlPdfBtn    = document.getElementById('dl-pdf-btn');
-var shareBtn    = document.getElementById('share-btn');
+var docInput      = document.getElementById('doc-input');
+var ctxInput      = document.getElementById('ctx-input');
+var composeBtn    = document.getElementById('compose-btn');
+var btnLabel      = document.getElementById('btn-label');
+var clearBtn      = document.getElementById('clear-btn');
+var resultSec     = document.getElementById('result-section');
+var resultText    = document.getElementById('result-text');
+var resultTitle   = document.getElementById('result-title');
+var quotaDisp     = document.getElementById('quota-display');
+var toastEl       = document.getElementById('toast');
+var copyBtn       = document.getElementById('copy-btn');
+var dlBtn         = document.getElementById('dl-btn');
+var dlPdfBtn      = document.getElementById('dl-pdf-btn');
+var shareBtn      = document.getElementById('share-btn');
+var docModeText   = document.getElementById('doc-mode-text');
+var docModeUrl    = document.getElementById('doc-mode-url');
+var docUrlRow     = document.getElementById('doc-url-row');
+var docUrlInput   = document.getElementById('doc-url-input');
+var docUrlExtract = document.getElementById('doc-url-extract-btn');
+var docUrlHint    = document.getElementById('doc-url-hint');
+
+// ── Document URL extraction ───────────────────────────────────────────────────
+docModeText.addEventListener('click', function() {
+  docModeText.classList.add('active');
+  docModeUrl.classList.remove('active');
+  docInput.style.display = '';
+  docUrlRow.style.display = 'none';
+  docUrlHint.style.display = 'none';
+});
+
+docModeUrl.addEventListener('click', function() {
+  docModeUrl.classList.add('active');
+  docModeText.classList.remove('active');
+  docInput.style.display = 'none';
+  docUrlRow.style.display = 'flex';
+  docUrlHint.style.display = 'block';
+  docUrlHint.classList.remove('err');
+  docUrlHint.textContent = 'Supports public Google Docs, PDFs, and most web pages.';
+  docUrlInput.focus();
+});
+
+docUrlInput.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') extractDocFromUrl();
+});
+
+docUrlExtract.addEventListener('click', extractDocFromUrl);
+
+function extractDocFromUrl() {
+  var url = docUrlInput.value.trim();
+  if (!url) return;
+  docUrlExtract.disabled = true;
+  docUrlExtract.textContent = '…';
+  docUrlHint.classList.remove('err');
+  docUrlHint.textContent = 'Fetching…';
+  docUrlHint.style.display = 'block';
+
+  fetch('/api/v1/compose/extract', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ url: url })
+  })
+  .then(function(res) {
+    return res.json().then(function(body) {
+      if (!res.ok) throw new Error(body.detail || body.error || ('Error ' + res.status));
+      return body;
+    });
+  })
+  .then(function(data) {
+    docInput.value = data.text;
+    // Switch back to text mode
+    docModeText.classList.add('active');
+    docModeUrl.classList.remove('active');
+    docInput.style.display = '';
+    docUrlRow.style.display = 'none';
+    docUrlHint.style.display = 'none';
+    docUrlInput.value = '';
+    showToast('Resume extracted — review and execute.', 'ok');
+  })
+  .catch(function(err) {
+    docUrlHint.classList.add('err');
+    docUrlHint.textContent = err.message || 'Extraction failed.';
+  })
+  .finally(function() {
+    docUrlExtract.disabled = false;
+    docUrlExtract.textContent = 'EXTRACT';
+  });
+}
 
 // ── Template grid ─────────────────────────────────────────────────────────────
 function renderTemplateGrid() {

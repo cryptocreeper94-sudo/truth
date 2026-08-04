@@ -16,7 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Copy, Download, Share2, Check, Loader2, Sparkles, ImagePlus, ArrowUpCircle, Target } from "lucide-react";
+import { Copy, Download, Share2, Check, Loader2, Sparkles, ImagePlus, ArrowUpCircle, Target, Link } from "lucide-react";
 
 // ── sample composed output ──────────────────────────────────────────────────
 const SAMPLE_COVER_LETTER = `Dear Hiring Manager,
@@ -234,6 +234,10 @@ export default function Compose() {
 
   // ── ATS match state ────────────────────────────────────────────────────────
   const [resume, setResume] = useState(SAMPLE_RESUME);
+  const [resumeInputMode, setResumeInputMode] = useState<"text" | "url">("text");
+  const [resumeUrl, setResumeUrl] = useState("");
+  const [extractState, setExtractState] = useState<"idle" | "extracting" | "error">("idle");
+  const [extractError, setExtractError] = useState("");
   const [atsState, setAtsState] = useState<AtsState>("idle");
   const [matchResult, setMatchResult] = useState<MatchResult | null>(null);
 
@@ -380,6 +384,39 @@ export default function Compose() {
     a.href = imageData;
     a.download = `axiom-visual-${imageSizeResult}.png`;
     a.click();
+  }
+
+  // ── extract resume text from a URL ────────────────────────────────────────
+  async function handleExtractFromUrl() {
+    const trimmed = resumeUrl.trim();
+    if (!trimmed) return;
+    setExtractState("extracting");
+    setExtractError("");
+    try {
+      const res = await fetch("/api/v1/compose/extract", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: trimmed }),
+      });
+      if (!res.ok) {
+        const body = (await res.json().catch(() => ({}))) as { error?: string; detail?: string };
+        throw new Error(body.detail ?? body.error ?? `Server error ${res.status}`);
+      }
+      const data = (await res.json()) as { text: string };
+      setResume(data.text);
+      setResumeInputMode("text");
+      setResumeUrl("");
+      setExtractState("idle");
+      // Reset match state when resume changes
+      setAtsState("idle");
+      setMatchResult(null);
+      setFixState("idle");
+      setFixResultText("");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Unknown error";
+      setExtractError(message);
+      setExtractState("error");
+    }
   }
 
   // ── ATS match — extracts keywords from the actual JD, then checks resume ──
@@ -556,21 +593,80 @@ export default function Compose() {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-white/50 uppercase tracking-widest">
-              Your Resume
-            </label>
-            <Textarea
-              className="bg-white/5 border-white/10 text-white placeholder:text-white/20 resize-none min-h-[160px] focus-visible:ring-1 focus-visible:ring-white/20 font-mono text-xs leading-relaxed"
-              placeholder="Paste your current resume here…"
-              value={resume}
-              onChange={(e) => {
-                setResume(e.target.value);
-                setAtsState("idle");
-                setMatchResult(null);
-                setFixState("idle");
-                setFixResultText("");
-              }}
-            />
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-medium text-white/50 uppercase tracking-widest">
+                Your Resume
+              </label>
+              {/* toggle */}
+              <div className="flex items-center gap-0.5 bg-white/5 rounded-md p-0.5 border border-white/8">
+                <button
+                  onClick={() => { setResumeInputMode("text"); setExtractState("idle"); setExtractError(""); }}
+                  className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
+                    resumeInputMode === "text"
+                      ? "bg-white/15 text-white"
+                      : "text-white/40 hover:text-white/60"
+                  }`}
+                >
+                  Paste text
+                </button>
+                <button
+                  onClick={() => { setResumeInputMode("url"); setExtractState("idle"); setExtractError(""); }}
+                  className={`px-2.5 py-1 rounded text-xs font-medium transition-colors flex items-center gap-1 ${
+                    resumeInputMode === "url"
+                      ? "bg-white/15 text-white"
+                      : "text-white/40 hover:text-white/60"
+                  }`}
+                >
+                  <Link className="w-3 h-3" />
+                  URL
+                </button>
+              </div>
+            </div>
+
+            {resumeInputMode === "text" ? (
+              <Textarea
+                className="bg-white/5 border-white/10 text-white placeholder:text-white/20 resize-none min-h-[160px] focus-visible:ring-1 focus-visible:ring-white/20 font-mono text-xs leading-relaxed"
+                placeholder="Paste your current resume here…"
+                value={resume}
+                onChange={(e) => {
+                  setResume(e.target.value);
+                  setAtsState("idle");
+                  setMatchResult(null);
+                  setFixState("idle");
+                  setFixResultText("");
+                }}
+              />
+            ) : (
+              <div className="space-y-2">
+                <div className="flex gap-2">
+                  <Input
+                    className="bg-white/5 border-white/10 text-white placeholder:text-white/20 h-10 focus-visible:ring-1 focus-visible:ring-white/20 flex-1"
+                    placeholder="https://docs.google.com/… or a PDF URL"
+                    value={resumeUrl}
+                    onChange={(e) => { setResumeUrl(e.target.value); setExtractError(""); }}
+                    onKeyDown={(e) => { if (e.key === "Enter") void handleExtractFromUrl(); }}
+                    disabled={extractState === "extracting"}
+                  />
+                  <Button
+                    onClick={handleExtractFromUrl}
+                    disabled={!resumeUrl.trim() || extractState === "extracting"}
+                    className="h-10 px-4 bg-white/10 text-white border border-white/10 hover:bg-white/15 disabled:opacity-40 shrink-0"
+                  >
+                    {extractState === "extracting" ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      "Extract"
+                    )}
+                  </Button>
+                </div>
+                <p className="text-xs text-white/30">
+                  Supports public Google Docs, PDFs, and most web pages.
+                </p>
+                {extractState === "error" && (
+                  <p className="text-xs text-red-400 leading-relaxed">{extractError}</p>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="space-y-1.5">
