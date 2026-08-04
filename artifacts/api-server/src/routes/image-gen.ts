@@ -1,7 +1,8 @@
 import { Router, type Request, type Response } from "express";
 import { z } from "zod";
-import { sql } from "drizzle-orm";
-import { db, imageGenUsageTable } from "@workspace/db";
+import { sql, desc, eq } from "drizzle-orm";
+import { db, imageGenUsageTable, generatedImagesTable } from "@workspace/db";
+import { randomUUID } from "crypto";
 
 const router = Router();
 
@@ -11,6 +12,9 @@ const router = Router();
 // without any cleanup job. Reserving a slot is an atomic upsert so concurrent
 // requests from the same IP both see the incremented count.
 const DAILY_LIMIT = 5;
+
+// Maximum number of previously generated images returned in history
+const HISTORY_LIMIT = 10;
 
 /**
  * Atomically increment the usage counter for (ip, today).
@@ -61,6 +65,32 @@ const SIZE_MAP: Record<ImageSize, "1024x1024" | "1536x1024" | "1024x1536"> = {
   wide: "1536x1024",
   tall: "1024x1536",
 };
+
+// ── GET /v1/image/history ──────────────────────────────────────────────────
+// Returns the most recent generated images for the requesting IP.
+router.get("/v1/image/history", async (req: Request, res: Response) => {
+  const clientIp = req.ip ?? "unknown";
+
+  try {
+    const rows = await db
+      .select({
+        id: generatedImagesTable.id,
+        prompt: generatedImagesTable.prompt,
+        size: generatedImagesTable.size,
+        image_data_b64: generatedImagesTable.image_data_b64,
+        created_at: generatedImagesTable.created_at,
+      })
+      .from(generatedImagesTable)
+      .where(eq(generatedImagesTable.ip, clientIp))
+      .orderBy(desc(generatedImagesTable.created_at))
+      .limit(HISTORY_LIMIT);
+
+    res.json({ images: rows });
+  } catch (err) {
+    console.error("Failed to fetch image history:", err);
+    res.status(503).json({ error: "Could not load image history", images: [] });
+  }
+});
 
 // ── POST /v1/image/generate ────────────────────────────────────────────────
 router.post("/v1/image/generate", async (req: Request, res: Response) => {
@@ -144,8 +174,30 @@ router.post("/v1/image/generate", async (req: Request, res: Response) => {
     return;
   }
 
+  // ── persist the generated image ───────────────────────────────────────────
+  const imageId = randomUUID();
+  try {
+    await db.insert(generatedImagesTable).values({
+      id: imageId,
+      ip: clientIp,
+      prompt,
+      size,
+      image_data_b64: b64Json,
+    });
+  } catch (err) {
+    // Non-fatal: generation succeeded, persistence failed — log and continue
+    console.error("Failed to persist generated image:", err);
+  }
+
   const remaining = DAILY_LIMIT - newCount;
-  res.json({ b64_json: b64Json, size, remaining, used: newCount, limit: DAILY_LIMIT });
+  res.json({
+    b64_json: b64Json,
+    size,
+    remaining,
+    used: newCount,
+    limit: DAILY_LIMIT,
+    image_id: imageId,
+  });
 });
 
 export default router;

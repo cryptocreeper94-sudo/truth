@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -201,6 +201,36 @@ export default function Compose() {
   const [imageRemaining, setImageRemaining] = useState<number>(5);
   const [imageSizeResult, setImageSizeResult] = useState<ImageSize>("wide");
 
+  // ── image history ──────────────────────────────────────────────────────────
+  interface HistoryImage {
+    id: string;
+    prompt: string;
+    size: ImageSize;
+    image_data_b64: string;
+    created_at: string;
+  }
+  const [imageHistory, setImageHistory] = useState<HistoryImage[]>([]);
+  const [historyLoaded, setHistoryLoaded] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/v1/image/history")
+      .then((r) => r.json())
+      .then((data: { images?: HistoryImage[] }) => {
+        if (data.images && data.images.length > 0) {
+          setImageHistory(data.images);
+          // Pre-load the most recent image into the active viewer
+          const latest = data.images[0]!;
+          setImageData(`data:image/png;base64,${latest.image_data_b64}`);
+          setImageSizeResult(latest.size);
+          setImageState("done");
+          setImagePrompt(latest.prompt);
+          setImageSize(latest.size);
+        }
+      })
+      .catch(() => {/* non-fatal — history just won't show */})
+      .finally(() => setHistoryLoaded(true));
+  }, []);
+
   // ── ATS match state ────────────────────────────────────────────────────────
   const [resume, setResume] = useState(SAMPLE_RESUME);
   const [atsState, setAtsState] = useState<AtsState>("idle");
@@ -304,12 +334,27 @@ export default function Compose() {
         b64_json: string;
         size: ImageSize;
         remaining: number;
+        image_id?: string;
       };
 
-      setImageData(`data:image/png;base64,${data.b64_json}`);
+      const dataUrl = `data:image/png;base64,${data.b64_json}`;
+      setImageData(dataUrl);
       setImageSizeResult(data.size);
       setImageRemaining(data.remaining);
       setImageState("done");
+
+      // Add to local history so the strip updates immediately (without refetch)
+      const persistedId = data.image_id;
+      if (persistedId) {
+        const newEntry: HistoryImage = {
+          id: persistedId,
+          prompt: imagePrompt.trim(),
+          size: data.size,
+          image_data_b64: data.b64_json,
+          created_at: new Date().toISOString(),
+        };
+        setImageHistory((prev) => [newEntry, ...prev].slice(0, 10));
+      }
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unknown error";
       setImageError(message);
@@ -1026,6 +1071,46 @@ export default function Compose() {
               <p className="text-sm text-red-400">{imageError}</p>
             )}
           </div>
+
+          {/* ── history strip ── */}
+          {historyLoaded && imageHistory.length > 1 && (
+            <div className="space-y-2">
+              <span className="text-xs font-medium text-white/35 uppercase tracking-widest">
+                Previously generated
+              </span>
+              <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+                {imageHistory.map((img) => (
+                  <button
+                    key={img.id}
+                    title={img.prompt}
+                    onClick={() => {
+                      setImageData(`data:image/png;base64,${img.image_data_b64}`);
+                      setImageSizeResult(img.size);
+                      setImagePrompt(img.prompt);
+                      setImageSize(img.size);
+                      setImageState("done");
+                      setImageError("");
+                    }}
+                    className={`shrink-0 rounded-md overflow-hidden border transition-all ${
+                      imageData === `data:image/png;base64,${img.image_data_b64}`
+                        ? "border-white/50 ring-1 ring-white/30"
+                        : "border-white/10 hover:border-white/30"
+                    }`}
+                    style={{
+                      width: img.size === "tall" ? 40 : 64,
+                      height: img.size === "wide" ? 40 : 64,
+                    }}
+                  >
+                    <img
+                      src={`data:image/png;base64,${img.image_data_b64}`}
+                      alt={img.prompt}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </section>
       </main>
 
