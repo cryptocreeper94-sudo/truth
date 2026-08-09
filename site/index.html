@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TRUTH — Provenance-First Evidence Archive</title>
+  <meta name="description" content="A provenance-first archive of historical claims, the sources behind them, and the documented gaps between them. Companion to Invariant — The Lying Pen.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚖️</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Inter:wght@400;500;600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- 4% opacity noise overlay — matches Invariant -->
+  <div class="noise"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a href="#/" class="nav-brand">TRUTH</a>
+      <div class="nav-links">
+        <a href="#/claims">Claims</a>
+        <a href="#/sources">Sources</a>
+        <a href="#/digs">Digs</a>
+        <a href="#/links">Links</a>
+        <a href="#/method">Method</a>
+        <a href="#/manifest">Manifest</a>
+      </div>
+    </div>
+  </nav>
+
+  <main id="app">
+    <div class="loading">Loading archive…</div>
+  </main>
+
+  <footer class="site-footer">
+    <p>Curated by Jason Andrews / DarkWave Studios LLC · Companion to <a href="https://thelyingpen.tlid.io">Invariant — The Lying Pen</a></p>
+    <p style="margin-top:4px;">Method outranks conclusion. If an entry violates its own tags, the entry is wrong.</p>
+  </footer>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════
+// TRUTH — Client-side archive renderer
+// Parses YAML frontmatter + markdown from the /truth repo structure
+// ═══════════════════════════════════════════════════════════════════
+
+const REPO_RAW = 'https://raw.githubusercontent.com/cryptocreeper94-sudo/truth/main';
+const REPO_API = 'https://api.github.com/repos/cryptocreeper94-sudo/truth/contents';
+
+// ── State ──
+let archive = { claims: [], sources: [], digs: [], links: [], method: '', manifest: '', readme: '' };
+let loaded = false;
+
+// ── YAML Frontmatter Parser ──
+function parseFrontmatter(text) {
+  const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
+  if (!match) return { meta: {}, body: text };
+  const meta = {};
+  match[1].split('\n').forEach(line => {
+    const m = line.match(/^(\w[\w-]*):\s*(.+)$/);
+    if (m) {
+      let val = m[2].trim();
+      if (val.startsWith('[') && val.endsWith(']')) {
+        val = val.slice(1, -1).split(',').map(s => s.trim());
+      }
+      meta[m[1]] = val;
+    }
+  });
+  return { meta, body: match[2] };
+}
+
+// ── Markdown → HTML (lightweight) ──
+function md(text) {
+  if (!text) return '';
+  let html = text
+    // headings
+    .replace(/^#### (.+)$/gm, '<h4>$1</h4>')
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+    // bold + italic
+    .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    // code
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    // links
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+    // horizontal rule
+    .replace(/^---$/gm, '<hr>')
+    // unordered lists
+    .replace(/^- (.+)$/gm, '<li>$1</li>')
+    // paragraphs
+    .split('\n\n').map(block => {
+      block = block.trim();
+      if (!block) return '';
+      if (block.startsWith('<h') || block.startsWith('<hr') || block.startsWith('<li') || block.startsWith('<table') || block.startsWith('|')) return block;
+      if (block.includes('<li>')) return '<ul>' + block + '</ul>';
+      return '<p>' + block.replace(/\n/g, '<br>') + '</p>';
+    }).join('\n');
+
+  // tables
+  html = html.replace(/((?:^\|.+\|$\n?)+)/gm, (tableBlock) => {
+    const rows = tableBlock.trim().split('\n').filter(r => r.trim());
+    if (rows.length < 2) return tableBlock;
+    const parseRow = r => r.split('|').filter((_, i, a) => i > 0 && i < a.length - 1).map(c => c.trim());
+    const headers = parseRow(rows[0]);
+    const isSep = r => /^[\s|:-]+$/.test(r);
+    let dataStart = 1;
+    if (rows[1] && isSep(rows[1])) dataStart = 2;
+    let t = '<table><thead><tr>' + headers.map(h => `<th>${h}</th>`).join('') + '</tr></thead><tbody>';
+    for (let i = dataStart; i < rows.length; i++) {
+      const cells = parseRow(rows[i]);
+      t += '<tr>' + cells.map(c => `<td>${c}</td>`).join('') + '</tr>';
+    }
+    t += '</tbody></table>';
+    return t;
+  });
+
+  return html;
+}
+
+// ── Fetch helpers ──
+async function fetchText(url) {
+  const r = await fetch(url);
+  if (!r.ok) return '';
+  return r.text();
+}
+
+async function fetchDir(path) {
+  try {
+    const r = await fetch(`${REPO_API}/${path}`);
+    if (!r.ok) return [];
+    const data = await r.json();
+    return data.filter(f => f.name.endsWith('.md') && f.name !== 'TEMPLATE.md');
+  } catch { return []; }
+}
+
+// ── Load Archive ──
+async function loadArchive() {
+  const [claimFiles, sourceFiles, digFiles, linkFiles] = await Promise.all([
+    fetchDir('claims'),
+    fetchDir('sources/tier-1'),
+    fetchDir('digs'),
+    fetchDir('links'),
+  ]);
+
+  const fetchAndParse = async (file) => {
+    const text = await fetchText(file.download_url);
+    return { ...parseFrontmatter(text), filename: file.name };
+  };
+
+  const [claims, sources, digs, links, method, manifest, readme] = await Promise.all([
+    Promise.all(claimFiles.map(fetchAndParse)),
+    Promise.all(sourceFiles.map(fetchAndParse)),
+    Promise.all(digFiles.map(fetchAndParse)),
+    Promise.all(linkFiles.map(fetchAndParse)),
+    fetchText(`${REPO_RAW}/METHOD.md`),
+    fetchText(`${REPO_RAW}/MANIFEST.md`),
+    fetchText(`${REPO_RAW}/README.md`),
+  ]);
+
+  archive = { claims, sources, digs, links, method, manifest, readme };
+  loaded = true;
+}
+
+// ── Tag Helpers ──
+function confidenceTag(confidence) {
+  if (!confidence) return '';
+  const cls = {
+    'DOCUMENTED': 'tag-documented',
+    'CONTESTED': 'tag-contested',
+    'SUPPRESSED-IF-TRUE': 'tag-suppressed',
+    'SPECULATIVE': 'tag-speculative',
+  }[confidence] || 'tag-speculative';
+  return `<span class="tag ${cls}">${confidence}</span>`;
+}
+
+function statusBadge(status) {
+  if (!status) return '';
+  const s = status.toLowerCase();
+  const cls = s.includes('unsearched') ? 'status-unsearched'
+    : s.includes('sampled') ? 'status-sampled'
+    : s.includes('surveyed') ? 'status-surveyed'
+    : s.includes('exhausted') ? 'status-exhausted'
+    : 'status-unsearched';
+  return `<span class="status-badge ${cls}">${status}</span>`;
+}
+
+function tierBadge(tier, open = true) {
+  return `<span class="tier-badge ${open ? '' : 'tier-badge-closed'}">Tier ${tier}</span>`;
+}
+
+// ── Page Renderers ──
+function renderHome() {
+  const claimCount = archive.claims.length;
+  const sourceCount = archive.sources.length;
+  const digCount = archive.digs.length;
+  const linkCount = archive.links.length;
+  const documented = archive.claims.filter(c => c.meta.confidence === 'DOCUMENTED').length;
+
+  return `
+    <div class="page">
+      <div class="hero">
+        <h1 class="hero-title">TRUTH</h1>
+        <p class="hero-subtitle">A provenance-first archive of historical claims, the sources behind them, and the documented gaps between them.</p>
+        <p class="hero-companion">Companion research archive for <a href="https://thelyingpen.tlid.io">Invariant — The Lying Pen</a></p>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-val">${claimCount}</div>
+          <div class="stat-label">Claims Filed</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val">${sourceCount}</div>
+          <div class="stat-label">Tier-1 Sources</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val">${digCount}</div>
+          <div class="stat-label">Dig Sites</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val">${documented}</div>
+          <div class="stat-label">Documented</div>
+        </div>
+      </div>
+
+      <div class="iron-rules">
+        <h2>The Three Iron Rules</h2>
+        <ol>
+          <li><strong>Every claim carries a confidence tag.</strong> DOCUMENTED / CONTESTED / SUPPRESSED-IF-TRUE / SPECULATIVE. No untagged claims. Ever.</li>
+          <li><strong>Every link between claims is typed and tagged too.</strong> A connection is itself a claim. "These sources use identical phrasing" (documented) is not the same kind of link as "these events feel related" (speculative).</li>
+          <li><strong>The hunting map shows what hasn't been searched.</strong> An archive can be incomplete honestly; it cannot be partial honestly. The difference is whether the unexamined territory is on the record.</li>
+        </ol>
+      </div>
+
+      <div class="nav-grid">
+        <a href="#/claims" class="nav-grid-item">
+          <span class="entry-title">Claims</span>
+          <span class="entry-sub">${claimCount} filed · ${documented} documented</span>
+        </a>
+        <a href="#/sources" class="nav-grid-item">
+          <span class="entry-title">Sources</span>
+          <span class="entry-sub">${sourceCount} Tier-1 catalogued</span>
+        </a>
+        <a href="#/digs" class="nav-grid-item">
+          <span class="entry-title">Dig Sites</span>
+          <span class="entry-sub">${digCount} trenches open</span>
+        </a>
+        <a href="#/method" class="nav-grid-item">
+          <span class="entry-title">The Method</span>
+          <span class="entry-sub">The law of the archive</span>
+        </a>
+        <a href="#/manifest" class="nav-grid-item">
+          <span class="entry-title">Hunting Map</span>
+          <span class="entry-sub">What's searched, what isn't</span>
+        </a>
+        <a href="#/links" class="nav-grid-item">
+          <span class="entry-title">Links</span>
+          <span class="entry-sub">${linkCount} connections typed</span>
+        </a>
+      </div>
+    </div>
+  `;
+}
+
+function renderClaimsIndex() {
+  let cards = archive.claims.map(c => `
+    <a href="#/claims/${c.meta.id}" class="entry-card">
+      <span class="entry-id">${c.meta.id || '—'}</span>
+      <span class="entry-title">${c.meta.title || c.filename}</span>
+      <span class="entry-meta">${confidenceTag(c.meta.confidence)}</span>
+    </a>
+  `).join('');
+
+  return `
+    <div class="page">
+      <div class="section-header">
+        <h1>Claims</h1>
+        <p class="section-sub">Every claim carries a confidence tag. No exceptions.</p>
+      </div>
+      <div class="filter-bar">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="DOCUMENTED">Documented</button>
+        <button class="filter-btn" data-filter="CONTESTED">Contested</button>
+        <button class="filter-btn" data-filter="SUPPRESSED-IF-TRUE">Suppressed-if-True</button>
+        <button class="filter-btn" data-filter="SPECULATIVE">Speculative</button>
+      </div>
+      <div class="entry-grid" id="claims-list">${cards}</div>
+    </div>
+  `;
+}
+
+function renderClaimDetail(id) {
+  const claim = archive.claims.find(c => c.meta.id === id);
+  if (!claim) return `<div class="page"><p>Claim ${id} not found.</p></div>`;
+
+  const linkedSources = (claim.meta.sources || []).map(sid => {
+    const src = archive.sources.find(s => s.meta.id === sid);
+    return src ? `<a class="ref-link" href="#/sources/${sid}">${sid}: ${src.meta.title || sid}</a>` : `<span class="ref-link">${sid}</span>`;
+  }).join('');
+
+  const linkedDig = claim.meta.dig ? `<a class="ref-link" href="#/digs/${claim.meta.dig.replace('digs/','').replace('.md','')}">${claim.meta.dig}</a>` : '';
+
+  return `
+    <div class="page">
+      <div class="section-header">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+          <span class="entry-id" style="font-size:13px;">${claim.meta.id}</span>
+          ${confidenceTag(claim.meta.confidence)}
+          <span style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;">Status: ${claim.meta.status || 'active'}</span>
+        </div>
+        <h1 style="text-transform:none;letter-spacing:0;">${claim.meta.title}</h1>
+      </div>
+      <div class="detail-layout">
+        <div class="detail-main">
+          <div class="document">${md(claim.body)}</div>
+        </div>
+        <div class="detail-sidebar">
+          ${linkedSources ? `<div class="sidebar-card"><h4>Sources</h4>${linkedSources}</div>` : ''}
+          ${linkedDig ? `<div class="sidebar-card"><h4>Dig Site</h4>${linkedDig}</div>` : ''}
+          <div class="sidebar-card">
+            <h4>Confidence</h4>
+            <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.6;">
+              ${claim.meta.confidence === 'DOCUMENTED' ? 'Supported by Tier 1–2 sources with checkable provenance.' :
+                claim.meta.confidence === 'CONTESTED' ? 'Credible sources genuinely conflict; both sides recorded.' :
+                claim.meta.confidence === 'SUPPRESSED-IF-TRUE' ? 'Supporting record shows documented signs of removal or alteration.' :
+                'An honest hypothesis. Never corroborates.'}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderSourcesIndex() {
+  const tiers = [
+    { n: 1, name: 'Physical Survivors', open: true, desc: 'Old maps, first editions, gravestones, buildings, coins, court records — anything the pen cannot reach after the fact.' },
+    { n: 2, name: 'Contemporary Record', open: false, desc: 'Newspapers, diaries, letters, church registers — what people wrote at the time.' },
+    { n: 3, name: 'Official Narrative (as exhibit)', open: false, desc: 'Textbooks, encyclopedias — catalogued as claims, never as truth.' },
+    { n: 4, name: 'Testimony & Tradition', open: false, desc: 'Oral histories, tribal accounts, family stories — tagged as what they are.' },
+    { n: 5, name: 'The Absence Catalogue', open: false, desc: 'Records that should exist and don\'t — only when expected presence is documented.' },
+  ];
+
+  let html = tiers.map(tier => {
+    const sources = tier.open ? archive.sources.filter(s => (s.meta.tier || '1') === String(tier.n)) : [];
+    return `
+      <div style="margin-bottom:32px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+          ${tierBadge(tier.n, tier.open)}
+          <h3 style="font-family:var(--font-heading);font-weight:800;font-size:0.95rem;">${tier.name}</h3>
+          ${!tier.open ? '<span style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;">Not yet open</span>' : ''}
+        </div>
+        <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:16px;">${tier.desc}</p>
+        ${tier.open && sources.length > 0 ? `<div class="entry-grid">${sources.map(s => `
+          <a href="#/sources/${s.meta.id}" class="entry-card">
+            <span class="entry-id">${s.meta.id}</span>
+            <span class="entry-title">${s.meta.title || s.filename}</span>
+            <span class="entry-meta">${tierBadge(s.meta.tier || 1)}</span>
+          </a>
+        `).join('')}</div>` : ''}
+      </div>
+    `;
+  }).join('');
+
+  return `
+    <div class="page">
+      <div class="section-header">
+        <h1>Sources</h1>
+        <p class="section-sub">Ranked by how hard they are to retroactively edit — not by who published them.</p>
+      </div>
+      ${html}
+    </div>
+  `;
+}
+
+function renderSourceDetail(id) {
+  const source = archive.sources.find(s => s.meta.id === id);
+  if (!source) return `<div class="page"><p>Source ${id} not found.</p></div>`;
+
+  const citedBy = archive.claims.filter(c => (c.meta.sources || []).includes(id));
+  const refs = citedBy.map(c => `<a class="ref-link" href="#/claims/${c.meta.id}">${c.meta.id}: ${c.meta.title || ''}</a>`).join('');
+
+  return `
+    <div class="page">
+      <div class="section-header">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+          <span class="entry-id" style="font-size:13px;">${source.meta.id}</span>
+          ${tierBadge(source.meta.tier || 1)}
+          ${source.meta.type ? `<span style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;">${source.meta.type}</span>` : ''}
+        </div>
+        <h1 style="text-transform:none;letter-spacing:0;">${source.meta.title}</h1>
+        ${source.meta['date-of-object'] ? `<p class="section-sub">Date: ${source.meta['date-of-object']}</p>` : ''}
+        ${source.meta.holder ? `<p class="section-sub">Held: ${source.meta.holder}</p>` : ''}
+      </div>
+      <div class="detail-layout">
+        <div class="detail-main">
+          <div class="document">${md(source.body)}</div>
+        </div>
+        <div class="detail-sidebar">
+          ${refs ? `<div class="sidebar-card"><h4>Cited by Claims</h4>${refs}</div>` : ''}
+          ${source.meta['verify-at'] ? `<div class="sidebar-card"><h4>Verify</h4><a class="ref-link" href="${source.meta['verify-at']}" target="_blank" rel="noopener">${source.meta['verify-at']}</a></div>` : ''}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderDigsIndex() {
+  let cards = archive.digs.map(d => {
+    const slug = d.filename.replace('.md', '');
+    const lines = d.body.split('\n');
+    const question = lines.find(l => l.startsWith('**The question:'))?.replace(/\*\*/g, '') || '';
+    const hasCounter = d.body.includes('Counter-exhibits') && !d.body.includes('Currently empty') && !d.body.includes('None yet catalogued');
+    return `
+      <a href="#/digs/${slug}" class="dig-card">
+        <h3>${d.body.split('\n')[0]?.replace(/^#\s*/, '').replace('DIG SITE — ', '') || slug}</h3>
+        <p>${question}</p>
+        <div class="dig-meta">
+          ${!hasCounter ? '<span class="tag tag-speculative" style="font-size:9px;">⚠ Counter-exhibits needed</span>' : '<span class="tag tag-documented" style="font-size:9px;">Compliant</span>'}
+        </div>
+      </a>
+    `;
+  }).join('');
+
+  return `
+    <div class="page">
+      <div class="section-header">
+        <h1>Dig Sites</h1>
+        <p class="section-sub">Active investigations. Start from trenches already opened — expand outward from proven ground.</p>
+      </div>
+      <div class="dig-grid">${cards}</div>
+    </div>
+  `;
+}
+
+function renderDigDetail(slug) {
+  const dig = archive.digs.find(d => d.filename.replace('.md', '') === slug);
+  if (!dig) return `<div class="page"><p>Dig site "${slug}" not found.</p></div>`;
+
+  const hasCounter = dig.body.includes('Counter-exhibits') && !dig.body.includes('Currently empty') && !dig.body.includes('None yet catalogued');
+
+  return `
+    <div class="page">
+      <div class="section-header">
+        <h1>${dig.body.split('\n')[0]?.replace(/^#\s*/, '') || slug}</h1>
+      </div>
+      ${!hasCounter ? '<div class="compliance-warning"><strong>⚠ Non-compliant:</strong> Counter-exhibits section is empty. This dig cannot support pattern claims until a genuine search for counter-evidence has been made and recorded. (METHOD.md §6)</div>' : ''}
+      <div class="document">${md(dig.body.split('\n').slice(1).join('\n'))}</div>
+    </div>
+  `;
+}
+
+function renderLinksIndex() {
+  if (archive.links.length === 0) {
+    return `
+      <div class="page">
+        <div class="section-header">
+          <h1>Links</h1>
+          <p class="section-sub">Every connection between entries is itself a claim, with its own confidence tag.</p>
+        </div>
+        <div style="text-align:center;padding:60px 0;color:var(--text-muted);">
+          <p style="font-size:14px;">No links catalogued yet.</p>
+          <p style="font-size:12px;margin-top:8px;">Links will appear here as connections between claims and sources are typed and tagged.</p>
+        </div>
+      </div>
+    `;
+  }
+  const cards = archive.links.map(l => `
+    <a href="#/links/${l.meta.id}" class="entry-card">
+      <span class="entry-id">${l.meta.id}</span>
+      <span class="entry-title">${l.meta.title || l.filename}</span>
+      <span class="entry-meta">
+        <span class="link-type link-type-${(l.meta.type || '').toLowerCase()}">${l.meta.type || '—'}</span>
+        ${confidenceTag(l.meta.confidence)}
+      </span>
+    </a>
+  `).join('');
+  return `
+    <div class="page">
+      <div class="section-header">
+        <h1>Links</h1>
+        <p class="section-sub">Every connection between entries is itself a claim, with its own confidence tag.</p>
+      </div>
+      <div class="entry-grid">${cards}</div>
+    </div>
+  `;
+}
+
+function renderMethod() {
+  return `
+    <div class="page" style="max-width:800px;">
+      <div class="section-header">
+        <h1>⚖️ The Method</h1>
+        <p class="section-sub">This file is the law of the archive. If an entry conflicts with this file, the entry is wrong.</p>
+      </div>
+      <div class="document law-document">${md(archive.method.split('\n').slice(2).join('\n'))}</div>
+    </div>
+  `;
+}
+
+function renderManifest() {
+  return `
+    <div class="page" style="max-width:800px;">
+      <div class="section-header">
+        <h1>🗺️ The Hunting Map</h1>
+        <p class="section-sub">Where Tier-1 material lives, what we have searched, and — just as important — what we have not.</p>
+      </div>
+      <div class="document">${md(archive.manifest.split('\n').slice(2).join('\n'))}</div>
+    </div>
+  `;
+}
+
+// ── Router ──
+function route() {
+  const hash = window.location.hash || '#/';
+  const parts = hash.slice(2).split('/');
+  const section = parts[0] || '';
+  const detail = parts.slice(1).join('/');
+
+  // Update active nav link
+  document.querySelectorAll('.nav-links a').forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#/' + section);
+  });
+
+  const app = document.getElementById('app');
+
+  if (!loaded) { app.innerHTML = '<div class="loading">Loading archive…</div>'; return; }
+
+  switch (section) {
+    case '':
+      app.innerHTML = renderHome(); break;
+    case 'claims':
+      app.innerHTML = detail ? renderClaimDetail(detail) : renderClaimsIndex();
+      if (!detail) bindFilters();
+      break;
+    case 'sources':
+      app.innerHTML = detail ? renderSourceDetail(detail) : renderSourcesIndex(); break;
+    case 'digs':
+      app.innerHTML = detail ? renderDigDetail(detail) : renderDigsIndex(); break;
+    case 'links':
+      app.innerHTML = renderLinksIndex(); break;
+    case 'method':
+      app.innerHTML = renderMethod(); break;
+    case 'manifest':
+      app.innerHTML = renderManifest(); break;
+    default:
+      app.innerHTML = `<div class="page"><p>Page not found.</p></div>`;
+  }
+
+  window.scrollTo(0, 0);
+}
+
+function bindFilters() {
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const filter = btn.dataset.filter;
+      document.querySelectorAll('#claims-list .entry-card').forEach(card => {
+        if (filter === 'all') { card.style.display = ''; return; }
+        const tag = card.querySelector('.tag');
+        card.style.display = tag && tag.textContent.trim() === filter ? '' : 'none';
+      });
+    });
+  });
+}
+
+// ── Init ──
+window.addEventListener('hashchange', route);
+
+loadArchive().then(() => {
+  route();
+}).catch(err => {
+  document.getElementById('app').innerHTML = `<div class="page"><p style="color:var(--oxblood);">Failed to load archive: ${err.message}</p></div>`;
+});
+</script>
+</body>
+</html>
