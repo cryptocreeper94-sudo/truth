@@ -24,8 +24,9 @@ Status values: `UNSEARCHED` / `SAMPLED` (looked at some material) / `SURVEYED` (
 | Collection | What it holds | Status |
 |---|---|---|
 | U.S. National Archives (NARA) | Land patents, court records, censuses, military records | UNSEARCHED |
+| Missouri State Archives | Territorial land-title records incl. New Madrid Claims (RG 951.3) | SAMPLED (S-0003) |
 | BLM General Land Office records (glorecords.blm.gov) | Digitized land patents incl. New Madrid certificates | UNSEARCHED |
-| U.S. Statutes at Large | Every act of Congress as printed at the time | UNSEARCHED |
+| U.S. Statutes at Large | Every act of Congress as printed at the time | SAMPLED (S-0002) |
 | Google Patents / USPTO full-text | Patents from 1790, dated technical record | UNSEARCHED |
 
 ## Physical objects (coins, buildings, stones)
