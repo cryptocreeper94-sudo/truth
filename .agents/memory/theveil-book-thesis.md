@@ -24,3 +24,13 @@ description: Jason's "lying pen" thesis, the book's revision history through Aug
 # Pending
 - "Evidence Room" reader UI redesign approved in spirit, awaiting go: replace cyan glassmorphism (veil-reader.tsx, ~2000 lines, GlassCard/sky-blue) with ink/parchment archive aesthetic, serif body type, restrained accent.
 - Image provenance question open: 8 Wyatt-site photos in client/public/images/ may be web-sourced (copyright risk); Sodom ash photo has Android EXIF (possibly Jason's own).
+
+## Session update (Aug 8, 2026)
+- Manuscript complete through Epilogue "The Two Deathbeds" (grandmother witness: eyes AND hands up, non-responsive for days — 8 years ago, not decades).
+- Ch 36C now has three movements: Relocated Map, Little Season, The Great River (New Madrid 1811 = Rev 9:14 loosing on the Mississippi; tempo argument: slow apocalypse camouflaged by expectation of suddenness).
+- Hospitality pass done: names key table in front matter, promise paragraph in Sharded Truth, Ch 25B section headers, repetition trim (3 true restatements compressed; deliberate refrains kept).
+- All 8 Wyatt-site photos REMOVED (files deleted) — replaced with do-your-own-work note + relocated-map reframe. Copyright exposure closed.
+- Reader parser now recognizes "# EPILOGUE" headings (server/routes.ts).
+- Evidence Room restyle shipped: veil-reader.tsx cyan/glass chrome -> warm ink (#0f0d0b) + brass (amber) + oxblood (red-900); GlassCard swapped for solid archive panels; parchment reading surface was already Georgia/stone. GlassCard is SHARED by Trust Layer components — never restyle it globally.
+- Deferred by design: "real story of Yahusha happened in America" + "original books originated here" = next book's thesis, not in this book.
+- Still open: live site 404s all deep links (no SPA fallback in production) — no shareable front door to the book; dead throughtheveil.tlid.io Render domain (Jason's side).
