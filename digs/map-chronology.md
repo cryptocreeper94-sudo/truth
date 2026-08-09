@@ -16,5 +16,8 @@ The book (*Through The Veil*, ch. 36C "The Relocated Map") argues from map chron
 | S-0001 | Mercator 1595 polar map (Septentrionalium Terrarum) | source |
 | C-0001 | Mercator cites a lost source (Inventio Fortunata) | DOCUMENTED |
 
+## Counter-exhibits
+*(Required by METHOD.md §6. Tier-1 objects that cut AGAINST this dig's working question, catalogued with identical care. Currently empty — this dig is non-compliant for pattern claims until a genuine search for counter-exhibits has been made and recorded here.)*
+
 ## Motive layer
 *(Empty. Motive is argued last, from DOCUMENTED links only. There are not yet enough links in this trench to argue anything.)*
