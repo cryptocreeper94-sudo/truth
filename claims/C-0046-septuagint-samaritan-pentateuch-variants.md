@@ -1,5 +1,6 @@
 ---
 title: "Septuagint vs Samaritan Pentateuch: Textual Variants"
+domain: Biblical Texts
 summary: "Examination of textual variants between the Septuagint and the Samaritan Pentateuch, with manuscript evidence."
 confidence: DOCUMENTED
 sources: ["S-0073", "S-0074"]
