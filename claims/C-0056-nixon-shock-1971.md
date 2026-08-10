@@ -1,5 +1,6 @@
 ---
 title: "Nixon Shock (1971)"
+domain: Financial Origins
 date: 2023-10-05
 claim: "In 1971, President Nixon's administration unilaterally canceled the direct convertibility of the United States dollar to gold, effectively ending the Bretton Woods system."
 sources:
