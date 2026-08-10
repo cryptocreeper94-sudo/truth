@@ -1,5 +1,6 @@
 ---
 title: "Tower of Babel and Linguistic Diversification"
+domain: Biblical Lineage
 summary: "Examines the correlation between the Tower of Babel narrative and evidence for linguistic diversification."
 sources: ["S-0063", "S-0064"]
 confidence: "CONTESTED"
