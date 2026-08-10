@@ -4,4 +4,4 @@
 - [Axiom design system](axiom-design.md) — brutalist alternating dark/crème sections, 4% noise overlay, Inter 900 + JetBrains Mono, monochrome-to-color image hover, 3D tilt cards.
 - [The Veil book thesis](theveil-book-thesis.md) — Jason's "lying pen" reframe: the map and timeline themselves are the forgery; shapes future theveil content work.
 - [LumeScan OBD pipeline](lumescan-obd.md) — "no data" root cause was command/response mismatch, not noise; both BLE and WiFi connectors now serialized+verified; branch is master.
-- [Strata Archive](strata-archive.md) — Jason's provenance-first history archive repo; METHOD.md is law, tags on claims AND links, Tier 1 only open.
+- [Truth project](truth-project.md) — current product combines a METHOD-governed Historical Record with a separate provenance-first Observatory section; “Strata” is obsolete.
