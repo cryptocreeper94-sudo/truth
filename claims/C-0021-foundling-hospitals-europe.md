@@ -1,5 +1,6 @@
 ---
 title: "Presence and Role of Foundling Hospitals Across Europe"
+domain: Orphan History
 status: documented
 source_ids: ["S-0027", "S-0028"]
 ---
