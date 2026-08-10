@@ -1,6 +1,7 @@
 ---
 id: C-0005
 title: Between 1854 and 1929, an estimated 250,000 children were transported from Eastern U.S. cities to the Midwest and West on "orphan trains" — many were not orphans
+domain: Orphan History
 confidence: DOCUMENTED
 sources: [S-0008, S-0009]
 dig: digs/orphan-trains.md
