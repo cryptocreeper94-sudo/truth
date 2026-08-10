@@ -1,6 +1,7 @@
 ---
 id: C-0017
 title: The Book of Jubilees assigns specific territorial boundaries to Shem, Ham, and Japheth with geographic coordinates and landmarks
+domain: Biblical Lineage
 confidence: DOCUMENTED
 sources: [S-0023]
 dig: digs/lineage-of-nations.md
