@@ -1,5 +1,6 @@
 ---
 title: "Impact of Inter gravissimas on European Timekeeping"
+domain: Calendar Systems
 description: "Analysis of the adoption of the Gregorian calendar following the papal bull 'Inter gravissimas' in 1582 and its effect on timekeeping in Europe."
 sources:
   - S-0077
