@@ -1,5 +1,6 @@
 ---
 title: "Elongated Paracas Skulls"
+domain: Archaeology
 confidence: DOCUMENTED
 description: "Investigation into the elongated skulls found in the Paracas region of Peru."
 sources:
