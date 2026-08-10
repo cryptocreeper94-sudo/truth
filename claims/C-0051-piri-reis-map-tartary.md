@@ -1,5 +1,6 @@
 ---
 title: "Piri Reis Map (1513) Depiction of Tartary"
+domain: Cartography
 claim_id: "C-0051"
 sources: ["S-0080", "S-0081"]
 confidence: "DOCUMENTED"
