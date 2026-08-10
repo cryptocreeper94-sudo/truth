@@ -1,6 +1,7 @@
 ---
 id: C-0015
 title: Genesis 10 names 70 descendants of Noah and assigns them to specific territories, constituting the oldest surviving attempt at a comprehensive genealogy of nations
+domain: Biblical Lineage
 confidence: DOCUMENTED
 sources: [S-0004, S-0024]
 dig: digs/lineage-of-nations.md
