@@ -1,5 +1,6 @@
 ---
 title: "Carnegie Foundation Charter"
+domain: Institutional Origins
 confidence: DOCUMENTED
 objection: "There are claims that the Foundation's goals have shifted over time, influenced by political and economic interests not originally intended by Andrew Carnegie."
 ---
