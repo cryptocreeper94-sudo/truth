@@ -1,5 +1,6 @@
 ---
 title: "Critique of the Phantom Time Hypothesis"
+domain: Calendar Systems
 description: "A critical examination of the Phantom Time Hypothesis proposed by Heribert Illig, suggesting 297 years were added to the Early Middle Ages."
 sources:
   - S-0079
