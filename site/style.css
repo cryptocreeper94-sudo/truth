@@ -491,6 +491,8 @@ body {
 .reveal.active { opacity: 1; transform: translateY(0); }
 
 /* ═══ Responsive ═══ */
+
+/* Tablet */
 @media (max-width: 768px) {
   .detail-layout { grid-template-columns: 1fr; }
   .detail-sidebar { position: static; }
@@ -500,4 +502,81 @@ body {
   .iron-rules { padding: 28px; }
   .stats-row { grid-template-columns: repeat(2, 1fr); }
   .dig-grid { grid-template-columns: 1fr; }
+  .nav-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+  .filter-bar { flex-wrap: wrap; }
+  .filter-btn { flex: 1 1 auto; text-align: center; }
+}
+
+/* Mobile */
+@media (max-width: 520px) {
+  /* Nav */
+  .nav-inner {
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 16px;
+  }
+  .nav-links { flex-wrap: wrap; justify-content: center; gap: 2px; }
+  .nav-links a { padding: 6px 8px; font-size: 8px; }
+  .nav-brand { font-size: 14px; }
+
+  /* Hero */
+  .hero { padding: 80px 16px 40px; }
+  .hero h1 { font-size: 2rem; }
+  .hero p { font-size: 0.95rem; }
+
+  /* Content */
+  .document { padding: 20px 16px; }
+  .document h2 { font-size: 1.1rem; }
+  .document h3 { font-size: 0.95rem; }
+
+  /* Tables — horizontal scroll wrapper */
+  .document table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+    font-size: 0.8rem;
+  }
+  .document th,
+  .document td {
+    padding: 8px 10px;
+    min-width: 80px;
+  }
+  .document th { font-size: 8px; }
+
+  /* Stats */
+  .stats-row { grid-template-columns: 1fr 1fr; gap: 1px; }
+  .stat-number { font-size: 1.4rem; }
+
+  /* Iron rules */
+  .iron-rules { padding: 20px 16px; }
+  .iron-rules li { font-size: 0.85rem; }
+
+  /* Nav grid */
+  .nav-grid { grid-template-columns: 1fr; }
+
+  /* Filter bar — stack on mobile */
+  .filter-bar { flex-wrap: wrap; }
+  .filter-btn {
+    flex: 1 1 45%;
+    padding: 8px 12px;
+    font-size: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* Dig grid */
+  .dig-grid { grid-template-columns: 1fr; }
+
+  /* Claims list */
+  .claim-card { padding: 16px; }
+
+  /* Detail */
+  .detail-layout { grid-template-columns: 1fr; gap: 0; }
+  .detail-sidebar { position: static; padding: 16px; }
+
+  /* Footer */
+  .site-footer { padding: 24px 16px; font-size: 10px; }
+
+  /* Compliance warning */
+  .compliance-warning { padding: 16px; font-size: 0.85rem; }
 }
