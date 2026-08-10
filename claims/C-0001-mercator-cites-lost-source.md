@@ -1,6 +1,7 @@
 ---
 id: C-0001
 title: Mercator's 1595 polar map cites a named source text (Inventio Fortunata) of which no copy survives anywhere
+domain: Cartography
 confidence: DOCUMENTED
 sources: [S-0001]
 dig: digs/map-chronology.md
