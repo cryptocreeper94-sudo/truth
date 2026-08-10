@@ -1,5 +1,6 @@
 ---
 title: "Lineage and Territories of Ham"
+domain: Biblical Lineage
 source_ids: ["S-0132", "S-0133"]
 confidence: DOCUMENTED
 ---
