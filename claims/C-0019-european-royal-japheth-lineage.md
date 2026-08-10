@@ -1,6 +1,7 @@
 ---
 id: C-0019
 title: Medieval European royal genealogies systematically claimed descent from Japheth, connecting ruling houses to the Genesis Table of Nations
+domain: Biblical Lineage
 confidence: DOCUMENTED
 sources: [S-0025]
 dig: digs/lineage-of-nations.md
