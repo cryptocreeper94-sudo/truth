@@ -1,5 +1,6 @@
 ---
 title: "Seattle Underground Documentation"
+domain: Buried Cities
 summary: "The existence of the Seattle Underground is well-documented through municipal records and contemporary reports."
 sources: ["S-0102", "S-0103"]
 confidence: DOCUMENTED
