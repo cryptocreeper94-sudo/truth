@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * TRUTH — Research Daemon v0.2.0
+ * TRUTH — Research Daemon v0.3.0
  * DarkWave Studios LLC — Copyright 2026
  *
  * A deterministic research engine for the Truth provenance-first archive.
@@ -45,7 +45,6 @@
 
 import fs from 'fs';
 import path from 'path';
-import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
 import http from 'http';
 import crypto from 'crypto';
@@ -61,7 +60,7 @@ const REPO_ROOT = path.resolve(__dirname, '..');
 // ═══════════════════════════════════════════════════════════════════════════════
 const IDENTITY = Object.freeze({
   name: 'truth-research-daemon',
-  version: '0.2.0',
+  version: '0.3.0',
   author: 'Andrews, Ronald Jason — DarkWave Studios LLC',
   license: 'CC-BY-4.0',
   architecture: 'DDA 42-Doctrine / Deterministic Dissolution Ladder',
@@ -77,11 +76,14 @@ const CONFIG = Object.freeze({
   openaiApiKey: process.env.OPENAI_API_KEY || '',
   openaiModel: process.env.TRUTH_MODEL || 'gpt-4o',
 
-  claimsDir: path.join(REPO_ROOT, 'claims'),
-  sourcesDir: path.join(REPO_ROOT, 'sources', 'tier-1'),
-  digsDir: path.join(REPO_ROOT, 'digs'),
-  methodFile: path.join(REPO_ROOT, 'METHOD.md'),
+  // GitHub API — the daemon reads/writes directly to the repo
+  githubToken: process.env.GITHUB_TOKEN || '',
+  githubOwner: 'cryptocreeper94-sudo',
+  githubRepo: 'truth',
+  githubBranch: 'main',
 
+  // Local paths (for METHOD.md baked into Docker image)
+  methodFile: path.join(REPO_ROOT, 'METHOD.md'),
   stateFile: path.join(__dirname, 'daemon_state.json'),
   budgetFile: path.join(__dirname, 'daemon_budget.json'),
   auditLog: path.join(__dirname, 'audit.log'),
@@ -239,33 +241,80 @@ function recordSpend(budget, tokensIn, tokensOut) {
 // ═══════════════════════════════════════════════════════════════════════════════
 // [20] COHERENCE ENGINE — Archive scanner. Cross-reference validation.
 // ═══════════════════════════════════════════════════════════════════════════════
-function scanArchive() {
+async function githubApiGet(path) {
+  const url = `https://api.github.com/repos/${CONFIG.githubOwner}/${CONFIG.githubRepo}/contents/${path}?ref=${CONFIG.githubBranch}`;
+  const res = await fetch(url, {
+    headers: {
+      'Authorization': `token ${CONFIG.githubToken}`,
+      'Accept': 'application/vnd.github.v3+json',
+    },
+  });
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`GitHub API ${res.status}: ${await res.text()}`);
+  return res.json();
+}
+
+async function githubApiPut(path, content, message) {
+  const url = `https://api.github.com/repos/${CONFIG.githubOwner}/${CONFIG.githubRepo}/contents/${path}`;
+  // Check if file exists (need sha for update)
+  const existing = await githubApiGet(path);
+  const body = {
+    message,
+    content: Buffer.from(content).toString('base64'),
+    branch: CONFIG.githubBranch,
+  };
+  if (existing && existing.sha) body.sha = existing.sha;
+  const res = await fetch(url, {
+    method: 'PUT',
+    headers: {
+      'Authorization': `token ${CONFIG.githubToken}`,
+      'Accept': 'application/vnd.github.v3+json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(`GitHub PUT ${res.status}: ${await res.text()}`);
+  const result = await res.json();
+  return result.commit?.sha || 'unknown';
+}
+
+async function scanArchive() {
   const scan = { claims: [], sources: [], digs: [], maxClaimId: 0, maxSourceId: 0 };
 
-  if (fs.existsSync(CONFIG.claimsDir)) {
-    for (const f of fs.readdirSync(CONFIG.claimsDir).filter(f => f.endsWith('.md'))) {
-      const match = f.match(/C-(\d+)/);
-      if (match) {
-        const id = parseInt(match[1]);
-        if (id > scan.maxClaimId) scan.maxClaimId = id;
-        scan.claims.push(f);
+  // Scan claims via GitHub API
+  const claimsDir = await githubApiGet('claims');
+  if (Array.isArray(claimsDir)) {
+    for (const f of claimsDir) {
+      if (f.name.endsWith('.md')) {
+        const match = f.name.match(/C-(\d+)/);
+        if (match) {
+          const id = parseInt(match[1]);
+          if (id > scan.maxClaimId) scan.maxClaimId = id;
+          scan.claims.push(f.name);
+        }
       }
     }
   }
 
-  if (fs.existsSync(CONFIG.sourcesDir)) {
-    for (const f of fs.readdirSync(CONFIG.sourcesDir).filter(f => f.endsWith('.md'))) {
-      const match = f.match(/S-(\d+)/);
-      if (match) {
-        const id = parseInt(match[1]);
-        if (id > scan.maxSourceId) scan.maxSourceId = id;
-        scan.sources.push(f);
+  // Scan sources via GitHub API
+  const sourcesDir = await githubApiGet('sources/tier-1');
+  if (Array.isArray(sourcesDir)) {
+    for (const f of sourcesDir) {
+      if (f.name.endsWith('.md')) {
+        const match = f.name.match(/S-(\d+)/);
+        if (match) {
+          const id = parseInt(match[1]);
+          if (id > scan.maxSourceId) scan.maxSourceId = id;
+          scan.sources.push(f.name);
+        }
       }
     }
   }
 
-  if (fs.existsSync(CONFIG.digsDir)) {
-    scan.digs = fs.readdirSync(CONFIG.digsDir).filter(f => f.endsWith('.md'));
+  // Scan digs via GitHub API
+  const digsDir = await githubApiGet('digs');
+  if (Array.isArray(digsDir)) {
+    scan.digs = digsDir.filter(f => f.name.endsWith('.md')).map(f => f.name);
   }
 
   auditWrite(`[20/COHERENCE] Archive: ${scan.claims.length} claims (max C-${String(scan.maxClaimId).padStart(4, '0')}), ${scan.sources.length} sources (max S-${String(scan.maxSourceId).padStart(4, '0')}), ${scan.digs.length} digs`);
@@ -394,63 +443,57 @@ function validateResults(results) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// [32] INTEGRITY LAYER — Write files and commit with cryptographic chain
+// [32] INTEGRITY LAYER + [23] CAUSALITY ENGINE
+// Write files via GitHub API — each file is a commit in the cryptographic chain
 // ═══════════════════════════════════════════════════════════════════════════════
-function writeResults(results) {
+async function writeResults(results, domain) {
   let claimsWritten = 0;
   let sourcesWritten = 0;
 
   if (results.claims) {
     for (const claim of results.claims) {
       if (claim._rejected) continue;
-      const filepath = path.join(CONFIG.claimsDir, claim.filename);
-      if (!fs.existsSync(filepath)) {
-        fs.writeFileSync(filepath, claim.content);
+      try {
+        const ghPath = `claims/${claim.filename}`;
+        const existing = await githubApiGet(ghPath);
+        if (existing) {
+          auditWrite(`[20/COHERENCE] Skipped duplicate: ${claim.filename}`);
+          continue;
+        }
+        const commitMsg = `daemon: ${claim.id} — ${domain.name} [${IDENTITY.version}]`;
+        const sha = await githubApiPut(ghPath, claim.content, commitMsg);
         const hash = crypto.createHash('sha256').update(claim.content).digest('hex').slice(0, 12);
         auditWrite(`[32/INTEGRITY] Wrote claim: ${claim.filename} (SHA-256: ${hash}...)`);
+        auditWrite(`[23/CAUSALITY] Committed: ${sha.slice(0, 8)} — ${commitMsg}`);
         claimsWritten++;
-      } else {
-        auditWrite(`[20/COHERENCE] Skipped duplicate: ${claim.filename}`);
+      } catch (e) {
+        auditWrite(`[32/INTEGRITY] Failed to write claim ${claim.id}: ${e.message}`);
       }
     }
   }
 
   if (results.sources) {
     for (const source of results.sources) {
-      const filepath = path.join(CONFIG.sourcesDir, source.filename);
-      if (!fs.existsSync(filepath)) {
-        fs.writeFileSync(filepath, source.content);
+      try {
+        const ghPath = `sources/tier-1/${source.filename}`;
+        const existing = await githubApiGet(ghPath);
+        if (existing) {
+          auditWrite(`[20/COHERENCE] Skipped duplicate: ${source.filename}`);
+          continue;
+        }
+        const commitMsg = `daemon: ${source.id} — source for ${domain.name} [${IDENTITY.version}]`;
+        const sha = await githubApiPut(ghPath, source.content, commitMsg);
         const hash = crypto.createHash('sha256').update(source.content).digest('hex').slice(0, 12);
         auditWrite(`[32/INTEGRITY] Wrote source: ${source.filename} (SHA-256: ${hash}...)`);
+        auditWrite(`[23/CAUSALITY] Committed: ${sha.slice(0, 8)} — ${commitMsg}`);
         sourcesWritten++;
-      } else {
-        auditWrite(`[20/COHERENCE] Skipped duplicate: ${source.filename}`);
+      } catch (e) {
+        auditWrite(`[32/INTEGRITY] Failed to write source ${source.id}: ${e.message}`);
       }
     }
   }
 
   return { claimsWritten, sourcesWritten };
-}
-
-// [23] CAUSALITY ENGINE — Git as cryptographic causal chain
-function gitCommitAndPush(domain, claimsWritten, sourcesWritten) {
-  try {
-    execSync('git add -A', { cwd: REPO_ROOT, stdio: 'pipe' });
-    const status = execSync('git status --porcelain', { cwd: REPO_ROOT, encoding: 'utf-8' }).trim();
-    if (!status) {
-      auditWrite('[23/CAUSALITY] No changes to commit.');
-      return false;
-    }
-    const msg = `daemon: ${domain.name} — ${claimsWritten} claims, ${sourcesWritten} sources [${IDENTITY.version}]`;
-    execSync(`git commit -m "${msg}"`, { cwd: REPO_ROOT, stdio: 'pipe' });
-    execSync('git push', { cwd: REPO_ROOT, stdio: 'pipe' });
-    const sha = execSync('git rev-parse HEAD', { cwd: REPO_ROOT, encoding: 'utf-8' }).trim();
-    auditWrite(`[23/CAUSALITY] Committed: ${sha.slice(0, 8)} — ${msg}`);
-    return true;
-  } catch (e) {
-    auditWrite(`[23/CAUSALITY] Git operation failed: ${e.message}`);
-    return false;
-  }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -504,7 +547,7 @@ async function runCycle(client, state, budget, method) {
   state.methodHash = currentMethodHash;
 
   // [20] Coherence — scan current archive state
-  const scan = scanArchive();
+  const scan = await scanArchive();
 
   try {
     // [14] Determinacy — generate claims with full constraint context
@@ -521,13 +564,8 @@ async function runCycle(client, state, budget, method) {
     // [31] Verification — validate generated content
     validateResults(data);
 
-    // [32] Integrity — write files with SHA-256 logging
-    const { claimsWritten, sourcesWritten } = writeResults(data);
-
-    // [23] Causality — commit to cryptographic chain
-    if (claimsWritten > 0 || sourcesWritten > 0) {
-      gitCommitAndPush(domain, claimsWritten, sourcesWritten);
-    }
+    // [32] Integrity + [23] Causality — write to GitHub API with SHA-256 logging
+    const { claimsWritten, sourcesWritten } = await writeResults(data, domain);
 
     // [22] Continuity — update state
     state.totalClaims += claimsWritten;
@@ -569,6 +607,11 @@ async function main() {
     process.exit(1);
   }
 
+  if (!CONFIG.githubToken) {
+    auditWrite('[42/DEVOID] GITHUB_TOKEN not set. Cannot write to repo. HALT.');
+    process.exit(1);
+  }
+
   // [02] Boundary — load the law
   const method = loadMethod();
   const client = new OpenAI({ apiKey: CONFIG.openaiApiKey });
@@ -581,17 +624,16 @@ async function main() {
   auditWrite(`[03/DIFFERENTIATION] Queue: ${DOMAIN_QUEUE.length} domains, position ${state.queuePosition}`);
   auditWrite(`[16/DOMAIN] Next: ${DOMAIN_QUEUE[state.queuePosition % DOMAIN_QUEUE.length].name}`);
 
-  // Ensure directories exist
-  [CONFIG.claimsDir, CONFIG.sourcesDir, CONFIG.digsDir].forEach(d => {
-    if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true });
-  });
-
-  // Configure git identity for daemon commits
+  // Verify GitHub API access
   try {
-    execSync('git config user.email "daemon@truth.tlid.io"', { cwd: REPO_ROOT, stdio: 'pipe' });
-    execSync('git config user.name "Truth Research Daemon"', { cwd: REPO_ROOT, stdio: 'pipe' });
+    const repo = await fetch(`https://api.github.com/repos/${CONFIG.githubOwner}/${CONFIG.githubRepo}`, {
+      headers: { 'Authorization': `token ${CONFIG.githubToken}` },
+    });
+    if (!repo.ok) throw new Error(`Status ${repo.status}`);
+    auditWrite(`[23/CAUSALITY] GitHub API verified: ${CONFIG.githubOwner}/${CONFIG.githubRepo}`);
   } catch (e) {
-    auditWrite(`[23/CAUSALITY] Git config warning: ${e.message}`);
+    auditWrite(`[42/DEVOID] GitHub API access failed: ${e.message}. HALT.`);
+    process.exit(1);
   }
 
   // Start health server
