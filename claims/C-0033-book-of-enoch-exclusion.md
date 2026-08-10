@@ -1,5 +1,6 @@
 ---
 title: "Exclusion of the Book of Enoch from Biblical Canon"
+domain: Ancient Texts
 status: "SUPPRESSED-IF-TRUE"
 sources: ["S-0050", "S-0051"]
 objections: "The Ethiopian Orthodox Church includes the Book of Enoch in its biblical canon, suggesting that its exclusion by other traditions is not universal."
