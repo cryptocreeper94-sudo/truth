@@ -1,5 +1,6 @@
 ---
 title: "Bank of England Charter (1694)"
+domain: Financial Origins
 date: 2023-10-05
 claim: "The 1694 charter of the Bank of England established it as the first privately owned central bank."
 sources:
