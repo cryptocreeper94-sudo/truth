@@ -1,5 +1,6 @@
 ---
 title: "Global Distribution of Star Forts"
+domain: Star Forts
 status: DOCUMENTED
 sources: ["S-0043", "S-0044"]
 objections: "The global spread of star forts can be explained through colonial expansion, military strategy dissemination, and architectural influence rather than a singular civilizational blueprint."
