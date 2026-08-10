@@ -1,5 +1,6 @@
 ---
 title: "Elongated Skulls of Malta"
+domain: Archaeology
 confidence: DOCUMENTED
 description: "Discovery of elongated skulls in Malta with atypical features."
 sources:
