@@ -1,5 +1,6 @@
 ---
 title: "St. Louis Fair Architectural Style Consistency"
+domain: World Fairs
 summary: "The architectural style of the 1904 St. Louis World's Fair exhibits a consistency that suggests a uniform design directive."
 status: "DOCUMENTED"
 sources: ["S-0126", "S-0127"]
