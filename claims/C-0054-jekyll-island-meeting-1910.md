@@ -1,5 +1,6 @@
 ---
 title: "Jekyll Island Meeting (1910)"
+domain: Financial Origins
 date: 2023-10-05
 claim: "The secret meeting on Jekyll Island in 1910 laid the foundation for the creation of the Federal Reserve System."
 sources:
