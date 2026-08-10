@@ -457,28 +457,84 @@ body {
   display: block;
 }
 
-/* ═══ Domain Grid ═══ */
-.domain-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 1px; background: var(--border);
+/* ═══ Tier Accordion ═══ */
+.tier-accordion {
   border: 1px solid var(--border);
   margin-bottom: 40px;
 }
-.domain-card {
-  background: var(--bg-primary); padding: 24px 20px;
-  text-decoration: none; color: inherit;
-  transition: all 0.2s; display: flex; flex-direction: column; gap: 6px;
+.tier-section {
+  border-bottom: 1px solid var(--border);
 }
-.domain-card:hover { background: var(--bg-secondary); }
-.domain-icon { font-size: 1.5rem; }
-.domain-name {
-  font-family: var(--font-heading); font-weight: 700;
-  font-size: 0.82rem; letter-spacing: -0.01em;
-  color: var(--text-primary);
+.tier-section:last-child { border-bottom: none; }
+.tier-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 24px; cursor: pointer;
+  background: var(--bg-primary);
+  transition: background 0.2s;
 }
-.domain-count {
+.tier-header:hover { background: var(--bg-secondary); }
+.tier-header-left {
+  display: flex; align-items: center; gap: 16px;
+}
+.tier-numeral {
+  font-family: var(--font-heading); font-weight: 900;
+  font-size: 1.1rem; color: var(--brass);
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  border: 2px solid var(--brass);
+  flex-shrink: 0; letter-spacing: -0.02em;
+}
+.tier-title {
+  font-family: var(--font-heading); font-weight: 800;
+  font-size: 0.85rem; text-transform: uppercase;
+  letter-spacing: 0.04em; color: var(--text-primary);
+  display: block;
+}
+.tier-desc {
   font-family: var(--font-mono); font-size: 10px;
-  color: var(--text-dim); letter-spacing: 0.05em;
+  color: var(--text-dim); letter-spacing: 0.04em;
+  display: block; margin-top: 2px;
+}
+.tier-header-right {
+  display: flex; align-items: center; gap: 12px;
+}
+.tier-claim-total {
+  font-family: var(--font-mono); font-size: 10px;
+  color: var(--text-muted); letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.tier-chevron {
+  font-size: 10px; color: var(--text-dim);
+  transition: transform 0.3s;
+}
+.tier-section:not(.tier-open) .tier-chevron { transform: rotate(-90deg); }
+.tier-body {
+  max-height: 0; overflow: hidden;
+  transition: max-height 0.35s ease;
+  background: var(--bg-secondary);
+}
+.tier-section.tier-open .tier-body { max-height: 600px; }
+.tier-domain-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 24px 14px 76px;
+  text-decoration: none; color: inherit;
+  border-top: 1px solid var(--border);
+  transition: all 0.15s;
+}
+.tier-domain-row:hover {
+  background: var(--bg-tertiary);
+  padding-left: 80px;
+}
+.tier-domain-name {
+  font-family: var(--font-body); font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+.tier-domain-row:hover .tier-domain-name { color: var(--brass); }
+.tier-domain-count {
+  font-family: var(--font-mono); font-size: 11px;
+  color: var(--text-dim); letter-spacing: 0.06em;
+  background: var(--bg-primary);
+  padding: 3px 10px; min-width: 24px; text-align: center;
 }
 
 /* ═══ Domain Tag ═══ */
@@ -681,15 +737,15 @@ body {
   /* Compliance warning */
   .compliance-warning { padding: 16px; font-size: 0.85rem; }
 
-  /* Domain grid */
-  .domain-grid { grid-template-columns: repeat(2, 1fr); }
-  .domain-card { padding: 16px 14px; }
-  .domain-icon { font-size: 1.2rem; }
-  .domain-name { font-size: 0.75rem; }
-
-  /* Domain filter bar */
-  .domain-filter-bar { gap: 4px; }
-  .domain-filter-btn { font-size: 8px !important; padding: 5px 8px !important; }
+  /* Tier accordion */
+  .tier-header { padding: 16px 14px; }
+  .tier-numeral { width: 28px; height: 28px; font-size: 0.85rem; }
+  .tier-title { font-size: 0.75rem; }
+  .tier-desc { display: none; }
+  .tier-domain-row { padding: 12px 14px 12px 58px; }
+  .tier-domain-row:hover { padding-left: 62px; }
+  .tier-domain-name { font-size: 0.82rem; }
+  .tier-claim-total { font-size: 9px; }
 
   /* Breadcrumb */
   .breadcrumb { font-size: 10px; }

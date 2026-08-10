@@ -203,16 +203,13 @@ function tierBadge(tier, open = true) {
 }
 
 // ── Domain Helpers ──
-const DOMAIN_ICONS = {
-  'Cartography': '🗺️', 'Biblical Lineage': '📜', 'Biblical Texts': '📖',
-  'Intelligence Programs': '🔍', 'Orphan History': '👤', 'Buried Cities': '🏛️',
-  'Institutional Origins': '🏢', 'Ancient Engineering': '⚙️', 'Archaeology': '🦴',
-  'Flood Narratives': '🌊', 'Calendar Systems': '📅', 'Financial Origins': '💰',
-  'Education Design': '🎓', 'Star Forts': '⭐', 'Reset Evidence': '🔄',
-  'Suppressed Finds': '🔎', 'Ancient Texts': '📕', 'Etymology': '🔤',
-  'World Fairs': '🏗️', 'Land History': '📋', 'Media Control': '📺',
-  'Tartary': '🏰', 'Uncategorized': '📄'
-};
+const DOMAIN_TIERS = [
+  { tier: 'I', name: 'Foundation', desc: 'Heaviest Tier-1 material — primary sources, physical objects', domains: ['Biblical Lineage', 'Biblical Texts', 'Calendar Systems', 'Cartography', 'Financial Origins'] },
+  { tier: 'II', name: 'Institutional', desc: 'Government records, charter documents, declassified files', domains: ['Intelligence Programs', 'Institutional Origins', 'Education Design'] },
+  { tier: 'III', name: 'Physical Evidence', desc: 'Archaeological surveys, engineering analysis, site documentation', domains: ['Ancient Engineering', 'Buried Cities', 'Star Forts', 'Archaeology'] },
+  { tier: 'IV', name: 'Civilization Patterns', desc: 'Census records, construction timelines, institutional archives', domains: ['Orphan History', 'World Fairs', 'Reset Evidence'] },
+  { tier: 'V', name: 'Deep Chronology', desc: 'Suppressed texts, flood traditions, out-of-place artifacts', domains: ['Suppressed Finds', 'Ancient Texts', 'Flood Narratives', 'Etymology'] },
+];
 
 function getDomains() {
   const domainMap = {};
@@ -222,7 +219,7 @@ function getDomains() {
     domainMap[d].push(c);
   });
   return Object.entries(domainMap)
-    .map(([name, claims]) => ({ name, claims, count: claims.length, icon: DOMAIN_ICONS[name] || '📄' }))
+    .map(([name, claims]) => ({ name, claims, count: claims.length }))
     .sort((a, b) => b.count - a.count);
 }
 
@@ -234,14 +231,69 @@ function renderHome() {
   const linkCount = archive.links.length;
   const documented = archive.claims.filter(c => c.meta.confidence === 'DOCUMENTED').length;
   const domains = getDomains();
+  const domainLookup = Object.fromEntries(domains.map(d => [d.name, d]));
 
-  const domainCards = domains.map(d => `
-    <a href="#/claims?domain=${encodeURIComponent(d.name)}" class="domain-card">
-      <span class="domain-icon">${d.icon}</span>
-      <span class="domain-name">${d.name}</span>
-      <span class="domain-count">${d.count} claim${d.count !== 1 ? 's' : ''}</span>
-    </a>
-  `).join('');
+  // Build tiered accordion
+  const tierAccordion = DOMAIN_TIERS.map((t, i) => {
+    const tierDomains = t.domains
+      .map(name => domainLookup[name])
+      .filter(Boolean)
+      .sort((a, b) => b.count - a.count);
+    if (tierDomains.length === 0) return '';
+    const tierTotal = tierDomains.reduce((sum, d) => sum + d.count, 0);
+    const domainRows = tierDomains.map(d => `
+      <a href="#/claims?domain=${encodeURIComponent(d.name)}" class="tier-domain-row">
+        <span class="tier-domain-name">${d.name}</span>
+        <span class="tier-domain-count">${d.count}</span>
+      </a>
+    `).join('');
+    // Also collect uncategorized domains not in any tier
+    return `
+      <div class="tier-section${i === 0 ? ' tier-open' : ''}" data-tier="${t.tier}">
+        <div class="tier-header" onclick="this.parentElement.classList.toggle('tier-open')">
+          <div class="tier-header-left">
+            <span class="tier-numeral">${t.tier}</span>
+            <div>
+              <span class="tier-title">${t.name}</span>
+              <span class="tier-desc">${t.desc}</span>
+            </div>
+          </div>
+          <div class="tier-header-right">
+            <span class="tier-claim-total">${tierTotal} claims</span>
+            <span class="tier-chevron">▼</span>
+          </div>
+        </div>
+        <div class="tier-body">${domainRows}</div>
+      </div>
+    `;
+  }).join('');
+
+  // Uncategorized domains (not in any tier)
+  const tieredNames = DOMAIN_TIERS.flatMap(t => t.domains);
+  const uncategorized = domains.filter(d => !tieredNames.includes(d.name) && d.name !== 'Uncategorized');
+  const uncatSection = uncategorized.length > 0 ? `
+    <div class="tier-section" data-tier="?">
+      <div class="tier-header" onclick="this.parentElement.classList.toggle('tier-open')">
+        <div class="tier-header-left">
+          <span class="tier-numeral">?</span>
+          <div>
+            <span class="tier-title">Other</span>
+            <span class="tier-desc">Domains not yet classified into a research tier</span>
+          </div>
+        </div>
+        <div class="tier-header-right">
+          <span class="tier-claim-total">${uncategorized.reduce((s, d) => s + d.count, 0)} claims</span>
+          <span class="tier-chevron">▼</span>
+        </div>
+      </div>
+      <div class="tier-body">${uncategorized.map(d => `
+        <a href="#/claims?domain=${encodeURIComponent(d.name)}" class="tier-domain-row">
+          <span class="tier-domain-name">${d.name}</span>
+          <span class="tier-domain-count">${d.count}</span>
+        </a>
+      `).join('')}</div>
+    </div>
+  ` : '';
 
   return `
     <div class="page">
@@ -271,10 +323,13 @@ function renderHome() {
       </div>
 
       <div class="section-header" style="margin-top:40px;">
-        <h2>Research Domains</h2>
-        <p class="section-sub">Browse claims by topic. Each domain is a distinct area of investigation.</p>
+        <h2>Investigation Index</h2>
+        <p class="section-sub">Research domains organized by source-material density. Tier I carries the heaviest physical evidence.</p>
       </div>
-      <div class="domain-grid">${domainCards}</div>
+      <div class="tier-accordion">
+        ${tierAccordion}
+        ${uncatSection}
+      </div>
 
       <div class="iron-rules">
         <h2>The Three Iron Rules</h2>
@@ -338,7 +393,7 @@ function renderClaimsIndex() {
   `).join('');
 
   const domainBtns = domains.map(d => `
-    <button class="filter-btn domain-filter-btn${activeDomain === d.name ? ' active' : ''}" data-domain="${d.name}">${d.icon} ${d.name} (${d.count})</button>
+    <button class="filter-btn domain-filter-btn${activeDomain === d.name ? ' active' : ''}" data-domain="${d.name}">${d.name} (${d.count})</button>
   `).join('');
 
   return `
