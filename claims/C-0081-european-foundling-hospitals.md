@@ -1,5 +1,6 @@
 ---
 title: "European Foundling Hospitals Documentation"
+domain: Orphan History
 summary: "Claim regarding the existence and operational records of foundling hospitals across Europe during the 18th and 19th centuries."
 tags: ["foundling hospitals", "Europe", "historical documentation"]
 confidence: "DOCUMENTED"
