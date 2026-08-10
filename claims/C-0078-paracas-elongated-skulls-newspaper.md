@@ -1,5 +1,6 @@
 ---
 title: "Paracas Elongated Skulls Newspaper Reports"
+domain: Archaeology
 status: "DOCUMENTED"
 tags: [elongated skulls, Paracas, newspaper reports]
 ---
