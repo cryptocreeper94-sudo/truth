@@ -1,5 +1,6 @@
 ---
 title: "CAS Orphan Train Records"
+domain: Orphan History
 summary: "Claim regarding the completeness and existence of Children's Aid Society (CAS) records for the Orphan Train Movement between 1854 and 1929."
 tags: ["orphan trains", "Children's Aid Society", "historical records"]
 confidence: "DOCUMENTED"
