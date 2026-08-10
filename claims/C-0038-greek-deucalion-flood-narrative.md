@@ -1,5 +1,6 @@
 ---
 title: "Greek Deucalion Flood Narrative"
+domain: Flood Narratives
 confidence: DOCUMENTED
 sources: ["S-0058"]
 objections: "The Greek flood story is sometimes seen as derivative of Near Eastern narratives, potentially influenced by cultural exchanges rather than independent origin."
