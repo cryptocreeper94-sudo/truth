@@ -457,6 +457,70 @@ body {
   display: block;
 }
 
+/* ═══ Domain Grid ═══ */
+.domain-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1px; background: var(--border);
+  border: 1px solid var(--border);
+  margin-bottom: 40px;
+}
+.domain-card {
+  background: var(--bg-primary); padding: 24px 20px;
+  text-decoration: none; color: inherit;
+  transition: all 0.2s; display: flex; flex-direction: column; gap: 6px;
+}
+.domain-card:hover { background: var(--bg-secondary); }
+.domain-icon { font-size: 1.5rem; }
+.domain-name {
+  font-family: var(--font-heading); font-weight: 700;
+  font-size: 0.82rem; letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+.domain-count {
+  font-family: var(--font-mono); font-size: 10px;
+  color: var(--text-dim); letter-spacing: 0.05em;
+}
+
+/* ═══ Domain Tag ═══ */
+.domain-tag {
+  font-family: var(--font-mono); font-size: 9px; font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--brass); background: var(--brass-dim);
+  padding: 3px 8px; border-radius: 2px;
+  text-transform: uppercase;
+}
+
+/* ═══ Domain Filter Bar ═══ */
+.domain-filter-bar {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  margin-bottom: 8px; padding: 12px 0;
+}
+.domain-filter-btn {
+  font-size: 10px !important; letter-spacing: 0.04em !important;
+  padding: 6px 12px !important;
+  border: 1px solid var(--border) !important;
+  background: var(--bg-primary) !important;
+  cursor: pointer;
+}
+.domain-filter-btn:hover { background: var(--bg-secondary) !important; }
+.domain-filter-btn.active {
+  background: var(--bg-tertiary) !important;
+  border-color: var(--brass) !important;
+  color: var(--brass) !important;
+}
+
+/* ═══ Breadcrumb ═══ */
+.breadcrumb {
+  font-family: var(--font-mono); font-size: 11px;
+  color: var(--text-dim); letter-spacing: 0.04em;
+  margin-bottom: 16px; padding-top: 8px;
+}
+.breadcrumb a {
+  color: var(--text-secondary); text-decoration: none;
+  transition: color 0.15s;
+}
+.breadcrumb a:hover { color: var(--brass); }
+
 /* ═══ Footer ═══ */
 .site-footer {
   border-top: 1px solid var(--border);
@@ -581,4 +645,20 @@ body {
 
   /* Compliance warning */
   .compliance-warning { padding: 16px; font-size: 0.85rem; }
+
+  /* Domain grid */
+  .domain-grid { grid-template-columns: repeat(2, 1fr); }
+  .domain-card { padding: 16px 14px; }
+  .domain-icon { font-size: 1.2rem; }
+  .domain-name { font-size: 0.75rem; }
+
+  /* Domain filter bar */
+  .domain-filter-bar { gap: 4px; }
+  .domain-filter-btn { font-size: 8px !important; padding: 5px 8px !important; }
+
+  /* Breadcrumb */
+  .breadcrumb { font-size: 10px; }
+
+  /* Domain tag */
+  .domain-tag { font-size: 7px; }
 }

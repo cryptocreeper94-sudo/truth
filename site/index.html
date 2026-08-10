@@ -202,6 +202,30 @@ function tierBadge(tier, open = true) {
   return `<span class="tier-badge ${open ? '' : 'tier-badge-closed'}">Tier ${tier}</span>`;
 }
 
+// ── Domain Helpers ──
+const DOMAIN_ICONS = {
+  'Cartography': '🗺️', 'Biblical Lineage': '📜', 'Biblical Texts': '📖',
+  'Intelligence Programs': '🔍', 'Orphan History': '👤', 'Buried Cities': '🏛️',
+  'Institutional Origins': '🏢', 'Ancient Engineering': '⚙️', 'Archaeology': '🦴',
+  'Flood Narratives': '🌊', 'Calendar Systems': '📅', 'Financial Origins': '💰',
+  'Education Design': '🎓', 'Star Forts': '⭐', 'Reset Evidence': '🔄',
+  'Suppressed Finds': '🔎', 'Ancient Texts': '📕', 'Etymology': '🔤',
+  'World Fairs': '🏗️', 'Land History': '📋', 'Media Control': '📺',
+  'Tartary': '🏰', 'Uncategorized': '📄'
+};
+
+function getDomains() {
+  const domainMap = {};
+  archive.claims.forEach(c => {
+    const d = c.meta.domain || 'Uncategorized';
+    if (!domainMap[d]) domainMap[d] = [];
+    domainMap[d].push(c);
+  });
+  return Object.entries(domainMap)
+    .map(([name, claims]) => ({ name, claims, count: claims.length, icon: DOMAIN_ICONS[name] || '📄' }))
+    .sort((a, b) => b.count - a.count);
+}
+
 // ── Page Renderers ──
 function renderHome() {
   const claimCount = archive.claims.length;
@@ -209,6 +233,15 @@ function renderHome() {
   const digCount = archive.digs.length;
   const linkCount = archive.links.length;
   const documented = archive.claims.filter(c => c.meta.confidence === 'DOCUMENTED').length;
+  const domains = getDomains();
+
+  const domainCards = domains.map(d => `
+    <a href="#/claims?domain=${encodeURIComponent(d.name)}" class="domain-card">
+      <span class="domain-icon">${d.icon}</span>
+      <span class="domain-name">${d.name}</span>
+      <span class="domain-count">${d.count} claim${d.count !== 1 ? 's' : ''}</span>
+    </a>
+  `).join('');
 
   return `
     <div class="page">
@@ -237,6 +270,12 @@ function renderHome() {
         </div>
       </div>
 
+      <div class="section-header" style="margin-top:40px;">
+        <h2>Research Domains</h2>
+        <p class="section-sub">Browse claims by topic. Each domain is a distinct area of investigation.</p>
+      </div>
+      <div class="domain-grid">${domainCards}</div>
+
       <div class="iron-rules">
         <h2>The Three Iron Rules</h2>
         <ol>
@@ -248,7 +287,7 @@ function renderHome() {
 
       <div class="nav-grid">
         <a href="#/claims" class="nav-grid-item">
-          <span class="entry-title">Claims</span>
+          <span class="entry-title">All Claims</span>
           <span class="entry-sub">${claimCount} filed · ${documented} documented</span>
         </a>
         <a href="#/sources" class="nav-grid-item">
@@ -277,20 +316,39 @@ function renderHome() {
 }
 
 function renderClaimsIndex() {
-  let cards = archive.claims.map(c => `
-    <a href="#/claims/${c.meta.id}" class="entry-card">
+  // Parse domain from URL query
+  const hashParts = location.hash.split('?');
+  const params = new URLSearchParams(hashParts[1] || '');
+  const activeDomain = params.get('domain') ? decodeURIComponent(params.get('domain')) : null;
+
+  const domains = getDomains();
+  const filteredClaims = activeDomain
+    ? archive.claims.filter(c => (c.meta.domain || 'Uncategorized') === activeDomain)
+    : archive.claims;
+
+  let cards = filteredClaims.map(c => `
+    <a href="#/claims/${c.meta.id}" class="entry-card" data-domain="${c.meta.domain || 'Uncategorized'}">
       <span class="entry-id">${c.meta.id || '—'}</span>
       <span class="entry-title">${c.meta.title || c.filename}</span>
-      <span class="entry-meta">${confidenceTag(c.meta.confidence)}</span>
+      <span class="entry-meta">
+        ${c.meta.domain ? `<span class="domain-tag">${c.meta.domain}</span>` : ''}
+        ${confidenceTag(c.meta.confidence)}
+      </span>
     </a>
+  `).join('');
+
+  const domainBtns = domains.map(d => `
+    <button class="filter-btn domain-filter-btn${activeDomain === d.name ? ' active' : ''}" data-domain="${d.name}">${d.icon} ${d.name} (${d.count})</button>
   `).join('');
 
   return `
     <div class="page">
       <div class="section-header">
-        <h1>Claims</h1>
-        <p class="section-sub">Every claim carries a confidence tag. No exceptions.</p>
+        <h1>${activeDomain || 'All Claims'}</h1>
+        <p class="section-sub">${activeDomain ? `${filteredClaims.length} claims in this domain` : 'Every claim carries a confidence tag. No exceptions.'}</p>
+        ${activeDomain ? '<a href="#/claims" style="font-size:12px;color:var(--brass);font-family:var(--font-mono);letter-spacing:0.05em;">← All Claims</a>' : ''}
       </div>
+      ${!activeDomain ? `<div class="domain-filter-bar">${domainBtns}</div>` : ''}
       <div class="filter-bar">
         <button class="filter-btn active" data-filter="all">All</button>
         <button class="filter-btn" data-filter="DOCUMENTED">Documented</button>
@@ -314,12 +372,26 @@ function renderClaimDetail(id) {
 
   const linkedDig = claim.meta.dig ? `<a class="ref-link" href="#/digs/${claim.meta.dig.replace('digs/','').replace('.md','')}">${claim.meta.dig}</a>` : '';
 
+  // Related claims
+  const relatedClaims = (claim.meta.related || []).map(rid => {
+    const rc = archive.claims.find(c => c.meta.id === rid);
+    return rc ? `<a class="ref-link" href="#/claims/${rid}">${rid}: ${rc.meta.title || rid}</a>` : `<span class="ref-link">${rid}</span>`;
+  }).join('');
+
+  // Domain breadcrumb
+  const domain = claim.meta.domain;
+  const breadcrumb = domain
+    ? `<div class="breadcrumb"><a href="#/claims">Claims</a> → <a href="#/claims?domain=${encodeURIComponent(domain)}">${domain}</a> → ${claim.meta.id}</div>`
+    : `<div class="breadcrumb"><a href="#/claims">Claims</a> → ${claim.meta.id}</div>`;
+
   return `
     <div class="page">
+      ${breadcrumb}
       <div class="section-header">
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;flex-wrap:wrap;">
           <span class="entry-id" style="font-size:13px;">${claim.meta.id}</span>
           ${confidenceTag(claim.meta.confidence)}
+          ${domain ? `<span class="domain-tag">${domain}</span>` : ''}
           <span style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;">Status: ${claim.meta.status || 'active'}</span>
         </div>
         <h1 style="text-transform:none;letter-spacing:0;">${claim.meta.title}</h1>
@@ -331,6 +403,7 @@ function renderClaimDetail(id) {
         </div>
         <div class="detail-sidebar">
           ${linkedSources ? `<div class="sidebar-card"><h4>Sources</h4>${linkedSources}</div>` : ''}
+          ${relatedClaims ? `<div class="sidebar-card"><h4>Related Claims</h4>${relatedClaims}</div>` : ''}
           ${linkedDig ? `<div class="sidebar-card"><h4>Dig Site</h4>${linkedDig}</div>` : ''}
           <div class="sidebar-card">
             <h4>Confidence</h4>
@@ -604,7 +677,8 @@ function submitDiscussion(type, id) {
 // ── Router ──
 function route() {
   const hash = window.location.hash || '#/';
-  const parts = hash.slice(2).split('/');
+  const hashBase = hash.split('?')[0];
+  const parts = hashBase.slice(2).split('/');
   const section = parts[0] || '';
   const detail = parts.slice(1).join('/');
 
@@ -642,9 +716,10 @@ function route() {
 }
 
 function bindFilters() {
-  document.querySelectorAll('.filter-btn').forEach(btn => {
+  // Confidence filters
+  document.querySelectorAll('.filter-bar .filter-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.filter-bar .filter-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       const filter = btn.dataset.filter;
       document.querySelectorAll('#claims-list .entry-card').forEach(card => {
@@ -652,6 +727,13 @@ function bindFilters() {
         const tag = card.querySelector('.tag');
         card.style.display = tag && tag.textContent.trim() === filter ? '' : 'none';
       });
+    });
+  });
+
+  // Domain filters — navigate via hash
+  document.querySelectorAll('.domain-filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      location.hash = `#/claims?domain=${encodeURIComponent(btn.dataset.domain)}`;
     });
   });
 }
