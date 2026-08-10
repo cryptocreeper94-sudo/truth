@@ -550,11 +550,10 @@ body {
 }
 .tier-section:not(.tier-open) .tier-chevron { transform: rotate(-90deg); }
 .tier-body {
-  max-height: 0; overflow: hidden;
-  transition: max-height 0.35s ease;
+  display: none;
   background: var(--bg-secondary);
 }
-.tier-section.tier-open .tier-body { max-height: 600px; }
+.tier-section.tier-open .tier-body { display: block; }
 .tier-domain-row {
   display: flex; align-items: center; justify-content: space-between;
   padding: 14px 24px 14px 76px;
