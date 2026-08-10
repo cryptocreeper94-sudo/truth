@@ -1,5 +1,6 @@
 ---
 title: "Impact of GEB Occasional Letter No. 1 on Education Reform"
+domain: Intelligence Programs
 summary: "The GEB Occasional Letter No. 1 (1906) significantly influenced early 20th-century educational reforms."
 sources:
   - S-0096
