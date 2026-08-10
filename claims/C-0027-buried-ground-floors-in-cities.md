@@ -1,5 +1,6 @@
 ---
 title: "Buried Ground Floors in Historical City Structures"
+domain: Buried Cities
 status: DOCUMENTED
 sources: ["S-0039", "S-0040"]
 objections: "Some historians argue that buried ground floors result from gradual street level rises due to sediment deposit and urban construction waste over centuries."
