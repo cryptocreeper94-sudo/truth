@@ -5,7 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TRUTH — Provenance-First Evidence Archive</title>
   <meta name="description" content="A provenance-first archive of historical claims, the sources behind them, and the documented gaps between them. Companion to Invariant — The Lying Pen.">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚖️</text></svg>">
+  <link rel="icon" href="/img/icon-512.png" type="image/png">
+  <link rel="apple-touch-icon" href="/img/icon-512.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#050505">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="TRUTH">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Inter:wght@400;500;600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -148,14 +154,14 @@ function md(text) {
 
 // ── Fetch helpers ──
 async function fetchText(url) {
-  const r = await fetch(url);
+  const r = await fetch(url, { cache: 'no-store' });
   if (!r.ok) return '';
   return r.text();
 }
 
 async function fetchDir(path) {
   try {
-    const r = await fetch(`${REPO_API}/${path}`);
+    const r = await fetch(`${REPO_API}/${path}`, { cache: 'no-store' });
     if (!r.ok) return [];
     const data = await r.json();
     return data.filter(f => f.name.endsWith('.md') && f.name !== 'TEMPLATE.md');
@@ -851,6 +857,10 @@ loadArchive().then(() => {
   route();
   initKenBurns();
   initAdminGate();
+  // Register service worker for PWA
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  }
 }).catch(err => {
   document.getElementById('app').innerHTML = `<div class="page"><p style="color:var(--oxblood);">Failed to load archive: ${err.message}</p></div>`;
 });

@@ -1,0 +1,27 @@
+{
+  "name": "TRUTH — Provenance-First Evidence Archive",
+  "short_name": "TRUTH",
+  "description": "A provenance-first archive of historical claims, the sources behind them, and the documented gaps between them.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "theme_color": "#050505",
+  "background_color": "#050505",
+  "icons": [
+    {
+      "src": "/img/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/img/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["education", "news", "reference"],
+  "lang": "en",
+  "dir": "ltr"
+}
