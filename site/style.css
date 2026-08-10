@@ -749,7 +749,7 @@ body {
   .detail-layout { grid-template-columns: 1fr; }
   .detail-sidebar { position: static; }
   .nav-inner { height: auto; padding: 8px 16px; flex-wrap: wrap; gap: 4px; }
-  .nav-links a { padding: 6px 10px; font-size: 9px; }
+  .nav-links a { padding: 10px 10px; font-size: 10px; }
   .document { padding: 32px 20px; }
   .hero { padding: 100px 16px 60px; }
   .iron-rules { padding: 28px 20px; }
@@ -763,15 +763,23 @@ body {
 
 /* Mobile */
 @media (max-width: 520px) {
-  /* Nav */
+  /* Nav — single compact row, horizontally scrollable links, thumb-sized targets */
   .nav-inner {
-    flex-direction: column;
+    flex-direction: row;
+    align-items: center;
     gap: 8px;
-    padding: 12px 16px;
+    padding: 8px 12px;
   }
-  .nav-links { flex-wrap: wrap; justify-content: center; gap: 2px; }
-  .nav-links a { padding: 6px 8px; font-size: 8px; }
-  .nav-brand { font-size: 14px; }
+  .nav-links {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 0;
+  }
+  .nav-links::-webkit-scrollbar { display: none; }
+  .nav-links a { padding: 12px 10px; font-size: 10px; white-space: nowrap; }
+  .nav-brand { font-size: 14px; flex-shrink: 0; }
 
   /* Hero */
   .hero { padding: 80px 16px 40px; }
@@ -796,7 +804,7 @@ body {
     padding: 8px 10px;
     min-width: 80px;
   }
-  .document th { font-size: 8px; }
+  .document th { font-size: 10px; }
 
   /* Stats */
   .stats-row { grid-template-columns: 1fr 1fr; gap: 1px; }
@@ -813,8 +821,8 @@ body {
   .filter-bar { flex-wrap: wrap; }
   .filter-btn {
     flex: 1 1 45%;
-    padding: 8px 12px;
-    font-size: 8px;
+    padding: 12px;
+    font-size: 10px;
     border-bottom: 1px solid var(--border);
   }
 
@@ -839,16 +847,16 @@ body {
   .tier-numeral { width: 28px; height: 28px; font-size: 0.85rem; }
   .tier-title { font-size: 0.75rem; }
   .tier-desc { display: none; }
-  .tier-domain-row { padding: 12px 14px 12px 58px; }
-  .tier-domain-row:hover { padding-left: 62px; }
+  .tier-domain-row { padding: 14px 14px 14px 58px; min-height: 44px; }
+  .tier-domain-row:hover { padding-left: 58px; }
   .tier-domain-name { font-size: 0.82rem; }
-  .tier-claim-total { font-size: 9px; }
+  .tier-claim-total { font-size: 10px; }
 
   /* Breadcrumb */
   .breadcrumb { font-size: 10px; }
 
   /* Domain tag */
-  .domain-tag { font-size: 7px; }
+  .domain-tag { font-size: 9px; letter-spacing: 0.08em; }
 
   /* Hero */
   .hero { height: 50vh; min-height: 320px; }
