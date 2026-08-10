@@ -521,6 +521,41 @@ body {
 }
 .breadcrumb a:hover { color: var(--brass); }
 
+/* ═══ Evidence Preview ═══ */
+.evidence-preview {
+  display: block; text-decoration: none;
+  border: 1px solid var(--border);
+  overflow: hidden; transition: border-color 0.2s;
+}
+.evidence-preview:hover { border-color: var(--brass); }
+.evidence-preview img {
+  width: 100%; height: auto; display: block;
+  filter: sepia(0.1) contrast(1.05);
+  transition: filter 0.2s;
+}
+.evidence-preview:hover img { filter: sepia(0) contrast(1.1); }
+.evidence-caption {
+  display: block; text-align: center;
+  font-family: var(--font-mono); font-size: 9px;
+  color: var(--text-dim); letter-spacing: 0.08em;
+  padding: 8px; text-transform: uppercase;
+}
+
+/* ═══ Verify Button ═══ */
+.verify-btn {
+  display: block; text-align: center; text-decoration: none;
+  padding: 10px 16px;
+  font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--brass); background: var(--brass-dim);
+  border: 1px solid rgba(212, 160, 84, 0.2);
+  transition: all 0.2s;
+}
+.verify-btn:hover {
+  background: rgba(212, 160, 84, 0.15);
+  border-color: var(--brass);
+}
+
 /* ═══ Footer ═══ */
 .site-footer {
   border-top: 1px solid var(--border);

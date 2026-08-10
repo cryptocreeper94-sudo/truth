@@ -477,10 +477,29 @@ function renderSourceDetail(id) {
   const citedBy = archive.claims.filter(c => (c.meta.sources || []).includes(id));
   const refs = citedBy.map(c => `<a class="ref-link" href="#/claims/${c.meta.id}">${c.meta.id}: ${c.meta.title || ''}</a>`).join('');
 
+  // External references
+  const extRefs = source.meta['external-refs'] || [];
+  const extRefsHtml = Array.isArray(extRefs) && extRefs.length > 0
+    ? extRefs.map(url => `<a class="ref-link" href="${url}" target="_blank" rel="noopener">${url.replace(/^https?:\/\/(www\.)?/, '').split('/')[0]}</a>`).join('')
+    : '';
+
+  // Image preview
+  const imageUrl = source.meta['image-url'];
+  const imageHtml = imageUrl
+    ? `<div class="sidebar-card">
+        <h4>Document Preview</h4>
+        <a href="${imageUrl}" target="_blank" rel="noopener" class="evidence-preview">
+          <img src="${imageUrl}" alt="${source.meta.title || 'Source document'}" loading="lazy" />
+          <span class="evidence-caption">Click to view full size</span>
+        </a>
+      </div>`
+    : '';
+
   return `
     <div class="page">
+      <div class="breadcrumb"><a href="#/sources">Sources</a> → ${source.meta.id}</div>
       <div class="section-header">
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;flex-wrap:wrap;">
           <span class="entry-id" style="font-size:13px;">${source.meta.id}</span>
           ${tierBadge(source.meta.tier || 1)}
           ${source.meta.type ? `<span style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;">${source.meta.type}</span>` : ''}
@@ -495,8 +514,10 @@ function renderSourceDetail(id) {
           ${renderDiscussion('source', source.meta.id)}
         </div>
         <div class="detail-sidebar">
+          ${imageHtml}
           ${refs ? `<div class="sidebar-card"><h4>Cited by Claims</h4>${refs}</div>` : ''}
-          ${source.meta['verify-at'] ? `<div class="sidebar-card"><h4>Verify</h4><a class="ref-link" href="${source.meta['verify-at']}" target="_blank" rel="noopener">${source.meta['verify-at']}</a></div>` : ''}
+          ${source.meta['verify-at'] ? `<div class="sidebar-card"><h4>Verify This Source</h4><a class="verify-btn" href="${source.meta['verify-at']}" target="_blank" rel="noopener">⚖ Verify at Institution</a><p style="font-size:10px;color:var(--text-dim);margin-top:8px;font-family:var(--font-mono);">${source.meta['verify-at']}</p></div>` : ''}
+          ${extRefsHtml ? `<div class="sidebar-card"><h4>Further Reading</h4>${extRefsHtml}</div>` : ''}
         </div>
       </div>
     </div>
