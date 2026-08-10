@@ -1,5 +1,6 @@
 ---
 title: "Operation Northwoods Proposed False Flags"
+domain: Intelligence Programs
 claim_id: "C-0059"
 status: "DOCUMENTED"
 source_tiers: [1]
