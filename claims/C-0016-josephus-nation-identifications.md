@@ -1,6 +1,7 @@
 ---
 id: C-0016
 title: Josephus (Antiquities I.6, c. 94 CE) identifies Genesis 10 names with specific nations known in his era, providing the oldest surviving systematic key
+domain: Biblical Lineage
 confidence: DOCUMENTED
 sources: [S-0022]
 dig: digs/lineage-of-nations.md
