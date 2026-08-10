@@ -415,7 +415,7 @@ body {
 
 /* ═══ Filter Bar ═══ */
 .filter-bar {
-  display: flex; gap: 0; margin-bottom: 0;
+  display: flex; flex-wrap: wrap; gap: 0; margin-bottom: 0;
   border: 1px solid var(--border);
   border-bottom: none;
 }
