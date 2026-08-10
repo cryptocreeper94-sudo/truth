@@ -1,5 +1,6 @@
 ---
 title: "Buache Map (1737) Representation of Tartary"
+domain: Cartography
 claim_id: "C-0053"
 sources: ["S-0084", "S-0085"]
 confidence: "DOCUMENTED"
