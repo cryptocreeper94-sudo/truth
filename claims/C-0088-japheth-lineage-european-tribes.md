@@ -1,5 +1,6 @@
 ---
 title: "Japheth's Lineage and European Tribes"
+domain: Biblical Lineage
 source_ids: ["S-0134", "S-0135"]
 confidence: DOCUMENTED
 ---
