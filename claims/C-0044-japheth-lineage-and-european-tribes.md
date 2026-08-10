@@ -1,5 +1,6 @@
 ---
 title: "Japheth's Lineage and the Origins of European Tribes"
+domain: Biblical Lineage
 date: 2023-10-12
 sources:
   - S-0069
