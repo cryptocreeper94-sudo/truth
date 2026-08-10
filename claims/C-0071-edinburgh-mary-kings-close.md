@@ -1,5 +1,6 @@
 ---
 title: "Edinburgh's Mary King's Close Documentation"
+domain: Buried Cities
 summary: "Mary King's Close in Edinburgh is a preserved historical site with extensive municipal documentation."
 sources: ["S-0106", "S-0107"]
 confidence: DOCUMENTED
