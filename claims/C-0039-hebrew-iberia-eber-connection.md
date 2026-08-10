@@ -1,5 +1,6 @@
 ---
 title: "Hebrew-Iberia Connection: Eber and Iberia"
+domain: Biblical Lineage
 summary: "Explores the etymological connection between the Hebrew name Eber and the region of Iberia."
 sources: ["S-0059", "S-0060"]
 confidence: "DOCUMENTED"
