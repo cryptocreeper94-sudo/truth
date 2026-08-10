@@ -1,5 +1,6 @@
 ---
 title: "Ancient Tool Finds in Unexpected Strata"
+domain: Archaeology
 confidence: DOCUMENTED
 description: "Discovery of ancient tools in geological strata inconsistent with the age of known human habitation."
 sources:
