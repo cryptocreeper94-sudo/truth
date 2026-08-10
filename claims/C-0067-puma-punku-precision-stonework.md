@@ -1,5 +1,6 @@
 ---
 title: "Puma Punku Precision Stonework"
+domain: Ancient Engineering
 summary: "The precision of stonework at Puma Punku suggests advanced engineering techniques."
 status: "DOCUMENTED"
 sources: ["S-0100"]
