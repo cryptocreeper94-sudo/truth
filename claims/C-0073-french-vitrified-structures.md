@@ -1,5 +1,6 @@
 ---
 title: "Vitrified Structures in France"
+domain: Star Forts
 description: "Examination of vitrified structures found in France, including archaeological surveys and temperature analysis."
 sources: ["S-0111", "S-0112"]
 confidence: "CONTESTED"
