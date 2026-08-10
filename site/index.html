@@ -33,8 +33,29 @@
   </main>
 
   <footer class="site-footer">
-    <p>Curated by Jason Andrews / DarkWave Studios LLC · Companion to <a href="https://thelyingpen.tlid.io">Invariant — The Lying Pen</a></p>
-    <p style="margin-top:4px;">Method outranks conclusion. If an entry violates its own tags, the entry is wrong.</p>
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <span class="footer-logo">TRUTH</span>
+        <span class="footer-tagline">Method outranks conclusion.</span>
+      </div>
+      <div class="footer-links">
+        <a href="#/claims">Claims</a>
+        <a href="#/sources">Sources</a>
+        <a href="#/digs">Digs</a>
+        <a href="#/method">Method</a>
+        <a href="#/manifest">Manifest</a>
+      </div>
+      <div class="footer-meta">
+        <p>Curated by Jason Andrews / <a href="https://darkwavestudios.io" target="_blank" rel="noopener">DarkWave Studios LLC</a></p>
+        <p>Companion to <a href="https://thelyingpen.tlid.io">Invariant — The Lying Pen</a></p>
+        <p class="footer-copy" id="footer-copy">&copy; ${new Date().getFullYear()} DarkWave Studios LLC. If an entry violates its own tags, the entry is wrong.</p>
+      </div>
+    </div>
+    <!-- Admin gate: triple-click footer-copy to reveal PIN input -->
+    <div id="admin-gate" class="admin-gate" style="display:none;">
+      <input type="password" id="admin-pin" placeholder="PIN" maxlength="6" autocomplete="off" />
+      <button id="admin-go">→</button>
+    </div>
   </footer>
 
 <script>
@@ -298,9 +319,18 @@ function renderHome() {
   return `
     <div class="page">
       <div class="hero">
-        <h1 class="hero-title">TRUTH</h1>
-        <p class="hero-subtitle">A provenance-first archive of historical claims, the sources behind them, and the documented gaps between them.</p>
-        <p class="hero-companion">Companion research archive for <a href="https://thelyingpen.tlid.io">Invariant — The Lying Pen</a></p>
+        <div class="hero-slideshow" id="hero-slideshow">
+          <div class="hero-slide active" style="background-image:url('img/hero-1.png')"></div>
+          <div class="hero-slide" style="background-image:url('img/hero-2.png')"></div>
+          <div class="hero-slide" style="background-image:url('img/hero-3.png')"></div>
+          <div class="hero-slide" style="background-image:url('img/hero-4.png')"></div>
+        </div>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+          <h1 class="hero-title">TRUTH</h1>
+          <p class="hero-subtitle">A provenance-first archive of historical claims, the sources behind them, and the documented gaps between them.</p>
+          <p class="hero-companion">Companion research archive for <a href="https://thelyingpen.tlid.io">Invariant — The Lying Pen</a></p>
+        </div>
       </div>
 
       <div class="stats-row">
@@ -819,9 +849,73 @@ window.addEventListener('hashchange', route);
 
 loadArchive().then(() => {
   route();
+  initKenBurns();
+  initAdminGate();
 }).catch(err => {
   document.getElementById('app').innerHTML = `<div class="page"><p style="color:var(--oxblood);">Failed to load archive: ${err.message}</p></div>`;
 });
+
+// ── Ken Burns Slideshow ──
+let kbInterval = null;
+function initKenBurns() {
+  if (kbInterval) clearInterval(kbInterval);
+  const slides = document.querySelectorAll('.hero-slide');
+  if (slides.length === 0) return;
+  let current = 0;
+  kbInterval = setInterval(() => {
+    slides[current].classList.remove('active');
+    current = (current + 1) % slides.length;
+    slides[current].classList.add('active');
+  }, 8000);
+}
+// Re-init on route change (only home has slides)
+const _origRoute = route;
+// Watch for home page to reinit slides
+window.addEventListener('hashchange', () => {
+  setTimeout(() => {
+    const slides = document.querySelectorAll('.hero-slide');
+    if (slides.length > 0) initKenBurns();
+    else if (kbInterval) { clearInterval(kbInterval); kbInterval = null; }
+  }, 50);
+});
+
+// ── Admin Gate (triple-click easter egg) ──
+function initAdminGate() {
+  const copy = document.getElementById('footer-copy');
+  const gate = document.getElementById('admin-gate');
+  const pin = document.getElementById('admin-pin');
+  const go = document.getElementById('admin-go');
+  if (!copy || !gate) return;
+
+  let clickCount = 0;
+  let clickTimer = null;
+
+  copy.addEventListener('click', () => {
+    clickCount++;
+    if (clickTimer) clearTimeout(clickTimer);
+    clickTimer = setTimeout(() => { clickCount = 0; }, 600);
+
+    if (clickCount >= 3) {
+      clickCount = 0;
+      gate.style.display = gate.style.display === 'none' ? 'flex' : 'none';
+      if (gate.style.display === 'flex') pin.focus();
+    }
+  });
+
+  const submitPin = () => {
+    const v = pin.value.trim();
+    if (v.length >= 4) {
+      // Future: validate PIN against server
+      // For now, store intent and show feedback
+      pin.value = '';
+      gate.style.display = 'none';
+      console.log('[TRUTH] Admin gate triggered. PIN validation not yet implemented.');
+    }
+  };
+
+  go.addEventListener('click', submitPin);
+  pin.addEventListener('keydown', (e) => { if (e.key === 'Enter') submitPin(); });
+}
 </script>
 </body>
 </html>
