@@ -1,5 +1,6 @@
 ---
 title: "Ica Stones: Museum References"
+domain: Suppressed Finds
 status: "DOCUMENTED"
 confidence: "DOCUMENTED"
 source_ids: ["S-0047", "S-0048"]
