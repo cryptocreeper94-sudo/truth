@@ -1,5 +1,6 @@
 ---
 title: "The British Calendar Act of 1750 and Its Societal Effects"
+domain: Intelligence Programs
 description: "Examining the societal and economic impacts of the British Calendar Act of 1750, which resulted in the 'loss' of 11 days."
 sources:
   - S-0078
