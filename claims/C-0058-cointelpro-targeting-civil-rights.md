@@ -1,5 +1,6 @@
 ---
 title: "COINTELPRO Targeting Civil Rights"
+domain: Intelligence Programs
 claim_id: "C-0058"
 status: "DOCUMENTED"
 source_tiers: [1]
