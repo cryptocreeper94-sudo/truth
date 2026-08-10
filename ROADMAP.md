@@ -21,6 +21,51 @@
 4. **PM2 is BANNED.** All daemons run as Coolify containers.
 5. **Volume mount issue**: Sentinel Coolify volume mounts `/app/daemon` which overlays code. Need to change to `/app/state`.
 
+
+## Phase 0 — Observatory Specification ✅ COMPLETE (2026-08-10, main agent)
+
+> **NEW MAJOR SECTION: The Truth Observatory** — a continuously running atmospheric and geophysical monitoring system.
+> Read `OBSERVATORY.md` in full before doing any Observatory work. It is the governing specification.
+
+### What the Observatory is
+A daily-cadence evidence collection and review system for atmospheric, geophysical, infrastructure, and RF events. It sits alongside the Historical Record inside Truth. It is NOT a separate product. "Strata" is an obsolete name — do not use it.
+
+### Why it exists
+Jason has observed for over a year that major storm systems, unusual Doppler/radar patterns, apparent microwave-frequency events, and infrastructure-coincident atmospheric events appear at a pace and pattern that doesn't fit normal climate variation. The Observatory tests these observations using the same provenance discipline as the Historical Record.
+
+### Core operating rule
+The system must be capable of **disproving** the investigator's preferred explanation. If the skeptic engine is disabled, it becomes advocacy software.
+
+### Primary output: daily evidence digest
+Major storms and multi-stream coincidences must be surfaced within 24 hours — not weekly. The daily digest is the central output, not an optional report.
+
+### Data sources (full spec in OBSERVATORY.md)
+- NEXRAD / Doppler radar (NOAA public S3, Level II)
+- GOES satellite (IR, visible, water vapor)
+- Surface weather stations (NOAA ASOS / Mesonet)
+- Lightning (Blitzortung)
+- Solar / space weather (NOAA SWPC)
+- Geomagnetic (INTERMAGNET)
+- Schumann resonance (multiple independent stations — never treat one plot as ground truth)
+- Ionosonde (GIRO/DIDBase)
+- Power grid (EIA-930)
+- Aircraft tracks (ADS-B Exchange)
+- NOTAMs and cloud-seeding permits (FAA)
+- Cell tower infrastructure (FCC DB + OpenCelliD)
+- HAARP and ionospheric research facilities (by real name, not generic label)
+
+### Implementation stages (next agent: start at Stage 1)
+1. **Stage 1 — Foundation** ← START HERE
+   - Create `/observatory/` directory structure
+   - Define OBS-nnnn event record schema
+   - Build NEXRAD + GOES collectors with provenance writer (hash + retrieval manifest)
+   - No AI, no analysis — collection and preservation only
+2. Stage 2 — Multi-stream expansion (solar, geomagnetic, lightning, grid, Schumann)
+3. Stage 3 — Skeptic engine + event record writer
+4. Stage 4 — Infrastructure layers (towers, facilities, aircraft, NOTAMs)
+5. Stage 5 — Autonomous daemon + daily digest generator
+6. Stage 6 — Public visual interface (synchronized replay map, daily digest page)
+
 ## Phase 1a — Domain Navigation & Content Quality ✅ COMPLETE
 
 - [x] 19 domain categories (Biblical Lineage, Cartography, Intelligence Programs, etc.)
