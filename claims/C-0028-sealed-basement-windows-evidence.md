@@ -1,5 +1,6 @@
 ---
 title: "Sealed Basement Windows in Historical Buildings"
+domain: Buried Cities
 status: DOCUMENTED
 sources: ["S-0041", "S-0042"]
 objections: "Sealed windows could also be due to architectural renovations, changes in building codes, or aesthetic preferences rather than evidence of a reset."
