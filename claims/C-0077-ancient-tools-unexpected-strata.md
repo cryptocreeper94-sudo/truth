@@ -2,9 +2,12 @@
 id: C-0077
 title: Ancient Tool Finds in Unexpected Strata
 domain: Archaeology
-confidence: DOCUMENTED
+confidence: SPECULATIVE
+confidence-claimed: DOCUMENTED
 sources: []
 status: active
+verification: no-checkable-source
+verified-on: 2026-08-10
 ---
 
 # C-0077 — Ancient Tool Finds in Unexpected Strata

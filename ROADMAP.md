@@ -36,6 +36,19 @@
 - [x] Ken Burns hero slideshow (4 generated images)
 - [x] Canonical footer with easter egg admin gate (triple-click → PIN input)
 
+## Phase 1c — Record Integrity ✅ ENGINE BUILT (2026-08-10, main agent)
+
+> DOCUMENTED means "the record exists AND the pointer to it resolves" — not that the claim is true.
+> A fabricated catalog number or invented URL fails this even under the weak reading.
+
+- [x] `daemon/verify.mjs` — citation verification engine. Fetches every source verify-at/verification_url and every URL in claim bodies. Verdicts: verified / blocked (site refuses bots) / failed / no-checkable-source. Writes `verification/report.json` + stamps claim frontmatter (`verification:`, `verified-on:`).
+- [x] Demotion pass run: claims whose citations did not resolve dropped DOCUMENTED → SPECULATIVE (original tag preserved in `confidence-claimed:` — verify.mjs auto-restores when citations later pass). Result: 18 verified, 39 demoted, 32 already pending.
+- [x] Daemon contract fixed: daemon may NEVER assign DOCUMENTED; drafts start SPECULATIVE; fabricating citations prohibited in prompt. Only verify.mjs promotes.
+- [x] Site shows verification badges (claim cards + detail) and a Verification sidebar card explaining the gate.
+- [x] Duplicate ID fixed: second C-0077 renumbered to C-0089.
+- [ ] Repair pass on failed citations: replace invented URLs/catalog refs with real ones (Rumsey luna URLs, real LMA/archive references), then re-run verify.mjs to restore DOCUMENTED. **Do this as part of the image/link enrichment session.**
+- [ ] Run verify.mjs at the end of every daemon cycle (wire into daemon.mjs or cron).
+
 ## Phase 1b — Image Caching & Infrastructure
 
 - [ ] Create `/evidence/` directory in repo for hosting cached source images

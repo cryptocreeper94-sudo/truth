@@ -2,9 +2,12 @@
 id: C-0031
 title: Ica Stones: Museum References
 domain: Suppressed Finds
-confidence: DOCUMENTED
+confidence: SPECULATIVE
+confidence-claimed: DOCUMENTED
 sources: [S-0047, S-0048]
 status: active
+verification: failed
+verified-on: 2026-08-10
 ---
 
 # C-0031 — Ica Stones: Museum References

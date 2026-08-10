@@ -2,9 +2,12 @@
 id: C-0069
 title: Seattle Underground Documentation
 domain: Buried Cities
-confidence: DOCUMENTED
+confidence: SPECULATIVE
+confidence-claimed: DOCUMENTED
 sources: [S-0102, S-0103]
 status: active
+verification: failed
+verified-on: 2026-08-10
 ---
 
 # C-0069 — Seattle Underground Documentation

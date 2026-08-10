@@ -6,6 +6,8 @@ confidence: DOCUMENTED
 sources: [S-0001]
 dig: digs/map-chronology.md
 status: active
+verification: verified
+verified-on: 2026-08-10
 ---
 
 # C-0001 — Mercator cites a source that no longer exists

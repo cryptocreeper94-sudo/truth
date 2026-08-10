@@ -5,6 +5,8 @@ domain: Intelligence Programs
 confidence: SPECULATIVE
 sources: []
 status: active
+verification: failed
+verified-on: 2026-08-10
 ---
 
 # C-0057 — Operation Mockingbird Media Influence

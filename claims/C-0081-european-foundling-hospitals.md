@@ -2,9 +2,12 @@
 id: C-0081
 title: European Foundling Hospitals Documentation
 domain: Orphan History
-confidence: DOCUMENTED
+confidence: SPECULATIVE
+confidence-claimed: DOCUMENTED
 sources: []
 status: active
+verification: no-checkable-source
+verified-on: 2026-08-10
 ---
 
 # C-0081 — European Foundling Hospitals Documentation

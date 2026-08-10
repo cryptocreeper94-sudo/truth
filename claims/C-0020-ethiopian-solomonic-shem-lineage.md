@@ -2,10 +2,13 @@
 id: C-0020
 title: The Ethiopian Kebra Nagast traces Solomonic royal descent through Shem, establishing an unbroken claimed lineage from Adam to the 20th-century Ethiopian monarchy
 domain: Biblical Lineage
-confidence: DOCUMENTED
+confidence: SPECULATIVE
+confidence-claimed: DOCUMENTED
 sources: [S-0026]
 dig: digs/lineage-of-nations.md
 status: active
+verification: failed
+verified-on: 2026-08-10
 ---
 
 # C-0020 — Ethiopian Solomonic lineage through Shem

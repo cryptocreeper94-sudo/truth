@@ -6,7 +6,7 @@ type: map
 date-of-object: 1595 (published posthumously in Mercator's Atlas)
 holder: multiple institutional copies; high-resolution scans in the David Rumsey Map Collection and institutional atlas holdings
 catalog-ref: David Rumsey Collection (searchable by title); numerous library copies of the 1595 Atlas
-verify-at: https://www.davidrumsey.com (search "Septentrionalium Terrarum")
+verify-at: https://www.davidrumsey.com
 status: active
 ---
 

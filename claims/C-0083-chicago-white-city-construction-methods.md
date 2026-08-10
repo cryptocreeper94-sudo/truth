@@ -5,6 +5,8 @@ domain: World Fairs
 confidence: SPECULATIVE
 sources: [S-0124, S-0125]
 status: active
+verification: failed
+verified-on: 2026-08-10
 ---
 
 # C-0083 — Chicago White City Construction Methods

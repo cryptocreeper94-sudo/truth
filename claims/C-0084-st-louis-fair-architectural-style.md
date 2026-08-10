@@ -5,6 +5,8 @@ domain: World Fairs
 confidence: SPECULATIVE
 sources: [S-0126, S-0127]
 status: active
+verification: failed
+verified-on: 2026-08-10
 ---
 
 # C-0084 — St. Louis Fair Architectural Style Consistency

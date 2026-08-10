@@ -6,6 +6,8 @@ confidence: DOCUMENTED
 sources: [S-0017]
 dig: digs/institutional-capture.md
 status: active
+verification: verified
+verified-on: 2026-08-10
 ---
 
 # C-0010 — 1,600+ German scientists imported, records altered

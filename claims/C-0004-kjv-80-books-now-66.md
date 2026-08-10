@@ -2,10 +2,13 @@
 id: C-0004
 title: The 1611 King James Bible contained 80 books; modern editions contain 66
 domain: Biblical Texts
-confidence: DOCUMENTED
+confidence: SPECULATIVE
+confidence-claimed: DOCUMENTED
 sources: [S-0005, S-0007]
 dig: digs/book-removal.md
 status: active
+verification: failed
+verified-on: 2026-08-10
 ---
 
 # C-0004 — 14 books removed from the Bible between 1611 and the present

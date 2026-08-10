@@ -2,9 +2,12 @@
 id: C-0062
 title: Rockefeller Foundation Charter
 domain: Intelligence Programs
-confidence: DOCUMENTED
+confidence: SPECULATIVE
+confidence-claimed: DOCUMENTED
 sources: []
 status: active
+verification: no-checkable-source
+verified-on: 2026-08-10
 ---
 
 # C-0062 — Rockefeller Foundation Charter

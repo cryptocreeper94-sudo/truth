@@ -6,6 +6,8 @@ confidence: DOCUMENTED
 sources: [S-0004, S-0005]
 dig: digs/name-erasure.md
 status: active
+verification: verified
+verified-on: 2026-08-10
 ---
 
 # C-0003 — A proper name replaced 6,800 times with a title

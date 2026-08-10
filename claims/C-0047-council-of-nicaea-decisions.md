@@ -5,6 +5,8 @@ domain: Biblical Texts
 confidence: DOCUMENTED
 sources: [S-0075, S-0076]
 status: active
+verification: verified
+verified-on: 2026-08-10
 ---
 
 # C-0047 — Council of Nicaea: Decisions vs Popular Claims

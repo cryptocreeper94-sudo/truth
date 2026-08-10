@@ -2,9 +2,12 @@
 id: C-0045
 title: Dead Sea Scrolls vs Masoretic Text: Specific Variants
 domain: Biblical Texts
-confidence: DOCUMENTED
+confidence: SPECULATIVE
+confidence-claimed: DOCUMENTED
 sources: [S-0071, S-0072]
 status: active
+verification: failed
+verified-on: 2026-08-10
 ---
 
 # C-0045 — Dead Sea Scrolls vs Masoretic Text: Specific Variants

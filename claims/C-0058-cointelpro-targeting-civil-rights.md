@@ -5,6 +5,8 @@ domain: Intelligence Programs
 confidence: SPECULATIVE
 sources: []
 status: active
+verification: no-checkable-source
+verified-on: 2026-08-10
 ---
 
 # C-0058 — COINTELPRO Targeting Civil Rights

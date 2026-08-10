@@ -2,9 +2,12 @@
 id: C-0046
 title: Septuagint vs Samaritan Pentateuch: Textual Variants
 domain: Biblical Texts
-confidence: DOCUMENTED
+confidence: SPECULATIVE
+confidence-claimed: DOCUMENTED
 sources: [S-0073, S-0074]
 status: active
+verification: failed
+verified-on: 2026-08-10
 ---
 
 # C-0046 — Septuagint vs Samaritan Pentateuch: Textual Variants

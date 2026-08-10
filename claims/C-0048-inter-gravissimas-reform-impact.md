@@ -2,9 +2,12 @@
 id: C-0048
 title: Impact of Inter gravissimas on European Timekeeping
 domain: Calendar Systems
-confidence: DOCUMENTED
+confidence: SPECULATIVE
+confidence-claimed: DOCUMENTED
 sources: []
 status: active
+verification: no-checkable-source
+verified-on: 2026-08-10
 ---
 
 # C-0048 — Impact of Inter gravissimas on European Timekeeping

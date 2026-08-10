@@ -214,6 +214,13 @@ function confidenceTag(confidence) {
   return `<span class="tag ${cls}">${confidence}</span>`;
 }
 
+function verificationBadge(v) {
+  if (!v) return '';
+  const cls = v === 'verified' ? 'verif-ok' : v === 'blocked' ? 'verif-blocked' : 'verif-pending';
+  const label = v === 'verified' ? 'CITATIONS VERIFIED' : v === 'blocked' ? 'SOURCE BLOCKS BOTS' : 'CITATION CHECK PENDING';
+  return `<span class="verif-badge ${cls}" title="Automated citation check: every cited URL fetched and confirmed (verify.mjs)">${label}</span>`;
+}
+
 function statusBadge(status) {
   if (!status) return '';
   const s = status.toLowerCase();
@@ -424,6 +431,7 @@ function renderClaimsIndex() {
       <span class="entry-meta">
         ${c.meta.domain ? `<span class="domain-tag">${c.meta.domain}</span>` : ''}
         ${confidenceTag(c.meta.confidence)}
+        ${verificationBadge(c.meta.verification)}
       </span>
     </a>
   `).join('');
@@ -482,6 +490,7 @@ function renderClaimDetail(id) {
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;flex-wrap:wrap;">
           <span class="entry-id" style="font-size:13px;">${claim.meta.id}</span>
           ${confidenceTag(claim.meta.confidence)}
+          ${verificationBadge(claim.meta.verification)}
           ${domain ? `<span class="domain-tag">${domain}</span>` : ''}
           <span style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;">Status: ${claim.meta.status || 'active'}</span>
         </div>
@@ -503,6 +512,16 @@ function renderClaimDetail(id) {
                 claim.meta.confidence === 'CONTESTED' ? 'Credible sources genuinely conflict; both sides recorded.' :
                 claim.meta.confidence === 'SUPPRESSED-IF-TRUE' ? 'Supporting record shows documented signs of removal or alteration.' :
                 'An honest hypothesis. Never corroborates.'}
+            </p>
+          </div>
+          <div class="sidebar-card">
+            <h4>Verification</h4>
+            <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.6;">
+              ${claim.meta.verification === 'verified'
+                ? `Every cited source URL was fetched and confirmed to resolve${claim.meta['verified-on'] ? ' on ' + claim.meta['verified-on'] : ''}. DOCUMENTED means the record exists and the pointer to it works — not that the claim is true.`
+                : claim.meta.verification === 'blocked'
+                ? 'A cited source refuses automated access; a human needs to confirm it. Confidence is capped until then.'
+                : 'Citations have not yet passed the automated check (URL fetched and confirmed). Confidence is capped at SPECULATIVE until every pointer lands on a real record. Fabricated or dead citations keep a claim here permanently.'}
             </p>
           </div>
           <div class="sidebar-card">

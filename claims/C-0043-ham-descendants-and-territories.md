@@ -2,9 +2,12 @@
 id: C-0043
 title: Mapping the Descendants of Ham to Historical Territories
 domain: Biblical Lineage
-confidence: DOCUMENTED
+confidence: SPECULATIVE
+confidence-claimed: DOCUMENTED
 sources: []
 status: active
+verification: no-checkable-source
+verified-on: 2026-08-10
 ---
 
 # C-0043 — Mapping the Descendants of Ham to Historical Territories

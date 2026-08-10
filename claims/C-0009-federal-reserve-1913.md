@@ -6,6 +6,8 @@ confidence: DOCUMENTED
 sources: [S-0015, S-0016]
 dig: digs/monetary-system.md
 status: active
+verification: verified
+verified-on: 2026-08-10
 ---
 
 # C-0009 — Currency issuance delegated to a non-governmental structure

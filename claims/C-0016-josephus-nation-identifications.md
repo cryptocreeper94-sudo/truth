@@ -6,6 +6,8 @@ confidence: DOCUMENTED
 sources: [S-0022]
 dig: digs/lineage-of-nations.md
 status: active
+verification: verified
+verified-on: 2026-08-10
 ---
 
 # C-0016 — Josephus maps Genesis names to 1st-century nations

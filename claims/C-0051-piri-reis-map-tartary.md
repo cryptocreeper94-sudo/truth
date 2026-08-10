@@ -2,9 +2,12 @@
 id: C-0051
 title: Piri Reis Map (1513) Depiction of Tartary
 domain: Cartography
-confidence: DOCUMENTED
+confidence: SPECULATIVE
+confidence-claimed: DOCUMENTED
 sources: [S-0080, S-0081]
 status: active
+verification: failed
+verified-on: 2026-08-10
 ---
 
 # C-0051 — Piri Reis Map (1513) Depiction of Tartary

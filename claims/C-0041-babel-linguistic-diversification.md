@@ -5,6 +5,8 @@ domain: Biblical Lineage
 confidence: CONTESTED
 sources: [S-0063, S-0064]
 status: active
+verification: failed
+verified-on: 2026-08-10
 ---
 
 # C-0041 — Tower of Babel and Linguistic Diversification

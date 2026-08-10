@@ -1,10 +1,12 @@
 ---
-id: C-0077
+id: C-0089
 title: Smithsonian Accession Records for Giant Skeletons
 domain: Institutional Origins
 confidence: SPECULATIVE
 sources: []
 status: active
+verification: no-checkable-source
+verified-on: 2026-08-10
 ---
 
 # C-0077 — Smithsonian Accession Records for Giant Skeletons

@@ -336,7 +336,7 @@ ${method.text}
 
 DETERMINISTIC CONSTRAINTS (non-overridable):
 1. [37/NULL-BOUNDARY] Every claim MUST cite a SPECIFIC, NAMED, VERIFIABLE Tier-1 source. No claim without a source. Absence is never evidence.
-2. [26/ARBITRATION] Confidence hierarchy: DOCUMENTED (Tier 1-2 verifiable) > CONTESTED (genuine conflict) > SPECULATIVE (hypothesis, never corroborates). BE CONSERVATIVE.
+2. [26/ARBITRATION] Confidence hierarchy: DOCUMENTED > CONTESTED > SPECULATIVE. YOU MAY NEVER ASSIGN DOCUMENTED. Every claim you draft starts at SPECULATIVE (or CONTESTED when credible sources genuinely conflict). The DOCUMENTED tag is assigned ONLY by the verification engine (verify.mjs) after every cited URL has been fetched and confirmed to resolve. Never invent catalog numbers, page numbers, or URLs — if you do not know the real reference, write "reference needed" instead. A fabricated citation is worse than no citation.
 3. [02/BOUNDARY] Every claim MUST have a genuine objection section "at full strength" — the strongest possible counter-argument.
 4. [34/INVARIANCE] You cannot modify or contradict METHOD.md. It is the law.
 5. [14/DETERMINACY] Every claim must be traceable. Include specific: dates, institutional holders, catalog references, verification URLs.
@@ -348,7 +348,7 @@ EXACT CLAIM FRONTMATTER FORMAT (you MUST use this exact structure, no quotes aro
 id: C-XXXX
 title: Short descriptive title of the claim
 domain: ${domain.shortName}
-confidence: DOCUMENTED
+confidence: SPECULATIVE
 sources: [S-XXXX, S-XXXY]
 related: [C-XXXX]
 status: active

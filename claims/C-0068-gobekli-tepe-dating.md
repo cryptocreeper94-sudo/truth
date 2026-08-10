@@ -5,6 +5,8 @@ domain: Ancient Engineering
 confidence: SPECULATIVE
 sources: [S-0101]
 status: active
+verification: failed
+verified-on: 2026-08-10
 ---
 
 # C-0068 — Göbekli Tepe Dating

@@ -6,6 +6,8 @@ confidence: DOCUMENTED
 sources: [S-0021]
 dig: digs/education-system.md
 status: active
+verification: verified
+verified-on: 2026-08-10
 ---
 
 # C-0014 — Rockefeller education board's stated intent to shape schooling

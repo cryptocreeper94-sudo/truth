@@ -2,9 +2,12 @@
 id: C-0039
 title: Hebrew-Iberia Connection: Eber and Iberia
 domain: Biblical Lineage
-confidence: DOCUMENTED
+confidence: SPECULATIVE
+confidence-claimed: DOCUMENTED
 sources: [S-0059, S-0060]
 status: active
+verification: failed
+verified-on: 2026-08-10
 ---
 
 # C-0039 — Hebrew-Iberia Connection: Eber and Iberia

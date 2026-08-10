@@ -1,0 +1,2527 @@
+{
+  "generated": "2026-08-10T20:00:17.847Z",
+  "sources": {
+    "S-0001": {
+      "file": "sources/tier-1/S-0001-mercator-1595-polar-map.md",
+      "verifyAt": "https://www.davidrumsey.com",
+      "url": "https://www.davidrumsey.com",
+      "status": 200,
+      "verdict": "VERIFIED"
+    },
+    "S-0002": {
+      "file": "sources/tier-1/S-0002-new-madrid-relief-act-1815.md",
+      "verifyAt": "https://www.govinfo.gov/content/pkg/STATUTE-3/pdf/STATUTE-3-Pg211.pdf",
+      "url": "https://www.govinfo.gov/content/pkg/STATUTE-3/pdf/STATUTE-3-Pg211.pdf",
+      "status": 200,
+      "verdict": "VERIFIED"
+    },
+    "S-0003": {
+      "file": "sources/tier-1/S-0003-new-madrid-claims-records.md",
+      "verifyAt": "https://www.sos.mo.gov/CMSImages/Archives/resources/findingaids/rg951-03.pdf",
+      "url": "https://www.sos.mo.gov/CMSImages/Archives/resources/findingaids/rg951-03.pdf",
+      "status": 200,
+      "verdict": "VERIFIED"
+    },
+    "S-0004": {
+      "file": "sources/tier-1/S-0004-leningrad-codex.md",
+      "verifyAt": "https://www.sefaria.org",
+      "url": "https://www.sefaria.org",
+      "status": 200,
+      "verdict": "VERIFIED"
+    },
+    "S-0005": {
+      "file": "sources/tier-1/S-0005-kjv-1611-first-edition.md",
+      "verifyAt": "https://www.kingjamesbibleonline.org",
+      "url": "https://www.kingjamesbibleonline.org",
+      "status": 200,
+      "verdict": "VERIFIED"
+    },
+    "S-0007": {
+      "file": "sources/tier-1/S-0007-modern-kjv-no-apocrypha.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0008": {
+      "file": "sources/tier-1/S-0008-cas-annual-reports.md",
+      "verifyAt": "https://www.childrensaidnyc.org",
+      "url": "https://www.childrensaidnyc.org",
+      "status": 200,
+      "verdict": "VERIFIED"
+    },
+    "S-0009": {
+      "file": "sources/tier-1/S-0009-orphan-train-complex.md",
+      "verifyAt": "https://orphantraindepot.org",
+      "url": "https://orphantraindepot.org",
+      "status": 202,
+      "verdict": "VERIFIED"
+    },
+    "S-0010": {
+      "file": "sources/tier-1/S-0010-david-rumsey-maps.md",
+      "verifyAt": "https://www.davidrumsey.com",
+      "url": "https://www.davidrumsey.com",
+      "status": 200,
+      "verdict": "VERIFIED"
+    },
+    "S-0011": {
+      "file": "sources/tier-1/S-0011-britannica-1771-tartary.md",
+      "verifyAt": "https://archive.org",
+      "url": "https://archive.org",
+      "status": 200,
+      "verdict": "VERIFIED"
+    },
+    "S-0012": {
+      "file": "sources/tier-1/S-0012-inter-gravissimas-1582.md",
+      "verifyAt": "https://www.fourmilab.ch/documents/calendar/IG/",
+      "url": "https://www.fourmilab.ch/documents/calendar/IG/",
+      "status": 404,
+      "verdict": "FAILED"
+    },
+    "S-0013": {
+      "file": "sources/tier-1/S-0013-british-calendar-act-1750.md",
+      "verifyAt": "https://www.legislation.gov.uk",
+      "url": "https://www.legislation.gov.uk",
+      "status": 200,
+      "verdict": "VERIFIED"
+    },
+    "S-0014": {
+      "file": "sources/tier-1/S-0014-digitized-newspaper-archives.md",
+      "verifyAt": "https://chroniclingamerica.loc.gov",
+      "url": "https://chroniclingamerica.loc.gov",
+      "status": 403,
+      "verdict": "BLOCKED"
+    },
+    "S-0015": {
+      "file": "sources/tier-1/S-0015-federal-reserve-act-1913.md",
+      "verifyAt": "https://www.govinfo.gov",
+      "url": "https://www.govinfo.gov",
+      "status": 200,
+      "verdict": "VERIFIED"
+    },
+    "S-0016": {
+      "file": "sources/tier-1/S-0016-federal-reserve-faq.md",
+      "verifyAt": "https://www.federalreserve.gov/faqs.htm",
+      "url": "https://www.federalreserve.gov/faqs.htm",
+      "status": 200,
+      "verdict": "VERIFIED"
+    },
+    "S-0017": {
+      "file": "sources/tier-1/S-0017-operation-paperclip-jioa.md",
+      "verifyAt": "https://www.archives.gov",
+      "url": "https://www.archives.gov",
+      "status": 200,
+      "verdict": "VERIFIED"
+    },
+    "S-0018": {
+      "file": "sources/tier-1/S-0018-mkultra-cia-files.md",
+      "verifyAt": "https://www.cia.gov/readingroom/",
+      "url": "https://www.cia.gov/readingroom/",
+      "status": 0,
+      "verdict": "FAILED",
+      "error": "Error: redirect count exceeded"
+    },
+    "S-0019": {
+      "file": "sources/tier-1/S-0019-seattle-underground.md",
+      "verifyAt": "https://www.undergroundtour.com",
+      "url": "https://www.undergroundtour.com",
+      "status": 200,
+      "verdict": "VERIFIED"
+    },
+    "S-0020": {
+      "file": "sources/tier-1/S-0020-smithsonian-act-1846.md",
+      "verifyAt": "https://www.govinfo.gov",
+      "url": "https://www.govinfo.gov",
+      "status": 200,
+      "verdict": "VERIFIED"
+    },
+    "S-0021": {
+      "file": "sources/tier-1/S-0021-geb-occasional-letter-1906.md",
+      "verifyAt": "https://rockarch.org",
+      "url": "https://rockarch.org",
+      "status": 200,
+      "verdict": "VERIFIED"
+    },
+    "S-0022": {
+      "file": "sources/tier-1/S-0022-josephus-antiquities.md",
+      "verifyAt": "https://www.perseus.tufts.edu",
+      "url": "https://www.perseus.tufts.edu",
+      "status": 200,
+      "verdict": "VERIFIED"
+    },
+    "S-0023": {
+      "file": "sources/tier-1/S-0023-book-of-jubilees.md",
+      "verifyAt": "https://www.deadseascrolls.org.il",
+      "url": "https://www.deadseascrolls.org.il",
+      "status": 200,
+      "verdict": "VERIFIED"
+    },
+    "S-0024": {
+      "file": "sources/tier-1/S-0024-chronicles-genealogy.md",
+      "verifyAt": "https://www.sefaria.org/I_Chronicles.1",
+      "url": "https://www.sefaria.org/I_Chronicles.1",
+      "status": 200,
+      "verdict": "VERIFIED"
+    },
+    "S-0025": {
+      "file": "sources/tier-1/S-0025-medieval-genealogies.md",
+      "verifyAt": "https://asc.jebbo.co.uk",
+      "url": "https://asc.jebbo.co.uk",
+      "status": 200,
+      "verdict": "VERIFIED"
+    },
+    "S-0026": {
+      "file": "sources/tier-1/S-0026-kebra-nagast.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0027": {
+      "file": "sources/tier-1/S-0027-foundling-hospitals-london.md",
+      "verifyAt": "https://www.lma.gov.uk/records/foundlings",
+      "url": "https://www.lma.gov.uk/records/foundlings",
+      "status": 0,
+      "verdict": "FAILED",
+      "error": "AbortError: This operation was aborted"
+    },
+    "S-0028": {
+      "file": "sources/tier-1/S-0028-foundling-hospitals-vienna.md",
+      "verifyAt": "https://www.viennaarchives.at/foundling-admissions",
+      "url": "https://www.viennaarchives.at/foundling-admissions",
+      "status": 0,
+      "verdict": "FAILED",
+      "error": "ECONNREFUSED"
+    },
+    "S-0029": {
+      "file": "sources/tier-1/S-0029-baby-farm-trial-records.md",
+      "verifyAt": "https://www.nypl.org/archives/baby-farm-case",
+      "url": "https://www.nypl.org/archives/baby-farm-case",
+      "status": 200,
+      "verdict": "VERIFIED"
+    },
+    "S-0030": {
+      "file": "sources/tier-1/S-0030-baby-farms-inquest-reports.md",
+      "verifyAt": "https://www.nationalarchives.gov.uk/baby-farms-inquest",
+      "url": "https://www.nationalarchives.gov.uk/baby-farms-inquest",
+      "status": 404,
+      "verdict": "FAILED"
+    },
+    "S-0031": {
+      "file": "sources/tier-1/S-0031-magdalene-laundries-records-dublin.md",
+      "verifyAt": "https://www.irisharchives.ie/magdalene-laundry-records",
+      "url": "https://www.irisharchives.ie/magdalene-laundry-records",
+      "status": 0,
+      "verdict": "FAILED",
+      "error": "CERT_HAS_EXPIRED"
+    },
+    "S-0032": {
+      "file": "sources/tier-1/S-0032-magdalene-laundries-report.md",
+      "verifyAt": "https://www.gov.ie/magdalene-laundries-report",
+      "url": "https://www.gov.ie/magdalene-laundries-report",
+      "status": 403,
+      "verdict": "BLOCKED"
+    },
+    "S-0033": {
+      "file": "sources/tier-1/S-0033-official-guide-worlds-columbian-exposition.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0034": {
+      "file": "sources/tier-1/S-0034-photographic-views-worlds-columbian-exposition.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0035": {
+      "file": "sources/tier-1/S-0035-worlds-fair-bulletin-vol-5.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0036": {
+      "file": "sources/tier-1/S-0036-official-photographic-company-louisiana-purchase-exposition.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0037": {
+      "file": "sources/tier-1/S-0037-demolition-crystal-palace-1936.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0038": {
+      "file": "sources/tier-1/S-0038-crystal-palace-and-its-demise.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0039": {
+      "file": "sources/tier-1/S-0039-st-marys-basilica-krakow.md",
+      "verifyAt": "https://www.amu.krakow.pl/archaeology/st-marys-findings",
+      "url": "https://www.amu.krakow.pl/archaeology/st-marys-findings",
+      "status": 0,
+      "verdict": "FAILED",
+      "error": "ENOTFOUND"
+    },
+    "S-0040": {
+      "file": "sources/tier-1/S-0040-merchants-exchange-building-philadelphia.md",
+      "verifyAt": "https://www.phila.gov/historical/merchants-exchange",
+      "url": "https://www.phila.gov/historical/merchants-exchange",
+      "status": 200,
+      "verdict": "VERIFIED"
+    },
+    "S-0041": {
+      "file": "sources/tier-1/S-0041-palace-of-versailles-sealed-windows.md",
+      "verifyAt": "https://www.chateauversailles.fr/resources/sealed-windows",
+      "url": "https://www.chateauversailles.fr/resources/sealed-windows",
+      "status": 404,
+      "verdict": "FAILED"
+    },
+    "S-0042": {
+      "file": "sources/tier-1/S-0042-old-dutch-buildings-jakarta.md",
+      "verifyAt": "https://www.jakarta-history.org/colonial-buildings",
+      "url": "https://www.jakarta-history.org/colonial-buildings",
+      "status": 0,
+      "verdict": "FAILED",
+      "error": "ENOTFOUND"
+    },
+    "S-0043": {
+      "file": "sources/tier-1/S-0043-fort-bourtange-netherlands.md",
+      "verifyAt": "https://www.nationaalarchief.nl/fort-bourtange",
+      "url": "https://www.nationaalarchief.nl/fort-bourtange",
+      "status": 404,
+      "verdict": "FAILED"
+    },
+    "S-0044": {
+      "file": "sources/tier-1/S-0044-fort-ticonderoga-new-york.md",
+      "verifyAt": "https://www.nysl.nysed.gov/fort-ticonderoga",
+      "url": "https://www.nysl.nysed.gov/fort-ticonderoga",
+      "status": 404,
+      "verdict": "FAILED"
+    },
+    "S-0045": {
+      "file": "sources/tier-1/S-0045-waldemar-julsrud-collection.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0046": {
+      "file": "sources/tier-1/S-0046-guanajuato-state-museum-archives.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0047": {
+      "file": "sources/tier-1/S-0047-museo-regional-de-ica-archive.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0048": {
+      "file": "sources/tier-1/S-0048-cabrera-museum-collection.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0049": {
+      "file": "sources/tier-1/S-0049-national-museum-of-iraq-catalog.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0050": {
+      "file": "sources/tier-1/S-0050-book-of-enoch-ethiopian-canon.md",
+      "verifyAt": "https://www.ethiopianorthodox.org/canon.html",
+      "url": "https://www.ethiopianorthodox.org/canon.html",
+      "status": 404,
+      "verdict": "FAILED"
+    },
+    "S-0051": {
+      "file": "sources/tier-1/S-0051-council-of-laodicea-records.md",
+      "verifyAt": "https://www.vaticanarchives.va/laodicea",
+      "url": "https://www.vaticanarchives.va/laodicea",
+      "status": 0,
+      "verdict": "FAILED",
+      "error": "ENOTFOUND"
+    },
+    "S-0052": {
+      "file": "sources/tier-1/S-0052-bodleian-book-of-jasher.md",
+      "verifyAt": "https://www.bodleian.ox.ac.uk/jasher",
+      "url": "https://www.bodleian.ox.ac.uk/jasher",
+      "status": 404,
+      "verdict": "FAILED"
+    },
+    "S-0053": {
+      "file": "sources/tier-1/S-0053-hebrew-bible-references.md",
+      "verifyAt": "https://www.hebrewmanuscripts.org/jasher",
+      "url": "https://www.hebrewmanuscripts.org/jasher",
+      "status": 404,
+      "verdict": "FAILED"
+    },
+    "S-0054": {
+      "file": "sources/tier-1/S-0054-nag-hammadi-codices.md",
+      "verifyAt": "https://www.copticmuseum.gov.eg/naghammadi",
+      "url": "https://www.copticmuseum.gov.eg/naghammadi",
+      "status": 0,
+      "verdict": "FAILED",
+      "error": "AbortError: This operation was aborted"
+    },
+    "S-0055": {
+      "file": "sources/tier-1/S-0055-gospel-of-thomas-manuscript.md",
+      "verifyAt": "https://www.copticmuseum.gov.eg/thomas",
+      "url": "https://www.copticmuseum.gov.eg/thomas",
+      "status": 0,
+      "verdict": "FAILED",
+      "error": "AbortError: This operation was aborted"
+    },
+    "S-0056": {
+      "file": "sources/tier-1/S-0056-sumerian-king-list-nippur-tablet.md",
+      "verifyAt": "https://www.penn.museum/collections/object/12345",
+      "url": "https://www.penn.museum/collections/object/12345",
+      "status": 403,
+      "verdict": "BLOCKED"
+    },
+    "S-0057": {
+      "file": "sources/tier-1/S-0057-gilgamesh-tablet-xi-british-museum.md",
+      "verifyAt": "https://www.britishmuseum.org/collection/object/W_1850-0920-1",
+      "url": "https://www.britishmuseum.org/collection/object/W_1850-0920-1",
+      "status": 403,
+      "verdict": "BLOCKED"
+    },
+    "S-0058": {
+      "file": "sources/tier-1/S-0058-greek-flood-narrative-sources.md",
+      "verifyAt": "https://www.bne.es/en/Collections/Greek-Mythology",
+      "url": "https://www.bne.es/en/Collections/Greek-Mythology",
+      "status": 403,
+      "verdict": "BLOCKED"
+    },
+    "S-0059": {
+      "file": "sources/tier-1/S-0059-old-testament-manuscript.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0060": {
+      "file": "sources/tier-1/S-0060-ancient-greek-texts.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0061": {
+      "file": "sources/tier-1/S-0061-cuneiform-tablets.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0062": {
+      "file": "sources/tier-1/S-0062-old-testament-manuscript-vatican.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0063": {
+      "file": "sources/tier-1/S-0063-sumerian-king-list.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0064": {
+      "file": "sources/tier-1/S-0064-linguistic-phylogeny-studies.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0065": {
+      "file": "sources/tier-1/S-0065-septuagint-codex-vaticanus.md",
+      "verifyAt": "https://digi.vatlib.it/view/MSS_Vat.gr.1209",
+      "url": "https://digi.vatlib.it/view/MSS_Vat.gr.1209",
+      "status": 200,
+      "verdict": "VERIFIED"
+    },
+    "S-0066": {
+      "file": "sources/tier-1/S-0066-masoretic-text-leningrad-codex.md",
+      "verifyAt": "https://www.nlr.ru/eng/exib/Codex/",
+      "url": "https://www.nlr.ru/eng/exib/Codex/",
+      "status": 404,
+      "verdict": "FAILED"
+    },
+    "S-0067": {
+      "file": "sources/tier-1/S-0067-papyrus-anastasi-i.md",
+      "verifyAt": "https://www.egyptianmuseum.gov.eg/",
+      "url": "https://www.egyptianmuseum.gov.eg/",
+      "status": 0,
+      "verdict": "FAILED",
+      "error": "ENOTFOUND"
+    },
+    "S-0068": {
+      "file": "sources/tier-1/S-0068-canaanite-city-records-tel-hazor.md",
+      "verifyAt": "https://www.antiquities.org.il/",
+      "url": "https://www.antiquities.org.il/",
+      "status": 200,
+      "verdict": "VERIFIED"
+    },
+    "S-0069": {
+      "file": "sources/tier-1/S-0069-herodotus-histories.md",
+      "verifyAt": "https://www.britishmuseum.org/",
+      "url": "https://www.britishmuseum.org/",
+      "status": 403,
+      "verdict": "BLOCKED"
+    },
+    "S-0070": {
+      "file": "sources/tier-1/S-0070-tacitus-germania.md",
+      "verifyAt": "https://digi.vatlib.it/",
+      "url": "https://digi.vatlib.it/",
+      "status": 200,
+      "verdict": "VERIFIED"
+    },
+    "S-0071": {
+      "file": "sources/tier-1/S-0071-great-isaiah-scroll.md",
+      "verifyAt": "https://www.imj.org.il/en/content/shrine-book",
+      "url": "https://www.imj.org.il/en/content/shrine-book",
+      "status": 200,
+      "verdict": "VERIFIED"
+    },
+    "S-0072": {
+      "file": "sources/tier-1/S-0072-leningrad-codex.md",
+      "verifyAt": "https://nlr.ru/eng/exib/Codex/",
+      "url": "https://nlr.ru/eng/exib/Codex/",
+      "status": 404,
+      "verdict": "FAILED"
+    },
+    "S-0073": {
+      "file": "sources/tier-1/S-0073-codex-vaticanus.md",
+      "verifyAt": "https://digi.vatlib.it/view/MSS_Vat.gr.1209",
+      "url": "https://digi.vatlib.it/view/MSS_Vat.gr.1209",
+      "status": 200,
+      "verdict": "VERIFIED"
+    },
+    "S-0074": {
+      "file": "sources/tier-1/S-0074-abisha-scroll.md",
+      "verifyAt": "https://www.samaritans-museum.com/samaritan-torah-scrolls/",
+      "url": "https://www.samaritans-museum.com/samaritan-torah-scrolls/",
+      "status": 0,
+      "verdict": "FAILED",
+      "error": "ENOTFOUND"
+    },
+    "S-0075": {
+      "file": "sources/tier-1/S-0075-codex-sinaiticus.md",
+      "verifyAt": "https://www.bl.uk/collection-items/codex-sinaiticus",
+      "url": "https://www.bl.uk/collection-items/codex-sinaiticus",
+      "status": 200,
+      "verdict": "VERIFIED"
+    },
+    "S-0076": {
+      "file": "sources/tier-1/S-0076-life-of-constantine.md",
+      "verifyAt": "https://digi.vatlib.it/view/MSS_Vat.lat.1631",
+      "url": "https://digi.vatlib.it/view/MSS_Vat.lat.1631",
+      "status": 200,
+      "verdict": "VERIFIED"
+    },
+    "S-0077": {
+      "file": "sources/tier-1/S-0077-inter-gravissimas-document.md",
+      "verifyAt": "https://www.vatican.va/archive/",
+      "url": "https://www.vatican.va/archive/",
+      "status": 403,
+      "verdict": "BLOCKED"
+    },
+    "S-0078": {
+      "file": "sources/tier-1/S-0078-british-calendar-act-1750-document.md",
+      "verifyAt": "https://www.nationalarchives.gov.uk/",
+      "url": "https://www.nationalarchives.gov.uk/",
+      "status": 200,
+      "verdict": "VERIFIED"
+    },
+    "S-0079": {
+      "file": "sources/tier-1/S-0079-phantom-time-hypothesis-literature.md",
+      "verifyAt": "https://www.ub.uni-muenchen.de/",
+      "url": "https://www.ub.uni-muenchen.de/",
+      "status": 200,
+      "verdict": "VERIFIED"
+    },
+    "S-0080": {
+      "file": "sources/tier-1/S-0080-piri-reis-map.md",
+      "verifyAt": "https://www.topkapisarayi.gov.tr/",
+      "url": "https://www.topkapisarayi.gov.tr/",
+      "status": 0,
+      "verdict": "FAILED",
+      "error": "EAI_AGAIN"
+    },
+    "S-0081": {
+      "file": "sources/tier-1/S-0081-ottoman-records-piri-reis.md",
+      "verifyAt": "https://www.devletarsivleri.gov.tr/",
+      "url": "https://www.devletarsivleri.gov.tr/",
+      "status": 200,
+      "verdict": "VERIFIED"
+    },
+    "S-0082": {
+      "file": "sources/tier-1/S-0082-oronce-fine-map.md",
+      "verifyAt": "https://gallica.bnf.fr/",
+      "url": "https://gallica.bnf.fr/",
+      "status": 200,
+      "verdict": "VERIFIED"
+    },
+    "S-0083": {
+      "file": "sources/tier-1/S-0083-french-cartographic-records.md",
+      "verifyAt": "https://www.archives-nationales.culture.gouv.fr/",
+      "url": "https://www.archives-nationales.culture.gouv.fr/",
+      "status": 200,
+      "verdict": "VERIFIED"
+    },
+    "S-0084": {
+      "file": "sources/tier-1/S-0084-buache-map.md",
+      "verifyAt": "https://www.bl.uk/",
+      "url": "https://www.bl.uk/",
+      "status": 200,
+      "verdict": "VERIFIED"
+    },
+    "S-0085": {
+      "file": "sources/tier-1/S-0085-french-geographical-studies.md",
+      "verifyAt": "https://www.ined.fr/",
+      "url": "https://www.ined.fr/",
+      "status": 200,
+      "verdict": "VERIFIED"
+    },
+    "S-0086": {
+      "file": "sources/tier-1/S-0086-jekyll-island-club-records.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0087": {
+      "file": "sources/tier-1/S-0087-bank-of-england-charter.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0088": {
+      "file": "sources/tier-1/S-0088-nixon-presidential-materials.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0089": {
+      "file": "sources/tier-1/S-0089-church-committee-report.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0090": {
+      "file": "sources/tier-1/S-0090-fbi-cointelpro-files.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0091": {
+      "file": "sources/tier-1/S-0091-operation-northwoods-memo.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0092": {
+      "file": "sources/tier-1/S-0092-smithsonian-institution-act.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0093": {
+      "file": "sources/tier-1/S-0093-carnegie-foundation-charter.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0094": {
+      "file": "sources/tier-1/S-0094-rockefeller-foundation-charter.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0095": {
+      "file": "sources/tier-1/S-0095-horace-mann-1843-report.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0096": {
+      "file": "sources/tier-1/S-0096-geb-occasional-letter-no-1.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0097": {
+      "file": "sources/tier-1/S-0097-reece-committee-transcripts.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0098": {
+      "file": "sources/tier-1/S-0098-petrie-pyramids-gizeh.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0099": {
+      "file": "sources/tier-1/S-0099-cole-pyramid-size-orientation.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0100": {
+      "file": "sources/tier-1/S-0100-protzen-puma-punku-architecture.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0101": {
+      "file": "sources/tier-1/S-0101-schmidt-gobekli-tepe-dating.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0102": {
+      "file": "sources/tier-1/S-0102-seattle-municipal-records-1889.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0103": {
+      "file": "sources/tier-1/S-0103-seattle-times-reports-1890.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0104": {
+      "file": "sources/tier-1/S-0104-portland-historical-records-1901.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0105": {
+      "file": "sources/tier-1/S-0105-archaeological-survey-portland-underground.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0106": {
+      "file": "sources/tier-1/S-0106-edinburgh-city-council-planning-records-1753.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0107": {
+      "file": "sources/tier-1/S-0107-scottish-heritage-reports-mary-kings-close.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0108": {
+      "file": "sources/tier-1/S-0108-vitrified-forts-scotland-tap-onoth.md",
+      "verifyAt": "http://nms.ac.uk/research/tap-onoth-vitrified-fort",
+      "url": "http://nms.ac.uk/research/tap-onoth-vitrified-fort",
+      "status": 403,
+      "verdict": "BLOCKED"
+    },
+    "S-0109": {
+      "file": "sources/tier-1/S-0109-vitrified-forts-scotland-craig-phadrig.md",
+      "verifyAt": "http://historicenvironment.scot/research/craig-phadrig-vitrified-fort",
+      "url": "http://historicenvironment.scot/research/craig-phadrig-vitrified-fort",
+      "status": 403,
+      "verdict": "BLOCKED"
+    },
+    "S-0110": {
+      "file": "sources/tier-1/S-0110-vitrified-forts-scotland-finavon.md",
+      "verifyAt": "http://angusarchives.scot/research/finavon-vitrified-fort",
+      "url": "http://angusarchives.scot/research/finavon-vitrified-fort",
+      "status": 0,
+      "verdict": "FAILED",
+      "error": "ENOTFOUND"
+    },
+    "S-0111": {
+      "file": "sources/tier-1/S-0111-vitrified-structures-france.md",
+      "verifyAt": "http://inrap.fr/research/vitrified-structures-france",
+      "url": "http://inrap.fr/research/vitrified-structures-france",
+      "status": 403,
+      "verdict": "BLOCKED"
+    },
+    "S-0112": {
+      "file": "sources/tier-1/S-0112-french-vitrified-forts.md",
+      "verifyAt": "http://museedelhomme.fr/research/french-vitrified-forts",
+      "url": "http://museedelhomme.fr/research/french-vitrified-forts",
+      "status": 404,
+      "verdict": "FAILED"
+    },
+    "S-0113": {
+      "file": "sources/tier-1/S-0113-temperature-analysis-vitrified-forts.md",
+      "verifyAt": "http://ed.ac.uk/research/vitrified-forts-temperature-analysis",
+      "url": "http://ed.ac.uk/research/vitrified-forts-temperature-analysis",
+      "status": 0,
+      "verdict": "FAILED",
+      "error": "AbortError: This operation was aborted"
+    },
+    "S-0114": {
+      "file": "sources/tier-1/S-0114-ancient-technologies-vitrification.md",
+      "verifyAt": "http://britishmuseum.org/research/ancient-vitrification-technologies",
+      "url": "http://britishmuseum.org/research/ancient-vitrification-technologies",
+      "status": 403,
+      "verdict": "BLOCKED"
+    },
+    "S-0115": {
+      "file": "sources/tier-1/S-0115-smithsonian-accession-records.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0116": {
+      "file": "sources/tier-1/S-0116-paracas-skulls-newspaper-article.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0117": {
+      "file": "sources/tier-1/S-0117-malta-skulls-catalog.md",
+      "verifyAt": "https://www.heritagemalta.org/archaeology/malta-skulls",
+      "url": "https://www.heritagemalta.org/archaeology/malta-skulls",
+      "status": 200,
+      "verdict": "VERIFIED"
+    },
+    "S-0118": {
+      "file": "sources/tier-1/S-0118-themistocles-zammit-report.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0119": {
+      "file": "sources/tier-1/S-0119-ancient-tools-london-catalog.md",
+      "verifyAt": "https://www.nhm.ac.uk/archaeology/tools-catalog",
+      "url": "https://www.nhm.ac.uk/archaeology/tools-catalog",
+      "status": 404,
+      "verdict": "FAILED"
+    },
+    "S-0120": {
+      "file": "sources/tier-1/S-0120-geological-quarterly-report.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0121": {
+      "file": "sources/tier-1/S-0121-cas-records-nyhs.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0122": {
+      "file": "sources/tier-1/S-0122-foundling-hospital-uk.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0123": {
+      "file": "sources/tier-1/S-0123-baby-farms-london.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0124": {
+      "file": "sources/tier-1/S-0124-worlds-columbian-exposition-report.md",
+      "verifyAt": "https://www.loc.gov/item/123456789",
+      "url": "https://www.loc.gov/item/123456789",
+      "status": 403,
+      "verdict": "BLOCKED"
+    },
+    "S-0125": {
+      "file": "sources/tier-1/S-0125-worlds-columbian-exposition-photos.md",
+      "verifyAt": "https://www.chicagohistory.org/item/CHS-0987",
+      "url": "https://www.chicagohistory.org/item/CHS-0987",
+      "status": 404,
+      "verdict": "FAILED"
+    },
+    "S-0126": {
+      "file": "sources/tier-1/S-0126-louisiana-purchase-exposition-catalogue.md",
+      "verifyAt": "https://www.mohistory.org/item/MHS-2004",
+      "url": "https://www.mohistory.org/item/MHS-2004",
+      "status": 403,
+      "verdict": "BLOCKED"
+    },
+    "S-0127": {
+      "file": "sources/tier-1/S-0127-louisiana-purchase-exposition-photos.md",
+      "verifyAt": "https://www.sos.mo.gov/item/MSA-PH-1904",
+      "url": "https://www.sos.mo.gov/item/MSA-PH-1904",
+      "status": 0,
+      "verdict": "FAILED",
+      "error": "AbortError: This operation was aborted"
+    },
+    "S-0128": {
+      "file": "sources/tier-1/S-0128-great-exhibition-official-records.md",
+      "verifyAt": "https://www.bl.uk/item/BL-1851",
+      "url": "https://www.bl.uk/item/BL-1851",
+      "status": 404,
+      "verdict": "FAILED"
+    },
+    "S-0129": {
+      "file": "sources/tier-1/S-0129-crystal-palace-demolition-photos.md",
+      "verifyAt": "https://www.vam.ac.uk/item/VAM-CPD-1854",
+      "url": "https://www.vam.ac.uk/item/VAM-CPD-1854",
+      "status": 404,
+      "verdict": "FAILED"
+    },
+    "S-0130": {
+      "file": "sources/tier-1/S-0130-genesis-10-hebrew-bible.md",
+      "verifyAt": "https://www.bl.uk/collection-items/hebrew-bible-genesis",
+      "url": "https://www.bl.uk/collection-items/hebrew-bible-genesis",
+      "status": 200,
+      "verdict": "VERIFIED"
+    },
+    "S-0131": {
+      "file": "sources/tier-1/S-0131-1-chronicles-1-hebrew-bible.md",
+      "verifyAt": "http://www.vaticanlibrary.va",
+      "url": "http://www.vaticanlibrary.va",
+      "status": 200,
+      "verdict": "VERIFIED"
+    },
+    "S-0132": {
+      "file": "sources/tier-1/S-0132-genesis-10-hebrew-bible.md",
+      "verifyAt": "https://www.bl.uk/collection-items/hebrew-bible-genesis",
+      "url": "https://www.bl.uk/collection-items/hebrew-bible-genesis",
+      "status": 200,
+      "verdict": "VERIFIED"
+    },
+    "S-0133": {
+      "file": "sources/tier-1/S-0133-josephus-antiquities-i6.md",
+      "verifyAt": "https://www.loc.gov/item/07021519/",
+      "url": "https://www.loc.gov/item/07021519/",
+      "status": 403,
+      "verdict": "BLOCKED"
+    },
+    "S-0134": {
+      "file": "sources/tier-1/S-0134-genesis-10-hebrew-bible.md",
+      "verifyAt": "https://www.bl.uk/collection-items/hebrew-bible-genesis",
+      "url": "https://www.bl.uk/collection-items/hebrew-bible-genesis",
+      "status": 200,
+      "verdict": "VERIFIED"
+    },
+    "S-0135": {
+      "file": "sources/tier-1/S-0135-book-of-jubilees.md",
+      "verifyAt": "http://www.ethiopianarchives.org",
+      "url": "http://www.ethiopianarchives.org",
+      "status": 0,
+      "verdict": "FAILED",
+      "error": "ENOTFOUND"
+    },
+    "S-0136": {
+      "file": "sources/tier-1/S-0136-great-isaiah-scroll.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0137": {
+      "file": "sources/tier-1/S-0137-hebrew-bible-introduction.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    },
+    "S-0138": {
+      "file": "sources/tier-1/S-0138-nicene-council-decisions.md",
+      "verifyAt": null,
+      "verdict": "NO-URL"
+    }
+  },
+  "claims": {
+    "C-0001": {
+      "file": "claims/C-0001-mercator-cites-lost-source.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "verified",
+      "sources": [
+        {
+          "id": "S-0001",
+          "url": "https://www.davidrumsey.com",
+          "status": 200,
+          "verdict": "VERIFIED"
+        }
+      ],
+      "bodyUrls": []
+    },
+    "C-0002": {
+      "file": "claims/C-0002-congress-acknowledged-land-destruction.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "verified",
+      "sources": [
+        {
+          "id": "S-0002",
+          "url": "https://www.govinfo.gov/content/pkg/STATUTE-3/pdf/STATUTE-3-Pg211.pdf",
+          "status": 200,
+          "verdict": "VERIFIED"
+        },
+        {
+          "id": "S-0003",
+          "url": "https://www.sos.mo.gov/CMSImages/Archives/resources/findingaids/rg951-03.pdf",
+          "status": 200,
+          "verdict": "VERIFIED"
+        }
+      ],
+      "bodyUrls": []
+    },
+    "C-0003": {
+      "file": "claims/C-0003-tetragrammaton-replaced-6800-times.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "verified",
+      "sources": [
+        {
+          "id": "S-0004",
+          "url": "https://www.sefaria.org",
+          "status": 200,
+          "verdict": "VERIFIED"
+        },
+        {
+          "id": "S-0005",
+          "url": "https://www.kingjamesbibleonline.org",
+          "status": 200,
+          "verdict": "VERIFIED"
+        }
+      ],
+      "bodyUrls": []
+    },
+    "C-0004": {
+      "file": "claims/C-0004-kjv-80-books-now-66.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "failed",
+      "sources": [
+        {
+          "id": "S-0005",
+          "url": "https://www.kingjamesbibleonline.org",
+          "status": 200,
+          "verdict": "VERIFIED"
+        },
+        {
+          "id": "S-0007",
+          "verdict": "NO-URL"
+        }
+      ],
+      "bodyUrls": []
+    },
+    "C-0005": {
+      "file": "claims/C-0005-orphan-trains-250k-children.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "verified",
+      "sources": [
+        {
+          "id": "S-0008",
+          "url": "https://www.childrensaidnyc.org",
+          "status": 200,
+          "verdict": "VERIFIED"
+        },
+        {
+          "id": "S-0009",
+          "url": "https://orphantraindepot.org",
+          "status": 202,
+          "verdict": "VERIFIED"
+        }
+      ],
+      "bodyUrls": []
+    },
+    "C-0006": {
+      "file": "claims/C-0006-tartary-on-maps-300-years.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "failed",
+      "sources": [
+        {
+          "id": "S-0010",
+          "url": "https://www.davidrumsey.com",
+          "status": 200,
+          "verdict": "VERIFIED"
+        },
+        {
+          "id": "S-0011",
+          "url": "https://archive.org",
+          "status": 200,
+          "verdict": "VERIFIED"
+        }
+      ],
+      "bodyUrls": [
+        {
+          "url": "https://www.davidrumsey.com",
+          "status": 200,
+          "verdict": "VERIFIED"
+        },
+        {
+          "url": "https://www.davidrumsey.com/maps1792-3-1-1-1",
+          "status": 404,
+          "verdict": "FAILED"
+        },
+        {
+          "url": "https://www.davidrumsey.com/maps1792-3-1-1-2",
+          "status": 404,
+          "verdict": "FAILED"
+        }
+      ]
+    },
+    "C-0007": {
+      "file": "claims/C-0007-gregorian-calendar-10-days-removed.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "failed",
+      "sources": [
+        {
+          "id": "S-0012",
+          "url": "https://www.fourmilab.ch/documents/calendar/IG/",
+          "status": 404,
+          "verdict": "FAILED"
+        },
+        {
+          "id": "S-0013",
+          "url": "https://www.legislation.gov.uk",
+          "status": 200,
+          "verdict": "VERIFIED"
+        }
+      ],
+      "bodyUrls": []
+    },
+    "C-0008": {
+      "file": "claims/C-0008-giant-skeleton-newspaper-reports.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "blocked",
+      "sources": [
+        {
+          "id": "S-0014",
+          "url": "https://chroniclingamerica.loc.gov",
+          "status": 403,
+          "verdict": "BLOCKED"
+        }
+      ],
+      "bodyUrls": []
+    },
+    "C-0009": {
+      "file": "claims/C-0009-federal-reserve-1913.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "verified",
+      "sources": [
+        {
+          "id": "S-0015",
+          "url": "https://www.govinfo.gov",
+          "status": 200,
+          "verdict": "VERIFIED"
+        },
+        {
+          "id": "S-0016",
+          "url": "https://www.federalreserve.gov/faqs.htm",
+          "status": 200,
+          "verdict": "VERIFIED"
+        }
+      ],
+      "bodyUrls": []
+    },
+    "C-0010": {
+      "file": "claims/C-0010-operation-paperclip.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "verified",
+      "sources": [
+        {
+          "id": "S-0017",
+          "url": "https://www.archives.gov",
+          "status": 200,
+          "verdict": "VERIFIED"
+        }
+      ],
+      "bodyUrls": []
+    },
+    "C-0011": {
+      "file": "claims/C-0011-mkultra-cia-experiments.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "failed",
+      "sources": [
+        {
+          "id": "S-0018",
+          "url": "https://www.cia.gov/readingroom/",
+          "status": 0,
+          "verdict": "FAILED",
+          "error": "Error: redirect count exceeded"
+        }
+      ],
+      "bodyUrls": []
+    },
+    "C-0012": {
+      "file": "claims/C-0012-buried-architecture-cities.md",
+      "confidence": "CONTESTED",
+      "verdict": "verified",
+      "sources": [
+        {
+          "id": "S-0019",
+          "url": "https://www.undergroundtour.com",
+          "status": 200,
+          "verdict": "VERIFIED"
+        }
+      ],
+      "bodyUrls": []
+    },
+    "C-0013": {
+      "file": "claims/C-0013-smithsonian-charter-custody.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "verified",
+      "sources": [
+        {
+          "id": "S-0020",
+          "url": "https://www.govinfo.gov",
+          "status": 200,
+          "verdict": "VERIFIED"
+        }
+      ],
+      "bodyUrls": []
+    },
+    "C-0014": {
+      "file": "claims/C-0014-rockefeller-education-board.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "verified",
+      "sources": [
+        {
+          "id": "S-0021",
+          "url": "https://rockarch.org",
+          "status": 200,
+          "verdict": "VERIFIED"
+        }
+      ],
+      "bodyUrls": []
+    },
+    "C-0015": {
+      "file": "claims/C-0015-table-of-nations-70-names.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "verified",
+      "sources": [
+        {
+          "id": "S-0004",
+          "url": "https://www.sefaria.org",
+          "status": 200,
+          "verdict": "VERIFIED"
+        },
+        {
+          "id": "S-0024",
+          "url": "https://www.sefaria.org/I_Chronicles.1",
+          "status": 200,
+          "verdict": "VERIFIED"
+        }
+      ],
+      "bodyUrls": []
+    },
+    "C-0016": {
+      "file": "claims/C-0016-josephus-nation-identifications.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "verified",
+      "sources": [
+        {
+          "id": "S-0022",
+          "url": "https://www.perseus.tufts.edu",
+          "status": 200,
+          "verdict": "VERIFIED"
+        }
+      ],
+      "bodyUrls": []
+    },
+    "C-0017": {
+      "file": "claims/C-0017-jubilees-territorial-boundaries.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "verified",
+      "sources": [
+        {
+          "id": "S-0023",
+          "url": "https://www.deadseascrolls.org.il",
+          "status": 200,
+          "verdict": "VERIFIED"
+        }
+      ],
+      "bodyUrls": []
+    },
+    "C-0018": {
+      "file": "claims/C-0018-shem-to-abraham-lineage.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "verified",
+      "sources": [
+        {
+          "id": "S-0004",
+          "url": "https://www.sefaria.org",
+          "status": 200,
+          "verdict": "VERIFIED"
+        },
+        {
+          "id": "S-0024",
+          "url": "https://www.sefaria.org/I_Chronicles.1",
+          "status": 200,
+          "verdict": "VERIFIED"
+        }
+      ],
+      "bodyUrls": []
+    },
+    "C-0019": {
+      "file": "claims/C-0019-european-royal-japheth-lineage.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "verified",
+      "sources": [
+        {
+          "id": "S-0025",
+          "url": "https://asc.jebbo.co.uk",
+          "status": 200,
+          "verdict": "VERIFIED"
+        }
+      ],
+      "bodyUrls": []
+    },
+    "C-0020": {
+      "file": "claims/C-0020-ethiopian-solomonic-shem-lineage.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "failed",
+      "sources": [
+        {
+          "id": "S-0026",
+          "verdict": "NO-URL"
+        }
+      ],
+      "bodyUrls": []
+    },
+    "C-0021": {
+      "file": "claims/C-0021-foundling-hospitals-europe.md",
+      "confidence": "SPECULATIVE",
+      "verdict": "failed",
+      "sources": [
+        {
+          "id": "S-0027",
+          "url": "https://www.lma.gov.uk/records/foundlings",
+          "status": 0,
+          "verdict": "FAILED",
+          "error": "AbortError: This operation was aborted"
+        },
+        {
+          "id": "S-0028",
+          "url": "https://www.viennaarchives.at/foundling-admissions",
+          "status": 0,
+          "verdict": "FAILED",
+          "error": "ECONNREFUSED"
+        }
+      ],
+      "bodyUrls": [
+        {
+          "url": "https://www.lma.gov.uk/records/foundlings",
+          "status": 0,
+          "verdict": "FAILED",
+          "error": "AbortError: This operation was aborted"
+        },
+        {
+          "url": "https://www.viennaarchives.at/foundling-admissions",
+          "status": 0,
+          "verdict": "FAILED",
+          "error": "ECONNREFUSED"
+        }
+      ]
+    },
+    "C-0022": {
+      "file": "claims/C-0022-baby-farms-19th-century.md",
+      "confidence": "SPECULATIVE",
+      "verdict": "failed",
+      "sources": [
+        {
+          "id": "S-0029",
+          "url": "https://www.nypl.org/archives/baby-farm-case",
+          "status": 200,
+          "verdict": "VERIFIED"
+        },
+        {
+          "id": "S-0030",
+          "url": "https://www.nationalarchives.gov.uk/baby-farms-inquest",
+          "status": 404,
+          "verdict": "FAILED"
+        }
+      ],
+      "bodyUrls": [
+        {
+          "url": "https://www.nypl.org/archives/baby-farm-case",
+          "status": 200,
+          "verdict": "VERIFIED"
+        },
+        {
+          "url": "https://www.nationalarchives.gov.uk/baby-farms-inquest",
+          "status": 404,
+          "verdict": "FAILED"
+        }
+      ]
+    },
+    "C-0023": {
+      "file": "claims/C-0023-magdalene-laundries-ireland.md",
+      "confidence": "SPECULATIVE",
+      "verdict": "failed",
+      "sources": [
+        {
+          "id": "S-0031",
+          "url": "https://www.irisharchives.ie/magdalene-laundry-records",
+          "status": 0,
+          "verdict": "FAILED",
+          "error": "CERT_HAS_EXPIRED"
+        },
+        {
+          "id": "S-0032",
+          "url": "https://www.gov.ie/magdalene-laundries-report",
+          "status": 403,
+          "verdict": "BLOCKED"
+        }
+      ],
+      "bodyUrls": [
+        {
+          "url": "https://www.irisharchives.ie/magdalene-laundry-records",
+          "status": 0,
+          "verdict": "FAILED",
+          "error": "CERT_HAS_EXPIRED"
+        },
+        {
+          "url": "https://www.gov.ie/magdalene-laundries-report",
+          "status": 403,
+          "verdict": "BLOCKED"
+        }
+      ]
+    },
+    "C-0024": {
+      "file": "claims/C-0024-chicago-white-city-construction-timeline.md",
+      "confidence": "SPECULATIVE",
+      "verdict": "no-checkable-source",
+      "sources": [],
+      "bodyUrls": []
+    },
+    "C-0025": {
+      "file": "claims/C-0025-st-louis-fair-construction-photographs.md",
+      "confidence": "SPECULATIVE",
+      "verdict": "no-checkable-source",
+      "sources": [],
+      "bodyUrls": []
+    },
+    "C-0026": {
+      "file": "claims/C-0026-crystal-palace-demolition-photographs.md",
+      "confidence": "SPECULATIVE",
+      "verdict": "no-checkable-source",
+      "sources": [],
+      "bodyUrls": [
+        {
+          "url": "https://collections.vam.ac.uk/item/O1572280/demolition-of-the-crystal-palace-photograph-fox-photos-ltd/",
+          "status": 200,
+          "verdict": "VERIFIED"
+        }
+      ]
+    },
+    "C-0027": {
+      "file": "claims/C-0027-buried-ground-floors-in-cities.md",
+      "confidence": "SPECULATIVE",
+      "verdict": "failed",
+      "sources": [
+        {
+          "id": "S-0039",
+          "url": "https://www.amu.krakow.pl/archaeology/st-marys-findings",
+          "status": 0,
+          "verdict": "FAILED",
+          "error": "ENOTFOUND"
+        },
+        {
+          "id": "S-0040",
+          "url": "https://www.phila.gov/historical/merchants-exchange",
+          "status": 200,
+          "verdict": "VERIFIED"
+        }
+      ],
+      "bodyUrls": []
+    },
+    "C-0028": {
+      "file": "claims/C-0028-sealed-basement-windows-evidence.md",
+      "confidence": "SPECULATIVE",
+      "verdict": "failed",
+      "sources": [
+        {
+          "id": "S-0041",
+          "url": "https://www.chateauversailles.fr/resources/sealed-windows",
+          "status": 404,
+          "verdict": "FAILED"
+        },
+        {
+          "id": "S-0042",
+          "url": "https://www.jakarta-history.org/colonial-buildings",
+          "status": 0,
+          "verdict": "FAILED",
+          "error": "ENOTFOUND"
+        }
+      ],
+      "bodyUrls": []
+    },
+    "C-0029": {
+      "file": "claims/C-0029-star-forts-global-distribution.md",
+      "confidence": "SPECULATIVE",
+      "verdict": "failed",
+      "sources": [
+        {
+          "id": "S-0043",
+          "url": "https://www.nationaalarchief.nl/fort-bourtange",
+          "status": 404,
+          "verdict": "FAILED"
+        },
+        {
+          "id": "S-0044",
+          "url": "https://www.nysl.nysed.gov/fort-ticonderoga",
+          "status": 404,
+          "verdict": "FAILED"
+        }
+      ],
+      "bodyUrls": []
+    },
+    "C-0030": {
+      "file": "claims/C-0030-acambaro-figurines-museum-references.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "failed",
+      "sources": [
+        {
+          "id": "S-0045",
+          "verdict": "NO-URL"
+        },
+        {
+          "id": "S-0046",
+          "verdict": "NO-URL"
+        }
+      ],
+      "bodyUrls": [
+        {
+          "url": "http://www.museodeacambaro.gob.mx",
+          "status": 0,
+          "verdict": "FAILED",
+          "error": "ENOTFOUND"
+        }
+      ]
+    },
+    "C-0031": {
+      "file": "claims/C-0031-ica-stones-museum-references.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "failed",
+      "sources": [
+        {
+          "id": "S-0047",
+          "verdict": "NO-URL"
+        },
+        {
+          "id": "S-0048",
+          "verdict": "NO-URL"
+        }
+      ],
+      "bodyUrls": [
+        {
+          "url": "http://museoregionaldeica.gob.pe",
+          "status": 0,
+          "verdict": "FAILED",
+          "error": "ENOTFOUND"
+        },
+        {
+          "url": "http://cabreramuseum.com",
+          "status": 0,
+          "verdict": "FAILED",
+          "error": "ENOTFOUND"
+        }
+      ]
+    },
+    "C-0032": {
+      "file": "claims/C-0032-baghdad-battery-museum-references.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "failed",
+      "sources": [
+        {
+          "id": "S-0049",
+          "verdict": "NO-URL"
+        }
+      ],
+      "bodyUrls": []
+    },
+    "C-0033": {
+      "file": "claims/C-0033-book-of-enoch-exclusion.md",
+      "confidence": "SPECULATIVE",
+      "verdict": "failed",
+      "sources": [
+        {
+          "id": "S-0050",
+          "url": "https://www.ethiopianorthodox.org/canon.html",
+          "status": 404,
+          "verdict": "FAILED"
+        },
+        {
+          "id": "S-0051",
+          "url": "https://www.vaticanarchives.va/laodicea",
+          "status": 0,
+          "verdict": "FAILED",
+          "error": "ENOTFOUND"
+        }
+      ],
+      "bodyUrls": []
+    },
+    "C-0034": {
+      "file": "claims/C-0034-book-of-jasher-historicity.md",
+      "confidence": "SPECULATIVE",
+      "verdict": "failed",
+      "sources": [
+        {
+          "id": "S-0052",
+          "url": "https://www.bodleian.ox.ac.uk/jasher",
+          "status": 404,
+          "verdict": "FAILED"
+        },
+        {
+          "id": "S-0053",
+          "url": "https://www.hebrewmanuscripts.org/jasher",
+          "status": 404,
+          "verdict": "FAILED"
+        }
+      ],
+      "bodyUrls": []
+    },
+    "C-0035": {
+      "file": "claims/C-0035-nag-hammadi-discovery.md",
+      "confidence": "SPECULATIVE",
+      "verdict": "failed",
+      "sources": [
+        {
+          "id": "S-0054",
+          "url": "https://www.copticmuseum.gov.eg/naghammadi",
+          "status": 0,
+          "verdict": "FAILED",
+          "error": "AbortError: This operation was aborted"
+        },
+        {
+          "id": "S-0055",
+          "url": "https://www.copticmuseum.gov.eg/thomas",
+          "status": 0,
+          "verdict": "FAILED",
+          "error": "AbortError: This operation was aborted"
+        }
+      ],
+      "bodyUrls": [
+        {
+          "url": "http://www.copticmuseum.gov.eg",
+          "status": 0,
+          "verdict": "FAILED",
+          "error": "AbortError: This operation was aborted"
+        }
+      ]
+    },
+    "C-0036": {
+      "file": "claims/C-0036-sumerian-ziusudra-flood-narrative.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "blocked",
+      "sources": [
+        {
+          "id": "S-0056",
+          "url": "https://www.penn.museum/collections/object/12345",
+          "status": 403,
+          "verdict": "BLOCKED"
+        }
+      ],
+      "bodyUrls": []
+    },
+    "C-0037": {
+      "file": "claims/C-0037-babylonian-gilgamesh-flood-narrative.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "blocked",
+      "sources": [
+        {
+          "id": "S-0057",
+          "url": "https://www.britishmuseum.org/collection/object/W_1850-0920-1",
+          "status": 403,
+          "verdict": "BLOCKED"
+        }
+      ],
+      "bodyUrls": [
+        {
+          "url": "https://www.britishmuseum.org/collection/object/W_1884-1110-1",
+          "status": 403,
+          "verdict": "BLOCKED"
+        }
+      ]
+    },
+    "C-0038": {
+      "file": "claims/C-0038-greek-deucalion-flood-narrative.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "blocked",
+      "sources": [
+        {
+          "id": "S-0058",
+          "url": "https://www.bne.es/en/Collections/Greek-Mythology",
+          "status": 403,
+          "verdict": "BLOCKED"
+        }
+      ],
+      "bodyUrls": []
+    },
+    "C-0039": {
+      "file": "claims/C-0039-hebrew-iberia-eber-connection.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "failed",
+      "sources": [
+        {
+          "id": "S-0059",
+          "verdict": "NO-URL"
+        },
+        {
+          "id": "S-0060",
+          "verdict": "NO-URL"
+        }
+      ],
+      "bodyUrls": [
+        {
+          "url": "https://www.bl.uk/catalogues/illuminatedmanuscripts/record.asp?ref=Add.MS.4709",
+          "status": 200,
+          "verdict": "VERIFIED"
+        },
+        {
+          "url": "https://www.nlg.gr",
+          "status": 403,
+          "verdict": "BLOCKED"
+        },
+        {
+          "url": "https://www.jhl.org",
+          "status": 0,
+          "verdict": "FAILED",
+          "error": "UNABLE_TO_GET_ISSUER_CERT_LOCALLY"
+        }
+      ]
+    },
+    "C-0040": {
+      "file": "claims/C-0040-assyria-asshur-origin.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "failed",
+      "sources": [
+        {
+          "id": "S-0061",
+          "verdict": "NO-URL"
+        },
+        {
+          "id": "S-0062",
+          "verdict": "NO-URL"
+        }
+      ],
+      "bodyUrls": [
+        {
+          "url": "https://www.britishmuseum.org/collection/object/W_BM-121344",
+          "status": 403,
+          "verdict": "BLOCKED"
+        },
+        {
+          "url": "http://www.vaticanlibrary.va/",
+          "status": 200,
+          "verdict": "VERIFIED"
+        }
+      ]
+    },
+    "C-0041": {
+      "file": "claims/C-0041-babel-linguistic-diversification.md",
+      "confidence": "CONTESTED",
+      "verdict": "failed",
+      "sources": [
+        {
+          "id": "S-0063",
+          "verdict": "NO-URL"
+        },
+        {
+          "id": "S-0064",
+          "verdict": "NO-URL"
+        }
+      ],
+      "bodyUrls": [
+        {
+          "url": "https://www.istanbularkeoloji.gov.tr/en",
+          "status": 0,
+          "verdict": "FAILED",
+          "error": "ERR_TLS_CERT_ALTNAME_INVALID"
+        },
+        {
+          "url": "https://www.eva.mpg.de/lingua/",
+          "status": 200,
+          "verdict": "VERIFIED"
+        }
+      ]
+    },
+    "C-0042": {
+      "file": "claims/C-0042-septuagint-masoretic-chronology-differences.md",
+      "confidence": "SUPPRESSED-IF-TRUE",
+      "verdict": "no-checkable-source",
+      "sources": [],
+      "bodyUrls": [
+        {
+          "url": "https://www.vaticanlibrary.va",
+          "status": 200,
+          "verdict": "VERIFIED"
+        },
+        {
+          "url": "https://www.nlr.ru",
+          "status": 200,
+          "verdict": "VERIFIED"
+        }
+      ]
+    },
+    "C-0043": {
+      "file": "claims/C-0043-ham-descendants-and-territories.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "no-checkable-source",
+      "sources": [],
+      "bodyUrls": []
+    },
+    "C-0044": {
+      "file": "claims/C-0044-japheth-lineage-and-european-tribes.md",
+      "confidence": "CONTESTED",
+      "verdict": "no-checkable-source",
+      "sources": [],
+      "bodyUrls": []
+    },
+    "C-0045": {
+      "file": "claims/C-0045-dead-sea-scrolls-masoretic-variants.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "failed",
+      "sources": [
+        {
+          "id": "S-0071",
+          "url": "https://www.imj.org.il/en/content/shrine-book",
+          "status": 200,
+          "verdict": "VERIFIED"
+        },
+        {
+          "id": "S-0072",
+          "url": "https://nlr.ru/eng/exib/Codex/",
+          "status": 404,
+          "verdict": "FAILED"
+        }
+      ],
+      "bodyUrls": [
+        {
+          "url": "https://www.imj.org.il/en/content/shrine-book",
+          "status": 200,
+          "verdict": "VERIFIED"
+        },
+        {
+          "url": "https://nlr.ru/eng/exib/Codex/",
+          "status": 404,
+          "verdict": "FAILED"
+        }
+      ]
+    },
+    "C-0046": {
+      "file": "claims/C-0046-septuagint-samaritan-pentateuch-variants.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "failed",
+      "sources": [
+        {
+          "id": "S-0073",
+          "url": "https://digi.vatlib.it/view/MSS_Vat.gr.1209",
+          "status": 200,
+          "verdict": "VERIFIED"
+        },
+        {
+          "id": "S-0074",
+          "url": "https://www.samaritans-museum.com/samaritan-torah-scrolls/",
+          "status": 0,
+          "verdict": "FAILED",
+          "error": "ENOTFOUND"
+        }
+      ],
+      "bodyUrls": [
+        {
+          "url": "https://digi.vatlib.it/view/MSS_Vat.gr.1209",
+          "status": 200,
+          "verdict": "VERIFIED"
+        },
+        {
+          "url": "https://www.samaritans-museum.com/samaritan-torah-scrolls/",
+          "status": 0,
+          "verdict": "FAILED",
+          "error": "ENOTFOUND"
+        }
+      ]
+    },
+    "C-0047": {
+      "file": "claims/C-0047-council-of-nicaea-decisions.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "verified",
+      "sources": [
+        {
+          "id": "S-0075",
+          "url": "https://www.bl.uk/collection-items/codex-sinaiticus",
+          "status": 200,
+          "verdict": "VERIFIED"
+        },
+        {
+          "id": "S-0076",
+          "url": "https://digi.vatlib.it/view/MSS_Vat.lat.1631",
+          "status": 200,
+          "verdict": "VERIFIED"
+        }
+      ],
+      "bodyUrls": [
+        {
+          "url": "https://www.bl.uk/collection-items/codex-sinaiticus",
+          "status": 200,
+          "verdict": "VERIFIED"
+        },
+        {
+          "url": "https://digi.vatlib.it/view/MSS_Vat.lat.1631",
+          "status": 200,
+          "verdict": "VERIFIED"
+        }
+      ]
+    },
+    "C-0048": {
+      "file": "claims/C-0048-inter-gravissimas-reform-impact.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "no-checkable-source",
+      "sources": [],
+      "bodyUrls": []
+    },
+    "C-0049": {
+      "file": "claims/C-0049-british-calendar-act-1750-effects.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "failed",
+      "sources": [],
+      "bodyUrls": [
+        {
+          "url": "https://www.nationalarchives.gov.uk/education/resources/calendar-act-1750/",
+          "status": 404,
+          "verdict": "FAILED"
+        }
+      ]
+    },
+    "C-0050": {
+      "file": "claims/C-0050-phantom-time-hypothesis-critique.md",
+      "confidence": "SPECULATIVE",
+      "verdict": "no-checkable-source",
+      "sources": [],
+      "bodyUrls": []
+    },
+    "C-0051": {
+      "file": "claims/C-0051-piri-reis-map-tartary.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "failed",
+      "sources": [
+        {
+          "id": "S-0080",
+          "url": "https://www.topkapisarayi.gov.tr/",
+          "status": 0,
+          "verdict": "FAILED",
+          "error": "EAI_AGAIN"
+        },
+        {
+          "id": "S-0081",
+          "url": "https://www.devletarsivleri.gov.tr/",
+          "status": 200,
+          "verdict": "VERIFIED"
+        }
+      ],
+      "bodyUrls": [
+        {
+          "url": "https://www.topkapisarayi.gov.tr/",
+          "status": 0,
+          "verdict": "FAILED",
+          "error": "EAI_AGAIN"
+        },
+        {
+          "url": "https://www.devletarsivleri.gov.tr/",
+          "status": 200,
+          "verdict": "VERIFIED"
+        }
+      ]
+    },
+    "C-0052": {
+      "file": "claims/C-0052-oronce-fine-map-tartary.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "verified",
+      "sources": [
+        {
+          "id": "S-0082",
+          "url": "https://gallica.bnf.fr/",
+          "status": 200,
+          "verdict": "VERIFIED"
+        },
+        {
+          "id": "S-0083",
+          "url": "https://www.archives-nationales.culture.gouv.fr/",
+          "status": 200,
+          "verdict": "VERIFIED"
+        }
+      ],
+      "bodyUrls": [
+        {
+          "url": "https://gallica.bnf.fr/",
+          "status": 200,
+          "verdict": "VERIFIED"
+        },
+        {
+          "url": "https://www.archives-nationales.culture.gouv.fr/",
+          "status": 200,
+          "verdict": "VERIFIED"
+        }
+      ]
+    },
+    "C-0053": {
+      "file": "claims/C-0053-buache-map-tartary.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "verified",
+      "sources": [
+        {
+          "id": "S-0084",
+          "url": "https://www.bl.uk/",
+          "status": 200,
+          "verdict": "VERIFIED"
+        },
+        {
+          "id": "S-0085",
+          "url": "https://www.ined.fr/",
+          "status": 200,
+          "verdict": "VERIFIED"
+        }
+      ],
+      "bodyUrls": [
+        {
+          "url": "https://www.bl.uk/",
+          "status": 200,
+          "verdict": "VERIFIED"
+        },
+        {
+          "url": "https://www.ined.fr/",
+          "status": 200,
+          "verdict": "VERIFIED"
+        }
+      ]
+    },
+    "C-0054": {
+      "file": "claims/C-0054-jekyll-island-meeting-1910.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "no-checkable-source",
+      "sources": [],
+      "bodyUrls": [
+        {
+          "url": "https://georgiahistory.com/",
+          "status": 200,
+          "verdict": "VERIFIED"
+        }
+      ]
+    },
+    "C-0055": {
+      "file": "claims/C-0055-bank-of-england-charter-1694.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "no-checkable-source",
+      "sources": [],
+      "bodyUrls": []
+    },
+    "C-0056": {
+      "file": "claims/C-0056-nixon-shock-1971.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "no-checkable-source",
+      "sources": [],
+      "bodyUrls": [
+        {
+          "url": "https://catalog.archives.gov/id/12007220",
+          "status": 200,
+          "verdict": "VERIFIED"
+        },
+        {
+          "url": "https://catalog.archives.gov/id/12007221",
+          "status": 200,
+          "verdict": "VERIFIED"
+        }
+      ]
+    },
+    "C-0057": {
+      "file": "claims/C-0057-operation-mockingbird-media-influence.md",
+      "confidence": "SPECULATIVE",
+      "verdict": "failed",
+      "sources": [],
+      "bodyUrls": [
+        {
+          "url": "https://www.cia.gov/readingroom/document/cia-rdp90-00965r000200080008-7",
+          "status": 0,
+          "verdict": "FAILED",
+          "error": "Error: redirect count exceeded"
+        }
+      ]
+    },
+    "C-0058": {
+      "file": "claims/C-0058-cointelpro-targeting-civil-rights.md",
+      "confidence": "SPECULATIVE",
+      "verdict": "no-checkable-source",
+      "sources": [],
+      "bodyUrls": [
+        {
+          "url": "https://vault.fbi.gov/cointel-pro",
+          "status": 206,
+          "verdict": "VERIFIED"
+        },
+        {
+          "url": "https://catalog.archives.gov/id/193875",
+          "status": 200,
+          "verdict": "VERIFIED"
+        }
+      ]
+    },
+    "C-0059": {
+      "file": "claims/C-0059-operation-northwoods-proposed-false-flags.md",
+      "confidence": "SPECULATIVE",
+      "verdict": "failed",
+      "sources": [],
+      "bodyUrls": [
+        {
+          "url": "https://www.archives.gov/files/research/jfk/releases/docid-32110687.pdf",
+          "status": 404,
+          "verdict": "FAILED"
+        },
+        {
+          "url": "https://nsarchive2.gwu.edu/news/20010430/northwoods.pdf",
+          "status": 200,
+          "verdict": "VERIFIED"
+        }
+      ]
+    },
+    "C-0060": {
+      "file": "claims/C-0060-smithsonian-institution-act-1846.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "no-checkable-source",
+      "sources": [],
+      "bodyUrls": [
+        {
+          "url": "https://www.loc.gov/law/help/statutes-at-large/",
+          "status": 403,
+          "verdict": "BLOCKED"
+        },
+        {
+          "url": "https://www.si.edu/about/history",
+          "status": 403,
+          "verdict": "BLOCKED"
+        }
+      ]
+    },
+    "C-0061": {
+      "file": "claims/C-0061-carnegie-foundation-charter.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "no-checkable-source",
+      "sources": [],
+      "bodyUrls": [
+        {
+          "url": "https://www.loc.gov/collections/",
+          "status": 403,
+          "verdict": "BLOCKED"
+        }
+      ]
+    },
+    "C-0062": {
+      "file": "claims/C-0062-rockefeller-foundation-charter.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "no-checkable-source",
+      "sources": [],
+      "bodyUrls": [
+        {
+          "url": "https://rockarch.org",
+          "status": 200,
+          "verdict": "VERIFIED"
+        }
+      ]
+    },
+    "C-0063": {
+      "file": "claims/C-0063-prussian-education-model-adoption.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "no-checkable-source",
+      "sources": [],
+      "bodyUrls": [
+        {
+          "url": "https://www.sec.state.ma.us/arc/archives.htm",
+          "status": 200,
+          "verdict": "VERIFIED"
+        }
+      ]
+    },
+    "C-0064": {
+      "file": "claims/C-0064-geb-occasional-letter-no-1-impact.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "failed",
+      "sources": [],
+      "bodyUrls": [
+        {
+          "url": "https://www.rockarch.org/",
+          "status": 0,
+          "verdict": "FAILED",
+          "error": "CERT_HAS_EXPIRED"
+        }
+      ]
+    },
+    "C-0065": {
+      "file": "claims/C-0065-reece-committee-transcripts-influence.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "no-checkable-source",
+      "sources": [],
+      "bodyUrls": [
+        {
+          "url": "https://www.archives.gov",
+          "status": 200,
+          "verdict": "VERIFIED"
+        }
+      ]
+    },
+    "C-0066": {
+      "file": "claims/C-0066-great-pyramid-measurements.md",
+      "confidence": "SPECULATIVE",
+      "verdict": "failed",
+      "sources": [
+        {
+          "id": "S-0098",
+          "verdict": "NO-URL"
+        },
+        {
+          "id": "S-0099",
+          "verdict": "NO-URL"
+        }
+      ],
+      "bodyUrls": [
+        {
+          "url": "https://www.bl.uk/catalogue",
+          "status": 404,
+          "verdict": "FAILED"
+        },
+        {
+          "url": "https://www.bodleian.ox.ac.uk",
+          "status": 200,
+          "verdict": "VERIFIED"
+        }
+      ]
+    },
+    "C-0067": {
+      "file": "claims/C-0067-puma-punku-precision-stonework.md",
+      "confidence": "SPECULATIVE",
+      "verdict": "failed",
+      "sources": [
+        {
+          "id": "S-0100",
+          "verdict": "NO-URL"
+        }
+      ],
+      "bodyUrls": []
+    },
+    "C-0068": {
+      "file": "claims/C-0068-gobekli-tepe-dating.md",
+      "confidence": "SPECULATIVE",
+      "verdict": "failed",
+      "sources": [
+        {
+          "id": "S-0101",
+          "verdict": "NO-URL"
+        }
+      ],
+      "bodyUrls": []
+    },
+    "C-0069": {
+      "file": "claims/C-0069-seattle-underground-documentation.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "failed",
+      "sources": [
+        {
+          "id": "S-0102",
+          "verdict": "NO-URL"
+        },
+        {
+          "id": "S-0103",
+          "verdict": "NO-URL"
+        }
+      ],
+      "bodyUrls": [
+        {
+          "url": "http://uwspecialcollections.com/seattle-1890",
+          "status": 0,
+          "verdict": "FAILED",
+          "error": "ENOTFOUND"
+        }
+      ]
+    },
+    "C-0070": {
+      "file": "claims/C-0070-portland-shanghai-tunnels.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "failed",
+      "sources": [
+        {
+          "id": "S-0104",
+          "verdict": "NO-URL"
+        },
+        {
+          "id": "S-0105",
+          "verdict": "NO-URL"
+        }
+      ],
+      "bodyUrls": []
+    },
+    "C-0071": {
+      "file": "claims/C-0071-edinburgh-mary-kings-close.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "failed",
+      "sources": [
+        {
+          "id": "S-0106",
+          "verdict": "NO-URL"
+        },
+        {
+          "id": "S-0107",
+          "verdict": "NO-URL"
+        }
+      ],
+      "bodyUrls": [
+        {
+          "url": "https://www.nrscotland.gov.uk",
+          "status": 200,
+          "verdict": "VERIFIED"
+        }
+      ]
+    },
+    "C-0072": {
+      "file": "claims/C-0072-scottish-vitrified-forts-analysis.md",
+      "confidence": "CONTESTED",
+      "verdict": "failed",
+      "sources": [
+        {
+          "id": "S-0108",
+          "url": "http://nms.ac.uk/research/tap-onoth-vitrified-fort",
+          "status": 403,
+          "verdict": "BLOCKED"
+        },
+        {
+          "id": "S-0109",
+          "url": "http://historicenvironment.scot/research/craig-phadrig-vitrified-fort",
+          "status": 403,
+          "verdict": "BLOCKED"
+        },
+        {
+          "id": "S-0110",
+          "url": "http://angusarchives.scot/research/finavon-vitrified-fort",
+          "status": 0,
+          "verdict": "FAILED",
+          "error": "ENOTFOUND"
+        }
+      ],
+      "bodyUrls": []
+    },
+    "C-0073": {
+      "file": "claims/C-0073-french-vitrified-structures.md",
+      "confidence": "CONTESTED",
+      "verdict": "failed",
+      "sources": [
+        {
+          "id": "S-0111",
+          "url": "http://inrap.fr/research/vitrified-structures-france",
+          "status": 403,
+          "verdict": "BLOCKED"
+        },
+        {
+          "id": "S-0112",
+          "url": "http://museedelhomme.fr/research/french-vitrified-forts",
+          "status": 404,
+          "verdict": "FAILED"
+        }
+      ],
+      "bodyUrls": []
+    },
+    "C-0074": {
+      "file": "claims/C-0074-temperature-analysis-vitrified-forts.md",
+      "confidence": "CONTESTED",
+      "verdict": "failed",
+      "sources": [
+        {
+          "id": "S-0113",
+          "url": "http://ed.ac.uk/research/vitrified-forts-temperature-analysis",
+          "status": 0,
+          "verdict": "FAILED",
+          "error": "AbortError: This operation was aborted"
+        },
+        {
+          "id": "S-0114",
+          "url": "http://britishmuseum.org/research/ancient-vitrification-technologies",
+          "status": 403,
+          "verdict": "BLOCKED"
+        }
+      ],
+      "bodyUrls": []
+    },
+    "C-0075": {
+      "file": "claims/C-0075-elongated-paracas-skulls.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "no-checkable-source",
+      "sources": [],
+      "bodyUrls": []
+    },
+    "C-0076": {
+      "file": "claims/C-0076-malta-elongated-skulls.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "no-checkable-source",
+      "sources": [],
+      "bodyUrls": []
+    },
+    "C-0077": {
+      "file": "claims/C-0077-giant-skeleton-smithsonian-accession.md",
+      "confidence": "SPECULATIVE",
+      "verdict": "no-checkable-source",
+      "sources": [],
+      "bodyUrls": [
+        {
+          "url": "https://siarchives.si.edu/collections/siris_arc_217068",
+          "status": 403,
+          "verdict": "BLOCKED"
+        }
+      ]
+    },
+    "C-0078": {
+      "file": "claims/C-0078-paracas-elongated-skulls-newspaper.md",
+      "confidence": "SPECULATIVE",
+      "verdict": "no-checkable-source",
+      "sources": [],
+      "bodyUrls": [
+        {
+          "url": "https://chroniclingamerica.loc.gov/lccn/sn83030214/1928-01-15/ed-1/seq-12/",
+          "status": 403,
+          "verdict": "BLOCKED"
+        }
+      ]
+    },
+    "C-0079": {
+      "file": "claims/C-0079-ancient-tools-unexpected-strata.md",
+      "confidence": "SPECULATIVE",
+      "verdict": "no-checkable-source",
+      "sources": [],
+      "bodyUrls": [
+        {
+          "url": "https://www.britishmuseum.org/collection/object/H_1925-0109-1",
+          "status": 403,
+          "verdict": "BLOCKED"
+        }
+      ]
+    },
+    "C-0080": {
+      "file": "claims/C-0080-cas-orphan-train-records.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "no-checkable-source",
+      "sources": [],
+      "bodyUrls": [
+        {
+          "url": "https://www.nyhistory.org/library/catalog",
+          "status": 202,
+          "verdict": "VERIFIED"
+        },
+        {
+          "url": "https://www.loc.gov/collections",
+          "status": 403,
+          "verdict": "BLOCKED"
+        }
+      ]
+    },
+    "C-0081": {
+      "file": "claims/C-0081-european-foundling-hospitals.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "no-checkable-source",
+      "sources": [],
+      "bodyUrls": []
+    },
+    "C-0082": {
+      "file": "claims/C-0082-baby-farms-19th-century.md",
+      "confidence": "CONTESTED",
+      "verdict": "no-checkable-source",
+      "sources": [],
+      "bodyUrls": [
+        {
+          "url": "https://www.cityoflondon.gov.uk/things-to-do/history-and-heritage/london-metropolitan-archives",
+          "status": 200,
+          "verdict": "VERIFIED"
+        }
+      ]
+    },
+    "C-0083": {
+      "file": "claims/C-0083-chicago-white-city-construction-methods.md",
+      "confidence": "SPECULATIVE",
+      "verdict": "failed",
+      "sources": [
+        {
+          "id": "S-0124",
+          "url": "https://www.loc.gov/item/123456789",
+          "status": 403,
+          "verdict": "BLOCKED"
+        },
+        {
+          "id": "S-0125",
+          "url": "https://www.chicagohistory.org/item/CHS-0987",
+          "status": 404,
+          "verdict": "FAILED"
+        }
+      ],
+      "bodyUrls": [
+        {
+          "url": "https://www.loc.gov/item/123456789",
+          "status": 403,
+          "verdict": "BLOCKED"
+        },
+        {
+          "url": "https://www.chicagohistory.org/item/CHS-0987",
+          "status": 404,
+          "verdict": "FAILED"
+        }
+      ]
+    },
+    "C-0084": {
+      "file": "claims/C-0084-st-louis-fair-architectural-style.md",
+      "confidence": "SPECULATIVE",
+      "verdict": "failed",
+      "sources": [
+        {
+          "id": "S-0126",
+          "url": "https://www.mohistory.org/item/MHS-2004",
+          "status": 403,
+          "verdict": "BLOCKED"
+        },
+        {
+          "id": "S-0127",
+          "url": "https://www.sos.mo.gov/item/MSA-PH-1904",
+          "status": 0,
+          "verdict": "FAILED",
+          "error": "AbortError: This operation was aborted"
+        }
+      ],
+      "bodyUrls": [
+        {
+          "url": "https://www.mohistory.org/item/MHS-2004",
+          "status": 403,
+          "verdict": "BLOCKED"
+        }
+      ]
+    },
+    "C-0085": {
+      "file": "claims/C-0085-crystal-palace-demolition-timeline.md",
+      "confidence": "SPECULATIVE",
+      "verdict": "failed",
+      "sources": [
+        {
+          "id": "S-0128",
+          "url": "https://www.bl.uk/item/BL-1851",
+          "status": 404,
+          "verdict": "FAILED"
+        },
+        {
+          "id": "S-0129",
+          "url": "https://www.vam.ac.uk/item/VAM-CPD-1854",
+          "status": 404,
+          "verdict": "FAILED"
+        }
+      ],
+      "bodyUrls": []
+    },
+    "C-0086": {
+      "file": "claims/C-0086-shem-lineage-territories.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "verified",
+      "sources": [
+        {
+          "id": "S-0130",
+          "url": "https://www.bl.uk/collection-items/hebrew-bible-genesis",
+          "status": 200,
+          "verdict": "VERIFIED"
+        },
+        {
+          "id": "S-0131",
+          "url": "http://www.vaticanlibrary.va",
+          "status": 200,
+          "verdict": "VERIFIED"
+        }
+      ],
+      "bodyUrls": []
+    },
+    "C-0087": {
+      "file": "claims/C-0087-ham-lineage-territories.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "failed",
+      "sources": [
+        {
+          "id": "S-0132",
+          "url": "https://www.bl.uk/collection-items/hebrew-bible-genesis",
+          "status": 200,
+          "verdict": "VERIFIED"
+        },
+        {
+          "id": "S-0133",
+          "url": "https://www.loc.gov/item/07021519/",
+          "status": 403,
+          "verdict": "BLOCKED"
+        }
+      ],
+      "bodyUrls": [
+        {
+          "url": "https://www.bl.uk/catalogues/illuminatedmanuscripts/record.asp?ref=Add_MS_14761",
+          "status": 200,
+          "verdict": "VERIFIED"
+        },
+        {
+          "url": "https://archive.org/details/antiquitiesofj00jose_0",
+          "status": 404,
+          "verdict": "FAILED"
+        }
+      ]
+    },
+    "C-0088": {
+      "file": "claims/C-0088-japheth-lineage-european-tribes.md",
+      "confidence": "DOCUMENTED",
+      "verdict": "failed",
+      "sources": [
+        {
+          "id": "S-0134",
+          "url": "https://www.bl.uk/collection-items/hebrew-bible-genesis",
+          "status": 200,
+          "verdict": "VERIFIED"
+        },
+        {
+          "id": "S-0135",
+          "url": "http://www.ethiopianarchives.org",
+          "status": 0,
+          "verdict": "FAILED",
+          "error": "ENOTFOUND"
+        }
+      ],
+      "bodyUrls": []
+    }
+  }
+}

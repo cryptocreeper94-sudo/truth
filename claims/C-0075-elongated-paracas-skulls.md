@@ -2,9 +2,12 @@
 id: C-0075
 title: Elongated Paracas Skulls
 domain: Archaeology
-confidence: DOCUMENTED
+confidence: SPECULATIVE
+confidence-claimed: DOCUMENTED
 sources: []
 status: active
+verification: no-checkable-source
+verified-on: 2026-08-10
 ---
 
 # C-0075 — Elongated Paracas Skulls

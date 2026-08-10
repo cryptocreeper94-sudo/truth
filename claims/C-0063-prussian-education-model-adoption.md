@@ -2,9 +2,12 @@
 id: C-0063
 title: Prussian Education Model Adoption in the United States
 domain: Education Design
-confidence: DOCUMENTED
+confidence: SPECULATIVE
+confidence-claimed: DOCUMENTED
 sources: []
 status: active
+verification: no-checkable-source
+verified-on: 2026-08-10
 ---
 
 # C-0063 — Prussian Education Model Adoption in the United States

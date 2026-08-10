@@ -5,6 +5,8 @@ domain: Star Forts
 confidence: CONTESTED
 sources: [S-0113, S-0114]
 status: active
+verification: failed
+verified-on: 2026-08-10
 ---
 
 # C-0074 — Temperature Analysis of Vitrified Forts

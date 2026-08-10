@@ -5,6 +5,8 @@ domain: Calendar Systems
 confidence: SPECULATIVE
 sources: []
 status: active
+verification: no-checkable-source
+verified-on: 2026-08-10
 ---
 
 # C-0079 — Ancient Tools Found in Unexpected Strata

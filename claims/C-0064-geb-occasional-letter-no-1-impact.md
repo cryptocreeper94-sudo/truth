@@ -2,9 +2,12 @@
 id: C-0064
 title: Impact of GEB Occasional Letter No. 1 on Education Reform
 domain: Intelligence Programs
-confidence: DOCUMENTED
+confidence: SPECULATIVE
+confidence-claimed: DOCUMENTED
 sources: []
 status: active
+verification: failed
+verified-on: 2026-08-10
 ---
 
 # C-0064 — Impact of GEB Occasional Letter No. 1 on Education Reform

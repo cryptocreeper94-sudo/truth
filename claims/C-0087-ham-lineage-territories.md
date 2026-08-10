@@ -2,9 +2,12 @@
 id: C-0087
 title: Lineage and Territories of Ham
 domain: Biblical Lineage
-confidence: DOCUMENTED
+confidence: SPECULATIVE
+confidence-claimed: DOCUMENTED
 sources: [S-0132, S-0133]
 status: active
+verification: failed
+verified-on: 2026-08-10
 ---
 
 # C-0087 — Lineage and Territories of Ham

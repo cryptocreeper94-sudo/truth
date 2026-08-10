@@ -2,9 +2,12 @@
 id: C-0055
 title: Bank of England Charter (1694)
 domain: Financial Origins
-confidence: DOCUMENTED
+confidence: SPECULATIVE
+confidence-claimed: DOCUMENTED
 sources: []
 status: active
+verification: no-checkable-source
+verified-on: 2026-08-10
 ---
 
 # C-0055 — Bank of England Charter (1694)

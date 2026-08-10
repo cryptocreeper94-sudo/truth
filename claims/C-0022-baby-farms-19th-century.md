@@ -5,6 +5,8 @@ domain: Orphan History
 confidence: SPECULATIVE
 sources: [S-0029, S-0030]
 status: active
+verification: failed
+verified-on: 2026-08-10
 ---
 
 # C-0022 — Prevalence of Baby Farms in the 19th Century

@@ -2,9 +2,12 @@
 id: C-0032
 title: Baghdad Battery: Museum References
 domain: Suppressed Finds
-confidence: DOCUMENTED
+confidence: SPECULATIVE
+confidence-claimed: DOCUMENTED
 sources: [S-0049]
 status: active
+verification: failed
+verified-on: 2026-08-10
 ---
 
 # C-0032 — Baghdad Battery: Museum References

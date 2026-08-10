@@ -5,6 +5,8 @@ domain: Ancient Texts
 confidence: SPECULATIVE
 sources: [S-0052, S-0053]
 status: active
+verification: failed
+verified-on: 2026-08-10
 ---
 
 # C-0034 — The Book of Jasher: References and Historical Existence

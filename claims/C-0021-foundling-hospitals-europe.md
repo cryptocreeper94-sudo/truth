@@ -5,6 +5,8 @@ domain: Orphan History
 confidence: SPECULATIVE
 sources: [S-0027, S-0028]
 status: active
+verification: failed
+verified-on: 2026-08-10
 ---
 
 # C-0021 — Presence and Role of Foundling Hospitals Across Europe

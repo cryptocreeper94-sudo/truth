@@ -5,6 +5,8 @@ domain: Biblical Lineage
 confidence: DOCUMENTED
 sources: [S-0130, S-0131]
 status: active
+verification: verified
+verified-on: 2026-08-10
 ---
 
 # C-0086 — Lineage and Territories of Shem

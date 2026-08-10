@@ -2,9 +2,12 @@
 id: C-0049
 title: The British Calendar Act of 1750 and Its Societal Effects
 domain: Intelligence Programs
-confidence: DOCUMENTED
+confidence: SPECULATIVE
+confidence-claimed: DOCUMENTED
 sources: []
 status: active
+verification: failed
+verified-on: 2026-08-10
 ---
 
 # C-0049 — The British Calendar Act of 1750 and Its Societal Effects

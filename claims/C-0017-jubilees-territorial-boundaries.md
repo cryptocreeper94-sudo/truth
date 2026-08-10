@@ -6,6 +6,8 @@ confidence: DOCUMENTED
 sources: [S-0023]
 dig: digs/lineage-of-nations.md
 status: active
+verification: verified
+verified-on: 2026-08-10
 ---
 
 # C-0017 — Jubilees: territorial boundaries for the three sons

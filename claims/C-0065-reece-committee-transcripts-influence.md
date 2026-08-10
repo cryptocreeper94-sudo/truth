@@ -2,9 +2,12 @@
 id: C-0065
 title: Influence of Reece Committee Transcripts on Public Perception of Foundations
 domain: Institutional Origins
-confidence: DOCUMENTED
+confidence: SPECULATIVE
+confidence-claimed: DOCUMENTED
 sources: []
 status: active
+verification: no-checkable-source
+verified-on: 2026-08-10
 ---
 
 # C-0065 — Influence of Reece Committee Transcripts on Public Perception of Foundations

@@ -6,6 +6,8 @@ confidence: DOCUMENTED
 sources: [S-0004, S-0024]
 dig: digs/lineage-of-nations.md
 status: active
+verification: verified
+verified-on: 2026-08-10
 ---
 
 # C-0018 — Shem to Abraham: ten generations, three parallel texts

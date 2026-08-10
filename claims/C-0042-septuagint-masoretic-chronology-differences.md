@@ -5,6 +5,8 @@ domain: Biblical Texts
 confidence: SUPPRESSED-IF-TRUE
 sources: []
 status: active
+verification: no-checkable-source
+verified-on: 2026-08-10
 ---
 
 # C-0042 — Septuagint vs Masoretic Chronological Differences in Genesis Genealogies

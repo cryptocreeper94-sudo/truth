@@ -5,6 +5,8 @@ domain: Cartography
 confidence: DOCUMENTED
 sources: [S-0082, S-0083]
 status: active
+verification: verified
+verified-on: 2026-08-10
 ---
 
 # C-0052 — Oronce Finé Map (1531) Inclusion of Tartary

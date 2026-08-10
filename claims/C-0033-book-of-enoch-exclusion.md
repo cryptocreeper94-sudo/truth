@@ -5,6 +5,8 @@ domain: Ancient Texts
 confidence: SPECULATIVE
 sources: [S-0050, S-0051]
 status: active
+verification: failed
+verified-on: 2026-08-10
 ---
 
 # C-0033 — Exclusion of the Book of Enoch from Biblical Canon

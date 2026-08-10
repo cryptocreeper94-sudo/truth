@@ -2,10 +2,13 @@
 id: C-0011
 title: MKUltra was a real CIA program conducting illegal human experiments on unwitting subjects, documented by the agency's own surviving files
 domain: Intelligence Programs
-confidence: DOCUMENTED
+confidence: SPECULATIVE
+confidence-claimed: DOCUMENTED
 sources: [S-0018]
 dig: digs/institutional-capture.md
 status: active
+verification: failed
+verified-on: 2026-08-10
 ---
 
 # C-0011 — CIA conducted illegal mind control experiments on unwitting subjects

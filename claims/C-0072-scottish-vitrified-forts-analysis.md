@@ -5,6 +5,8 @@ domain: Star Forts
 confidence: CONTESTED
 sources: [S-0108, S-0109, S-0110]
 status: active
+verification: failed
+verified-on: 2026-08-10
 ---
 
 # C-0072 — Analysis of Vitrified Forts in Scotland

@@ -2,9 +2,12 @@
 id: C-0054
 title: Jekyll Island Meeting (1910)
 domain: Financial Origins
-confidence: DOCUMENTED
+confidence: SPECULATIVE
+confidence-claimed: DOCUMENTED
 sources: []
 status: active
+verification: no-checkable-source
+verified-on: 2026-08-10
 ---
 
 # C-0054 — Jekyll Island Meeting (1910)

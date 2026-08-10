@@ -2,9 +2,12 @@
 id: C-0088
 title: Japheth's Lineage and European Tribes
 domain: Biblical Lineage
-confidence: DOCUMENTED
+confidence: SPECULATIVE
+confidence-claimed: DOCUMENTED
 sources: [S-0134, S-0135]
 status: active
+verification: failed
+verified-on: 2026-08-10
 ---
 
 # C-0088 — Japheth's Lineage and European Tribes

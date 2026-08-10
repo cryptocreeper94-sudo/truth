@@ -5,6 +5,8 @@ domain: Buried Cities
 confidence: SPECULATIVE
 sources: [S-0041, S-0042]
 status: active
+verification: failed
+verified-on: 2026-08-10
 ---
 
 # C-0028 — Sealed Basement Windows in Historical Buildings

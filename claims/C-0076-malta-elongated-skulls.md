@@ -2,9 +2,12 @@
 id: C-0076
 title: Elongated Skulls of Malta
 domain: Archaeology
-confidence: DOCUMENTED
+confidence: SPECULATIVE
+confidence-claimed: DOCUMENTED
 sources: []
 status: active
+verification: no-checkable-source
+verified-on: 2026-08-10
 ---
 
 # C-0076 — Elongated Skulls of Malta

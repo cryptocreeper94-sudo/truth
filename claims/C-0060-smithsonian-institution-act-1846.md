@@ -2,9 +2,12 @@
 id: C-0060
 title: Smithsonian Institution Act (1846)
 domain: Institutional Origins
-confidence: DOCUMENTED
+confidence: SPECULATIVE
+confidence-claimed: DOCUMENTED
 sources: []
 status: active
+verification: no-checkable-source
+verified-on: 2026-08-10
 ---
 
 # C-0060 — Smithsonian Institution Act (1846)

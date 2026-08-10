@@ -6,6 +6,8 @@ confidence: CONTESTED
 sources: [S-0019]
 dig: digs/buried-architecture.md
 status: active
+verification: verified
+verified-on: 2026-08-10
 ---
 
 # C-0012 — Buried first floors in cities worldwide

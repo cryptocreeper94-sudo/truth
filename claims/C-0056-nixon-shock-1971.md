@@ -2,9 +2,12 @@
 id: C-0056
 title: Nixon Shock (1971)
 domain: Financial Origins
-confidence: DOCUMENTED
+confidence: SPECULATIVE
+confidence-claimed: DOCUMENTED
 sources: []
 status: active
+verification: no-checkable-source
+verified-on: 2026-08-10
 ---
 
 # C-0056 — Nixon Shock (1971)
