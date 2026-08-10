@@ -1,5 +1,6 @@
 ---
 title: "Temperature Analysis of Vitrified Forts"
+domain: Star Forts
 description: "Study on the temperatures required to vitrify fort walls and the feasibility of achieving such conditions with ancient technology."
 sources: ["S-0113", "S-0114"]
 confidence: "CONTESTED"
