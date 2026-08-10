@@ -1,5 +1,6 @@
 ---
 title: "Great Pyramid Measurements"
+domain: Ancient Engineering
 summary: "Analysis of the Great Pyramid's precise measurements and potential mathematical significance."
 status: "DOCUMENTED"
 sources: ["S-0098", "S-0099"]
