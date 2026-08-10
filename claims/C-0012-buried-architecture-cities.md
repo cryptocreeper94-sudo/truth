@@ -1,6 +1,7 @@
 ---
 id: C-0012
 title: Building Codes across multiple U.S. and European cities reveal ground-floor windows and doorways partially or fully below current street grade, consistent with a burial event
+domain: Buried Cities
 confidence: CONTESTED
 sources: [S-0019]
 dig: digs/buried-architecture.md
