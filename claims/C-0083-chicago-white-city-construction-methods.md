@@ -1,5 +1,6 @@
 ---
 title: "Chicago White City Construction Methods"
+domain: World Fairs
 summary: "The 1893 Chicago World's Fair, known as the White City, was constructed using methods that are contested due to the rapid timeline and scale."
 status: "CONTESTED"
 sources: ["S-0124", "S-0125"]
