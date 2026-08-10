@@ -1,6 +1,7 @@
 ---
 id: C-0013
 title: The Smithsonian Institution received a congressional charter (1846) granting it unique custody over natural and cultural artifacts with no external audit requirement for disposals
+domain: Institutional Origins
 confidence: DOCUMENTED
 sources: [S-0020]
 dig: digs/institutional-capture.md
