@@ -1,0 +1,28 @@
+{
+  "name": "truth-research-daemon",
+  "version": "0.1.0",
+  "description": "Truth Archive Research Daemon — DarkWave Studios LLC",
+  "type": "module",
+  "main": "daemon.mjs",
+  "scripts": {
+    "start": "node daemon.mjs",
+    "dev": "node --watch daemon.mjs"
+  },
+  "keywords": [
+    "truth",
+    "archive",
+    "research",
+    "daemon",
+    "darkwave",
+    "invariant"
+  ],
+  "author": "Andrews, Ronald Jason — DarkWave Studios LLC",
+  "license": "CC-BY-4.0",
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "openai": "^4.100.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

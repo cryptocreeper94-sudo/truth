@@ -1,0 +1,23 @@
+FROM node:20-slim
+
+RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy and install daemon dependencies
+COPY daemon/package*.json daemon/
+RUN cd daemon && npm ci --omit=dev
+
+# Copy entire repo (daemon needs METHOD.md, claims/, sources/, digs/)
+COPY . .
+
+RUN chmod +x daemon/start.sh
+
+ENV PORT=4242
+
+EXPOSE 4242
+
+HEALTHCHECK --interval=60s --timeout=5s --start-period=30s --retries=3 \
+  CMD node -e "const h=require('http');h.get('http://localhost:4242/health',r=>{process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))"
+
+CMD ["bash", "daemon/start.sh"]
