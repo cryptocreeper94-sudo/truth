@@ -1,5 +1,6 @@
 ---
 title: "Analysis of Vitrified Forts in Scotland"
+domain: Star Forts
 description: "Investigation of the vitrification process in Scottish forts, including Tap o'Noth, Craig Phadrig, and Finavon."
 sources: ["S-0108", "S-0109", "S-0110"]
 confidence: "CONTESTED"
