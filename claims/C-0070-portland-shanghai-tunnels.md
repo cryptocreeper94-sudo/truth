@@ -1,5 +1,6 @@
 ---
 title: "Portland Shanghai Tunnels"
+domain: Buried Cities
 summary: "The Shanghai Tunnels in Portland, Oregon, are believed to have been used for illicit activities, supported by physical evidence and historical records."
 sources: ["S-0104", "S-0105"]
 confidence: DOCUMENTED
