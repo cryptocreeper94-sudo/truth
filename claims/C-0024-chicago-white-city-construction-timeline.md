@@ -1,5 +1,6 @@
 ---
 title: "Chicago World's Fair White City Construction Timeline"
+domain: World Fairs
 summary: "Examine the construction timeline of the 1893 Chicago World's Fair White City and the methods claimed for its rapid completion."
 status: "DOCUMENTED"
 ---
