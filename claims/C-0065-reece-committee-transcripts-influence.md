@@ -1,5 +1,6 @@
 ---
 title: "Influence of Reece Committee Transcripts on Public Perception of Foundations"
+domain: Institutional Origins
 summary: "The Reece Committee transcripts of 1954 influenced public perception of the role of foundations in education."
 sources:
   - S-0097
