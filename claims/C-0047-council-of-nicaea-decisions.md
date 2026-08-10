@@ -1,5 +1,6 @@
 ---
 title: "Council of Nicaea: Decisions vs Popular Claims"
+domain: Biblical Texts
 summary: "A comparison of the actual decisions made at the Council of Nicaea versus popular claims about its outcomes."
 confidence: DOCUMENTED
 sources: ["S-0075", "S-0076"]
