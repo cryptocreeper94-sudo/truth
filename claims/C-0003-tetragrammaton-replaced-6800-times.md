@@ -1,6 +1,7 @@
 ---
 id: C-0003
 title: The Tetragrammaton (YHWH) appears approximately 6,800 times in the oldest complete Hebrew manuscript, but zero times in the King James Version
+domain: Biblical Texts
 confidence: DOCUMENTED
 sources: [S-0004, S-0005]
 dig: digs/name-erasure.md
