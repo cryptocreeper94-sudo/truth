@@ -1,5 +1,6 @@
 ---
 title: "Dead Sea Scrolls vs Masoretic Text: Specific Variants"
+domain: Biblical Texts
 summary: "Comparison of specific textual variants between the Dead Sea Scrolls and the Masoretic Text, citing specific manuscripts."
 confidence: DOCUMENTED
 sources: ["S-0071", "S-0072"]
