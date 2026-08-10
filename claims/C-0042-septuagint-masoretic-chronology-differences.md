@@ -1,5 +1,6 @@
 ---
 title: "Septuagint vs Masoretic Chronological Differences in Genesis Genealogies"
+domain: Biblical Texts
 date: 2023-10-12
 sources:
   - S-0065
