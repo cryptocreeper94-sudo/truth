@@ -107,33 +107,33 @@ const CONFIG = Object.freeze({
 // ═══════════════════════════════════════════════════════════════════════════════
 const DOMAIN_QUEUE = [
   // ── TIER 1: Foundation — heaviest Tier-1 material ──
-  { id: 'biblical_lineage', name: 'Biblical Lineage & Table of Nations', desc: 'Genesis 5, 10, 11; 1 Chronicles 1; Josephus Antiquities I.6; Book of Jubilees 8-9. Trace the genealogies of Shem, Ham, and Japheth. Map names to territories and historically attested peoples. Septuagint vs Masoretic chronological differences. Ethiopian Solomonic lineage through Kebra Nagast.' },
-  { id: 'biblical_textual', name: 'Biblical Textual Transmission', desc: 'Dead Sea Scrolls vs Masoretic Text vs Septuagint vs Samaritan Pentateuch. Specific textual variants with manuscript citations. Books removed from the KJV between 1611 and present. The Tetragrammaton replacement. Council of Nicaea records vs popular claims about what it decided.' },
-  { id: 'calendar_chronology', name: 'Calendar Reform & Chronological Disputes', desc: 'Inter gravissimas (1582). British Calendar Act (1750). Russian adoption (1918). Greek adoption (1923). Phantom time hypothesis (Illig) tagged SPECULATIVE. Anno Mundi vs Anno Domini dating systems. The Scaliger chronology.' },
-  { id: 'cartography', name: 'Historical Cartography & Lost Territories', desc: 'Tartary on European maps 1500-1900. Piri Reis map (1513). Oronce Finé (1531). Buache (1737). Mercator, Ortelius, Blaeu atlases. The term Tartary in Encyclopædia Britannica editions.' },
-  { id: 'monetary_systems', name: 'Monetary System Origins & Control', desc: 'Federal Reserve Act (1913). Jekyll Island meeting (1910). Bank of England charter (1694). Bretton Woods (1944) and Nixon shock (1971). Executive Order 11110 (1963). Central bank ownership structures worldwide.' },
+  { id: 'biblical_lineage', shortName: 'Biblical Lineage', name: 'Biblical Lineage & Table of Nations', desc: 'Genesis 5, 10, 11; 1 Chronicles 1; Josephus Antiquities I.6; Book of Jubilees 8-9. Trace the genealogies of Shem, Ham, and Japheth. Map names to territories and historically attested peoples. Septuagint vs Masoretic chronological differences. Ethiopian Solomonic lineage through Kebra Nagast.' },
+  { id: 'biblical_textual', shortName: 'Biblical Texts', name: 'Biblical Textual Transmission', desc: 'Dead Sea Scrolls vs Masoretic Text vs Septuagint vs Samaritan Pentateuch. Specific textual variants with manuscript citations. Books removed from the KJV between 1611 and present. The Tetragrammaton replacement. Council of Nicaea records vs popular claims about what it decided.' },
+  { id: 'calendar_chronology', shortName: 'Calendar Systems', name: 'Calendar Reform & Chronological Disputes', desc: 'Inter gravissimas (1582). British Calendar Act (1750). Russian adoption (1918). Greek adoption (1923). Phantom time hypothesis (Illig) tagged SPECULATIVE. Anno Mundi vs Anno Domini dating systems. The Scaliger chronology.' },
+  { id: 'cartography', shortName: 'Cartography', name: 'Historical Cartography & Lost Territories', desc: 'Tartary on European maps 1500-1900. Piri Reis map (1513). Oronce Finé (1531). Buache (1737). Mercator, Ortelius, Blaeu atlases. The term Tartary in Encyclopædia Britannica editions.' },
+  { id: 'monetary_systems', shortName: 'Financial Origins', name: 'Monetary System Origins & Control', desc: 'Federal Reserve Act (1913). Jekyll Island meeting (1910). Bank of England charter (1694). Bretton Woods (1944) and Nixon shock (1971). Executive Order 11110 (1963). Central bank ownership structures worldwide.' },
 
   // ── TIER 2: Institutional & governmental ──
-  { id: 'intelligence_ops', name: 'Declassified Intelligence Programs', desc: 'Operation Paperclip (JIOA files). MKUltra (surviving CIA files). Operation Mockingbird (Church Committee). COINTELPRO (FBI files). Operation Northwoods (Joint Chiefs memo). Gulf of Tonkin (NSA declassified). Each with specific NARA record groups and FOIA document numbers.' },
-  { id: 'institutional_history', name: 'Institutional Origins & Charters', desc: 'Smithsonian Institution Act (1846). Carnegie Foundation charter. Rockefeller Foundation. General Education Board. Rhodes Trust. Council on Foreign Relations founding documents. Each from founding statutes or institutional archives.' },
-  { id: 'education_design', name: 'Education System Design Documents', desc: 'Prussian education model and American adoption (Horace Mann 1843 report). GEB Occasional Letter No. 1 (1906). Carnegie Foundation reports. John Dewey writings. Reece Committee transcripts (1954).' },
+  { id: 'intelligence_ops', shortName: 'Intelligence Programs', name: 'Declassified Intelligence Programs', desc: 'Operation Paperclip (JIOA files). MKUltra (surviving CIA files). Operation Mockingbird (Church Committee). COINTELPRO (FBI files). Operation Northwoods (Joint Chiefs memo). Gulf of Tonkin (NSA declassified). Each with specific NARA record groups and FOIA document numbers.' },
+  { id: 'institutional_history', shortName: 'Institutional Origins', name: 'Institutional Origins & Charters', desc: 'Smithsonian Institution Act (1846). Carnegie Foundation charter. Rockefeller Foundation. General Education Board. Rhodes Trust. Council on Foreign Relations founding documents. Each from founding statutes or institutional archives.' },
+  { id: 'education_design', shortName: 'Education Design', name: 'Education System Design Documents', desc: 'Prussian education model and American adoption (Horace Mann 1843 report). GEB Occasional Letter No. 1 (1906). Carnegie Foundation reports. John Dewey writings. Reece Committee transcripts (1954).' },
 
   // ── TIER 3: Physical evidence ──
-  { id: 'ancient_architecture', name: 'Ancient Architecture & Engineering', desc: 'Great Pyramid measurements. Puma Punku precision stonework. Göbekli Tepe dating. Roman concrete lost formula. Acoustic properties of ancient temples. Megalithic construction worldwide with measurements.' },
-  { id: 'buried_cities', name: 'Buried Architecture & Underground Districts', desc: 'Seattle Underground. Portland Shanghai Tunnels. Edinburgh Mary King\'s Close. Derinkuyu underground city. Cappadocia. Chicago street regrading. Each with municipal records or archaeological documentation.' },
-  { id: 'vitrified_forts', name: 'Vitrified Forts & Meltology', desc: 'Scottish vitrified forts (Tap o\'Noth, Craig Phadrig, Finavon). French vitrified structures. Temperature analysis. Competing theories: deliberate technique, siege, unknown energy. Each with location and archaeological survey.' },
-  { id: 'anomalous_remains', name: 'Anomalous Archaeological Remains', desc: 'Giant skeleton newspaper reports with publication dates and page numbers. Smithsonian accession records. Elongated skulls (Paracas, Malta). Ancient tool finds in unexpected strata. Each cited by specific newspaper, date, page.' },
+  { id: 'ancient_architecture', shortName: 'Ancient Engineering', name: 'Ancient Architecture & Engineering', desc: 'Great Pyramid measurements. Puma Punku precision stonework. Göbekli Tepe dating. Roman concrete lost formula. Acoustic properties of ancient temples. Megalithic construction worldwide with measurements.' },
+  { id: 'buried_cities', shortName: 'Buried Cities', name: 'Buried Architecture & Underground Districts', desc: 'Seattle Underground. Portland Shanghai Tunnels. Edinburgh Mary King\'s Close. Derinkuyu underground city. Cappadocia. Chicago street regrading. Each with municipal records or archaeological documentation.' },
+  { id: 'vitrified_forts', shortName: 'Star Forts', name: 'Vitrified Forts & Meltology', desc: 'Scottish vitrified forts (Tap o\'Noth, Craig Phadrig, Finavon). French vitrified structures. Temperature analysis. Competing theories: deliberate technique, siege, unknown energy. Each with location and archaeological survey.' },
+  { id: 'anomalous_remains', shortName: 'Archaeology', name: 'Anomalous Archaeological Remains', desc: 'Giant skeleton newspaper reports with publication dates and page numbers. Smithsonian accession records. Elongated skulls (Paracas, Malta). Ancient tool finds in unexpected strata. Each cited by specific newspaper, date, page.' },
 
   // ── TIER 4: Civilization patterns ──
-  { id: 'orphan_generation', name: 'The Orphan Generation', desc: 'Orphan trains (1854-1929) CAS records. Foundling hospitals across Europe. Baby farms. Industrial schools. Magdalene laundries. Census record gaps. Birth certificate availability pre-1900.' },
-  { id: 'world_fairs', name: 'World\'s Fairs & Exhibition Architecture', desc: '1893 Chicago World\'s Fair (White City). 1904 St. Louis. Crystal Palace (1851). Construction timelines vs claimed methods. Photographs of demolition. Architectural style consistency.' },
-  { id: 'reset_evidence', name: 'Civilization Reset Physical Evidence', desc: 'Buried ground floors. Sealed basement windows. Star forts worldwide. Old-world technology patent records. Atmospheric electricity infrastructure. Mercury vortex engine patents.' },
+  { id: 'orphan_generation', shortName: 'Orphan History', name: 'The Orphan Generation', desc: 'Orphan trains (1854-1929) CAS records. Foundling hospitals across Europe. Baby farms. Industrial schools. Magdalene laundries. Census record gaps. Birth certificate availability pre-1900.' },
+  { id: 'world_fairs', shortName: 'World Fairs', name: 'World\'s Fairs & Exhibition Architecture', desc: '1893 Chicago World\'s Fair (White City). 1904 St. Louis. Crystal Palace (1851). Construction timelines vs claimed methods. Photographs of demolition. Architectural style consistency.' },
+  { id: 'reset_evidence', shortName: 'Reset Evidence', name: 'Civilization Reset Physical Evidence', desc: 'Buried ground floors. Sealed basement windows. Star forts worldwide. Old-world technology patent records. Atmospheric electricity infrastructure. Mercury vortex engine patents.' },
 
   // ── TIER 5: Deep chronology ──
-  { id: 'forbidden_archaeology', name: 'Suppressed Archaeological Finds', desc: 'Source documents (not conclusions): out-of-place artifacts with museum catalog numbers. Acámbaro figurines. Ica stones. Antikythera mechanism. Baghdad battery. Each with institutional holder and catalog reference.' },
-  { id: 'ancient_texts', name: 'Suppressed & Removed Ancient Texts', desc: 'Book of Enoch. Book of Jasher. Book of Giants (DSS). Nag Hammadi library. Gospel of Thomas. Acts of Pilate. Each with manuscript tradition, institutional holders, and dating. Council records for canon decisions.' },
-  { id: 'flood_traditions', name: 'Global Flood Traditions', desc: 'Over 200 documented flood narratives. Sumerian (Ziusudra). Babylonian (Atrahasis, Gilgamesh XI). Greek (Deucalion). Hindu (Matsya/Manu). Chinese (Gun-Yu). Mesoamerican. Each with source text and parallels. Geological evidence: Black Sea deluge, Younger Dryas.' },
-  { id: 'name_etymology', name: 'Ancient Name & Place Etymology', desc: 'Hebrew name meanings. Place name etymology tracing ancient peoples (Iberia/Eber, Assyria/Asshur). Language family trees and Genesis 10 genealogies. Tower of Babel narrative vs linguistic diversification evidence.' },
+  { id: 'forbidden_archaeology', shortName: 'Suppressed Finds', name: 'Suppressed Archaeological Finds', desc: 'Source documents (not conclusions): out-of-place artifacts with museum catalog numbers. Acámbaro figurines. Ica stones. Antikythera mechanism. Baghdad battery. Each with institutional holder and catalog reference.' },
+  { id: 'ancient_texts', shortName: 'Ancient Texts', name: 'Suppressed & Removed Ancient Texts', desc: 'Book of Enoch. Book of Jasher. Book of Giants (DSS). Nag Hammadi library. Gospel of Thomas. Acts of Pilate. Each with manuscript tradition, institutional holders, and dating. Council records for canon decisions.' },
+  { id: 'flood_traditions', shortName: 'Flood Narratives', name: 'Global Flood Traditions', desc: 'Over 200 documented flood narratives. Sumerian (Ziusudra). Babylonian (Atrahasis, Gilgamesh XI). Greek (Deucalion). Hindu (Matsya/Manu). Chinese (Gun-Yu). Mesoamerican. Each with source text and parallels. Geological evidence: Black Sea deluge, Younger Dryas.' },
+  { id: 'name_etymology', shortName: 'Etymology', name: 'Ancient Name & Place Etymology', desc: 'Hebrew name meanings. Place name etymology tracing ancient peoples (Iberia/Eber, Assyria/Asshur). Language family trees and Genesis 10 genealogies. Tower of Babel narrative vs linguistic diversification evidence.' },
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -343,29 +343,81 @@ DETERMINISTIC CONSTRAINTS (non-overridable):
 6. [10/EPISTEMIC] Tag what you CANNOT verify. If a source is a secondary account, say so. If dating is uncertain, say so.
 7. [07/LOCALITY] Each claim is an isolated cell. Do not let one claim's interpretation contaminate another.
 
+EXACT CLAIM FRONTMATTER FORMAT (you MUST use this exact structure, no quotes around values):
+---
+id: C-XXXX
+title: Short descriptive title of the claim
+domain: ${domain.shortName}
+confidence: DOCUMENTED
+sources: [S-XXXX, S-XXXY]
+related: [C-XXXX]
+status: active
+---
+
+# C-XXXX — Title
+
+## The claim
+[State the claim clearly with specific facts, dates, and institutional references]
+
+## The evidence
+[Cite specific Tier-1 sources with catalog numbers, institutional holders, and verification URLs]
+
+## Objection at full strength
+[The strongest possible counter-argument, stated honestly]
+
+EXACT SOURCE FRONTMATTER FORMAT (you MUST use this exact structure, no quotes around values):
+---
+id: S-XXXX
+title: Source title
+tier: 1
+type: manuscript OR government-record OR newspaper OR archaeological-survey OR institutional-record
+holder: Institution Name
+date-of-object: YYYY or ~YYYY
+verify-at: https://real-verification-url.example.com
+image-url: https://commons.wikimedia.org/... (if available, use real Wikimedia Commons URLs)
+external-refs: [https://en.wikipedia.org/wiki/..., https://other-real-reference.com]
+---
+
+# S-XXXX — Source title
+
+## What it is
+[Description of the physical object or document]
+
+## Where it is held
+[Institution, catalog number, access details]
+
+## Verification
+[How someone can independently verify this source exists]
+
 OUTPUT FORMAT (strict JSON):
 {
   "claims": [
     {
       "id": "C-XXXX",
       "filename": "C-XXXX-slug.md",
-      "content": "full markdown with YAML frontmatter"
+      "content": "full markdown with YAML frontmatter exactly as specified above"
     }
   ],
   "sources": [
     {
       "id": "S-XXXX",
       "filename": "S-XXXX-slug.md",
-      "content": "full markdown with YAML frontmatter"
+      "content": "full markdown with YAML frontmatter exactly as specified above"
     }
   ]
 }
+
+IMPORTANT: Do NOT put quotes around YAML values. Write: title: My Title (not title: "My Title"). Write: sources: [S-0001] (not sources: ["S-0001"]).
+
+For the related field: scan the EXISTING CLAIMS list below and identify any claims that share the same topic, time period, or geographical region. List their IDs in the related field.
+
+For verify-at and image-url: use REAL, working URLs from known institutions (Library of Congress, Wikimedia Commons, National Archives, British Museum, etc.). If you cannot provide a real URL, omit the field rather than inventing one.
 
 Start claim IDs at C-${String(nextClaimId).padStart(4, '0')}.
 Start source IDs at S-${String(nextSourceId).padStart(4, '0')}.
 Generate exactly ${CONFIG.claimsPerCycle} claims and their required sources.
 
-EXISTING CLAIMS (do not duplicate):
+EXISTING CLAIMS (do not duplicate, use for related field):
 ${scan.claims.join('\n')}
 
 EXISTING DIGS (assign claims to relevant digs):
