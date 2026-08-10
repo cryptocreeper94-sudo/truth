@@ -1,6 +1,7 @@
 ---
 id: C-0009
 title: The U.S. Federal Reserve System was created by an act of Congress signed December 23, 1913, delegating currency issuance to a privately structured central bank
+domain: Financial Origins
 confidence: DOCUMENTED
 sources: [S-0015, S-0016]
 dig: digs/monetary-system.md
