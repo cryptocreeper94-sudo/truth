@@ -1,5 +1,6 @@
 ---
 title: "Lineage and Territories of Shem"
+domain: Biblical Lineage
 source_ids: ["S-0130", "S-0131"]
 confidence: DOCUMENTED
 ---
