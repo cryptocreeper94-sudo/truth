@@ -1,5 +1,6 @@
 ---
 title: "Crystal Palace Demolition Timeline"
+domain: World Fairs
 summary: "The demolition timeline of the Crystal Palace post-1851 Exhibition reveals discrepancies between official records and photographic evidence."
 status: "SUPPRESSED-IF-TRUE"
 sources: ["S-0128", "S-0129"]
