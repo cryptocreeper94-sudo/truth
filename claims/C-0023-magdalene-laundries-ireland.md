@@ -1,5 +1,6 @@
 ---
 title: "Operations of Magdalene Laundries in Ireland"
+domain: Orphan History
 status: documented
 source_ids: ["S-0031", "S-0032"]
 ---
