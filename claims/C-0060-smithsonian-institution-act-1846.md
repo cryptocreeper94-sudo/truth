@@ -1,5 +1,6 @@
 ---
 title: "Smithsonian Institution Act (1846)"
+domain: Institutional Origins
 confidence: DOCUMENTED
 objection: "The interpretation of the Act's intent has been debated, with some arguing it was meant to serve primarily as a research institution rather than a public museum."
 ---
