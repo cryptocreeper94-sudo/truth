@@ -1,5 +1,6 @@
 ---
 title: "Operation Mockingbird Media Influence"
+domain: Intelligence Programs
 claim_id: "C-0057"
 status: "DOCUMENTED"
 source_tiers: [1]
