@@ -1,5 +1,6 @@
 ---
 title: "Sumerian Ziusudra Flood Narrative"
+domain: Flood Narratives
 confidence: DOCUMENTED
 sources: ["S-0056"]
 objections: "The Sumerian flood narrative's interpretation as a historical event is contested. Some scholars argue it may be a mythological allegory rather than a literal account."
