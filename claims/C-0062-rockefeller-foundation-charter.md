@@ -1,5 +1,6 @@
 ---
 title: "Rockefeller Foundation Charter"
+domain: Intelligence Programs
 confidence: DOCUMENTED
 objection: "The Foundation has been accused of using its funds to influence global policy in ways that may not align with its original mission of 'promoting the well-being of mankind.'"
 ---
