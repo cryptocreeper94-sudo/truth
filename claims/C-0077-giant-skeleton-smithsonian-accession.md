@@ -1,5 +1,6 @@
 ---
 title: "Smithsonian Accession Records for Giant Skeletons"
+domain: Institutional Origins
 status: "DOCUMENTED"
 tags: [giant skeletons, Smithsonian, archaeological remains]
 ---
