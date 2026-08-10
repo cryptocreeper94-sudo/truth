@@ -1,5 +1,6 @@
 ---
 title: "Assyria and Asshur: Etymological Origins"
+domain: Biblical Lineage
 summary: "Investigates the etymological roots of the name 'Assyria' and its connection to the biblical figure Asshur."
 sources: ["S-0061", "S-0062"]
 confidence: "DOCUMENTED"
