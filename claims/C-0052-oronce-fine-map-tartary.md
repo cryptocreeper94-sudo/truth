@@ -1,5 +1,6 @@
 ---
 title: "Oronce Finé Map (1531) Inclusion of Tartary"
+domain: Cartography
 claim_id: "C-0052"
 sources: ["S-0082", "S-0083"]
 confidence: "DOCUMENTED"
