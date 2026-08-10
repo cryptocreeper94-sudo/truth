@@ -1,5 +1,6 @@
 ---
 title: "Baghdad Battery: Museum References"
+domain: Suppressed Finds
 status: "DOCUMENTED"
 confidence: "DOCUMENTED"
 source_ids: ["S-0049"]
