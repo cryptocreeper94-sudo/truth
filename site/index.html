@@ -315,6 +315,7 @@ function renderClaimDetail(id) {
       <div class="detail-layout">
         <div class="detail-main">
           <div class="document">${md(claim.body)}</div>
+          ${renderDiscussion('claim', claim.meta.id)}
         </div>
         <div class="detail-sidebar">
           ${linkedSources ? `<div class="sidebar-card"><h4>Sources</h4>${linkedSources}</div>` : ''}
@@ -327,6 +328,15 @@ function renderClaimDetail(id) {
                 claim.meta.confidence === 'SUPPRESSED-IF-TRUE' ? 'Supporting record shows documented signs of removal or alteration.' :
                 'An honest hypothesis. Never corroborates.'}
             </p>
+          </div>
+          <div class="sidebar-card">
+            <h4>Discussion Tags</h4>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <span class="tag tag-documented" style="font-size:8px;">SOURCED — cites a verifiable source</span>
+              <span class="tag tag-contested" style="font-size:8px;">QUESTION — asks for evidence</span>
+              <span class="tag tag-speculative" style="font-size:8px;">OPINION — personal interpretation</span>
+              <span class="tag tag-suppressed" style="font-size:8px;">LEAD — potential new source</span>
+            </div>
           </div>
         </div>
       </div>
@@ -397,6 +407,7 @@ function renderSourceDetail(id) {
       <div class="detail-layout">
         <div class="detail-main">
           <div class="document">${md(source.body)}</div>
+          ${renderDiscussion('source', source.meta.id)}
         </div>
         <div class="detail-sidebar">
           ${refs ? `<div class="sidebar-card"><h4>Cited by Claims</h4>${refs}</div>` : ''}
@@ -448,6 +459,7 @@ function renderDigDetail(slug) {
       </div>
       ${!hasCounter ? '<div class="compliance-warning"><strong>⚠ Non-compliant:</strong> Counter-exhibits section is empty. This dig cannot support pattern claims until a genuine search for counter-evidence has been made and recorded. (METHOD.md §6)</div>' : ''}
       <div class="document">${md(dig.body.split('\n').slice(1).join('\n'))}</div>
+      ${renderDiscussion('dig', slug)}
     </div>
   `;
 }
@@ -510,6 +522,71 @@ function renderManifest() {
       <div class="document">${md(archive.manifest.split('\n').slice(2).join('\n'))}</div>
     </div>
   `;
+}
+
+// ── Discussion Component ──
+function renderDiscussion(type, id) {
+  const key = `truth-discuss-${type}-${id}`;
+  const comments = JSON.parse(localStorage.getItem(key) || '[]');
+  
+  const tagOptions = [
+    { value: 'SOURCED', label: 'Sourced — citing a verifiable source', cls: 'tag-documented' },
+    { value: 'QUESTION', label: 'Question — asking for evidence', cls: 'tag-contested' },
+    { value: 'OPINION', label: 'Opinion — personal interpretation', cls: 'tag-speculative' },
+    { value: 'LEAD', label: 'Lead — potential new source', cls: 'tag-suppressed' },
+  ];
+
+  const commentsHtml = comments.length > 0 ? comments.map((c, i) => `
+    <div class="discuss-comment" style="padding:16px 20px;border-bottom:1px solid var(--border);">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <span class="tag tag-${c.tag === 'SOURCED' ? 'documented' : c.tag === 'QUESTION' ? 'contested' : c.tag === 'LEAD' ? 'suppressed' : 'speculative'}" style="font-size:8px;">${c.tag}</span>
+        <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim);">${c.author || 'Anonymous'}</span>
+        <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim);margin-left:auto;">${c.date}</span>
+      </div>
+      <p style="font-size:0.88rem;color:var(--text-secondary);line-height:1.7;">${c.text.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>
+      ${c.source ? `<p style="font-size:0.78rem;color:var(--brass);margin-top:6px;">Source: ${c.source.replace(/</g, '&lt;')}</p>` : ''}
+    </div>
+  `).join('') : '<div style="padding:24px;text-align:center;color:var(--text-dim);font-family:var(--font-mono);font-size:11px;letter-spacing:0.08em;">No discussion yet. Be the first to contribute evidence or ask a question.</div>';
+
+  return `
+    <div class="discuss-section" style="margin-top:1px;background:var(--bg-card);border:1px solid var(--border);">
+      <div style="padding:20px 20px 12px;border-bottom:1px solid var(--border);">
+        <h3 style="font-family:var(--font-mono);font-weight:600;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-dim);margin-bottom:4px;">Community Discussion</h3>
+        <p style="font-size:11px;color:var(--text-dim);line-height:1.5;">Tag your contribution: <strong style="color:var(--tag-documented)">SOURCED</strong> if citing evidence, <strong style="color:var(--tag-speculative)">OPINION</strong> if interpreting. Method outranks conclusion.</p>
+      </div>
+      ${commentsHtml}
+      <div style="padding:16px 20px;border-top:1px solid var(--border);">
+        <div style="display:flex;gap:8px;margin-bottom:8px;">
+          <input id="discuss-author" placeholder="Name (optional)" style="flex:0 0 140px;padding:8px 12px;background:var(--bg-primary);border:1px solid var(--border);color:var(--text-primary);font-family:var(--font-mono);font-size:11px;outline:none;" />
+          <select id="discuss-tag" style="flex:0 0 160px;padding:8px 12px;background:var(--bg-primary);border:1px solid var(--border);color:var(--text-primary);font-family:var(--font-mono);font-size:11px;outline:none;">
+            ${tagOptions.map(t => `<option value="${t.value}">${t.value}</option>`).join('')}
+          </select>
+        </div>
+        <textarea id="discuss-text" rows="3" placeholder="Your contribution. If SOURCED, cite the specific source below." style="width:100%;padding:10px 12px;background:var(--bg-primary);border:1px solid var(--border);color:var(--text-primary);font-family:var(--font-body);font-size:13px;outline:none;resize:vertical;line-height:1.6;"></textarea>
+        <input id="discuss-source" placeholder="Source URL or citation (for SOURCED and LEAD tags)" style="width:100%;padding:8px 12px;margin-top:4px;background:var(--bg-primary);border:1px solid var(--border);color:var(--text-primary);font-family:var(--font-mono);font-size:11px;outline:none;" />
+        <button onclick="submitDiscussion('${type}','${id}')" style="margin-top:8px;padding:8px 24px;background:var(--bg-tertiary);border:1px solid var(--border);color:var(--text-secondary);font-family:var(--font-mono);font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:all 0.15s;"
+          onmouseover="this.style.color='var(--text-primary)';this.style.borderColor='var(--border-light)'"
+          onmouseout="this.style.color='var(--text-secondary)';this.style.borderColor='var(--border)'"
+        >Submit</button>
+      </div>
+    </div>
+  `;
+}
+
+function submitDiscussion(type, id) {
+  const key = `truth-discuss-${type}-${id}`;
+  const text = document.getElementById('discuss-text')?.value?.trim();
+  if (!text) return;
+  const comments = JSON.parse(localStorage.getItem(key) || '[]');
+  comments.push({
+    author: document.getElementById('discuss-author')?.value?.trim() || 'Anonymous',
+    tag: document.getElementById('discuss-tag')?.value || 'OPINION',
+    text: text,
+    source: document.getElementById('discuss-source')?.value?.trim() || '',
+    date: new Date().toISOString().split('T')[0],
+  });
+  localStorage.setItem(key, JSON.stringify(comments));
+  route(); // re-render
 }
 
 // ── Router ──
