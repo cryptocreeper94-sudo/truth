@@ -1,5 +1,6 @@
 ---
 title: "Prussian Education Model Adoption in the United States"
+domain: Education Design
 summary: "Horace Mann's 1843 report influenced the adoption of the Prussian education model in the United States."
 sources:
   - S-0095
