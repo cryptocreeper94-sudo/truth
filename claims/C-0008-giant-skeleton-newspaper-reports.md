@@ -1,6 +1,7 @@
 ---
 id: C-0008
 title: Major U.S. newspapers published hundreds of reports of oversized human skeletal remains between 1840 and 1920
+domain: Archaeology
 confidence: DOCUMENTED
 sources: [S-0014]
 dig: digs/giant-skeleton-reports.md
