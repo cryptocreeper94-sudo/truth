@@ -1,5 +1,6 @@
 ---
 title: "Babylonian Gilgamesh Flood Narrative"
+domain: Flood Narratives
 confidence: DOCUMENTED
 sources: ["S-0057"]
 objections: "The epic's flood story may have been influenced by earlier Sumerian versions, casting doubt on its originality as a distinct narrative."
