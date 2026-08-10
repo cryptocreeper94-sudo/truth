@@ -1,5 +1,6 @@
 ---
 title: "Mapping the Descendants of Ham to Historical Territories"
+domain: Biblical Lineage
 date: 2023-10-12
 sources:
   - S-0067
