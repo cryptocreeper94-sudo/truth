@@ -1,6 +1,7 @@
 ---
 id: C-0018
 title: The Abrahamic lineage is traced in Genesis, 1 Chronicles, and Luke through ten named generations from Shem to Abraham, with consistent names across three independent texts
+domain: Biblical Lineage
 confidence: DOCUMENTED
 sources: [S-0004, S-0024]
 dig: digs/lineage-of-nations.md
