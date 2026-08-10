@@ -1,5 +1,6 @@
 ---
 title: "Discovery and Impact of the Nag Hammadi Library"
+domain: Ancient Texts
 status: "DOCUMENTED"
 sources: ["S-0054", "S-0055"]
 objections: "Some scholars argue the Gnostic texts found in the Nag Hammadi Library represent fringe beliefs rather than mainstream early Christian thought, limiting their historical impact."
