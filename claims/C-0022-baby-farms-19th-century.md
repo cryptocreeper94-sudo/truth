@@ -1,5 +1,6 @@
 ---
 title: "Prevalence of Baby Farms in the 19th Century"
+domain: Orphan History
 status: documented
 source_ids: ["S-0029", "S-0030"]
 ---
