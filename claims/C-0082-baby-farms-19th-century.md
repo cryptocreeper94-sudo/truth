@@ -1,5 +1,6 @@
 ---
 title: "19th Century Baby Farms Records"
+domain: Orphan History
 summary: "Claim regarding the existence and extent of documentation related to baby farms in the 19th century."
 tags: ["baby farms", "19th century", "historical records"]
 confidence: "CONTESTED"
