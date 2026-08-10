@@ -1,6 +1,7 @@
 ---
 id: C-0010
 title: Operation Paperclip brought over 1,600 German scientists into U.S. government service after WWII, with war-crime records officially scrubbed
+domain: Intelligence Programs
 confidence: DOCUMENTED
 sources: [S-0017]
 dig: digs/institutional-capture.md
