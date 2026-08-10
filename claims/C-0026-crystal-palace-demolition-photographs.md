@@ -1,5 +1,6 @@
 ---
 title: "Crystal Palace Demolition Photographs"
+domain: World Fairs
 summary: "Investigate photographic records of the Crystal Palace demolition to assess claims about its construction durability."
 status: "DOCUMENTED"
 ---
