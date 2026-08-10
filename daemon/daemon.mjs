@@ -74,7 +74,7 @@ const IDENTITY = Object.freeze({
 // ═══════════════════════════════════════════════════════════════════════════════
 const CONFIG = Object.freeze({
   openaiApiKey: process.env.OPENAI_API_KEY || '',
-  openaiModel: process.env.TRUTH_MODEL || 'gpt-4o',
+  openaiModel: process.env.TRUTH_MODEL || 'gpt-4o-mini',
 
   // GitHub API — the daemon reads/writes directly to the repo
   githubToken: process.env.GITHUB_TOKEN || '',
@@ -95,9 +95,9 @@ const CONFIG = Object.freeze({
   warnThreshold: 0.80,
   pauseThreshold: 0.95,
 
-  // GPT-4o cost (per 1M tokens)
-  inputCostPer1M: 2.50,
-  outputCostPer1M: 10.00,
+  // GPT-4o-mini cost (per 1M tokens)
+  inputCostPer1M: 0.15,
+  outputCostPer1M: 0.60,
 
   port: parseInt(process.env.PORT || '4242'),
 });
