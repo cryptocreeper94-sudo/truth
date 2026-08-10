@@ -54,6 +54,9 @@ Major storms and multi-stream coincidences must be surfaced within 24 hours — 
 - Cell tower infrastructure (FCC DB + OpenCelliD)
 - HAARP and ionospheric research facilities (by real name, not generic label)
 
+### Architecture
+All Observatory components follow the **DDA 42-Doctrine / Deterministic Dissolution Ladder** — same architecture as the Truth Sentinel daemon. Read the module map in `OBSERVATORY.md` before writing any collector, normalizer, or detector script. Every script must declare its doctrine nodes in its header comment.
+
 ### Implementation stages (next agent: start at Stage 1)
 1. **Stage 1 — Foundation** ← START HERE
    - Create `/observatory/` directory structure

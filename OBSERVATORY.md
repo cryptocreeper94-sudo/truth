@@ -2,6 +2,62 @@
 
 > **CRITICAL: Any agent working on Truth MUST read this file AND ROADMAP.md before making changes.**
 > **Last Updated: 2026-08-10 — Specification written by main agent (Jason Andrews / DarkWave Studios LLC)**
+> **Architecture: DDA 42-Doctrine / Deterministic Dissolution Ladder**
+
+---
+
+## Architecture: DDA 42-Doctrine
+
+The Observatory is a **42-doctrine organism** — every module maps to a numbered doctrine node. This is not an analogy or a label. It is the design constraint. Any agent building Observatory components must maintain this mapping.
+
+The existing Truth Sentinel daemon (`daemon/daemon.mjs`) demonstrates the full pattern. The Observatory follows the same discipline across its different functional layers.
+
+### Module map
+
+```
+Layer 1 — Identity & Structure
+  [01] Identity Kernel      → OBSERVATORY_IDENTITY: immutable identity cert, version, author, purpose
+  [02] Boundary Engine      → METHOD.md + OBSERVATORY.md as hard boundaries; no event published outside them
+  [03] Differentiation      → Source domains separated: atmospheric / geophysical / infrastructure / RF
+  [07] Locality Engine      → Each event record is an isolated cell; no cross-contamination between OBS entries
+
+Layer 2 — Cognition & Reference
+  [08] Temporal Engine      → Every reading timestamped UTC; all streams locked to a shared time axis
+  [10] Epistemic Model      → Four verdict states: CORROBORATED / UNRESOLVED / CONTRADICTED / INSUFFICIENT-DATA
+  [12] Meta-Phenomenology   → Validation pass: does a detection meet the multi-stream coincidence threshold?
+
+Layer 3 — Constraint & Determinacy
+  [13] Constraint Engine    → Skeptic engine is non-overridable; ordinary explanations always stored alongside anomaly
+  [14] Determinacy Engine   → Every reading traceable to a raw file with SHA-256 hash; no inference from absence
+  [16] Domain Mapper        → Source domains route to correct normalizer and detector layer
+
+Layer 4 — System & Coherence
+  [20] Coherence Engine     → Control-region comparison: every event tested against a neighboring region
+  [22] Continuity Layer     → Raw file archive is append-only; no raw data is modified or deleted
+  [23] Causality Engine     → Git commit chain: cryptographic causal ordering of all collected data
+  [26] Arbitration Layer    → Verdict rules: detector generates verdict deterministically; AI does not set verdict
+
+Layer 5 — Integration & Resolution
+  [31] Verification         → verify.mjs checks every cited URL in every OBS event record weekly
+  [32] Integrity Layer      → SHA-256 on every raw file at time of download; hash stored in retrieval manifest
+  [33] Alignment Layer      → Collection budget gates: human-controlled rate limits per source
+  [34] Invariance Layer     → OBSERVATORY.md and METHOD.md are immutable; collectors cannot modify them
+
+Layer 6 — Safety Envelope
+  [35] Collapse Detection   → Source failure monitoring: if a collector fails repeatedly, alert and halt
+  [37] Null Boundary        → No event record published without at least two independent streams confirming
+  [40] Non-Being Guard      → Data-gap detection: missing data is recorded as a gap, not silently skipped
+  [42] Devoid Limit         → Fatal error handler: clean shutdown, raw archive preserved, state written before exit
+```
+
+### What this means in practice
+
+- Every collector script must declare its doctrine nodes in its header comment (same pattern as `daemon/daemon.mjs`).
+- The skeptic engine is **[13] Constraint Engine** — it is non-overridable by design. Disabling it breaks the architecture.
+- The verdict is **[26] Arbitration Layer** — deterministic rules, not AI judgment.
+- The hash-and-manifest provenance is **[32] Integrity Layer** — every file, every time, no exceptions.
+- The control-region comparison is **[20] Coherence Engine** — an anomaly without a control comparison is incomplete.
+- Data gaps are **[40] Non-Being Guard** — silence from a sensor is a recorded fact, not an ignored absence.
 
 ---
 
