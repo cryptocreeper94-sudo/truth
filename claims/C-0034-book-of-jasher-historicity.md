@@ -1,5 +1,6 @@
 ---
 title: "The Book of Jasher: References and Historical Existence"
+domain: Ancient Texts
 status: "DOCUMENTED"
 sources: ["S-0052", "S-0053"]
 objections: "There is no extant complete manuscript of the Book of Jasher predating the medieval period, raising questions about its authenticity and historical continuity."
