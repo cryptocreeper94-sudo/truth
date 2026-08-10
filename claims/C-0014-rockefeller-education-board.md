@@ -1,6 +1,7 @@
 ---
 id: C-0014
 title: The Rockefeller Foundation's General Education Board, established 1902, stated its intent to shape American education and explicitly described producing compliant workers
+domain: Institutional Origins
 confidence: DOCUMENTED
 sources: [S-0021]
 dig: digs/education-system.md
