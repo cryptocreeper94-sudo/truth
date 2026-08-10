@@ -1,5 +1,6 @@
 ---
 title: "St. Louis World's Fair Construction Photographs"
+domain: Intelligence Programs
 summary: "Analyze photographic evidence of the construction phases of the 1904 St. Louis World's Fair."
 status: "DOCUMENTED"
 ---
