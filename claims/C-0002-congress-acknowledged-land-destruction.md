@@ -1,6 +1,7 @@
 ---
 id: C-0002
 title: Within living memory of the events, the U.S. Congress legally acknowledged that the 1811–12 New Madrid earthquakes materially destroyed land — severe enough to warrant wholesale land replacement
+domain: Land History
 confidence: DOCUMENTED
 sources: [S-0002, S-0003]
 dig: digs/new-madrid-1811.md
