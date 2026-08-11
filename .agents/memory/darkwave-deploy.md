@@ -11,6 +11,6 @@ description: Which GitHub repo feeds darkwavestudios.io and the Coolify redeploy
 
 **Why:** An investor-page rebuild was first committed to a clone of the archived repo and could not be pushed; the same commit had to be re-applied to `DarkWaveStudiosLLC` (pushed Aug 11, 2026, `/investors` rebuild).
 
-**How to apply:** Always push DarkWave site changes to `DarkWaveStudiosLLC`. After pushing, verify deployment by checking the hashed `index-*.js` bundle on darkwavestudios.io for new content.
+**How to apply:** Always push DarkWave site changes to `DarkWaveStudiosLLC`. After pushing, verify deployment by checking the hashed `index-*.js` bundle on darkwavestudios.io for new content — build locally at a commit and compare the emitted `index-*.js` hash to the live one to identify exactly which commit is deployed.
 
-**Confirmed Aug 11, 2026: the repo has ZERO GitHub webhooks** (`GET /repos/.../hooks` returns empty) — Coolify cannot auto-deploy on push. Every deploy requires the user to click Redeploy in Coolify. Past "auto-deploys" were manual redeploys that happened to follow pushes. Permanent fix: register the Coolify app's webhook URL on the GitHub repo.
+**Auto-deploy DOES exist despite zero repo-level webhooks** (Aug 11, 2026): a push deployed within ~30s with the user away — the trigger is almost certainly a GitHub App connection in Coolify (App events don't appear in `GET /repos/.../hooks`). Do NOT conclude "no repo webhooks = manual deploys." However, the pipeline can silently stop: after one successful auto-deploy, three subsequent pushes (including an empty retrigger commit) produced no new build — a stuck/failed build in Coolify's queue, only diagnosable from the Coolify dashboard.
