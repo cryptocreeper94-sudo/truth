@@ -47,16 +47,36 @@ export function validateSchema(raw) {
     return { valid: false, trace };
   }
 
-  for (const claim of raw.claims) {
+  for (let i = 0; i < raw.claims.length; i++) {
+    const claim = raw.claims[i];
+    if (typeof claim === 'string') {
+      trace.results.push({ check: 'claim_type', pass: false, reason: `Claim[${i}] is a string, not an object — GPT returned wrong format` });
+      return { valid: false, trace };
+    }
+    if (!claim || typeof claim !== 'object') {
+      trace.results.push({ check: 'claim_type', pass: false, reason: `Claim[${i}] is ${typeof claim}, expected object` });
+      return { valid: false, trace };
+    }
     if (!claim.id || !claim.filename || !claim.content) {
-      trace.results.push({ check: 'claim_fields', pass: false, reason: `Claim missing required fields: ${JSON.stringify(Object.keys(claim))}` });
+      const missing = ['id', 'filename', 'content'].filter(f => !claim[f]);
+      trace.results.push({ check: 'claim_fields', pass: false, reason: `Claim ${claim.id || i} missing fields: [${missing.join(', ')}]. Has: [${Object.keys(claim).join(', ')}]` });
       return { valid: false, trace };
     }
   }
 
-  for (const source of raw.sources) {
+  for (let i = 0; i < raw.sources.length; i++) {
+    const source = raw.sources[i];
+    if (typeof source === 'string') {
+      trace.results.push({ check: 'source_type', pass: false, reason: `Source[${i}] is a string, not an object — GPT returned wrong format` });
+      return { valid: false, trace };
+    }
+    if (!source || typeof source !== 'object') {
+      trace.results.push({ check: 'source_type', pass: false, reason: `Source[${i}] is ${typeof source}, expected object` });
+      return { valid: false, trace };
+    }
     if (!source.id || !source.filename || !source.content) {
-      trace.results.push({ check: 'source_fields', pass: false, reason: `Source missing required fields: ${JSON.stringify(Object.keys(source))}` });
+      const missing = ['id', 'filename', 'content'].filter(f => !source[f]);
+      trace.results.push({ check: 'source_fields', pass: false, reason: `Source ${source.id || i} missing fields: [${missing.join(', ')}]. Has: [${Object.keys(source).join(', ')}]` });
       return { valid: false, trace };
     }
   }
