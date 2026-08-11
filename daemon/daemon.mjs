@@ -84,9 +84,14 @@ const CONFIG = Object.freeze({
 
   // Local paths (for METHOD.md baked into Docker image)
   methodFile: path.join(REPO_ROOT, 'METHOD.md'),
-  stateFile: path.join(__dirname, 'daemon_state.json'),
-  budgetFile: path.join(__dirname, 'daemon_budget.json'),
-  auditLog: path.join(__dirname, 'audit.log'),
+
+  // State files — MUST NOT live in __dirname (/app/daemon) because Coolify
+  // volume-mounts /app/daemon which overlays the code directory. Use /app/state
+  // in production (set STATE_DIR env var in Coolify), falls back to daemon/ locally.
+  stateDir: process.env.STATE_DIR || __dirname,
+  get stateFile() { return path.join(this.stateDir, 'daemon_state.json'); },
+  get budgetFile() { return path.join(this.stateDir, 'daemon_budget.json'); },
+  get auditLog() { return path.join(this.stateDir, 'audit.log'); },
 
   claimsPerCycle: 3,
   cycleIntervalMs: 6 * 60 * 60 * 1000, // 6 hours
@@ -641,6 +646,11 @@ async function runCycle(client, state, budget, method) {
 }
 
 async function main() {
+  // Ensure state directory exists (critical when STATE_DIR=/app/state on first deploy)
+  if (!fs.existsSync(CONFIG.stateDir)) {
+    fs.mkdirSync(CONFIG.stateDir, { recursive: true });
+  }
+
   console.log('');
   console.log('═══════════════════════════════════════════════════════════');
   console.log(`  ${IDENTITY.name} v${IDENTITY.version}`);
