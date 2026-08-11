@@ -391,6 +391,30 @@ An Observatory event record may eventually be cited as a Tier-1 source in a Hist
 
 ## Implementation stages
 
+### Sequencing rule
+
+Implementation proceeds from preservation to interpretation to presentation.
+Work on a later stage may be prepared in an isolated branch, but it must
+remain additive and may not bypass the earlier stage gates:
+
+1. **Stage 1:** operate and verify the existing NEXRAD/GOES collection,
+   storage, hashing, manifests, retention, and Coolify deployment.
+2. **Stage 2:** add independent source collectors and normalizers, including
+   seismic/geological sources. This stage does not issue verdicts or causal
+   interpretations.
+3. **Stage 3:** add the skeptic engine, deterministic verdict rules, and
+   `OBS-nnnn` event records.
+4. **Stages 4–5:** add infrastructure/context layers, autonomous operation,
+   and daily evidence digests.
+5. **Stage 6:** build the public live multi-layer map and synchronized replay
+   from the preserved, normalized records.
+
+The seismic workstream is therefore an additive Stage 2 component. It must
+not modify the meaning or operation of the Stage 1 collectors, implement the
+Stage 3 skeptic/verdict layer, or create a competing Stage 6 visualization.
+Code produced by an isolated task agent is not part of the operational
+Observatory until it has been reviewed, validated, and explicitly merged.
+
 ### Stage 1 — Foundation ← **START HERE**
 
 - Define the `/observatory/` directory structure in the truth repo

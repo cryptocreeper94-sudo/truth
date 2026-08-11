@@ -60,6 +60,15 @@ Schumann resonance.
 Build normalizer for NEXRAD and GOES.
 Wire event detector with 15-minute coincidence window.
 
+### Sequencing guardrail
+
+The seismic task is an additive Stage 2 workstream. It does not replace or
+reconfigure the Stage 1 NEXRAD/GOES collectors, and it does not implement
+Stage 3 verdicts, the skeptic engine, or Stage 6 map UI. Its output is
+preserved source records and normalized seismic observations for later stages.
+Task-agent code remains isolated until review, validation, and an explicit
+merge.
+
 ## Live visual Observatory map (planned Stage 6)
 
 The public interface is a required multi-layer map, not a collection of links

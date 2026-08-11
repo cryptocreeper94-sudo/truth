@@ -64,6 +64,28 @@ Major storms and multi-stream coincidences must be surfaced within 24 hours — 
 ### Architecture
 All Observatory components follow the **DDA 42-Doctrine / Deterministic Dissolution Ladder** — same architecture as the Truth Sentinel daemon. Read the module map in `OBSERVATORY.md` before writing any collector, normalizer, or detector script. Every script must declare its doctrine nodes in its header comment.
 
+### Execution order and task boundaries
+
+The Observatory is built in sequence. A later task may prepare additive
+components, but it must not silently replace, bypass, or redefine an earlier
+stage.
+
+- **Stage 1 remains the foundation:** deploy and verify the existing NEXRAD
+  and GOES collectors, storage volume, supervisor, manifests, hashing, and
+  retention behavior before treating the Observatory as operational.
+- **Stage 2 additions are collection-only:** seismic work may add earthquake,
+  station, volcano, fault, and deformation collectors plus their provenance
+  and normalization records. It must not implement verdicts, causal claims,
+  or the skeptic engine.
+- **Stage 3 remains separate:** the skeptic engine, deterministic verdict
+  rules, and `OBS-nnnn` event records are not part of a Stage 2 collector.
+- **Stage 6 remains separate:** the live multi-layer map and synchronized
+  replay consume normalized records later; seismic collection must not create
+  a competing visualization or reorder the map milestone.
+- **Merge gate:** task-agent work is isolated until reviewed and explicitly
+  merged. No later-stage work is considered complete merely because its code
+  exists; the roadmap stage and validation requirements still govern release.
+
 ### Implementation stages (next agent: start at Stage 1)
 1. **Stage 1 — Foundation** ✅ COLLECTORS BUILT & LIVE-TESTED (2026-08-10, main agent)
    - [x] `/observatory/` directory structure (see observatory/README.md)
