@@ -1,0 +1,115 @@
+## Handoff — Truth Archive Citation Repair & Governance Integration
+
+### What this session accomplished
+
+The Truth archive moved from v0.3.0 (ungoverned GPT output → GitHub) to v0.4.0 
+(Lume-V governed GPT output → 8 invariant gate → GitHub). The governance engine 
+(daemon/governance.mjs) implements layers 2–6 of the Lume-V CHI paper as deterministic 
+invariant checks between GPT-4o-mini and the archive. Nothing reaches the repo without 
+passing all 8 invariants. Trust certificates are SHA-256 hash-chained.
+
+### The 8 invariants
+
+1. SOURCE_LINKAGE — every claim must reference source IDs that exist
+2. URL_ALLOWLIST — source URLs must be on a known institutional domain list (80+ domains)
+3. OBJECTION_PRESENT — every claim must contain a substantive counter-argument (≥100 chars)
+4. CONFIDENCE_CEILING — the model cannot assign DOCUMENTED; only verify.mjs can
+5. NO_CENSORSHIP — if the model evades an assigned domain, it's logged for audit
+6. DUPLICATION_GUARD — >70% title overlap with existing claims = rejected
+7. DOMAIN_BOUNDARY — claims must stay in their assigned investigation domain
+8. CATALOG_FORMAT — fabricated catalog numbers (Report No. 2023-07 etc.) are stripped
+
+Invariants 2 and 8 are corrective (strip the bad data, keep the source). 
+Invariants 1, 3, 6, 7 are rejecting (claim does not enter the archive).
+Invariant 4 is corrective (DOCUMENTED → SPECULATIVE).
+Invariant 5 is a warning (logged, not a per-claim blocker).
+
+### What was fixed in this session
+
+1. **Body URL false failures (critical bug):** verify.mjs was failing claims when a 
+   reference URL in the prose body returned 404, even if all primary source citations 
+   verified. A Wikipedia link in a paragraph breaking should not invalidate verified 
+   LOC and archive.org sources. Fixed: body URL failures are logged but do not cause 
+   hard claim-level failure. Result: 41 verified → 59 verified.
+
+2. **Source ID collision guard:** The daemon checked filename uniqueness but not ID 
+   uniqueness. Two files with different names could carry the same S-ID. The auditor 
+   found S-0115/0116/0117 were overwritten. Fixed: scanArchive() now collects all IDs 
+   into Sets, and writeResults() checks for ID collisions before writing.
+
+3. **6 source URL repairs:** CDLI moved from UCLA to Max Planck (S-0061, S-0063). 
+   Book of Jasher archive.org path corrected (S-0053). Greek flood myths Wikipedia 
+   article doesn't exist at that path (S-0058). LOC item ID 123456789 was fabricated 
+   (S-0124). Missouri SOS path corrected (S-0127).
+
+4. **5 modern forensic domains added:** Anomalous Fires, Structural Forensics, Photo 
+   Forensics, Media Coverage, Environmental Anomalies. 65/35 priority queue favoring 
+   current events over historical backfill.
+
+5. **Fire-event source repair:** The daemon's first governed cycle produced 3 claims 
+   with fabricated source URLs (lahainafiredepartment.gov doesn't exist, osu.edu is 
+   Ohio State not Oregon State, etc.). All repaired to real institutional URLs. All 
+   now verify 200.
+
+### The digital absence doctrine
+
+This is a philosophical position from the project founder, not just a code change:
+
+In 2026, if an institution claims to hold physical records but those records have 
+zero digital footprint — no catalog entry, no finding aid, no digitized scan — that 
+absence is itself a data point. The old verify.mjs treated "no URL" as neutral. The 
+new logic treats it as notable. Claims with no checkable source are presented in the 
+archive with the observation that digital absence in the modern era is worth examining, 
+not dismissed.
+
+Do NOT reclassify these claims as less credible simply because they lack a URL. The 
+lack of a URL when the record should logically have been digitized may be the most 
+important thing about them.
+
+### What remains (the ~8 still-failing claims)
+
+These are real source-level failures where the cited URL returns 404 or connection error:
+- C-0023: S-0032 (gov.ie Magdalene laundries report — 403 blocked)
+- C-0083: S-0124 (LOC Columbian Exposition — URL was repaired, needs re-verify)
+- C-0084: S-0126 (mohistory.org — 403) + S-0127 (sos.mo.gov — repaired)
+- C-0092: was FAILED, now VERIFIED after auditor's Bretton Woods FRASER repair
+
+For each remaining failure: find the real URL if the document exists digitally, 
+or strip the URL and note "physical archive only — digital absence noted" if it 
+doesn't. Do not fabricate a replacement URL. An honest omission is always better 
+than a plausible-sounding fake.
+
+### Files that matter
+
+- daemon/daemon.mjs — the engine (v0.4.0, Lume-V governed)
+- daemon/governance.mjs — 8 invariant gate + trust certificates
+- daemon/url-allowlist.mjs — institutional domain whitelist
+- daemon/verify.mjs — post-publish verification engine
+- daemon/start.sh — container entrypoint (v0.4.0 banner)
+- digs/anomalous-fires.md — dig site with counter-exhibits (added by auditor)
+- verification/report.json — full verification evidence trail
+- METHOD.md — the law (daemon cannot modify or contradict it)
+
+### Sentinel deploy status
+
+The Sentinel container in Coolify is still running v0.3.0 (ungoverned). It needs 
+a rebuild (not just redeploy — Coolify may be caching the Docker image). The 
+Dockerfile is at Dockerfile.daemon. Once v0.4.0 is live, every new claim goes 
+through the governance gate. The old ungoverned claims are already in the archive 
+and have been audited/repaired.
+
+### The anti-censorship constraint
+
+The system prompt now includes directives 8 and 9:
+- [ANTI-CENSORSHIP]: Do not filter by mainstream acceptability. Filter only by 
+  evidence quality. If forensic evidence exists (engineering reports, metallurgical 
+  analysis, satellite imagery, patent records), it must be investigated regardless 
+  of whether the topic is labeled "conspiracy theory." If the model refuses to 
+  investigate an assigned domain, this is logged as censorship evasion.
+- [EVIDENCE-FIRST]: Cite patents, DOIs, FOIA docs, engineering reports. Expert 
+  testimony from licensed professionals carries weight. Editorial narrative does not 
+  constitute evidence.
+
+These are not suggestions. They are enforced constraints. The governance engine's 
+Invariant 5 monitors for censorship evasion. Truth does not care about social comfort. 
+Truth cares about evidence.
