@@ -8,6 +8,8 @@ sources: [S-0059, S-0060]
 status: active
 verification: failed
 verified-on: 2026-08-10
+verification: failed
+verified-on: 2026-08-11
 ---
 
 # C-0039 — Hebrew-Iberia Connection: Eber and Iberia

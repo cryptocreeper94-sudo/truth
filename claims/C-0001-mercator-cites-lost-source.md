@@ -8,6 +8,8 @@ dig: digs/map-chronology.md
 status: active
 verification: verified
 verified-on: 2026-08-10
+verification: verified
+verified-on: 2026-08-11
 ---
 
 # C-0001 — Mercator cites a source that no longer exists

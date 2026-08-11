@@ -9,6 +9,8 @@ dig: digs/institutional-capture.md
 status: active
 verification: failed
 verified-on: 2026-08-10
+verification: failed
+verified-on: 2026-08-11
 ---
 
 # C-0011 — CIA conducted illegal mind control experiments on unwitting subjects

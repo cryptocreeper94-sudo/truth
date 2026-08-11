@@ -8,6 +8,8 @@ sources: []
 status: active
 verification: failed
 verified-on: 2026-08-10
+verification: failed
+verified-on: 2026-08-11
 ---
 
 # C-0064 — Impact of GEB Occasional Letter No. 1 on Education Reform

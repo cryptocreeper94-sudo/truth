@@ -8,6 +8,8 @@ dig: digs/orphan-trains.md
 status: active
 verification: verified
 verified-on: 2026-08-10
+verification: verified
+verified-on: 2026-08-11
 ---
 
 # C-0005 — The Orphan Train movement relocated 250,000 children, many with living parents

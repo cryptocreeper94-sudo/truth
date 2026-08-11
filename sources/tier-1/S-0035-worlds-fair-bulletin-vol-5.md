@@ -4,6 +4,7 @@ author: "Exposition Authorities"
 year: "1903-1904"
 institution: "Missouri Historical Society"
 catalog_reference: "2003.78.1"
+verify-at: https://archive.org/search?query=world%27s+fair+bulletin+1904
 ---
 
 ## Description

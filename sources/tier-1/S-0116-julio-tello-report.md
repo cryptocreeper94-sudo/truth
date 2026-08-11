@@ -5,6 +5,7 @@ publication: "Journal of South American Anthropology"
 volume: 5
 issue: 3
 pages: "45-67"
+verify-at: https://en.wikipedia.org/wiki/Paracas_elongated_skulls
 ---
 
 ## Description

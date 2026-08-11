@@ -9,6 +9,8 @@ dig: digs/lineage-of-nations.md
 status: active
 verification: failed
 verified-on: 2026-08-10
+verification: failed
+verified-on: 2026-08-11
 ---
 
 # C-0020 — Ethiopian Solomonic lineage through Shem

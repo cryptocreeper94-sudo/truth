@@ -7,6 +7,8 @@ sources: [S-0098, S-0099]
 status: active
 verification: failed
 verified-on: 2026-08-10
+verification: failed
+verified-on: 2026-08-11
 ---
 
 # C-0066 — Great Pyramid Measurements

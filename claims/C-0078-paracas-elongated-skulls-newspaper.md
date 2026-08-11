@@ -7,6 +7,8 @@ sources: []
 status: active
 verification: no-checkable-source
 verified-on: 2026-08-10
+verification: no-checkable-source
+verified-on: 2026-08-11
 ---
 
 # C-0078 — Paracas Elongated Skulls Newspaper Reports

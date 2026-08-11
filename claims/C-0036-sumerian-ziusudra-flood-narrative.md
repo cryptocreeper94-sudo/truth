@@ -8,6 +8,8 @@ sources: [S-0056]
 status: active
 verification: blocked
 verified-on: 2026-08-10
+verification: blocked
+verified-on: 2026-08-11
 ---
 
 # C-0036 — Sumerian Ziusudra Flood Narrative

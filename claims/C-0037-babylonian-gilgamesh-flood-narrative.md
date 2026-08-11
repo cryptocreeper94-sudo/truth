@@ -8,6 +8,8 @@ sources: [S-0057]
 status: active
 verification: blocked
 verified-on: 2026-08-10
+verification: failed
+verified-on: 2026-08-11
 ---
 
 # C-0037 — Babylonian Gilgamesh Flood Narrative

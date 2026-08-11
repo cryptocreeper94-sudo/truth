@@ -1,5 +1,6 @@
 ---
 title: The Hebrew Bible: A Historical and Literary Introduction
+verify-at: https://www.sefaria.org/
 ---
 
 This book provides a comprehensive introduction to the Hebrew Bible, discussing its historical context, literary forms, and variations among manuscripts, including the impact of the Tetragrammaton.

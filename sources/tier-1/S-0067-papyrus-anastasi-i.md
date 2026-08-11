@@ -4,5 +4,6 @@ description: "An Egyptian papyrus providing insight into the geopolitical landsc
 institution: "Egyptian Museum, Cairo"
 catalog_number: "JE 66745"
 verification_url: "https://www.egyptianmuseum.gov.eg/"
+verify-at: https://egymonuments.gov.eg/
 ---
 Papyrus Anastasi I is an Egyptian document from the Ramesside period, providing geopolitical and administrative details of the time, which can be correlated with biblical references to Ham's descendants.

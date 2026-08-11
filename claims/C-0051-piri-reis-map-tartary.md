@@ -8,6 +8,8 @@ sources: [S-0080, S-0081]
 status: active
 verification: failed
 verified-on: 2026-08-10
+verification: failed
+verified-on: 2026-08-11
 ---
 
 # C-0051 — Piri Reis Map (1513) Depiction of Tartary

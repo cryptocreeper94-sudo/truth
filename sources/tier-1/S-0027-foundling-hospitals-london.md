@@ -4,4 +4,5 @@ institution: "London Metropolitan Archives"
 reference: "LMA/PAN/CH/01-12"
 description: "Documenting baptisms and admissions of foundlings from 1780 to 1890."
 verification_url: "https://www.lma.gov.uk/records/foundlings"
+verify-at: https://archives.coram.org.uk/
 ---

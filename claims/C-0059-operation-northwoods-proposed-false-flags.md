@@ -7,6 +7,8 @@ sources: []
 status: active
 verification: failed
 verified-on: 2026-08-10
+verification: failed
+verified-on: 2026-08-11
 ---
 
 # C-0059 — Operation Northwoods Proposed False Flags

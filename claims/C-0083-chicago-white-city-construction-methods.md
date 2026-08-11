@@ -7,6 +7,8 @@ sources: [S-0124, S-0125]
 status: active
 verification: failed
 verified-on: 2026-08-10
+verification: failed
+verified-on: 2026-08-11
 ---
 
 # C-0083 — Chicago White City Construction Methods

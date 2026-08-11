@@ -8,6 +8,8 @@ sources: [S-0132, S-0133]
 status: active
 verification: failed
 verified-on: 2026-08-10
+verification: failed
+verified-on: 2026-08-11
 ---
 
 # C-0087 — Lineage and Territories of Ham

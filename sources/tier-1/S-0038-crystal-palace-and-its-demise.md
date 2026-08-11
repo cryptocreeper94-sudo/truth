@@ -4,6 +4,7 @@ author: "The Architectural Review"
 year: 1937
 institution: "British Library"
 catalog_reference: "7708.tt.42"
+verify-at: https://www.vam.ac.uk/articles/the-crystal-palace
 ---
 
 ## Description

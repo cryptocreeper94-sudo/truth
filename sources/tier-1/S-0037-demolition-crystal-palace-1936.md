@@ -4,6 +4,7 @@ author: "Fox Photos Ltd"
 year: 1936
 institution: "Victoria and Albert Museum"
 catalog_reference: "PH.296-1936"
+verify-at: https://en.wikipedia.org/wiki/The_Crystal_Palace#Destruction
 ---
 
 ## Description

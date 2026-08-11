@@ -2,12 +2,14 @@
 id: C-0070
 title: Portland Shanghai Tunnels
 domain: Buried Cities
-confidence: SPECULATIVE
+confidence: DOCUMENTED
 confidence-claimed: DOCUMENTED
 sources: [S-0104, S-0105]
 status: active
 verification: failed
 verified-on: 2026-08-10
+verification: verified
+verified-on: 2026-08-11
 ---
 
 # C-0070 — Portland Shanghai Tunnels

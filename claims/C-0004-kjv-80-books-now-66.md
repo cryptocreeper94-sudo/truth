@@ -9,6 +9,8 @@ dig: digs/book-removal.md
 status: active
 verification: failed
 verified-on: 2026-08-10
+verification: failed
+verified-on: 2026-08-11
 ---
 
 # C-0004 — 14 books removed from the Bible between 1611 and the present

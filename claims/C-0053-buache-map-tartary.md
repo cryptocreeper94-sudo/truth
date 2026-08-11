@@ -7,6 +7,8 @@ sources: [S-0084, S-0085]
 status: active
 verification: verified
 verified-on: 2026-08-10
+verification: verified
+verified-on: 2026-08-11
 ---
 
 # C-0053 — Buache Map (1737) Representation of Tartary

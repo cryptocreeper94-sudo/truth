@@ -7,6 +7,8 @@ sources: [S-0031, S-0032]
 status: active
 verification: failed
 verified-on: 2026-08-10
+verification: failed
+verified-on: 2026-08-11
 ---
 
 # C-0023 — Operations of Magdalene Laundries in Ireland

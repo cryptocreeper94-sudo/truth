@@ -2,13 +2,15 @@
 id: C-0007
 title: The Gregorian calendar reform of 1582 removed 10 days from the calendar by papal decree; adoption took over 300 years across nations
 domain: Calendar Systems
-confidence: SPECULATIVE
+confidence: DOCUMENTED
 confidence-claimed: DOCUMENTED
 sources: [S-0012, S-0013]
 dig: digs/calendar-reform.md
 status: active
 verification: failed
 verified-on: 2026-08-10
+verification: verified
+verified-on: 2026-08-11
 ---
 
 # C-0007 — 10 days deleted, adoption spanning centuries

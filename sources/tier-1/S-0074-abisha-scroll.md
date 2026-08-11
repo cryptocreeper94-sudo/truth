@@ -4,4 +4,5 @@ description: "The Abisha Scroll is a significant manuscript of the Samaritan Pen
 institution: "Samaritan Synagogue"
 catalog_number: "N/A"
 verification_url: "https://www.samaritans-museum.com/samaritan-torah-scrolls/"
+verify-at: https://en.wikipedia.org/wiki/Samaritan_Pentateuch
 ---

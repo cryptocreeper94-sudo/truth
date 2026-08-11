@@ -9,6 +9,8 @@ dig: digs/giant-skeleton-reports.md
 status: active
 verification: blocked
 verified-on: 2026-08-10
+verification: blocked
+verified-on: 2026-08-11
 ---
 
 # C-0008 — Newspaper accounts of giant skeletons, 1840–1920

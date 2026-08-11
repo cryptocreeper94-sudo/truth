@@ -6,7 +6,7 @@ type: document
 date-of-object: 1582
 holder: Vatican Archives; reproduced in numerous published collections
 catalog-ref: Papal bull, February 24, 1582
-verify-at: https://www.fourmilab.ch/documents/calendar/IG/ (Latin text and English translation)
+verify-at: https://www.fourmilab.ch/documents/calendar/
 status: active
 ---
 

@@ -4,6 +4,7 @@ author: "Exposition Authorities"
 year: 1893
 institution: "Newberry Library, Chicago"
 catalog_reference: "NC 1075 .C5 1893"
+verify-at: https://archive.org/details/officialguideworl00worl
 ---
 
 ## Description

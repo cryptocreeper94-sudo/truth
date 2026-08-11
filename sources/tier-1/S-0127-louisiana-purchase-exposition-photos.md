@@ -4,6 +4,7 @@ summary: "A collection of photographs from the 1904 St. Louis World's Fair, show
 institution: "Missouri State Archives"
 archive_number: "MSA-PH-1904"
 verification_url: "https://www.sos.mo.gov/item/MSA-PH-1904"
+verify-at: https://www.sos.mo.gov/archives
 ---
 
 ## Description

@@ -8,6 +8,8 @@ dig: digs/lineage-of-nations.md
 status: active
 verification: verified
 verified-on: 2026-08-10
+verification: verified
+verified-on: 2026-08-11
 ---
 
 # C-0015 — The Table of Nations: 70 named descendants mapped to territories

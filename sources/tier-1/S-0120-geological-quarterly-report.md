@@ -5,6 +5,7 @@ publication: "Geological Quarterly"
 volume: 18
 issue: 2
 pages: "101-120"
+verify-at: https://en.wikipedia.org/wiki/Out-of-place_artifact
 ---
 
 ## Description

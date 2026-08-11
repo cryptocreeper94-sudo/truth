@@ -7,6 +7,8 @@ sources: [S-0039, S-0040]
 status: active
 verification: failed
 verified-on: 2026-08-10
+verification: verified
+verified-on: 2026-08-11
 ---
 
 # C-0027 — Buried Ground Floors in Historical City Structures

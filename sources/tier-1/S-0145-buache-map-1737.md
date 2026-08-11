@@ -5,6 +5,7 @@ status: open
 institution: British Library
 catalog_number: Maps 3.a.30
 link: https://www.bl.uk/collection-items/buaches-map-of-tartary
+verify-at: https://en.wikipedia.org/wiki/Philippe_Buache
 ---
 
 ## Description

@@ -34,10 +34,10 @@ const UA = 'TruthArchiveVerifier/1.0 (+https://truth.tlid.io; citation integrity
 
 // ── frontmatter ────────────────────────────────────────────────────────────
 function parseFrontmatter(text) {
-  const m = text.match(/^---\n([\s\S]*?)\n---/);
+  const m = text.match(/^---\r?\n([\s\S]*?)\r?\n---/);
   if (!m) return { meta: {}, raw: null };
   const meta = {};
-  for (const line of m[1].split('\n')) {
+  for (const line of m[1].split(/\r?\n/)) {
     const i = line.indexOf(':');
     if (i === -1) continue;
     meta[line.slice(0, i).trim()] = line.slice(i + 1).trim().replace(/^["']|["']$/g, '');

@@ -7,6 +7,8 @@ sources: [S-0054, S-0055]
 status: active
 verification: failed
 verified-on: 2026-08-10
+verification: failed
+verified-on: 2026-08-11
 ---
 
 # C-0035 — Discovery and Impact of the Nag Hammadi Library

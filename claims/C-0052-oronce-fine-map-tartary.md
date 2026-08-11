@@ -7,6 +7,8 @@ sources: [S-0082, S-0083]
 status: active
 verification: verified
 verified-on: 2026-08-10
+verification: verified
+verified-on: 2026-08-11
 ---
 
 # C-0052 — Oronce Finé Map (1531) Inclusion of Tartary

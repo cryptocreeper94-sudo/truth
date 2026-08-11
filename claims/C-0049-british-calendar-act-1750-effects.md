@@ -8,6 +8,8 @@ sources: []
 status: active
 verification: failed
 verified-on: 2026-08-10
+verification: failed
+verified-on: 2026-08-11
 ---
 
 # C-0049 — The British Calendar Act of 1750 and Its Societal Effects

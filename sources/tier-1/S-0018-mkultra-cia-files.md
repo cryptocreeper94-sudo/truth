@@ -6,7 +6,7 @@ type: government-records
 date-of-object: 1953–1973 (program); 1977 (discovery of surviving files)
 holder: National Archives and Records Administration (NARA)
 catalog-ref: CIA FOIA Electronic Reading Room; Church Committee hearings (1975)
-verify-at: https://www.cia.gov/readingroom/ (search "MKULTRA")
+verify-at: https://www.cia.gov/readingroom/search/site/mkultra
 status: active
 ---
 

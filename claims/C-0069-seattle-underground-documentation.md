@@ -8,6 +8,8 @@ sources: [S-0102, S-0103]
 status: active
 verification: failed
 verified-on: 2026-08-10
+verification: failed
+verified-on: 2026-08-11
 ---
 
 # C-0069 — Seattle Underground Documentation

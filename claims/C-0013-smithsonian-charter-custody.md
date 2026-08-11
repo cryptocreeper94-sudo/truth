@@ -8,6 +8,8 @@ dig: digs/institutional-capture.md
 status: active
 verification: verified
 verified-on: 2026-08-10
+verification: verified
+verified-on: 2026-08-11
 ---
 
 # C-0013 — Smithsonian's unique custodial authority with limited disposal oversight

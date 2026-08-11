@@ -5,6 +5,7 @@ status: open
 institution: University of Chicago Library
 catalog_number: 303394
 link: https://catalog.lib.uchicago.edu/vufind/Record/303394
+verify-at: https://en.wikipedia.org/wiki/Encyclop%C3%A6dia_Britannica
 ---
 
 ## Description

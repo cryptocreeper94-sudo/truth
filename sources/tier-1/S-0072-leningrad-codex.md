@@ -4,4 +4,5 @@ description: "The Leningrad Codex is the oldest complete manuscript of the Hebre
 institution: "National Library of Russia"
 catalog_number: "Firkovich B 19 A"
 verification_url: "https://nlr.ru/eng/exib/Codex/"
+verify-at: https://nlr.ru/eng/
 ---

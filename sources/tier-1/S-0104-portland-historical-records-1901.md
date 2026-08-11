@@ -4,4 +4,5 @@ institution: "Multnomah County Archives"
 reference: "Collection 045, Box 7, Document 112"
 url: ""
 summary: "Records detailing municipal activities in Portland, including references to the Shanghai Tunnels."
+verify-at: https://www.oregonhistoryproject.org/
 ---

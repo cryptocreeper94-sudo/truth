@@ -4,6 +4,7 @@ summary: "A collection of photographs documenting the stages of the Crystal Pala
 institution: "Victoria and Albert Museum"
 reference_number: "VAM-CPD-1854"
 verification_url: "https://www.vam.ac.uk/item/VAM-CPD-1854"
+verify-at: https://www.vam.ac.uk/collections
 ---
 
 ## Description

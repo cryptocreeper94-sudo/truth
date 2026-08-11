@@ -8,6 +8,8 @@ sources: [S-0047, S-0048]
 status: active
 verification: failed
 verified-on: 2026-08-10
+verification: failed
+verified-on: 2026-08-11
 ---
 
 # C-0031 — Ica Stones: Museum References

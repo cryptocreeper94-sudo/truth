@@ -4,6 +4,7 @@ description: "Report by Dr. Themistocles Zammit on the discovery of elongated sk
 publication: "Malta Archaeological Review"
 issue: 12
 pages: "220-238"
+verify-at: https://en.wikipedia.org/wiki/Hal_Saflieni_Hypogeum
 ---
 
 ## Description

@@ -8,6 +8,8 @@ dig: digs/lineage-of-nations.md
 status: active
 verification: verified
 verified-on: 2026-08-10
+verification: verified
+verified-on: 2026-08-11
 ---
 
 # C-0019 — European royal lines traced to Japheth

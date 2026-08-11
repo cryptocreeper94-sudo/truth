@@ -8,6 +8,8 @@ sources: [S-0073, S-0074]
 status: active
 verification: failed
 verified-on: 2026-08-10
+verification: failed
+verified-on: 2026-08-11
 ---
 
 # C-0046 — Septuagint vs Samaritan Pentateuch: Textual Variants

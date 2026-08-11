@@ -8,6 +8,8 @@ sources: []
 status: active
 verification: no-checkable-source
 verified-on: 2026-08-10
+verification: no-checkable-source
+verified-on: 2026-08-11
 ---
 
 # C-0060 — Smithsonian Institution Act (1846)

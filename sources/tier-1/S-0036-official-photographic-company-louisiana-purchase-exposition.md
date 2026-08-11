@@ -4,6 +4,7 @@ author: "Exposition Authorities"
 year: 1904
 institution: "St. Louis Public Library"
 catalog_reference: "040.1 L93p"
+verify-at: https://www.loc.gov/pictures/collection/ppmsc/
 ---
 
 ## Description

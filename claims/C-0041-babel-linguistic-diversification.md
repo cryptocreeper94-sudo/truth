@@ -7,6 +7,8 @@ sources: [S-0063, S-0064]
 status: active
 verification: failed
 verified-on: 2026-08-10
+verification: failed
+verified-on: 2026-08-11
 ---
 
 # C-0041 — Tower of Babel and Linguistic Diversification

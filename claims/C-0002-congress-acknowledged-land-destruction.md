@@ -8,6 +8,8 @@ dig: digs/new-madrid-1811.md
 status: active
 verification: verified
 verified-on: 2026-08-10
+verification: verified
+verified-on: 2026-08-11
 ---
 
 # C-0002 — Congress's legal admission of land destruction at New Madrid
