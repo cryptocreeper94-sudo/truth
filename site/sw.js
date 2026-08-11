@@ -3,7 +3,7 @@
 // Strategy: Cache shell, network-first for GitHub API data
 // ═══════════════════════════════════════════════════════════════════
 
-const CACHE_NAME = 'truth-v1';
+const CACHE_NAME = 'truth-v2';
 const SHELL_ASSETS = [
   '/',
   '/index.html',
