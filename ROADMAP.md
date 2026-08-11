@@ -77,7 +77,17 @@ All Observatory components follow the **DDA 42-Doctrine / Deterministic Dissolut
 3. Stage 3 — Skeptic engine + event record writer
 4. Stage 4 — Infrastructure layers (towers, facilities, aircraft, NOTAMs)
 5. Stage 5 — Autonomous daemon + daily digest generator
-6. Stage 6 — Public visual interface (synchronized replay map, daily digest page)
+6. **Stage 6 — Public visual interface** — live multi-layer map, synchronized
+   replay, and daily digest page
+   - [ ] Build a public live map that combines NEXRAD and GOES in one view
+   - [ ] Add shared timestamps, play/pause, timeline scrubbing, and current-event following
+   - [ ] Add layer controls: visibility, opacity, legends, coverage, and source identity
+   - [ ] Show observation time, retrieval time, latency, raw artifact pointer, and manifest hash
+   - [ ] Show delayed, stale, unavailable, and partial data as explicit data gaps
+   - [ ] Add lightning and surface-station overlays after their collectors/normalizers exist
+   - [ ] Add later context overlays for solar/geomagnetic, RF, aircraft, infrastructure, grid, and ecological/chemical streams
+   - [ ] Keep coincidence visually distinct from causation; no interpretive label from proximity alone
+   - [ ] Add synchronized event replay, Raw / Normalized / Interpretive modes, and equal-prominence skeptic panel
 
 ### Deferred deliverable — Truth Observatory methods/protocol paper
 

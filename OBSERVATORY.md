@@ -383,11 +383,67 @@ An Observatory event record may eventually be cited as a Tier-1 source in a Hist
 
 ### Stage 6 — Visual interface and public view
 
-- Full synchronized replay map
+- **Live multi-layer Observatory map** — a public storm-viewing map that
+  combines the currently available spatial data streams in one geographic
+  view, rather than forcing people to open separate radar, satellite, and
+  lightning pages
+- **Synchronized replay map** — the same layers aligned to a shared timeline
+  for reviewing completed events
 - Three rendering modes (Raw / Normalized / Interpretive)
 - Control region comparison
 - Skeptic panel at equal visual prominence
 - Daily digest public page on truth.tlid.io/observatory
+
+#### Live multi-layer map requirements
+
+This is a first-class product requirement, not an optional visualization. The
+map must make it possible to watch a storm or other significant event as it
+develops while preserving the distinction between what was measured and what
+is inferred.
+
+The initial public release should support:
+
+1. **Base map and storm navigation** — pan, zoom, site/event search, and a
+   current-event view that follows the latest collected timestamp
+2. **Radar layer** — NEXRAD reflectivity first; velocity, dual-pol, and other
+   products as normalized coverage becomes available
+3. **Satellite layer** — GOES visible, infrared, water-vapor, lightning, and
+   rainfall products where available
+4. **Ground observations** — surface stations, radiosondes, and lightning
+   detections as point or track overlays
+5. **Context overlays** — solar/geomagnetic state, aircraft, infrastructure,
+   grid, cloud-seeding authorizations, RF, and ecological/chemical records
+   when their sources and timestamps support geographic display
+6. **Layer controls** — show/hide, opacity, legend, source identity, and
+   coverage footprint; never blend colors so heavily that one source cannot
+   be distinguished from another
+7. **Time controls** — play/pause, scrubber, playback speed, time window, and
+   a visible “now” indicator
+8. **Provenance on every layer** — source name, retrieval time, observation
+   time, latency, product/version, coverage, raw artifact pointer, and
+   manifest hash where applicable
+9. **Data-gap visibility** — show unavailable, delayed, or stale sources
+   explicitly instead of silently presenting an incomplete composite
+10. **Interpretation boundary** — spatial or temporal coincidence may be
+    highlighted, but the map must label it as coincidence/unresolved unless
+    the deterministic event rules support a stronger status
+
+The composite view is a comparison workspace, not a single new measurement.
+Each layer remains independently inspectable, and the raw source artifact
+must remain available behind the visual. A lightning symbol near a radar
+feature, for example, can be shown as a spatial and temporal relationship;
+the interface must not label that relationship as causation by appearance
+alone.
+
+#### Delivery sequence
+
+- **MVP:** NEXRAD + GOES on one map, shared timestamps, opacity controls,
+  source/latency panel, raw-file provenance links, and explicit data gaps
+- **Next:** lightning and surface stations, then the normalized event timeline
+- **Later:** solar/geomagnetic, RF, aircraft, infrastructure, grid, and
+  ecological/chemical overlays according to source availability and cadence
+- **Replay:** once event records exist, provide synchronized playback with
+  Raw / Normalized / Interpretive modes and the skeptic panel
 
 ### Deferred documentation milestone — Methods/protocol paper
 

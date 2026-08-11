@@ -25,6 +25,7 @@ observatory/
   digests/               — daily evidence digests (Stage 5+)
   normalizers/           — normalizer scripts, one per source (Stage 2+)
   detectors/             — event detector and skeptic engine (Stage 3+)
+  visual/                — live map, layer adapters, timeline, and replay UI (Stage 6+)
 ```
 
 ## Container deployment (Coolify)
@@ -56,6 +57,21 @@ Add collectors for: solar/space weather (NOAA SWPC), geomagnetic (INTERMAGNET),
 lightning (Blitzortung), power grid (EIA-930), Schumann resonance.
 Build normalizer for NEXRAD and GOES.
 Wire event detector with 15-minute coincidence window.
+
+## Live visual Observatory map (planned Stage 6)
+
+The public interface is a required multi-layer map, not a collection of links
+to separate provider websites. Its first release will combine NEXRAD and GOES
+with shared timestamps, opacity controls, source/latency metadata, raw-file
+provenance, and visible data gaps. Lightning and surface stations follow as
+their normalizers become available; other infrastructure, RF, space-weather,
+grid, and ecological streams are added when their coverage and timestamps
+support reliable overlays.
+
+The map is a comparison workspace. It must preserve independent layer
+identity and must not turn visual proximity into a causal claim. Completed
+events will later be replayable on the same timeline with Raw, Normalized, and
+Interpretive modes plus the skeptic panel.
 
 ## 42-doctrine alignment
 
