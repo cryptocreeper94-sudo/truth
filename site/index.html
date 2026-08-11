@@ -479,9 +479,20 @@ function renderClaimDetail(id) {
   const claim = archive.claims.find(c => c.meta.id === id);
   if (!claim) return `<div class="page"><p>Claim ${id} not found.</p></div>`;
 
-  const linkedSources = (claim.meta.sources || []).map(sid => {
+  // Build source cards with verify-yourself links
+  const sourceCards = (claim.meta.sources || []).map(sid => {
     const src = archive.sources.find(s => s.meta.id === sid);
-    return src ? `<a class="ref-link" href="#/sources/${sid}">${sid}: ${src.meta.title || sid}</a>` : `<span class="ref-link">${sid}</span>`;
+    if (!src) return `<span class="ref-link">${sid}</span>`;
+    const verifyUrl = src.meta['verify-at'] || src.meta.verification_url;
+    const verifyLink = verifyUrl
+      ? `<a href="${verifyUrl}" target="_blank" rel="noopener" class="verify-yourself-link">Verify yourself →</a>`
+      : '';
+    return `
+      <div class="source-verify-card">
+        <a class="ref-link" href="#/sources/${sid}">${sid}: ${src.meta.title || sid}</a>
+        ${src.meta.institution ? `<span class="source-holder">${src.meta.institution}</span>` : ''}
+        ${verifyLink}
+      </div>`;
   }).join('');
 
   const linkedDig = claim.meta.dig ? `<a class="ref-link" href="#/digs/${claim.meta.dig.replace('digs/','').replace('.md','')}">${claim.meta.dig}</a>` : '';
@@ -517,7 +528,7 @@ function renderClaimDetail(id) {
           ${renderDiscussion('claim', claim.meta.id)}
         </div>
         <div class="detail-sidebar">
-          ${linkedSources ? `<div class="sidebar-card"><h4>Sources</h4>${linkedSources}</div>` : ''}
+          ${sourceCards ? `<div class="sidebar-card"><h4>Sources</h4>${sourceCards}</div>` : ''}
           ${relatedClaims ? `<div class="sidebar-card"><h4>Related Claims</h4>${relatedClaims}</div>` : ''}
           ${linkedDig ? `<div class="sidebar-card"><h4>Dig Site</h4>${linkedDig}</div>` : ''}
           <div class="sidebar-card">
@@ -534,9 +545,11 @@ function renderClaimDetail(id) {
             <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.6;">
               ${claim.meta.verification === 'verified'
                 ? `Every cited source URL was fetched and confirmed to resolve${claim.meta['verified-on'] ? ' on ' + claim.meta['verified-on'] : ''}. DOCUMENTED means the record exists and the pointer to it works — not that the claim is true.`
-                : claim.meta.verification === 'blocked'
-                ? 'A cited source refuses automated access; a human needs to confirm it. Confidence is capped until then.'
-                : 'Citations have not yet passed the automated check (URL fetched and confirmed). Confidence is capped at SPECULATIVE until every pointer lands on a real record. Fabricated or dead citations keep a claim here permanently.'}
+                : claim.meta.verification === 'failed'
+                ? 'One or more citation URLs failed to resolve. The source may still exist — the link just needs repair. Use the "Verify yourself" links above to check directly.'
+                : claim.meta.verification === 'unverifiable'
+                ? 'This claim cites physical sources held by known institutions. No automated check is possible, but the institutional holders are identified. Visit them in person or contact them directly.'
+                : 'Some cited institutions block automated access. This does not mean the source is fake — it means their servers refuse bots. Use the "Verify yourself" links above to confirm with your own browser.'}
             </p>
           </div>
           <div class="sidebar-card">

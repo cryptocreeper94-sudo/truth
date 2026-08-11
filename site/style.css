@@ -874,4 +874,10 @@ body {
 .verif-ok { color: #7fbf7f; border-color: rgba(127,191,127,0.4); background: rgba(127,191,127,0.08); }
 .verif-pending { color: #c9a227; border-color: rgba(201,162,39,0.4); background: rgba(201,162,39,0.08); }
 .verif-blocked { color: #9a9a9a; border-color: rgba(154,154,154,0.4); background: rgba(154,154,154,0.08); }
+.verif-failed { color: #bf7f7f; border-color: rgba(191,127,127,0.4); background: rgba(191,127,127,0.08); }
+.source-verify-card { padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+.source-verify-card:last-child { border-bottom: none; }
+.source-holder { display: block; font-size: 0.75rem; color: var(--text-muted); margin: 2px 0 4px 0; font-style: italic; }
+.verify-yourself-link { display: inline-block; font-size: 0.75rem; font-family: var(--font-mono, monospace); color: #7fbf7f; text-decoration: none; letter-spacing: 0.04em; padding: 2px 0; transition: color 0.2s; }
+.verify-yourself-link:hover { color: #a0e0a0; text-decoration: underline; }
 @media (max-width: 520px) { .verif-badge { font-size: 8px; padding: 2px 6px; } }
