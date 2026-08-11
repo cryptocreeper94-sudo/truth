@@ -810,9 +810,26 @@ body {
   .stats-row { grid-template-columns: 1fr 1fr; gap: 1px; }
   .stat-number { font-size: 1.4rem; }
 
-  /* Iron rules */
+  /* Iron rules — stack vertically on mobile */
   .iron-rules { padding: 20px 16px; }
-  .iron-rules li { font-size: 0.85rem; }
+  .iron-rules li {
+    flex-direction: column;
+    gap: 8px;
+    font-size: 0.9rem;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .iron-rules li:last-child { border-bottom: none; padding-bottom: 0; }
+  .iron-rules li::before {
+    font-size: 0.8rem;
+    padding-top: 0;
+  }
+  .iron-rules strong {
+    display: block;
+    font-size: 1rem;
+    margin-bottom: 4px;
+    line-height: 1.4;
+  }
 
   /* Nav grid */
   .nav-grid { grid-template-columns: 1fr; }
@@ -842,15 +859,46 @@ body {
   /* Compliance warning */
   .compliance-warning { padding: 16px; font-size: 0.85rem; }
 
-  /* Tier accordion */
-  .tier-header { padding: 16px 14px; }
+  /* Tier accordion — prevent horizontal overflow */
+  .tier-accordion { max-width: 100%; overflow: hidden; }
+  .tier-header {
+    padding: 14px 12px;
+    gap: 8px;
+    min-width: 0;
+  }
+  .tier-header-left {
+    gap: 10px;
+    min-width: 0;
+    flex: 1;
+    overflow: hidden;
+  }
+  .tier-header-right {
+    flex-shrink: 0;
+    gap: 6px;
+  }
   .tier-numeral { width: 28px; height: 28px; font-size: 0.85rem; }
-  .tier-title { font-size: 0.75rem; }
+  .tier-title {
+    font-size: 0.75rem;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
   .tier-desc { display: none; }
-  .tier-domain-row { padding: 14px 14px 14px 58px; min-height: 44px; }
-  .tier-domain-row:hover { padding-left: 58px; }
-  .tier-domain-name { font-size: 0.82rem; }
-  .tier-claim-total { font-size: 10px; }
+  .tier-domain-row {
+    padding: 12px 12px 12px 42px;
+    min-height: 44px;
+    min-width: 0;
+  }
+  .tier-domain-row:hover { padding-left: 42px; }
+  .tier-domain-name {
+    font-size: 0.82rem;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    min-width: 0;
+    flex: 1;
+  }
+  .tier-claim-total { font-size: 10px; flex-shrink: 0; }
 
   /* Breadcrumb */
   .breadcrumb { font-size: 10px; }
