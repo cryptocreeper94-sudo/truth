@@ -48,6 +48,7 @@ Major storms and multi-stream coincidences must be surfaced within 24 hours — 
 - Geomagnetic (INTERMAGNET)
 - Schumann resonance (multiple independent stations — never treat one plot as ground truth)
 - Ionosonde (GIRO/DIDBase)
+- **Seismic and geological observations** (USGS/ANSS earthquake catalogs, public seismic stations, volcano alerts, GNSS/InSAR deformation, geological surveys)
 - Power grid (EIA-930)
 - Aircraft tracks (ADS-B Exchange)
 - NOTAMs and cloud-seeding permits (FAA)
@@ -73,7 +74,11 @@ All Observatory components follow the **DDA 42-Doctrine / Deterministic Dissolut
    - [ ] Deploy Observatory container in Coolify (Jason: new service from Dockerfile.observatory, volume `/app/state`)
    - [ ] OBS-nnnn event record schema (define in Stage 3 when detector exists)
    - **Live-verified source notes:** NOAA primary NEXRAD bucket denies anonymous listing — use `unidata-nexrad-level2` mirror. GOES-19 replaced GOES-16 as GOES-East (noaa-goes16 has no 2026 data). Full-disk imagery is 250-390 MB/file — CONUS products are the sustainable default; enable full-disk with `GOES_INCLUDE_MCMIPF=1`.
-2. Stage 2 — Multi-stream expansion (solar, geomagnetic, lightning, grid, Schumann)
+2. **Stage 2 — Multi-stream expansion** (solar, geomagnetic, seismic, lightning, grid, Schumann)
+   - [ ] Add earthquake catalog and public seismic-station collectors
+   - [ ] Add volcano alerts, fault/geology context, and public ground-deformation products where available
+   - [ ] Preserve catalog IDs, uncertainty, magnitude type, review status, duplicate reconciliation, and station coverage
+   - [ ] Add seismic baselines and controls before comparing earthquakes to atmospheric, RF, solar, or infrastructure events
 3. Stage 3 — Skeptic engine + event record writer
 4. Stage 4 — Infrastructure layers (towers, facilities, aircraft, NOTAMs)
 5. Stage 5 — Autonomous daemon + daily digest generator
@@ -85,7 +90,7 @@ All Observatory components follow the **DDA 42-Doctrine / Deterministic Dissolut
    - [ ] Show observation time, retrieval time, latency, raw artifact pointer, and manifest hash
    - [ ] Show delayed, stale, unavailable, and partial data as explicit data gaps
    - [ ] Add lightning and surface-station overlays after their collectors/normalizers exist
-   - [ ] Add later context overlays for solar/geomagnetic, RF, aircraft, infrastructure, grid, and ecological/chemical streams
+   - [ ] Add later context overlays for seismic/geological, solar/geomagnetic, RF, aircraft, infrastructure, grid, and ecological/chemical streams
    - [ ] Keep coincidence visually distinct from causation; no interpretive label from proximity alone
    - [ ] Add synchronized event replay, Raw / Normalized / Interpretive modes, and equal-prominence skeptic panel
 

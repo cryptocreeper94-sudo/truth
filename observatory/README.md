@@ -54,7 +54,9 @@ observatory/
 ## Stage 2 (next)
 
 Add collectors for: solar/space weather (NOAA SWPC), geomagnetic (INTERMAGNET),
-lightning (Blitzortung), power grid (EIA-930), Schumann resonance.
+**seismic/geological observations** (USGS/ANSS, public FDSN stations, volcano
+alerts, deformation products), lightning (Blitzortung), power grid (EIA-930),
+Schumann resonance.
 Build normalizer for NEXRAD and GOES.
 Wire event detector with 15-minute coincidence window.
 
@@ -64,9 +66,14 @@ The public interface is a required multi-layer map, not a collection of links
 to separate provider websites. Its first release will combine NEXRAD and GOES
 with shared timestamps, opacity controls, source/latency metadata, raw-file
 provenance, and visible data gaps. Lightning and surface stations follow as
-their normalizers become available; other infrastructure, RF, space-weather,
-grid, and ecological streams are added when their coverage and timestamps
-support reliable overlays.
+their normalizers become available; seismic/geological, infrastructure, RF,
+space-weather, grid, and ecological streams are added when their coverage and
+timestamps support reliable overlays.
+
+Seismic overlays must retain earthquake catalog IDs, provider and review
+status, location/magnitude/depth uncertainty, station coverage, and duplicate
+reconciliation. A nearby earthquake or fault is a context relationship, not
+evidence of an intentional or human-made cause.
 
 The map is a comparison workspace. It must preserve independent layer
 identity and must not turn visual proximity into a causal claim. Completed

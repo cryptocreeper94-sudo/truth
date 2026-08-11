@@ -124,6 +124,57 @@ The goal: show coincidence first, eliminate ordinary explanations systematically
 
 > **Schumann resonance note:** no single global meter exists. Compare multiple independent stations; never treat one colorful waterfall plot as a ground truth reading. Different stations use different instruments, locations, and filtering methods.
 
+### Layer 2A — Seismic and geological observations
+
+Seismic activity is a distinct Earth-system evidence stream. The Observatory
+should preserve earthquake and volcanic observations even when they do not
+coincide with an atmospheric event. Earthquakes are not evidence of
+manipulation by themselves; any investigation of an unusual relationship must
+begin with verified event catalogs, known tectonic context, and appropriate
+statistical baselines.
+
+| Source | What | Interval |
+|---|---|---|
+| USGS Earthquake Hazards Program API | Real-time earthquake events — origin time, magnitude, depth, location, alert status | Near real time |
+| ANSS Comprehensive Earthquake Catalog / FDSN services | Reviewed earthquake catalog and waveform metadata for historical baselines | As published |
+| EarthScope Consortium / FDSN stations | Seismometer station metadata and waveform access where public | As available |
+| USGS Volcano Hazards Program | Volcanic activity notifications, ash advisories, deformation and monitoring context | As published |
+| NASA/JPL and EarthScope deformation products | GNSS and InSAR ground-motion/deformation products where public and documented | As published |
+| State and national geological surveys | Regional catalogs, fault maps, aftershock sequences, and hazard products | As published |
+| Documented induced-seismicity studies and regulatory records | Injection, wastewater, geothermal, mining, blasting, and reservoir activity where publicly recorded | As published |
+
+#### Seismic data requirements
+
+Every event record must preserve the catalog source, event identifier,
+provider version or endpoint, retrieval time, origin time, location
+uncertainty, magnitude type, depth uncertainty where available, and
+review/automatic status. Multiple catalogs may report the same event; the
+normalizer must preserve the original identifiers and record how duplicates
+were reconciled rather than silently counting them as separate earthquakes.
+
+The skeptic engine must account for:
+
+1. **Detection completeness** — network coverage, station outages, magnitude
+   of completeness, and changes in catalog processing
+2. **Tectonic and geological context** — known faults, volcanic regions,
+   aftershock sequences, swarms, seasonal or hydrological influences, and
+   normal regional rates
+3. **Human activity alternatives** — wastewater or geothermal injection,
+   mining, quarrying, blasting, reservoir loading, and construction
+4. **Location and timing uncertainty** — an apparent overlap is not exact if
+   the event or suspected activity is poorly located or timestamped
+5. **Independent confirmation** — compare at least two authoritative catalogs
+   or a catalog event with public waveform/station evidence when available
+6. **Statistical controls** — compare against the same region's historical
+   rate and matched control regions; do not infer causation from one
+   earthquake near one facility or storm
+
+> **Scope boundary:** correlations between seismic activity and atmospheric,
+> RF, solar, infrastructure, or weather observations may be recorded as
+> `COINCIDENT` or `DATA-GAP` where appropriate. They must not be presented as
+> evidence of a causal or intentional mechanism without a reproducible model
+> and evidence that survives the ordinary geological explanations above.
+
 ### Layer 3 — Human infrastructure
 
 | Source | What | Interval |
@@ -294,6 +345,8 @@ Primary view: **synchronized replay map**
 - **Claim panel:** the structured event record
 - **Control comparison:** same time window in a nearby control region, side by side
 - **Skeptic panel:** ordinary explanations at equal visual prominence — never buried
+- **Geophysical overlays:** earthquake catalogs, seismic stations, volcano alerts,
+  fault context, and ground-deformation products
 
 Three rendering modes always labeled:
 1. **Raw** — unprocessed sensor data, original file
@@ -310,9 +363,10 @@ Sections:
 1. Major storm systems — size, path, intensity, and anomaly score vs. 30-day baseline
 2. Multi-stream coincident events — what streams, what changed, what time
 3. Infrastructure overlays — documented facility activity, NOTAMs, cloud-seeding authorizations, grid events during storm periods
-4. Skeptic engine results — which anomalies had ordinary explanations; which remain unresolved
-5. Control region comparison — whether neighboring regions showed the same patterns
-6. Data gaps — which sources had no data and why
+4. Geophysical overlays — earthquake catalogs, seismic stations, volcano alerts, fault context, and ground-deformation products
+5. Skeptic engine results — which anomalies had ordinary explanations; which remain unresolved
+6. Control region comparison — whether neighboring regions showed the same patterns
+7. Data gaps — which sources had no data and why
 7. Carry-forward items — unresolved events from prior days
 
 ---
