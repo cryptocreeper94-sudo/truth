@@ -5,7 +5,7 @@ domain: Ancient Texts
 confidence: SPECULATIVE
 sources: [S-0052, S-0053]
 status: active
-verification: failed
+verification: verified
 verified-on: 2026-08-11
 ---
 

@@ -7,7 +7,7 @@ type: institutional-record
 holder: University of Alaska Fairbanks
 
 date-of-object: 2020
-verify-at: https://www.uaf.edu/engineering/
+verify-at: https://ine.uaf.edu/wtc7
 ---
 
 # S-0157 — University of Alaska Fairbanks WTC7 Finite Element Study

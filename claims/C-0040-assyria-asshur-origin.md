@@ -2,11 +2,11 @@
 id: C-0040
 title: Assyria and Asshur: Etymological Origins
 domain: Biblical Lineage
-confidence: DOCUMENTED
+confidence: SPECULATIVE
 confidence-claimed: DOCUMENTED
 sources: [S-0061, S-0062]
 status: active
-verification: verified
+verification: failed
 verified-on: 2026-08-11
 ---
 

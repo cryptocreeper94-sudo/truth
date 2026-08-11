@@ -7,7 +7,7 @@ type: government-record
 holder: National Institute of Standards and Technology
 
 date-of-object: 2002
-verify-at: https://www.nist.gov/publications/fema-bpat-report-appendix-c
+verify-at: https://www.fema.gov/media-library-data/20130726-1512-20490-8452/403_apc.pdf
 ---
 
 # S-0156 — FEMA BPAT Report Appendix C

@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-11T08:42:57.221Z",
+  "generated": "2026-08-11T08:53:14.083Z",
   "sources": {
     "S-0001": {
       "file": "D:\\truth\\sources\\tier-1\\S-0001-mercator-1595-polar-map.md",
@@ -143,7 +143,7 @@
       "file": "D:\\truth\\sources\\tier-1\\S-0022-josephus-antiquities.md",
       "verifyAt": "https://www.perseus.tufts.edu",
       "url": "https://www.perseus.tufts.edu",
-      "status": 200,
+      "status": 206,
       "verdict": "VERIFIED"
     },
     "S-0023": {
@@ -197,7 +197,7 @@
       "file": "D:\\truth\\sources\\tier-1\\S-0030-baby-farms-inquest-reports.md",
       "verifyAt": "https://discovery.nationalarchives.gov.uk/",
       "url": "https://discovery.nationalarchives.gov.uk/",
-      "status": 200,
+      "status": 202,
       "verdict": "VERIFIED"
     },
     "S-0031": {
@@ -356,10 +356,10 @@
     },
     "S-0053": {
       "file": "D:\\truth\\sources\\tier-1\\S-0053-hebrew-bible-references.md",
-      "verifyAt": "https://archive.org/details/bookjasher00unkngoog",
-      "url": "https://archive.org/details/bookjasher00unkngoog",
-      "status": 404,
-      "verdict": "FAILED"
+      "verifyAt": "https://archive.org/details/bookofjasherrefe00sefe",
+      "url": "https://archive.org/details/bookofjasherrefe00sefe",
+      "status": 200,
+      "verdict": "VERIFIED"
     },
     "S-0054": {
       "file": "D:\\truth\\sources\\tier-1\\S-0054-nag-hammadi-codices.md",
@@ -414,8 +414,9 @@
       "file": "D:\\truth\\sources\\tier-1\\S-0061-cuneiform-tablets.md",
       "verifyAt": "https://cdli.mpiwg-berlin.mpg.de/",
       "url": "https://cdli.mpiwg-berlin.mpg.de/",
-      "status": 200,
-      "verdict": "VERIFIED"
+      "status": 0,
+      "verdict": "FAILED",
+      "error": "AbortError: This operation was aborted"
     },
     "S-0062": {
       "file": "D:\\truth\\sources\\tier-1\\S-0062-old-testament-manuscript-vatican.md",
@@ -428,8 +429,9 @@
       "file": "D:\\truth\\sources\\tier-1\\S-0063-sumerian-king-list.md",
       "verifyAt": "https://cdli.mpiwg-berlin.mpg.de/",
       "url": "https://cdli.mpiwg-berlin.mpg.de/",
-      "status": 200,
-      "verdict": "VERIFIED"
+      "status": 0,
+      "verdict": "FAILED",
+      "error": "AbortError: This operation was aborted"
     },
     "S-0064": {
       "file": "D:\\truth\\sources\\tier-1\\S-0064-linguistic-phylogeny-studies.md",
@@ -470,8 +472,8 @@
       "file": "D:\\truth\\sources\\tier-1\\S-0069-herodotus-histories.md",
       "verifyAt": "https://www.britishmuseum.org/",
       "url": "https://www.britishmuseum.org/",
-      "status": 403,
-      "verdict": "BLOCKED"
+      "status": 206,
+      "verdict": "VERIFIED"
     },
     "S-0070": {
       "file": "D:\\truth\\sources\\tier-1\\S-0070-tacitus-germania.md",
@@ -848,15 +850,15 @@
       "file": "D:\\truth\\sources\\tier-1\\S-0123-baby-farms-london.md",
       "verifyAt": "https://discovery.nationalarchives.gov.uk/",
       "url": "https://discovery.nationalarchives.gov.uk/",
-      "status": 200,
+      "status": 202,
       "verdict": "VERIFIED"
     },
     "S-0124": {
       "file": "D:\\truth\\sources\\tier-1\\S-0124-worlds-columbian-exposition-report.md",
-      "verifyAt": "https://www.loc.gov/pictures/collection/wce/",
-      "url": "https://www.loc.gov/pictures/collection/wce/",
-      "status": 404,
-      "verdict": "FAILED"
+      "verifyAt": "https://www.loc.gov/search/?q=world%27s+columbian+exposition&fa=online-format:image",
+      "url": "https://www.loc.gov/search/?q=world%27s+columbian+exposition&fa=online-format:image",
+      "status": 403,
+      "verdict": "BLOCKED"
     },
     "S-0125": {
       "file": "D:\\truth\\sources\\tier-1\\S-0125-worlds-columbian-exposition-photos.md",
@@ -987,10 +989,10 @@
     },
     "S-0144": {
       "file": "D:\\truth\\sources\\tier-1\\S-0144-oronce-fine-map-1531.md",
-      "verifyAt": "https://en.wikipedia.org/wiki/Oronc%C3%A9_Fin%C3%A9",
-      "url": "https://en.wikipedia.org/wiki/Oronc%C3%A9_Fin%C3%A9",
-      "status": 404,
-      "verdict": "FAILED"
+      "verifyAt": "https://en.wikipedia.org/wiki/Orontius_Finaeus",
+      "url": "https://en.wikipedia.org/wiki/Orontius_Finaeus",
+      "status": 200,
+      "verdict": "VERIFIED"
     },
     "S-0145": {
       "file": "D:\\truth\\sources\\tier-1\\S-0145-buache-map-1737.md",
@@ -1057,17 +1059,18 @@
     },
     "S-0156": {
       "file": "D:\\truth\\sources\\tier-1\\S-0156-fema-bpat-report-appendix-c.md",
-      "verifyAt": "https://www.nist.gov/publications/fema-bpat-report-appendix-c",
-      "url": "https://www.nist.gov/publications/fema-bpat-report-appendix-c",
-      "status": 404,
-      "verdict": "FAILED"
+      "verifyAt": "https://www.fema.gov/media-library-data/20130726-1512-20490-8452/403_apc.pdf",
+      "url": "https://www.fema.gov/media-library-data/20130726-1512-20490-8452/403_apc.pdf",
+      "status": 0,
+      "verdict": "FAILED",
+      "error": "AbortError: This operation was aborted"
     },
     "S-0157": {
       "file": "D:\\truth\\sources\\tier-1\\S-0157-university-of-alaska-fairbanks-wtc7-study.md",
-      "verifyAt": "https://www.uaf.edu/engineering/",
-      "url": "https://www.uaf.edu/engineering/",
-      "status": 404,
-      "verdict": "FAILED"
+      "verifyAt": "https://ine.uaf.edu/wtc7",
+      "url": "https://ine.uaf.edu/wtc7",
+      "status": 200,
+      "verdict": "VERIFIED"
     },
     "S-0158": {
       "file": "D:\\truth\\sources\\tier-1\\S-0158-smithsonian-accession-records.md",
@@ -1186,7 +1189,7 @@
     },
     "C-0006": {
       "file": "D:\\truth\\claims\\C-0006-tartary-on-maps-300-years.md",
-      "confidence": "SPECULATIVE",
+      "confidence": "DOCUMENTED",
       "verdict": "verified",
       "sources": [
         {
@@ -1372,7 +1375,7 @@
         {
           "id": "S-0022",
           "url": "https://www.perseus.tufts.edu",
-          "status": 200,
+          "status": 206,
           "verdict": "VERIFIED"
         }
       ],
@@ -1485,7 +1488,7 @@
         {
           "id": "S-0030",
           "url": "https://discovery.nationalarchives.gov.uk/",
-          "status": 200,
+          "status": 202,
           "verdict": "VERIFIED"
         }
       ],
@@ -1623,7 +1626,7 @@
     },
     "C-0030": {
       "file": "D:\\truth\\claims\\C-0030-acambaro-figurines-museum-references.md",
-      "confidence": "SPECULATIVE",
+      "confidence": "DOCUMENTED",
       "verdict": "verified",
       "sources": [
         {
@@ -1650,7 +1653,7 @@
     },
     "C-0031": {
       "file": "D:\\truth\\claims\\C-0031-ica-stones-museum-references.md",
-      "confidence": "SPECULATIVE",
+      "confidence": "DOCUMENTED",
       "verdict": "verified",
       "sources": [
         {
@@ -1718,7 +1721,7 @@
     "C-0034": {
       "file": "D:\\truth\\claims\\C-0034-book-of-jasher-historicity.md",
       "confidence": "SPECULATIVE",
-      "verdict": "failed",
+      "verdict": "verified",
       "sources": [
         {
           "id": "S-0052",
@@ -1728,9 +1731,9 @@
         },
         {
           "id": "S-0053",
-          "url": "https://archive.org/details/bookjasher00unkngoog",
-          "status": 404,
-          "verdict": "FAILED"
+          "url": "https://archive.org/details/bookofjasherrefe00sefe",
+          "status": 200,
+          "verdict": "VERIFIED"
         }
       ],
       "bodyUrls": []
@@ -1798,7 +1801,7 @@
     },
     "C-0038": {
       "file": "D:\\truth\\claims\\C-0038-greek-deucalion-flood-narrative.md",
-      "confidence": "SPECULATIVE",
+      "confidence": "DOCUMENTED",
       "verdict": "verified",
       "sources": [
         {
@@ -1812,7 +1815,7 @@
     },
     "C-0039": {
       "file": "D:\\truth\\claims\\C-0039-hebrew-iberia-eber-connection.md",
-      "confidence": "SPECULATIVE",
+      "confidence": "DOCUMENTED",
       "verdict": "verified",
       "sources": [
         {
@@ -1849,14 +1852,15 @@
     },
     "C-0040": {
       "file": "D:\\truth\\claims\\C-0040-assyria-asshur-origin.md",
-      "confidence": "SPECULATIVE",
-      "verdict": "verified",
+      "confidence": "DOCUMENTED",
+      "verdict": "failed",
       "sources": [
         {
           "id": "S-0061",
           "url": "https://cdli.mpiwg-berlin.mpg.de/",
-          "status": 200,
-          "verdict": "VERIFIED"
+          "status": 0,
+          "verdict": "FAILED",
+          "error": "AbortError: This operation was aborted"
         },
         {
           "id": "S-0062",
@@ -1881,13 +1885,14 @@
     "C-0041": {
       "file": "D:\\truth\\claims\\C-0041-babel-linguistic-diversification.md",
       "confidence": "CONTESTED",
-      "verdict": "verified",
+      "verdict": "failed",
       "sources": [
         {
           "id": "S-0063",
           "url": "https://cdli.mpiwg-berlin.mpg.de/",
-          "status": 200,
-          "verdict": "VERIFIED"
+          "status": 0,
+          "verdict": "FAILED",
+          "error": "AbortError: This operation was aborted"
         },
         {
           "id": "S-0064",
@@ -1944,7 +1949,7 @@
     },
     "C-0045": {
       "file": "D:\\truth\\claims\\C-0045-dead-sea-scrolls-masoretic-variants.md",
-      "confidence": "SPECULATIVE",
+      "confidence": "DOCUMENTED",
       "verdict": "verified",
       "sources": [
         {
@@ -1975,7 +1980,7 @@
     },
     "C-0046": {
       "file": "D:\\truth\\claims\\C-0046-septuagint-samaritan-pentateuch-variants.md",
-      "confidence": "SPECULATIVE",
+      "confidence": "DOCUMENTED",
       "verdict": "verified",
       "sources": [
         {
@@ -2065,7 +2070,7 @@
     },
     "C-0051": {
       "file": "D:\\truth\\claims\\C-0051-piri-reis-map-tartary.md",
-      "confidence": "SPECULATIVE",
+      "confidence": "DOCUMENTED",
       "verdict": "verified",
       "sources": [
         {
@@ -2390,7 +2395,7 @@
     },
     "C-0069": {
       "file": "D:\\truth\\claims\\C-0069-seattle-underground-documentation.md",
-      "confidence": "SPECULATIVE",
+      "confidence": "DOCUMENTED",
       "verdict": "verified",
       "sources": [
         {
@@ -2615,13 +2620,13 @@
     "C-0083": {
       "file": "D:\\truth\\claims\\C-0083-chicago-white-city-construction-methods.md",
       "confidence": "SPECULATIVE",
-      "verdict": "failed",
+      "verdict": "verified",
       "sources": [
         {
           "id": "S-0124",
-          "url": "https://www.loc.gov/pictures/collection/wce/",
-          "status": 404,
-          "verdict": "FAILED"
+          "url": "https://www.loc.gov/search/?q=world%27s+columbian+exposition&fa=online-format:image",
+          "status": 403,
+          "verdict": "BLOCKED"
         },
         {
           "id": "S-0125",
@@ -2712,7 +2717,7 @@
     },
     "C-0087": {
       "file": "D:\\truth\\claims\\C-0087-ham-lineage-territories.md",
-      "confidence": "SPECULATIVE",
+      "confidence": "DOCUMENTED",
       "verdict": "verified",
       "sources": [
         {

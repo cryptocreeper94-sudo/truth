@@ -5,7 +5,7 @@ status: open
 institution: National Library of France
 catalog_number: GE C1 1531
 link: https://gallica.bnf.fr/ark:/12148/btv1b53009362c
-verify-at: https://en.wikipedia.org/wiki/Oronc%C3%A9_Fin%C3%A9
+verify-at: https://en.wikipedia.org/wiki/Orontius_Finaeus
 ---
 
 ## Description
