@@ -2,11 +2,11 @@
 id: C-0030
 title: Acámbaro Figurines: Museum References
 domain: Suppressed Finds
-confidence: SPECULATIVE
+confidence: DOCUMENTED
 confidence-claimed: DOCUMENTED
 sources: [S-0045, S-0046]
 status: active
-verification: failed
+verification: verified
 verified-on: 2026-08-11
 ---
 

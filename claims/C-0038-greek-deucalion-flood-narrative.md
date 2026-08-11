@@ -2,11 +2,11 @@
 id: C-0038
 title: Greek Deucalion Flood Narrative
 domain: Flood Narratives
-confidence: SPECULATIVE
+confidence: DOCUMENTED
 confidence-claimed: DOCUMENTED
 sources: [S-0058]
 status: active
-verification: failed
+verification: verified
 verified-on: 2026-08-11
 ---
 

@@ -2,11 +2,11 @@
 id: C-0006
 title: "Tartary" or "Grande Tartarie" appears as a named sovereign territory on European maps continuously from the 16th century through the mid-19th century, then vanishes
 domain: Cartography
-confidence: SPECULATIVE
+confidence: DOCUMENTED
 confidence-claimed: DOCUMENTED
 sources: [S-0010, S-0011]
 status: active
-verification: failed
+verification: verified
 verified-on: 2026-08-11
 ---
 

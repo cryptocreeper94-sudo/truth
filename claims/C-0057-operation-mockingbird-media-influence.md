@@ -5,7 +5,7 @@ domain: Intelligence Programs
 confidence: SPECULATIVE
 sources: []
 status: active
-verification: failed
+verification: no-checkable-source
 verified-on: 2026-08-11
 ---
 

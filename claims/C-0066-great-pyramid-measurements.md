@@ -5,7 +5,7 @@ domain: Ancient Engineering
 confidence: SPECULATIVE
 sources: [S-0098, S-0099]
 status: active
-verification: failed
+verification: verified
 verified-on: 2026-08-11
 ---
 

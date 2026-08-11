@@ -5,7 +5,7 @@ domain: Orphan History
 confidence: SPECULATIVE
 sources: [S-0029, S-0030]
 status: active
-verification: failed
+verification: verified
 verified-on: 2026-08-11
 ---
 

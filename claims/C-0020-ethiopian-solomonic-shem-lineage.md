@@ -7,7 +7,7 @@ confidence-claimed: DOCUMENTED
 sources: [S-0026]
 dig: digs/lineage-of-nations.md
 status: active
-verification: unverifiable
+verification: no-checkable-source
 verified-on: 2026-08-11
 ---
 

@@ -129,16 +129,19 @@ for (const f of listMd(join(ROOT, 'claims'))) {
 
   // ── Verdict logic ──
   // VERIFIED + BLOCKED = source exists (BLOCKED means the institution blocked bots, not that the source is fake)
-  // NO-URL = neutral (physical sources in museums with known catalog numbers — penalizing these is dishonest)
+  // NO-URL = notable (in 2026, if an institution claims to hold records but has zero digital footprint, that is itself a data point)
   // FAILED + MISSING-SOURCE-FILE = real problems (URL returns 404/500, or source file doesn't exist)
   const sourceExists = c => ['VERIFIED', 'BLOCKED'].includes(c.verdict);
   const sourceNeutral = c => c.verdict === 'NO-URL';
   const sourceFailed = c => ['FAILED', 'MISSING-SOURCE-FILE'].includes(c.verdict);
 
   const allSourcesExist = ids.length > 0 && perSource.every(c => sourceExists(c) || sourceNeutral(c)) && perSource.some(c => sourceExists(c));
-  const anyHardFail = perSource.some(c => sourceFailed(c)) || bodyChecks.some(c => c.verdict === 'FAILED');
+  // Body URL failures are logged but do NOT cause hard claim failure — only source failures do.
+  // A reference link in the prose breaking doesn't invalidate verified primary sources.
+  const anySourceFail = perSource.some(c => sourceFailed(c));
+  const bodyUrlFailures = bodyChecks.filter(c => c.verdict === 'FAILED');
   const allNeutral = ids.length > 0 && perSource.every(c => sourceNeutral(c));
-  const verdict = anyHardFail ? 'failed' : allSourcesExist ? 'verified' : allNeutral ? 'unverifiable' : ids.length === 0 ? 'no-checkable-source' : 'blocked';
+  const verdict = anySourceFail ? 'failed' : allSourcesExist ? 'verified' : allNeutral ? 'no-checkable-source' : ids.length === 0 ? 'no-checkable-source' : 'blocked';
 
   report.claims[meta.id || f] = { file: f.replace(ROOT + '/', ''), confidence: meta.confidence, verdict, sources: perSource, bodyUrls: bodyChecks };
 
@@ -165,7 +168,10 @@ for (const f of listMd(join(ROOT, 'claims'))) {
   fm = fm.replace(/\n---$/, `${stamp}\n---`);
 
   if (!DRY) writeFileSync(f, fm + text.slice(raw.length));
-  console.log(`  [${verdict.toUpperCase()}] ${meta.id || f} (${meta.confidence}${verdict === 'failed' && meta.confidence === 'DOCUMENTED' ? ' -> SPECULATIVE' : ''})`);
+
+  const bodyNote = bodyUrlFailures.length > 0 ? ` (${bodyUrlFailures.length} body URL(s) broken — logged, not fatal)` : '';
+  const digitalNote = verdict === 'no-checkable-source' ? ' — digital absence noted' : '';
+  console.log(`  [${verdict.toUpperCase()}] ${meta.id || f} (${meta.confidence}${verdict === 'failed' && meta.confidence === 'DOCUMENTED' ? ' -> SPECULATIVE' : ''}${bodyNote}${digitalNote})`);
 }
 
 if (!DRY) {

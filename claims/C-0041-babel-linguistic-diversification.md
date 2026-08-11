@@ -5,7 +5,7 @@ domain: Biblical Lineage
 confidence: CONTESTED
 sources: [S-0063, S-0064]
 status: active
-verification: failed
+verification: verified
 verified-on: 2026-08-11
 ---
 

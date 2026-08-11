@@ -1,881 +1,879 @@
 {
-  "generated": "2026-08-11T08:23:22.206Z",
+  "generated": "2026-08-11T08:42:57.221Z",
   "sources": {
     "S-0001": {
-      "file": "sources/tier-1/S-0001-mercator-1595-polar-map.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0001-mercator-1595-polar-map.md",
       "verifyAt": "https://www.davidrumsey.com",
       "url": "https://www.davidrumsey.com",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0002": {
-      "file": "sources/tier-1/S-0002-new-madrid-relief-act-1815.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0002-new-madrid-relief-act-1815.md",
       "verifyAt": "https://www.govinfo.gov/content/pkg/STATUTE-3/pdf/STATUTE-3-Pg211.pdf",
       "url": "https://www.govinfo.gov/content/pkg/STATUTE-3/pdf/STATUTE-3-Pg211.pdf",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0003": {
-      "file": "sources/tier-1/S-0003-new-madrid-claims-records.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0003-new-madrid-claims-records.md",
       "verifyAt": "https://www.sos.mo.gov/CMSImages/Archives/resources/findingaids/rg951-03.pdf",
       "url": "https://www.sos.mo.gov/CMSImages/Archives/resources/findingaids/rg951-03.pdf",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0004": {
-      "file": "sources/tier-1/S-0004-leningrad-codex.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0004-leningrad-codex.md",
       "verifyAt": "https://www.sefaria.org",
       "url": "https://www.sefaria.org",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0005": {
-      "file": "sources/tier-1/S-0005-kjv-1611-first-edition.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0005-kjv-1611-first-edition.md",
       "verifyAt": "https://www.kingjamesbibleonline.org",
       "url": "https://www.kingjamesbibleonline.org",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0007": {
-      "file": "sources/tier-1/S-0007-modern-kjv-no-apocrypha.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0007-modern-kjv-no-apocrypha.md",
       "verifyAt": null,
       "verdict": "NO-URL"
     },
     "S-0008": {
-      "file": "sources/tier-1/S-0008-cas-annual-reports.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0008-cas-annual-reports.md",
       "verifyAt": "https://www.childrensaidnyc.org",
       "url": "https://www.childrensaidnyc.org",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0009": {
-      "file": "sources/tier-1/S-0009-orphan-train-complex.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0009-orphan-train-complex.md",
       "verifyAt": "https://orphantraindepot.org",
       "url": "https://orphantraindepot.org",
-      "status": 202,
+      "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0010": {
-      "file": "sources/tier-1/S-0010-david-rumsey-maps.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0010-david-rumsey-maps.md",
       "verifyAt": "https://www.davidrumsey.com",
       "url": "https://www.davidrumsey.com",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0011": {
-      "file": "sources/tier-1/S-0011-britannica-1771-tartary.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0011-britannica-1771-tartary.md",
       "verifyAt": "https://archive.org",
       "url": "https://archive.org",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0012": {
-      "file": "sources/tier-1/S-0012-inter-gravissimas-1582.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0012-inter-gravissimas-1582.md",
       "verifyAt": "https://www.fourmilab.ch/documents/calendar/",
       "url": "https://www.fourmilab.ch/documents/calendar/",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0013": {
-      "file": "sources/tier-1/S-0013-british-calendar-act-1750.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0013-british-calendar-act-1750.md",
       "verifyAt": "https://www.legislation.gov.uk",
       "url": "https://www.legislation.gov.uk",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0014": {
-      "file": "sources/tier-1/S-0014-digitized-newspaper-archives.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0014-digitized-newspaper-archives.md",
       "verifyAt": "https://chroniclingamerica.loc.gov",
       "url": "https://chroniclingamerica.loc.gov",
       "status": 403,
       "verdict": "BLOCKED"
     },
     "S-0015": {
-      "file": "sources/tier-1/S-0015-federal-reserve-act-1913.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0015-federal-reserve-act-1913.md",
       "verifyAt": "https://www.govinfo.gov",
       "url": "https://www.govinfo.gov",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0016": {
-      "file": "sources/tier-1/S-0016-federal-reserve-faq.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0016-federal-reserve-faq.md",
       "verifyAt": "https://www.federalreserve.gov/faqs.htm",
       "url": "https://www.federalreserve.gov/faqs.htm",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0017": {
-      "file": "sources/tier-1/S-0017-operation-paperclip-jioa.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0017-operation-paperclip-jioa.md",
       "verifyAt": "https://www.archives.gov",
       "url": "https://www.archives.gov",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0018": {
-      "file": "sources/tier-1/S-0018-mkultra-cia-files.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0018-mkultra-cia-files.md",
       "verifyAt": "https://en.wikipedia.org/wiki/Project_MKUltra",
       "url": "https://en.wikipedia.org/wiki/Project_MKUltra",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0019": {
-      "file": "sources/tier-1/S-0019-seattle-underground.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0019-seattle-underground.md",
       "verifyAt": "https://www.undergroundtour.com",
       "url": "https://www.undergroundtour.com",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0020": {
-      "file": "sources/tier-1/S-0020-smithsonian-act-1846.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0020-smithsonian-act-1846.md",
       "verifyAt": "https://www.govinfo.gov",
       "url": "https://www.govinfo.gov",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0021": {
-      "file": "sources/tier-1/S-0021-geb-occasional-letter-1906.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0021-geb-occasional-letter-1906.md",
       "verifyAt": "https://rockarch.org",
       "url": "https://rockarch.org",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0022": {
-      "file": "sources/tier-1/S-0022-josephus-antiquities.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0022-josephus-antiquities.md",
       "verifyAt": "https://www.perseus.tufts.edu",
       "url": "https://www.perseus.tufts.edu",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0023": {
-      "file": "sources/tier-1/S-0023-book-of-jubilees.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0023-book-of-jubilees.md",
       "verifyAt": "https://www.deadseascrolls.org.il",
       "url": "https://www.deadseascrolls.org.il",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0024": {
-      "file": "sources/tier-1/S-0024-chronicles-genealogy.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0024-chronicles-genealogy.md",
       "verifyAt": "https://www.sefaria.org/I_Chronicles.1",
       "url": "https://www.sefaria.org/I_Chronicles.1",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0025": {
-      "file": "sources/tier-1/S-0025-medieval-genealogies.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0025-medieval-genealogies.md",
       "verifyAt": "https://asc.jebbo.co.uk",
       "url": "https://asc.jebbo.co.uk",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0026": {
-      "file": "sources/tier-1/S-0026-kebra-nagast.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0026-kebra-nagast.md",
       "verifyAt": null,
       "verdict": "NO-URL"
     },
     "S-0027": {
-      "file": "sources/tier-1/S-0027-foundling-hospitals-london.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0027-foundling-hospitals-london.md",
       "verifyAt": "https://archives.coram.org.uk/",
       "url": "https://archives.coram.org.uk/",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0028": {
-      "file": "sources/tier-1/S-0028-foundling-hospitals-vienna.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0028-foundling-hospitals-vienna.md",
       "verifyAt": "https://www.wien.gv.at/actaproweb2/benutzung/archive.xhtml",
       "url": "https://www.wien.gv.at/actaproweb2/benutzung/archive.xhtml",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0029": {
-      "file": "sources/tier-1/S-0029-baby-farm-trial-records.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0029-baby-farm-trial-records.md",
       "verifyAt": "https://www.nypl.org/archives/baby-farm-case",
       "url": "https://www.nypl.org/archives/baby-farm-case",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0030": {
-      "file": "sources/tier-1/S-0030-baby-farms-inquest-reports.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0030-baby-farms-inquest-reports.md",
       "verifyAt": "https://discovery.nationalarchives.gov.uk/",
       "url": "https://discovery.nationalarchives.gov.uk/",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0031": {
-      "file": "sources/tier-1/S-0031-magdalene-laundries-records-dublin.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0031-magdalene-laundries-records-dublin.md",
       "verifyAt": "https://www.nationalarchives.ie/",
       "url": "https://www.nationalarchives.ie/",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0032": {
-      "file": "sources/tier-1/S-0032-magdalene-laundries-report.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0032-magdalene-laundries-report.md",
       "verifyAt": "https://www.gov.ie/magdalene-laundries-report",
       "url": "https://www.gov.ie/magdalene-laundries-report",
       "status": 403,
       "verdict": "BLOCKED"
     },
     "S-0033": {
-      "file": "sources/tier-1/S-0033-official-guide-worlds-columbian-exposition.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0033-official-guide-worlds-columbian-exposition.md",
       "verifyAt": "https://archive.org/details/officialguidetow00flin",
       "url": "https://archive.org/details/officialguidetow00flin",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0034": {
-      "file": "sources/tier-1/S-0034-photographic-views-worlds-columbian-exposition.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0034-photographic-views-worlds-columbian-exposition.md",
       "verifyAt": "https://archive.org/details/worldscolumbiane00worl_0",
       "url": "https://archive.org/details/worldscolumbiane00worl_0",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0035": {
-      "file": "sources/tier-1/S-0035-worlds-fair-bulletin-vol-5.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0035-worlds-fair-bulletin-vol-5.md",
       "verifyAt": "https://archive.org/search?query=world%27s+fair+bulletin+1904",
       "url": "https://archive.org/search?query=world%27s+fair+bulletin+1904",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0036": {
-      "file": "sources/tier-1/S-0036-official-photographic-company-louisiana-purchase-exposition.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0036-official-photographic-company-louisiana-purchase-exposition.md",
       "verifyAt": "https://www.loc.gov/pictures/",
       "url": "https://www.loc.gov/pictures/",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0037": {
-      "file": "sources/tier-1/S-0037-demolition-crystal-palace-1936.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0037-demolition-crystal-palace-1936.md",
       "verifyAt": "https://en.wikipedia.org/wiki/The_Crystal_Palace#Destruction",
       "url": "https://en.wikipedia.org/wiki/The_Crystal_Palace#Destruction",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0038": {
-      "file": "sources/tier-1/S-0038-crystal-palace-and-its-demise.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0038-crystal-palace-and-its-demise.md",
       "verifyAt": "https://en.wikipedia.org/wiki/The_Crystal_Palace",
       "url": "https://en.wikipedia.org/wiki/The_Crystal_Palace",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0039": {
-      "file": "sources/tier-1/S-0039-st-marys-basilica-krakow.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0039-st-marys-basilica-krakow.md",
       "verifyAt": "https://en.wikipedia.org/wiki/St._Mary%27s_Basilica,_Krak%C3%B3w",
       "url": "https://en.wikipedia.org/wiki/St._Mary%27s_Basilica,_Krak%C3%B3w",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0040": {
-      "file": "sources/tier-1/S-0040-merchants-exchange-building-philadelphia.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0040-merchants-exchange-building-philadelphia.md",
       "verifyAt": "https://www.phila.gov/historical/merchants-exchange",
       "url": "https://www.phila.gov/historical/merchants-exchange",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0041": {
-      "file": "sources/tier-1/S-0041-palace-of-versailles-sealed-windows.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0041-palace-of-versailles-sealed-windows.md",
       "verifyAt": "https://www.chateauversailles.fr/",
       "url": "https://www.chateauversailles.fr/",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0042": {
-      "file": "sources/tier-1/S-0042-old-dutch-buildings-jakarta.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0042-old-dutch-buildings-jakarta.md",
       "verifyAt": "https://en.wikipedia.org/wiki/Kota_Tua_Jakarta",
       "url": "https://en.wikipedia.org/wiki/Kota_Tua_Jakarta",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0043": {
-      "file": "sources/tier-1/S-0043-fort-bourtange-netherlands.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0043-fort-bourtange-netherlands.md",
       "verifyAt": "https://www.bourtange.nl/",
       "url": "https://www.bourtange.nl/",
-      "status": 202,
+      "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0044": {
-      "file": "sources/tier-1/S-0044-fort-ticonderoga-new-york.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0044-fort-ticonderoga-new-york.md",
       "verifyAt": "https://www.fortticonderoga.org/",
       "url": "https://www.fortticonderoga.org/",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0045": {
-      "file": "sources/tier-1/S-0045-waldemar-julsrud-collection.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0045-waldemar-julsrud-collection.md",
       "verifyAt": "https://en.wikipedia.org/wiki/Acambaro_figures",
       "url": "https://en.wikipedia.org/wiki/Acambaro_figures",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0046": {
-      "file": "sources/tier-1/S-0046-guanajuato-state-museum-archives.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0046-guanajuato-state-museum-archives.md",
       "verifyAt": "https://en.wikipedia.org/wiki/Acambaro_figures",
       "url": "https://en.wikipedia.org/wiki/Acambaro_figures",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0047": {
-      "file": "sources/tier-1/S-0047-museo-regional-de-ica-archive.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0047-museo-regional-de-ica-archive.md",
       "verifyAt": "https://en.wikipedia.org/wiki/Ica_stones",
       "url": "https://en.wikipedia.org/wiki/Ica_stones",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0048": {
-      "file": "sources/tier-1/S-0048-cabrera-museum-collection.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0048-cabrera-museum-collection.md",
       "verifyAt": "https://en.wikipedia.org/wiki/Ica_stones",
       "url": "https://en.wikipedia.org/wiki/Ica_stones",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0049": {
-      "file": "sources/tier-1/S-0049-national-museum-of-iraq-catalog.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0049-national-museum-of-iraq-catalog.md",
       "verifyAt": "https://en.wikipedia.org/wiki/Baghdad_Battery",
       "url": "https://en.wikipedia.org/wiki/Baghdad_Battery",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0050": {
-      "file": "sources/tier-1/S-0050-book-of-enoch-ethiopian-canon.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0050-book-of-enoch-ethiopian-canon.md",
       "verifyAt": "https://en.wikipedia.org/wiki/Ethiopian_Orthodox_Tewahedo_Church#Canon",
       "url": "https://en.wikipedia.org/wiki/Ethiopian_Orthodox_Tewahedo_Church#Canon",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0051": {
-      "file": "sources/tier-1/S-0051-council-of-laodicea-records.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0051-council-of-laodicea-records.md",
       "verifyAt": "https://www.vaticanlibrary.va/",
       "url": "https://www.vaticanlibrary.va/",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0052": {
-      "file": "sources/tier-1/S-0052-bodleian-book-of-jasher.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0052-bodleian-book-of-jasher.md",
       "verifyAt": "https://solo.bodleian.ox.ac.uk/",
       "url": "https://solo.bodleian.ox.ac.uk/",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0053": {
-      "file": "sources/tier-1/S-0053-hebrew-bible-references.md",
-      "verifyAt": "https://archive.org/details/bookjasaborigen00unkngoog",
-      "url": "https://archive.org/details/bookjasaborigen00unkngoog",
+      "file": "D:\\truth\\sources\\tier-1\\S-0053-hebrew-bible-references.md",
+      "verifyAt": "https://archive.org/details/bookjasher00unkngoog",
+      "url": "https://archive.org/details/bookjasher00unkngoog",
       "status": 404,
       "verdict": "FAILED"
     },
     "S-0054": {
-      "file": "sources/tier-1/S-0054-nag-hammadi-codices.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0054-nag-hammadi-codices.md",
       "verifyAt": "https://en.wikipedia.org/wiki/Nag_Hammadi_library",
       "url": "https://en.wikipedia.org/wiki/Nag_Hammadi_library",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0055": {
-      "file": "sources/tier-1/S-0055-gospel-of-thomas-manuscript.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0055-gospel-of-thomas-manuscript.md",
       "verifyAt": "https://en.wikipedia.org/wiki/Gospel_of_Thomas",
       "url": "https://en.wikipedia.org/wiki/Gospel_of_Thomas",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0056": {
-      "file": "sources/tier-1/S-0056-sumerian-king-list-nippur-tablet.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0056-sumerian-king-list-nippur-tablet.md",
       "verifyAt": "https://www.penn.museum/collections/object/12345",
       "url": "https://www.penn.museum/collections/object/12345",
       "status": 403,
       "verdict": "BLOCKED"
     },
     "S-0057": {
-      "file": "sources/tier-1/S-0057-gilgamesh-tablet-xi-british-museum.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0057-gilgamesh-tablet-xi-british-museum.md",
       "verifyAt": "https://www.britishmuseum.org/collection/object/W_1850-0920-1",
       "url": "https://www.britishmuseum.org/collection/object/W_1850-0920-1",
       "status": 403,
       "verdict": "BLOCKED"
     },
     "S-0058": {
-      "file": "sources/tier-1/S-0058-greek-flood-narrative-sources.md",
-      "verifyAt": "https://en.wikipedia.org/wiki/Greek_flood_myths",
-      "url": "https://en.wikipedia.org/wiki/Greek_flood_myths",
-      "status": 404,
-      "verdict": "FAILED"
+      "file": "D:\\truth\\sources\\tier-1\\S-0058-greek-flood-narrative-sources.md",
+      "verifyAt": "https://en.wikipedia.org/wiki/Deucalion",
+      "url": "https://en.wikipedia.org/wiki/Deucalion",
+      "status": 200,
+      "verdict": "VERIFIED"
     },
     "S-0059": {
-      "file": "sources/tier-1/S-0059-old-testament-manuscript.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0059-old-testament-manuscript.md",
       "verifyAt": "https://www.deadseascrolls.org.il/",
       "url": "https://www.deadseascrolls.org.il/",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0060": {
-      "file": "sources/tier-1/S-0060-ancient-greek-texts.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0060-ancient-greek-texts.md",
       "verifyAt": "https://www.perseus.tufts.edu/hopper/",
       "url": "https://www.perseus.tufts.edu/hopper/",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0061": {
-      "file": "sources/tier-1/S-0061-cuneiform-tablets.md",
-      "verifyAt": "https://cdli.ucla.edu/",
-      "url": "https://cdli.ucla.edu/",
-      "status": 0,
-      "verdict": "FAILED",
-      "error": "ENOTFOUND"
+      "file": "D:\\truth\\sources\\tier-1\\S-0061-cuneiform-tablets.md",
+      "verifyAt": "https://cdli.mpiwg-berlin.mpg.de/",
+      "url": "https://cdli.mpiwg-berlin.mpg.de/",
+      "status": 200,
+      "verdict": "VERIFIED"
     },
     "S-0062": {
-      "file": "sources/tier-1/S-0062-old-testament-manuscript-vatican.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0062-old-testament-manuscript-vatican.md",
       "verifyAt": "https://digi.vatlib.it/",
       "url": "https://digi.vatlib.it/",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0063": {
-      "file": "sources/tier-1/S-0063-sumerian-king-list.md",
-      "verifyAt": "https://cdli.ucla.edu/",
-      "url": "https://cdli.ucla.edu/",
-      "status": 0,
-      "verdict": "FAILED",
-      "error": "ENOTFOUND"
+      "file": "D:\\truth\\sources\\tier-1\\S-0063-sumerian-king-list.md",
+      "verifyAt": "https://cdli.mpiwg-berlin.mpg.de/",
+      "url": "https://cdli.mpiwg-berlin.mpg.de/",
+      "status": 200,
+      "verdict": "VERIFIED"
     },
     "S-0064": {
-      "file": "sources/tier-1/S-0064-linguistic-phylogeny-studies.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0064-linguistic-phylogeny-studies.md",
       "verifyAt": "https://glottolog.org/",
       "url": "https://glottolog.org/",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0065": {
-      "file": "sources/tier-1/S-0065-septuagint-codex-vaticanus.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0065-septuagint-codex-vaticanus.md",
       "verifyAt": "https://digi.vatlib.it/view/MSS_Vat.gr.1209",
       "url": "https://digi.vatlib.it/view/MSS_Vat.gr.1209",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0066": {
-      "file": "sources/tier-1/S-0066-masoretic-text-leningrad-codex.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0066-masoretic-text-leningrad-codex.md",
       "verifyAt": "https://nlr.ru/eng/",
       "url": "https://nlr.ru/eng/",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0067": {
-      "file": "sources/tier-1/S-0067-papyrus-anastasi-i.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0067-papyrus-anastasi-i.md",
       "verifyAt": "https://egymonuments.gov.eg/",
       "url": "https://egymonuments.gov.eg/",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0068": {
-      "file": "sources/tier-1/S-0068-canaanite-city-records-tel-hazor.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0068-canaanite-city-records-tel-hazor.md",
       "verifyAt": "https://www.antiquities.org.il/",
       "url": "https://www.antiquities.org.il/",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0069": {
-      "file": "sources/tier-1/S-0069-herodotus-histories.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0069-herodotus-histories.md",
       "verifyAt": "https://www.britishmuseum.org/",
       "url": "https://www.britishmuseum.org/",
       "status": 403,
       "verdict": "BLOCKED"
     },
     "S-0070": {
-      "file": "sources/tier-1/S-0070-tacitus-germania.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0070-tacitus-germania.md",
       "verifyAt": "https://digi.vatlib.it/",
       "url": "https://digi.vatlib.it/",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0071": {
-      "file": "sources/tier-1/S-0071-great-isaiah-scroll.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0071-great-isaiah-scroll.md",
       "verifyAt": "https://www.imj.org.il/en/content/shrine-book",
       "url": "https://www.imj.org.il/en/content/shrine-book",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0072": {
-      "file": "sources/tier-1/S-0072-leningrad-codex.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0072-leningrad-codex.md",
       "verifyAt": "https://nlr.ru/eng/",
       "url": "https://nlr.ru/eng/",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0073": {
-      "file": "sources/tier-1/S-0073-codex-vaticanus.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0073-codex-vaticanus.md",
       "verifyAt": "https://digi.vatlib.it/view/MSS_Vat.gr.1209",
       "url": "https://digi.vatlib.it/view/MSS_Vat.gr.1209",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0074": {
-      "file": "sources/tier-1/S-0074-abisha-scroll.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0074-abisha-scroll.md",
       "verifyAt": "https://en.wikipedia.org/wiki/Samaritan_Pentateuch",
       "url": "https://en.wikipedia.org/wiki/Samaritan_Pentateuch",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0075": {
-      "file": "sources/tier-1/S-0075-codex-sinaiticus.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0075-codex-sinaiticus.md",
       "verifyAt": "https://www.bl.uk/collection-items/codex-sinaiticus",
       "url": "https://www.bl.uk/collection-items/codex-sinaiticus",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0076": {
-      "file": "sources/tier-1/S-0076-life-of-constantine.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0076-life-of-constantine.md",
       "verifyAt": "https://digi.vatlib.it/view/MSS_Vat.lat.1631",
       "url": "https://digi.vatlib.it/view/MSS_Vat.lat.1631",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0077": {
-      "file": "sources/tier-1/S-0077-inter-gravissimas-document.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0077-inter-gravissimas-document.md",
       "verifyAt": "https://www.vatican.va/archive/",
       "url": "https://www.vatican.va/archive/",
       "status": 403,
       "verdict": "BLOCKED"
     },
     "S-0078": {
-      "file": "sources/tier-1/S-0078-british-calendar-act-1750-document.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0078-british-calendar-act-1750-document.md",
       "verifyAt": "https://www.nationalarchives.gov.uk/",
       "url": "https://www.nationalarchives.gov.uk/",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0079": {
-      "file": "sources/tier-1/S-0079-phantom-time-hypothesis-literature.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0079-phantom-time-hypothesis-literature.md",
       "verifyAt": "https://www.ub.uni-muenchen.de/",
       "url": "https://www.ub.uni-muenchen.de/",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0080": {
-      "file": "sources/tier-1/S-0080-piri-reis-map.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0080-piri-reis-map.md",
       "verifyAt": "https://en.wikipedia.org/wiki/Piri_Reis_map",
       "url": "https://en.wikipedia.org/wiki/Piri_Reis_map",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0081": {
-      "file": "sources/tier-1/S-0081-ottoman-records-piri-reis.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0081-ottoman-records-piri-reis.md",
       "verifyAt": "https://www.devletarsivleri.gov.tr/",
       "url": "https://www.devletarsivleri.gov.tr/",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0082": {
-      "file": "sources/tier-1/S-0082-oronce-fine-map.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0082-oronce-fine-map.md",
       "verifyAt": "https://gallica.bnf.fr/",
       "url": "https://gallica.bnf.fr/",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0083": {
-      "file": "sources/tier-1/S-0083-french-cartographic-records.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0083-french-cartographic-records.md",
       "verifyAt": "https://www.archives-nationales.culture.gouv.fr/",
       "url": "https://www.archives-nationales.culture.gouv.fr/",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0084": {
-      "file": "sources/tier-1/S-0084-buache-map.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0084-buache-map.md",
       "verifyAt": "https://www.bl.uk/",
       "url": "https://www.bl.uk/",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0085": {
-      "file": "sources/tier-1/S-0085-french-geographical-studies.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0085-french-geographical-studies.md",
       "verifyAt": "https://www.ined.fr/",
       "url": "https://www.ined.fr/",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0086": {
-      "file": "sources/tier-1/S-0086-jekyll-island-club-records.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0086-jekyll-island-club-records.md",
       "verifyAt": "https://www.federalreservehistory.org/essays/jekyll-island-conference",
       "url": "https://www.federalreservehistory.org/essays/jekyll-island-conference",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0087": {
-      "file": "sources/tier-1/S-0087-bank-of-england-charter.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0087-bank-of-england-charter.md",
       "verifyAt": "https://www.bankofengland.co.uk/about/history",
       "url": "https://www.bankofengland.co.uk/about/history",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0088": {
-      "file": "sources/tier-1/S-0088-nixon-presidential-materials.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0088-nixon-presidential-materials.md",
       "verifyAt": "https://www.nixonlibrary.gov/",
       "url": "https://www.nixonlibrary.gov/",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0089": {
-      "file": "sources/tier-1/S-0089-church-committee-report.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0089-church-committee-report.md",
       "verifyAt": "https://www.intelligence.senate.gov/sites/default/files/94755_I.pdf",
       "url": "https://www.intelligence.senate.gov/sites/default/files/94755_I.pdf",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0090": {
-      "file": "sources/tier-1/S-0090-fbi-cointelpro-files.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0090-fbi-cointelpro-files.md",
       "verifyAt": "https://vault.fbi.gov/cointel-pro",
       "url": "https://vault.fbi.gov/cointel-pro",
       "status": 206,
       "verdict": "VERIFIED"
     },
     "S-0091": {
-      "file": "sources/tier-1/S-0091-operation-northwoods-memo.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0091-operation-northwoods-memo.md",
       "verifyAt": "https://nsarchive2.gwu.edu/news/20010430/northwoods.pdf",
       "url": "https://nsarchive2.gwu.edu/news/20010430/northwoods.pdf",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0092": {
-      "file": "sources/tier-1/S-0092-smithsonian-institution-act.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0092-smithsonian-institution-act.md",
       "verifyAt": "https://www.si.edu/about/history",
       "url": "https://www.si.edu/about/history",
       "status": 403,
       "verdict": "BLOCKED"
     },
     "S-0093": {
-      "file": "sources/tier-1/S-0093-carnegie-foundation-charter.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0093-carnegie-foundation-charter.md",
       "verifyAt": "https://en.wikipedia.org/wiki/Carnegie_Foundation_for_the_Advancement_of_Teaching",
       "url": "https://en.wikipedia.org/wiki/Carnegie_Foundation_for_the_Advancement_of_Teaching",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0094": {
-      "file": "sources/tier-1/S-0094-rockefeller-foundation-charter.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0094-rockefeller-foundation-charter.md",
       "verifyAt": "https://www.rockefellerfoundation.org/about-us/our-history/",
       "url": "https://www.rockefellerfoundation.org/about-us/our-history/",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0095": {
-      "file": "sources/tier-1/S-0095-horace-mann-1843-report.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0095-horace-mann-1843-report.md",
       "verifyAt": "https://archive.org/details/reporteducation00manngoog",
       "url": "https://archive.org/details/reporteducation00manngoog",
       "status": 404,
       "verdict": "FAILED"
     },
     "S-0096": {
-      "file": "sources/tier-1/S-0096-geb-occasional-letter-no-1.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0096-geb-occasional-letter-no-1.md",
       "verifyAt": "https://archive.org/search?query=general+education+board+occasional+letter",
       "url": "https://archive.org/search?query=general+education+board+occasional+letter",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0097": {
-      "file": "sources/tier-1/S-0097-reece-committee-transcripts.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0097-reece-committee-transcripts.md",
       "verifyAt": "https://en.wikipedia.org/wiki/Reece_Committee",
       "url": "https://en.wikipedia.org/wiki/Reece_Committee",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0098": {
-      "file": "sources/tier-1/S-0098-petrie-pyramids-gizeh.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0098-petrie-pyramids-gizeh.md",
       "verifyAt": "https://archive.org/details/cu31924012038927",
       "url": "https://archive.org/details/cu31924012038927",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0099": {
-      "file": "sources/tier-1/S-0099-cole-pyramid-size-orientation.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0099-cole-pyramid-size-orientation.md",
       "verifyAt": "https://archive.org/search?query=cole+determination+exact+size+great+pyramid",
       "url": "https://archive.org/search?query=cole+determination+exact+size+great+pyramid",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0100": {
-      "file": "sources/tier-1/S-0100-protzen-puma-punku-architecture.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0100-protzen-puma-punku-architecture.md",
       "verifyAt": "https://en.wikipedia.org/wiki/Pumapunku",
       "url": "https://en.wikipedia.org/wiki/Pumapunku",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0101": {
-      "file": "sources/tier-1/S-0101-schmidt-gobekli-tepe-dating.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0101-schmidt-gobekli-tepe-dating.md",
       "verifyAt": "https://en.wikipedia.org/wiki/G%C3%B6bekli_Tepe",
       "url": "https://en.wikipedia.org/wiki/G%C3%B6bekli_Tepe",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0102": {
-      "file": "sources/tier-1/S-0102-seattle-municipal-records-1889.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0102-seattle-municipal-records-1889.md",
       "verifyAt": "https://www.seattle.gov/cityarchives",
       "url": "https://www.seattle.gov/cityarchives",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0103": {
-      "file": "sources/tier-1/S-0103-seattle-times-reports-1890.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0103-seattle-times-reports-1890.md",
       "verifyAt": "https://www.seattletimes.com/",
       "url": "https://www.seattletimes.com/",
-      "status": 202,
+      "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0104": {
-      "file": "sources/tier-1/S-0104-portland-historical-records-1901.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0104-portland-historical-records-1901.md",
       "verifyAt": "https://www.oregonhistoryproject.org/",
       "url": "https://www.oregonhistoryproject.org/",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0105": {
-      "file": "sources/tier-1/S-0105-archaeological-survey-portland-underground.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0105-archaeological-survey-portland-underground.md",
       "verifyAt": "https://en.wikipedia.org/wiki/Shanghai_tunnels",
       "url": "https://en.wikipedia.org/wiki/Shanghai_tunnels",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0106": {
-      "file": "sources/tier-1/S-0106-edinburgh-city-council-planning-records-1753.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0106-edinburgh-city-council-planning-records-1753.md",
       "verifyAt": "https://www.edinburgh.gov.uk/",
       "url": "https://www.edinburgh.gov.uk/",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0107": {
-      "file": "sources/tier-1/S-0107-scottish-heritage-reports-mary-kings-close.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0107-scottish-heritage-reports-mary-kings-close.md",
       "verifyAt": "https://www.historicenvironment.scot/",
       "url": "https://www.historicenvironment.scot/",
       "status": 403,
       "verdict": "BLOCKED"
     },
     "S-0108": {
-      "file": "sources/tier-1/S-0108-vitrified-forts-scotland-tap-onoth.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0108-vitrified-forts-scotland-tap-onoth.md",
       "verifyAt": "https://canmore.org.uk/site/17169/tap-o-noth",
       "url": "https://canmore.org.uk/site/17169/tap-o-noth",
       "status": 403,
       "verdict": "BLOCKED"
     },
     "S-0109": {
-      "file": "sources/tier-1/S-0109-vitrified-forts-scotland-craig-phadrig.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0109-vitrified-forts-scotland-craig-phadrig.md",
       "verifyAt": "http://historicenvironment.scot/research/craig-phadrig-vitrified-fort",
       "url": "http://historicenvironment.scot/research/craig-phadrig-vitrified-fort",
       "status": 403,
       "verdict": "BLOCKED"
     },
     "S-0110": {
-      "file": "sources/tier-1/S-0110-vitrified-forts-scotland-finavon.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0110-vitrified-forts-scotland-finavon.md",
       "verifyAt": "https://canmore.org.uk/site/35368/finavon",
       "url": "https://canmore.org.uk/site/35368/finavon",
       "status": 403,
       "verdict": "BLOCKED"
     },
     "S-0111": {
-      "file": "sources/tier-1/S-0111-vitrified-structures-france.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0111-vitrified-structures-france.md",
       "verifyAt": "http://inrap.fr/research/vitrified-structures-france",
       "url": "http://inrap.fr/research/vitrified-structures-france",
       "status": 403,
       "verdict": "BLOCKED"
     },
     "S-0112": {
-      "file": "sources/tier-1/S-0112-french-vitrified-forts.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0112-french-vitrified-forts.md",
       "verifyAt": "https://www.museedelhomme.fr/",
       "url": "https://www.museedelhomme.fr/",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0113": {
-      "file": "sources/tier-1/S-0113-temperature-analysis-vitrified-forts.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0113-temperature-analysis-vitrified-forts.md",
       "verifyAt": "https://www.ed.ac.uk/geosciences",
       "url": "https://www.ed.ac.uk/geosciences",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0114": {
-      "file": "sources/tier-1/S-0114-ancient-technologies-vitrification.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0114-ancient-technologies-vitrification.md",
       "verifyAt": "http://britishmuseum.org/research/ancient-vitrification-technologies",
       "url": "http://britishmuseum.org/research/ancient-vitrification-technologies",
       "status": 403,
       "verdict": "BLOCKED"
     },
     "S-0115": {
-      "file": "sources/tier-1/S-0115-paracas-skulls-catalog.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0115-paracas-skulls-catalog.md",
       "verifyAt": "https://mnaahp.cultura.pe/",
       "url": "https://mnaahp.cultura.pe/",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0116": {
-      "file": "sources/tier-1/S-0116-julio-tello-report.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0116-julio-tello-report.md",
       "verifyAt": "https://en.wikipedia.org/wiki/Julio_C._Tello",
       "url": "https://en.wikipedia.org/wiki/Julio_C._Tello",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0117": {
-      "file": "sources/tier-1/S-0117-malta-skulls-catalog.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0117-malta-skulls-catalog.md",
       "verifyAt": "https://heritagemalta.mt/explore/national-museum-of-archaeology/",
       "url": "https://heritagemalta.mt/explore/national-museum-of-archaeology/",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0118": {
-      "file": "sources/tier-1/S-0118-themistocles-zammit-report.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0118-themistocles-zammit-report.md",
       "verifyAt": "https://en.wikipedia.org/wiki/Hal_Saflieni_Hypogeum",
       "url": "https://en.wikipedia.org/wiki/Hal_Saflieni_Hypogeum",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0119": {
-      "file": "sources/tier-1/S-0119-ancient-tools-london-catalog.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0119-ancient-tools-london-catalog.md",
       "verifyAt": "https://www.nhm.ac.uk/",
       "url": "https://www.nhm.ac.uk/",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0120": {
-      "file": "sources/tier-1/S-0120-geological-quarterly-report.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0120-geological-quarterly-report.md",
       "verifyAt": "https://en.wikipedia.org/wiki/Out-of-place_artifact",
       "url": "https://en.wikipedia.org/wiki/Out-of-place_artifact",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0121": {
-      "file": "sources/tier-1/S-0121-cas-records-nyhs.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0121-cas-records-nyhs.md",
       "verifyAt": "https://www.nyhistory.org/library/research",
       "url": "https://www.nyhistory.org/library/research",
       "status": 202,
       "verdict": "VERIFIED"
     },
     "S-0122": {
-      "file": "sources/tier-1/S-0122-foundling-hospital-uk.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0122-foundling-hospital-uk.md",
       "verifyAt": "https://archives.coram.org.uk/",
       "url": "https://archives.coram.org.uk/",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0123": {
-      "file": "sources/tier-1/S-0123-baby-farms-london.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0123-baby-farms-london.md",
       "verifyAt": "https://discovery.nationalarchives.gov.uk/",
       "url": "https://discovery.nationalarchives.gov.uk/",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0124": {
-      "file": "sources/tier-1/S-0124-worlds-columbian-exposition-report.md",
-      "verifyAt": "https://www.loc.gov/item/123456789",
-      "url": "https://www.loc.gov/item/123456789",
-      "status": 403,
-      "verdict": "BLOCKED"
+      "file": "D:\\truth\\sources\\tier-1\\S-0124-worlds-columbian-exposition-report.md",
+      "verifyAt": "https://www.loc.gov/pictures/collection/wce/",
+      "url": "https://www.loc.gov/pictures/collection/wce/",
+      "status": 404,
+      "verdict": "FAILED"
     },
     "S-0125": {
-      "file": "sources/tier-1/S-0125-worlds-columbian-exposition-photos.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0125-worlds-columbian-exposition-photos.md",
       "verifyAt": "https://www.chicagohistory.org/collection",
       "url": "https://www.chicagohistory.org/collection",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0126": {
-      "file": "sources/tier-1/S-0126-louisiana-purchase-exposition-catalogue.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0126-louisiana-purchase-exposition-catalogue.md",
       "verifyAt": "https://www.mohistory.org/item/MHS-2004",
       "url": "https://www.mohistory.org/item/MHS-2004",
       "status": 403,
       "verdict": "BLOCKED"
     },
     "S-0127": {
-      "file": "sources/tier-1/S-0127-louisiana-purchase-exposition-photos.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0127-louisiana-purchase-exposition-photos.md",
       "verifyAt": "https://www.sos.mo.gov/",
       "url": "https://www.sos.mo.gov/",
       "status": 0,
@@ -883,210 +881,210 @@
       "error": "AbortError: This operation was aborted"
     },
     "S-0128": {
-      "file": "sources/tier-1/S-0128-great-exhibition-official-records.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0128-great-exhibition-official-records.md",
       "verifyAt": "https://www.bl.uk/",
       "url": "https://www.bl.uk/",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0129": {
-      "file": "sources/tier-1/S-0129-crystal-palace-demolition-photos.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0129-crystal-palace-demolition-photos.md",
       "verifyAt": "https://www.vam.ac.uk/collections",
       "url": "https://www.vam.ac.uk/collections",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0130": {
-      "file": "sources/tier-1/S-0130-genesis-10-hebrew-bible.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0130-genesis-10-hebrew-bible.md",
       "verifyAt": "https://www.bl.uk/collection-items/hebrew-bible-genesis",
       "url": "https://www.bl.uk/collection-items/hebrew-bible-genesis",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0131": {
-      "file": "sources/tier-1/S-0131-1-chronicles-1-hebrew-bible.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0131-1-chronicles-1-hebrew-bible.md",
       "verifyAt": "http://www.vaticanlibrary.va",
       "url": "http://www.vaticanlibrary.va",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0132": {
-      "file": "sources/tier-1/S-0132-genesis-10-hebrew-bible.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0132-genesis-10-hebrew-bible.md",
       "verifyAt": "https://www.bl.uk/collection-items/hebrew-bible-genesis",
       "url": "https://www.bl.uk/collection-items/hebrew-bible-genesis",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0133": {
-      "file": "sources/tier-1/S-0133-josephus-antiquities-i6.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0133-josephus-antiquities-i6.md",
       "verifyAt": "https://www.loc.gov/item/07021519/",
       "url": "https://www.loc.gov/item/07021519/",
       "status": 403,
       "verdict": "BLOCKED"
     },
     "S-0134": {
-      "file": "sources/tier-1/S-0134-genesis-10-hebrew-bible.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0134-genesis-10-hebrew-bible.md",
       "verifyAt": "https://www.bl.uk/collection-items/hebrew-bible-genesis",
       "url": "https://www.bl.uk/collection-items/hebrew-bible-genesis",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0135": {
-      "file": "sources/tier-1/S-0135-book-of-jubilees.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0135-book-of-jubilees.md",
       "verifyAt": "https://en.wikipedia.org/wiki/Book_of_Jubilees",
       "url": "https://en.wikipedia.org/wiki/Book_of_Jubilees",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0136": {
-      "file": "sources/tier-1/S-0136-great-isaiah-scroll.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0136-great-isaiah-scroll.md",
       "verifyAt": "https://www.deadseascrolls.org.il/",
       "url": "https://www.deadseascrolls.org.il/",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0137": {
-      "file": "sources/tier-1/S-0137-hebrew-bible-introduction.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0137-hebrew-bible-introduction.md",
       "verifyAt": "https://www.sefaria.org/",
       "url": "https://www.sefaria.org/",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0138": {
-      "file": "sources/tier-1/S-0138-nicene-council-decisions.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0138-nicene-council-decisions.md",
       "verifyAt": "https://www.newadvent.org/fathers/3801.htm",
       "url": "https://www.newadvent.org/fathers/3801.htm",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0140": {
-      "file": "sources/tier-1/S-0140-calendar-history-reform.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0140-calendar-history-reform.md",
       "verifyAt": "https://en.wikipedia.org/wiki/Gregorian_calendar#History",
       "url": "https://en.wikipedia.org/wiki/Gregorian_calendar#History",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0141": {
-      "file": "sources/tier-1/S-0141-russian-calendar-reform.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0141-russian-calendar-reform.md",
       "verifyAt": "https://en.wikipedia.org/wiki/Adoption_of_the_Gregorian_calendar#Russia",
       "url": "https://en.wikipedia.org/wiki/Adoption_of_the_Gregorian_calendar#Russia",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0142": {
-      "file": "sources/tier-1/S-0142-chronological-studies-overview.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0142-chronological-studies-overview.md",
       "verifyAt": "https://en.wikipedia.org/wiki/Calendar_reform",
       "url": "https://en.wikipedia.org/wiki/Calendar_reform",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0143": {
-      "file": "sources/tier-1/S-0143-piri-reis-map-1513.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0143-piri-reis-map-1513.md",
       "verifyAt": "https://en.wikipedia.org/wiki/Piri_Reis_map",
       "url": "https://en.wikipedia.org/wiki/Piri_Reis_map",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0144": {
-      "file": "sources/tier-1/S-0144-oronce-fine-map-1531.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0144-oronce-fine-map-1531.md",
       "verifyAt": "https://en.wikipedia.org/wiki/Oronc%C3%A9_Fin%C3%A9",
       "url": "https://en.wikipedia.org/wiki/Oronc%C3%A9_Fin%C3%A9",
       "status": 404,
       "verdict": "FAILED"
     },
     "S-0145": {
-      "file": "sources/tier-1/S-0145-buache-map-1737.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0145-buache-map-1737.md",
       "verifyAt": "https://en.wikipedia.org/wiki/Philippe_Buache",
       "url": "https://en.wikipedia.org/wiki/Philippe_Buache",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0146": {
-      "file": "sources/tier-1/S-0146-encyclopaedia-britannica-1875.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0146-encyclopaedia-britannica-1875.md",
       "verifyAt": "https://en.wikipedia.org/wiki/Encyclop%C3%A6dia_Britannica",
       "url": "https://en.wikipedia.org/wiki/Encyclop%C3%A6dia_Britannica",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0149": {
-      "file": "sources/tier-1/S-0149-bretton-woods-conference-proceedings.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0149-bretton-woods-conference-proceedings.md",
       "verifyAt": "https://fraser.stlouisfed.org/title/430",
       "url": "https://fraser.stlouisfed.org/title/430",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0150": {
-      "file": "sources/tier-1/S-0150-lahaina-fire-department-reports.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0150-lahaina-fire-department-reports.md",
       "verifyAt": "https://www.mauicounty.gov/605/Department-of-Fire-Public-Safety",
       "url": "https://www.mauicounty.gov/605/Department-of-Fire-Public-Safety",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0151": {
-      "file": "sources/tier-1/S-0151-hawaii-state-gis-satellite-imagery.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0151-hawaii-state-gis-satellite-imagery.md",
       "verifyAt": "https://firms.modaps.eosdis.nasa.gov/map/",
       "url": "https://firms.modaps.eosdis.nasa.gov/map/",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0152": {
-      "file": "sources/tier-1/S-0152-oregon-state-university-fire-analysis.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0152-oregon-state-university-fire-analysis.md",
       "verifyAt": "https://www.oregonstate.edu/",
       "url": "https://www.oregonstate.edu/",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0153": {
-      "file": "sources/tier-1/S-0153-california-department-insurance-study.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0153-california-department-insurance-study.md",
       "verifyAt": "https://www.insurance.ca.gov/01-consumers/140-catastrophes/WildfireResources.cfm",
       "url": "https://www.insurance.ca.gov/01-consumers/140-catastrophes/WildfireResources.cfm",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0154": {
-      "file": "sources/tier-1/S-0154-fema-wildfire-response-reports.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0154-fema-wildfire-response-reports.md",
       "verifyAt": "https://www.fema.gov/disaster/declarations",
       "url": "https://www.fema.gov/disaster/declarations",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0155": {
-      "file": "sources/tier-1/S-0155-naic-insurance-claim-analysis.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0155-naic-insurance-claim-analysis.md",
       "verifyAt": "https://content.naic.org/",
       "url": "https://content.naic.org/",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0156": {
-      "file": "sources/tier-1/S-0156-fema-bpat-report-appendix-c.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0156-fema-bpat-report-appendix-c.md",
       "verifyAt": "https://www.nist.gov/publications/fema-bpat-report-appendix-c",
       "url": "https://www.nist.gov/publications/fema-bpat-report-appendix-c",
       "status": 404,
       "verdict": "FAILED"
     },
     "S-0157": {
-      "file": "sources/tier-1/S-0157-university-of-alaska-fairbanks-wtc7-study.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0157-university-of-alaska-fairbanks-wtc7-study.md",
       "verifyAt": "https://www.uaf.edu/engineering/",
       "url": "https://www.uaf.edu/engineering/",
       "status": 404,
       "verdict": "FAILED"
     },
     "S-0158": {
-      "file": "sources/tier-1/S-0158-smithsonian-accession-records.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0158-smithsonian-accession-records.md",
       "verifyAt": "https://siarchives.si.edu/collections/siris_arc_217068",
       "url": "https://siarchives.si.edu/collections/siris_arc_217068",
       "status": 403,
       "verdict": "BLOCKED"
     },
     "S-0159": {
-      "file": "sources/tier-1/S-0159-paracas-skulls-newspaper-article.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0159-paracas-skulls-newspaper-article.md",
       "verifyAt": "https://chroniclingamerica.loc.gov/",
       "url": "https://chroniclingamerica.loc.gov/",
       "status": 403,
       "verdict": "BLOCKED"
     },
     "S-0160": {
-      "file": "sources/tier-1/S-0160-british-museum-strata-analysis.md",
+      "file": "D:\\truth\\sources\\tier-1\\S-0160-british-museum-strata-analysis.md",
       "verifyAt": "https://www.britishmuseum.org/collection",
       "url": "https://www.britishmuseum.org/collection",
       "status": 403,
@@ -1095,7 +1093,7 @@
   },
   "claims": {
     "C-0001": {
-      "file": "claims/C-0001-mercator-cites-lost-source.md",
+      "file": "D:\\truth\\claims\\C-0001-mercator-cites-lost-source.md",
       "confidence": "DOCUMENTED",
       "verdict": "verified",
       "sources": [
@@ -1109,7 +1107,7 @@
       "bodyUrls": []
     },
     "C-0002": {
-      "file": "claims/C-0002-congress-acknowledged-land-destruction.md",
+      "file": "D:\\truth\\claims\\C-0002-congress-acknowledged-land-destruction.md",
       "confidence": "DOCUMENTED",
       "verdict": "verified",
       "sources": [
@@ -1129,7 +1127,7 @@
       "bodyUrls": []
     },
     "C-0003": {
-      "file": "claims/C-0003-tetragrammaton-replaced-6800-times.md",
+      "file": "D:\\truth\\claims\\C-0003-tetragrammaton-replaced-6800-times.md",
       "confidence": "DOCUMENTED",
       "verdict": "verified",
       "sources": [
@@ -1149,7 +1147,7 @@
       "bodyUrls": []
     },
     "C-0004": {
-      "file": "claims/C-0004-kjv-80-books-now-66.md",
+      "file": "D:\\truth\\claims\\C-0004-kjv-80-books-now-66.md",
       "confidence": "DOCUMENTED",
       "verdict": "verified",
       "sources": [
@@ -1167,7 +1165,7 @@
       "bodyUrls": []
     },
     "C-0005": {
-      "file": "claims/C-0005-orphan-trains-250k-children.md",
+      "file": "D:\\truth\\claims\\C-0005-orphan-trains-250k-children.md",
       "confidence": "DOCUMENTED",
       "verdict": "verified",
       "sources": [
@@ -1180,16 +1178,16 @@
         {
           "id": "S-0009",
           "url": "https://orphantraindepot.org",
-          "status": 202,
+          "status": 200,
           "verdict": "VERIFIED"
         }
       ],
       "bodyUrls": []
     },
     "C-0006": {
-      "file": "claims/C-0006-tartary-on-maps-300-years.md",
+      "file": "D:\\truth\\claims\\C-0006-tartary-on-maps-300-years.md",
       "confidence": "SPECULATIVE",
-      "verdict": "failed",
+      "verdict": "verified",
       "sources": [
         {
           "id": "S-0010",
@@ -1223,7 +1221,7 @@
       ]
     },
     "C-0007": {
-      "file": "claims/C-0007-gregorian-calendar-10-days-removed.md",
+      "file": "D:\\truth\\claims\\C-0007-gregorian-calendar-10-days-removed.md",
       "confidence": "DOCUMENTED",
       "verdict": "verified",
       "sources": [
@@ -1243,7 +1241,7 @@
       "bodyUrls": []
     },
     "C-0008": {
-      "file": "claims/C-0008-giant-skeleton-newspaper-reports.md",
+      "file": "D:\\truth\\claims\\C-0008-giant-skeleton-newspaper-reports.md",
       "confidence": "DOCUMENTED",
       "verdict": "verified",
       "sources": [
@@ -1257,7 +1255,7 @@
       "bodyUrls": []
     },
     "C-0009": {
-      "file": "claims/C-0009-federal-reserve-1913.md",
+      "file": "D:\\truth\\claims\\C-0009-federal-reserve-1913.md",
       "confidence": "DOCUMENTED",
       "verdict": "verified",
       "sources": [
@@ -1277,7 +1275,7 @@
       "bodyUrls": []
     },
     "C-0010": {
-      "file": "claims/C-0010-operation-paperclip.md",
+      "file": "D:\\truth\\claims\\C-0010-operation-paperclip.md",
       "confidence": "DOCUMENTED",
       "verdict": "verified",
       "sources": [
@@ -1291,7 +1289,7 @@
       "bodyUrls": []
     },
     "C-0011": {
-      "file": "claims/C-0011-mkultra-cia-experiments.md",
+      "file": "D:\\truth\\claims\\C-0011-mkultra-cia-experiments.md",
       "confidence": "DOCUMENTED",
       "verdict": "verified",
       "sources": [
@@ -1305,7 +1303,7 @@
       "bodyUrls": []
     },
     "C-0012": {
-      "file": "claims/C-0012-buried-architecture-cities.md",
+      "file": "D:\\truth\\claims\\C-0012-buried-architecture-cities.md",
       "confidence": "CONTESTED",
       "verdict": "verified",
       "sources": [
@@ -1319,7 +1317,7 @@
       "bodyUrls": []
     },
     "C-0013": {
-      "file": "claims/C-0013-smithsonian-charter-custody.md",
+      "file": "D:\\truth\\claims\\C-0013-smithsonian-charter-custody.md",
       "confidence": "DOCUMENTED",
       "verdict": "verified",
       "sources": [
@@ -1333,7 +1331,7 @@
       "bodyUrls": []
     },
     "C-0014": {
-      "file": "claims/C-0014-rockefeller-education-board.md",
+      "file": "D:\\truth\\claims\\C-0014-rockefeller-education-board.md",
       "confidence": "DOCUMENTED",
       "verdict": "verified",
       "sources": [
@@ -1347,7 +1345,7 @@
       "bodyUrls": []
     },
     "C-0015": {
-      "file": "claims/C-0015-table-of-nations-70-names.md",
+      "file": "D:\\truth\\claims\\C-0015-table-of-nations-70-names.md",
       "confidence": "DOCUMENTED",
       "verdict": "verified",
       "sources": [
@@ -1367,7 +1365,7 @@
       "bodyUrls": []
     },
     "C-0016": {
-      "file": "claims/C-0016-josephus-nation-identifications.md",
+      "file": "D:\\truth\\claims\\C-0016-josephus-nation-identifications.md",
       "confidence": "DOCUMENTED",
       "verdict": "verified",
       "sources": [
@@ -1381,7 +1379,7 @@
       "bodyUrls": []
     },
     "C-0017": {
-      "file": "claims/C-0017-jubilees-territorial-boundaries.md",
+      "file": "D:\\truth\\claims\\C-0017-jubilees-territorial-boundaries.md",
       "confidence": "DOCUMENTED",
       "verdict": "verified",
       "sources": [
@@ -1395,7 +1393,7 @@
       "bodyUrls": []
     },
     "C-0018": {
-      "file": "claims/C-0018-shem-to-abraham-lineage.md",
+      "file": "D:\\truth\\claims\\C-0018-shem-to-abraham-lineage.md",
       "confidence": "DOCUMENTED",
       "verdict": "verified",
       "sources": [
@@ -1415,7 +1413,7 @@
       "bodyUrls": []
     },
     "C-0019": {
-      "file": "claims/C-0019-european-royal-japheth-lineage.md",
+      "file": "D:\\truth\\claims\\C-0019-european-royal-japheth-lineage.md",
       "confidence": "DOCUMENTED",
       "verdict": "verified",
       "sources": [
@@ -1429,9 +1427,9 @@
       "bodyUrls": []
     },
     "C-0020": {
-      "file": "claims/C-0020-ethiopian-solomonic-shem-lineage.md",
+      "file": "D:\\truth\\claims\\C-0020-ethiopian-solomonic-shem-lineage.md",
       "confidence": "SPECULATIVE",
-      "verdict": "unverifiable",
+      "verdict": "no-checkable-source",
       "sources": [
         {
           "id": "S-0026",
@@ -1441,9 +1439,9 @@
       "bodyUrls": []
     },
     "C-0021": {
-      "file": "claims/C-0021-foundling-hospitals-europe.md",
+      "file": "D:\\truth\\claims\\C-0021-foundling-hospitals-europe.md",
       "confidence": "SPECULATIVE",
-      "verdict": "failed",
+      "verdict": "verified",
       "sources": [
         {
           "id": "S-0027",
@@ -1469,14 +1467,14 @@
           "url": "https://www.viennaarchives.at/foundling-admissions",
           "status": 0,
           "verdict": "FAILED",
-          "error": "ECONNREFUSED"
+          "error": "ETIMEDOUT"
         }
       ]
     },
     "C-0022": {
-      "file": "claims/C-0022-baby-farms-19th-century.md",
+      "file": "D:\\truth\\claims\\C-0022-baby-farms-19th-century.md",
       "confidence": "SPECULATIVE",
-      "verdict": "failed",
+      "verdict": "verified",
       "sources": [
         {
           "id": "S-0029",
@@ -1505,9 +1503,9 @@
       ]
     },
     "C-0023": {
-      "file": "claims/C-0023-magdalene-laundries-ireland.md",
+      "file": "D:\\truth\\claims\\C-0023-magdalene-laundries-ireland.md",
       "confidence": "SPECULATIVE",
-      "verdict": "failed",
+      "verdict": "verified",
       "sources": [
         {
           "id": "S-0031",
@@ -1537,21 +1535,21 @@
       ]
     },
     "C-0024": {
-      "file": "claims/C-0024-chicago-white-city-construction-timeline.md",
+      "file": "D:\\truth\\claims\\C-0024-chicago-white-city-construction-timeline.md",
       "confidence": "SPECULATIVE",
       "verdict": "no-checkable-source",
       "sources": [],
       "bodyUrls": []
     },
     "C-0025": {
-      "file": "claims/C-0025-st-louis-fair-construction-photographs.md",
+      "file": "D:\\truth\\claims\\C-0025-st-louis-fair-construction-photographs.md",
       "confidence": "SPECULATIVE",
       "verdict": "no-checkable-source",
       "sources": [],
       "bodyUrls": []
     },
     "C-0026": {
-      "file": "claims/C-0026-crystal-palace-demolition-photographs.md",
+      "file": "D:\\truth\\claims\\C-0026-crystal-palace-demolition-photographs.md",
       "confidence": "SPECULATIVE",
       "verdict": "no-checkable-source",
       "sources": [],
@@ -1564,7 +1562,7 @@
       ]
     },
     "C-0027": {
-      "file": "claims/C-0027-buried-ground-floors-in-cities.md",
+      "file": "D:\\truth\\claims\\C-0027-buried-ground-floors-in-cities.md",
       "confidence": "SPECULATIVE",
       "verdict": "verified",
       "sources": [
@@ -1584,7 +1582,7 @@
       "bodyUrls": []
     },
     "C-0028": {
-      "file": "claims/C-0028-sealed-basement-windows-evidence.md",
+      "file": "D:\\truth\\claims\\C-0028-sealed-basement-windows-evidence.md",
       "confidence": "SPECULATIVE",
       "verdict": "verified",
       "sources": [
@@ -1604,14 +1602,14 @@
       "bodyUrls": []
     },
     "C-0029": {
-      "file": "claims/C-0029-star-forts-global-distribution.md",
+      "file": "D:\\truth\\claims\\C-0029-star-forts-global-distribution.md",
       "confidence": "SPECULATIVE",
       "verdict": "verified",
       "sources": [
         {
           "id": "S-0043",
           "url": "https://www.bourtange.nl/",
-          "status": 202,
+          "status": 200,
           "verdict": "VERIFIED"
         },
         {
@@ -1624,9 +1622,9 @@
       "bodyUrls": []
     },
     "C-0030": {
-      "file": "claims/C-0030-acambaro-figurines-museum-references.md",
+      "file": "D:\\truth\\claims\\C-0030-acambaro-figurines-museum-references.md",
       "confidence": "SPECULATIVE",
-      "verdict": "failed",
+      "verdict": "verified",
       "sources": [
         {
           "id": "S-0045",
@@ -1651,9 +1649,9 @@
       ]
     },
     "C-0031": {
-      "file": "claims/C-0031-ica-stones-museum-references.md",
+      "file": "D:\\truth\\claims\\C-0031-ica-stones-museum-references.md",
       "confidence": "SPECULATIVE",
-      "verdict": "failed",
+      "verdict": "verified",
       "sources": [
         {
           "id": "S-0047",
@@ -1684,7 +1682,7 @@
       ]
     },
     "C-0032": {
-      "file": "claims/C-0032-baghdad-battery-museum-references.md",
+      "file": "D:\\truth\\claims\\C-0032-baghdad-battery-museum-references.md",
       "confidence": "DOCUMENTED",
       "verdict": "verified",
       "sources": [
@@ -1698,7 +1696,7 @@
       "bodyUrls": []
     },
     "C-0033": {
-      "file": "claims/C-0033-book-of-enoch-exclusion.md",
+      "file": "D:\\truth\\claims\\C-0033-book-of-enoch-exclusion.md",
       "confidence": "SPECULATIVE",
       "verdict": "verified",
       "sources": [
@@ -1718,7 +1716,7 @@
       "bodyUrls": []
     },
     "C-0034": {
-      "file": "claims/C-0034-book-of-jasher-historicity.md",
+      "file": "D:\\truth\\claims\\C-0034-book-of-jasher-historicity.md",
       "confidence": "SPECULATIVE",
       "verdict": "failed",
       "sources": [
@@ -1730,7 +1728,7 @@
         },
         {
           "id": "S-0053",
-          "url": "https://archive.org/details/bookjasaborigen00unkngoog",
+          "url": "https://archive.org/details/bookjasher00unkngoog",
           "status": 404,
           "verdict": "FAILED"
         }
@@ -1738,9 +1736,9 @@
       "bodyUrls": []
     },
     "C-0035": {
-      "file": "claims/C-0035-nag-hammadi-discovery.md",
+      "file": "D:\\truth\\claims\\C-0035-nag-hammadi-discovery.md",
       "confidence": "SPECULATIVE",
-      "verdict": "failed",
+      "verdict": "verified",
       "sources": [
         {
           "id": "S-0054",
@@ -1765,7 +1763,7 @@
       ]
     },
     "C-0036": {
-      "file": "claims/C-0036-sumerian-ziusudra-flood-narrative.md",
+      "file": "D:\\truth\\claims\\C-0036-sumerian-ziusudra-flood-narrative.md",
       "confidence": "DOCUMENTED",
       "verdict": "verified",
       "sources": [
@@ -1779,7 +1777,7 @@
       "bodyUrls": []
     },
     "C-0037": {
-      "file": "claims/C-0037-babylonian-gilgamesh-flood-narrative.md",
+      "file": "D:\\truth\\claims\\C-0037-babylonian-gilgamesh-flood-narrative.md",
       "confidence": "DOCUMENTED",
       "verdict": "verified",
       "sources": [
@@ -1799,23 +1797,23 @@
       ]
     },
     "C-0038": {
-      "file": "claims/C-0038-greek-deucalion-flood-narrative.md",
+      "file": "D:\\truth\\claims\\C-0038-greek-deucalion-flood-narrative.md",
       "confidence": "SPECULATIVE",
-      "verdict": "failed",
+      "verdict": "verified",
       "sources": [
         {
           "id": "S-0058",
-          "url": "https://en.wikipedia.org/wiki/Greek_flood_myths",
-          "status": 404,
-          "verdict": "FAILED"
+          "url": "https://en.wikipedia.org/wiki/Deucalion",
+          "status": 200,
+          "verdict": "VERIFIED"
         }
       ],
       "bodyUrls": []
     },
     "C-0039": {
-      "file": "claims/C-0039-hebrew-iberia-eber-connection.md",
+      "file": "D:\\truth\\claims\\C-0039-hebrew-iberia-eber-connection.md",
       "confidence": "SPECULATIVE",
-      "verdict": "failed",
+      "verdict": "verified",
       "sources": [
         {
           "id": "S-0059",
@@ -1838,8 +1836,8 @@
         },
         {
           "url": "https://www.nlg.gr",
-          "status": 403,
-          "verdict": "BLOCKED"
+          "status": 200,
+          "verdict": "VERIFIED"
         },
         {
           "url": "https://www.jhl.org",
@@ -1850,16 +1848,15 @@
       ]
     },
     "C-0040": {
-      "file": "claims/C-0040-assyria-asshur-origin.md",
+      "file": "D:\\truth\\claims\\C-0040-assyria-asshur-origin.md",
       "confidence": "SPECULATIVE",
-      "verdict": "failed",
+      "verdict": "verified",
       "sources": [
         {
           "id": "S-0061",
-          "url": "https://cdli.ucla.edu/",
-          "status": 0,
-          "verdict": "FAILED",
-          "error": "ENOTFOUND"
+          "url": "https://cdli.mpiwg-berlin.mpg.de/",
+          "status": 200,
+          "verdict": "VERIFIED"
         },
         {
           "id": "S-0062",
@@ -1882,16 +1879,15 @@
       ]
     },
     "C-0041": {
-      "file": "claims/C-0041-babel-linguistic-diversification.md",
+      "file": "D:\\truth\\claims\\C-0041-babel-linguistic-diversification.md",
       "confidence": "CONTESTED",
-      "verdict": "failed",
+      "verdict": "verified",
       "sources": [
         {
           "id": "S-0063",
-          "url": "https://cdli.ucla.edu/",
-          "status": 0,
-          "verdict": "FAILED",
-          "error": "ENOTFOUND"
+          "url": "https://cdli.mpiwg-berlin.mpg.de/",
+          "status": 200,
+          "verdict": "VERIFIED"
         },
         {
           "id": "S-0064",
@@ -1915,7 +1911,7 @@
       ]
     },
     "C-0042": {
-      "file": "claims/C-0042-septuagint-masoretic-chronology-differences.md",
+      "file": "D:\\truth\\claims\\C-0042-septuagint-masoretic-chronology-differences.md",
       "confidence": "SUPPRESSED-IF-TRUE",
       "verdict": "no-checkable-source",
       "sources": [],
@@ -1933,23 +1929,23 @@
       ]
     },
     "C-0043": {
-      "file": "claims/C-0043-ham-descendants-and-territories.md",
+      "file": "D:\\truth\\claims\\C-0043-ham-descendants-and-territories.md",
       "confidence": "SPECULATIVE",
       "verdict": "no-checkable-source",
       "sources": [],
       "bodyUrls": []
     },
     "C-0044": {
-      "file": "claims/C-0044-japheth-lineage-and-european-tribes.md",
+      "file": "D:\\truth\\claims\\C-0044-japheth-lineage-and-european-tribes.md",
       "confidence": "CONTESTED",
       "verdict": "no-checkable-source",
       "sources": [],
       "bodyUrls": []
     },
     "C-0045": {
-      "file": "claims/C-0045-dead-sea-scrolls-masoretic-variants.md",
+      "file": "D:\\truth\\claims\\C-0045-dead-sea-scrolls-masoretic-variants.md",
       "confidence": "SPECULATIVE",
-      "verdict": "failed",
+      "verdict": "verified",
       "sources": [
         {
           "id": "S-0071",
@@ -1978,9 +1974,9 @@
       ]
     },
     "C-0046": {
-      "file": "claims/C-0046-septuagint-samaritan-pentateuch-variants.md",
+      "file": "D:\\truth\\claims\\C-0046-septuagint-samaritan-pentateuch-variants.md",
       "confidence": "SPECULATIVE",
-      "verdict": "failed",
+      "verdict": "verified",
       "sources": [
         {
           "id": "S-0073",
@@ -2010,7 +2006,7 @@
       ]
     },
     "C-0047": {
-      "file": "claims/C-0047-council-of-nicaea-decisions.md",
+      "file": "D:\\truth\\claims\\C-0047-council-of-nicaea-decisions.md",
       "confidence": "DOCUMENTED",
       "verdict": "verified",
       "sources": [
@@ -2041,16 +2037,16 @@
       ]
     },
     "C-0048": {
-      "file": "claims/C-0048-inter-gravissimas-reform-impact.md",
+      "file": "D:\\truth\\claims\\C-0048-inter-gravissimas-reform-impact.md",
       "confidence": "SPECULATIVE",
       "verdict": "no-checkable-source",
       "sources": [],
       "bodyUrls": []
     },
     "C-0049": {
-      "file": "claims/C-0049-british-calendar-act-1750-effects.md",
+      "file": "D:\\truth\\claims\\C-0049-british-calendar-act-1750-effects.md",
       "confidence": "SPECULATIVE",
-      "verdict": "failed",
+      "verdict": "no-checkable-source",
       "sources": [],
       "bodyUrls": [
         {
@@ -2061,16 +2057,16 @@
       ]
     },
     "C-0050": {
-      "file": "claims/C-0050-phantom-time-hypothesis-critique.md",
+      "file": "D:\\truth\\claims\\C-0050-phantom-time-hypothesis-critique.md",
       "confidence": "SPECULATIVE",
       "verdict": "no-checkable-source",
       "sources": [],
       "bodyUrls": []
     },
     "C-0051": {
-      "file": "claims/C-0051-piri-reis-map-tartary.md",
+      "file": "D:\\truth\\claims\\C-0051-piri-reis-map-tartary.md",
       "confidence": "SPECULATIVE",
-      "verdict": "failed",
+      "verdict": "verified",
       "sources": [
         {
           "id": "S-0080",
@@ -2090,7 +2086,7 @@
           "url": "https://www.topkapisarayi.gov.tr/",
           "status": 0,
           "verdict": "FAILED",
-          "error": "EAI_AGAIN"
+          "error": "ENOTFOUND"
         },
         {
           "url": "https://www.devletarsivleri.gov.tr/",
@@ -2100,7 +2096,7 @@
       ]
     },
     "C-0052": {
-      "file": "claims/C-0052-oronce-fine-map-tartary.md",
+      "file": "D:\\truth\\claims\\C-0052-oronce-fine-map-tartary.md",
       "confidence": "DOCUMENTED",
       "verdict": "verified",
       "sources": [
@@ -2131,7 +2127,7 @@
       ]
     },
     "C-0053": {
-      "file": "claims/C-0053-buache-map-tartary.md",
+      "file": "D:\\truth\\claims\\C-0053-buache-map-tartary.md",
       "confidence": "DOCUMENTED",
       "verdict": "verified",
       "sources": [
@@ -2162,7 +2158,7 @@
       ]
     },
     "C-0054": {
-      "file": "claims/C-0054-jekyll-island-meeting-1910.md",
+      "file": "D:\\truth\\claims\\C-0054-jekyll-island-meeting-1910.md",
       "confidence": "SPECULATIVE",
       "verdict": "no-checkable-source",
       "sources": [],
@@ -2175,14 +2171,14 @@
       ]
     },
     "C-0055": {
-      "file": "claims/C-0055-bank-of-england-charter-1694.md",
+      "file": "D:\\truth\\claims\\C-0055-bank-of-england-charter-1694.md",
       "confidence": "SPECULATIVE",
       "verdict": "no-checkable-source",
       "sources": [],
       "bodyUrls": []
     },
     "C-0056": {
-      "file": "claims/C-0056-nixon-shock-1971.md",
+      "file": "D:\\truth\\claims\\C-0056-nixon-shock-1971.md",
       "confidence": "SPECULATIVE",
       "verdict": "no-checkable-source",
       "sources": [],
@@ -2200,9 +2196,9 @@
       ]
     },
     "C-0057": {
-      "file": "claims/C-0057-operation-mockingbird-media-influence.md",
+      "file": "D:\\truth\\claims\\C-0057-operation-mockingbird-media-influence.md",
       "confidence": "SPECULATIVE",
-      "verdict": "failed",
+      "verdict": "no-checkable-source",
       "sources": [],
       "bodyUrls": [
         {
@@ -2214,7 +2210,7 @@
       ]
     },
     "C-0058": {
-      "file": "claims/C-0058-cointelpro-targeting-civil-rights.md",
+      "file": "D:\\truth\\claims\\C-0058-cointelpro-targeting-civil-rights.md",
       "confidence": "SPECULATIVE",
       "verdict": "no-checkable-source",
       "sources": [],
@@ -2232,9 +2228,9 @@
       ]
     },
     "C-0059": {
-      "file": "claims/C-0059-operation-northwoods-proposed-false-flags.md",
+      "file": "D:\\truth\\claims\\C-0059-operation-northwoods-proposed-false-flags.md",
       "confidence": "SPECULATIVE",
-      "verdict": "failed",
+      "verdict": "no-checkable-source",
       "sources": [],
       "bodyUrls": [
         {
@@ -2250,7 +2246,7 @@
       ]
     },
     "C-0060": {
-      "file": "claims/C-0060-smithsonian-institution-act-1846.md",
+      "file": "D:\\truth\\claims\\C-0060-smithsonian-institution-act-1846.md",
       "confidence": "SPECULATIVE",
       "verdict": "no-checkable-source",
       "sources": [],
@@ -2268,7 +2264,7 @@
       ]
     },
     "C-0061": {
-      "file": "claims/C-0061-carnegie-foundation-charter.md",
+      "file": "D:\\truth\\claims\\C-0061-carnegie-foundation-charter.md",
       "confidence": "SPECULATIVE",
       "verdict": "no-checkable-source",
       "sources": [],
@@ -2281,7 +2277,7 @@
       ]
     },
     "C-0062": {
-      "file": "claims/C-0062-rockefeller-foundation-charter.md",
+      "file": "D:\\truth\\claims\\C-0062-rockefeller-foundation-charter.md",
       "confidence": "SPECULATIVE",
       "verdict": "no-checkable-source",
       "sources": [],
@@ -2294,7 +2290,7 @@
       ]
     },
     "C-0063": {
-      "file": "claims/C-0063-prussian-education-model-adoption.md",
+      "file": "D:\\truth\\claims\\C-0063-prussian-education-model-adoption.md",
       "confidence": "SPECULATIVE",
       "verdict": "no-checkable-source",
       "sources": [],
@@ -2307,9 +2303,9 @@
       ]
     },
     "C-0064": {
-      "file": "claims/C-0064-geb-occasional-letter-no-1-impact.md",
+      "file": "D:\\truth\\claims\\C-0064-geb-occasional-letter-no-1-impact.md",
       "confidence": "SPECULATIVE",
-      "verdict": "failed",
+      "verdict": "no-checkable-source",
       "sources": [],
       "bodyUrls": [
         {
@@ -2321,7 +2317,7 @@
       ]
     },
     "C-0065": {
-      "file": "claims/C-0065-reece-committee-transcripts-influence.md",
+      "file": "D:\\truth\\claims\\C-0065-reece-committee-transcripts-influence.md",
       "confidence": "SPECULATIVE",
       "verdict": "no-checkable-source",
       "sources": [],
@@ -2334,9 +2330,9 @@
       ]
     },
     "C-0066": {
-      "file": "claims/C-0066-great-pyramid-measurements.md",
+      "file": "D:\\truth\\claims\\C-0066-great-pyramid-measurements.md",
       "confidence": "SPECULATIVE",
-      "verdict": "failed",
+      "verdict": "verified",
       "sources": [
         {
           "id": "S-0098",
@@ -2365,7 +2361,7 @@
       ]
     },
     "C-0067": {
-      "file": "claims/C-0067-puma-punku-precision-stonework.md",
+      "file": "D:\\truth\\claims\\C-0067-puma-punku-precision-stonework.md",
       "confidence": "SPECULATIVE",
       "verdict": "verified",
       "sources": [
@@ -2379,7 +2375,7 @@
       "bodyUrls": []
     },
     "C-0068": {
-      "file": "claims/C-0068-gobekli-tepe-dating.md",
+      "file": "D:\\truth\\claims\\C-0068-gobekli-tepe-dating.md",
       "confidence": "SPECULATIVE",
       "verdict": "verified",
       "sources": [
@@ -2393,9 +2389,9 @@
       "bodyUrls": []
     },
     "C-0069": {
-      "file": "claims/C-0069-seattle-underground-documentation.md",
+      "file": "D:\\truth\\claims\\C-0069-seattle-underground-documentation.md",
       "confidence": "SPECULATIVE",
-      "verdict": "failed",
+      "verdict": "verified",
       "sources": [
         {
           "id": "S-0102",
@@ -2406,7 +2402,7 @@
         {
           "id": "S-0103",
           "url": "https://www.seattletimes.com/",
-          "status": 202,
+          "status": 200,
           "verdict": "VERIFIED"
         }
       ],
@@ -2420,7 +2416,7 @@
       ]
     },
     "C-0070": {
-      "file": "claims/C-0070-portland-shanghai-tunnels.md",
+      "file": "D:\\truth\\claims\\C-0070-portland-shanghai-tunnels.md",
       "confidence": "DOCUMENTED",
       "verdict": "verified",
       "sources": [
@@ -2440,7 +2436,7 @@
       "bodyUrls": []
     },
     "C-0071": {
-      "file": "claims/C-0071-edinburgh-mary-kings-close.md",
+      "file": "D:\\truth\\claims\\C-0071-edinburgh-mary-kings-close.md",
       "confidence": "DOCUMENTED",
       "verdict": "verified",
       "sources": [
@@ -2466,7 +2462,7 @@
       ]
     },
     "C-0072": {
-      "file": "claims/C-0072-scottish-vitrified-forts-analysis.md",
+      "file": "D:\\truth\\claims\\C-0072-scottish-vitrified-forts-analysis.md",
       "confidence": "CONTESTED",
       "verdict": "verified",
       "sources": [
@@ -2492,7 +2488,7 @@
       "bodyUrls": []
     },
     "C-0073": {
-      "file": "claims/C-0073-french-vitrified-structures.md",
+      "file": "D:\\truth\\claims\\C-0073-french-vitrified-structures.md",
       "confidence": "CONTESTED",
       "verdict": "verified",
       "sources": [
@@ -2512,7 +2508,7 @@
       "bodyUrls": []
     },
     "C-0074": {
-      "file": "claims/C-0074-temperature-analysis-vitrified-forts.md",
+      "file": "D:\\truth\\claims\\C-0074-temperature-analysis-vitrified-forts.md",
       "confidence": "CONTESTED",
       "verdict": "verified",
       "sources": [
@@ -2532,28 +2528,28 @@
       "bodyUrls": []
     },
     "C-0075": {
-      "file": "claims/C-0075-elongated-paracas-skulls.md",
+      "file": "D:\\truth\\claims\\C-0075-elongated-paracas-skulls.md",
       "confidence": "SPECULATIVE",
       "verdict": "no-checkable-source",
       "sources": [],
       "bodyUrls": []
     },
     "C-0076": {
-      "file": "claims/C-0076-malta-elongated-skulls.md",
+      "file": "D:\\truth\\claims\\C-0076-malta-elongated-skulls.md",
       "confidence": "SPECULATIVE",
       "verdict": "no-checkable-source",
       "sources": [],
       "bodyUrls": []
     },
     "C-0077": {
-      "file": "claims/C-0077-ancient-tools-unexpected-strata.md",
+      "file": "D:\\truth\\claims\\C-0077-ancient-tools-unexpected-strata.md",
       "confidence": "SPECULATIVE",
       "verdict": "no-checkable-source",
       "sources": [],
       "bodyUrls": []
     },
     "C-0078": {
-      "file": "claims/C-0078-paracas-elongated-skulls-newspaper.md",
+      "file": "D:\\truth\\claims\\C-0078-paracas-elongated-skulls-newspaper.md",
       "confidence": "SPECULATIVE",
       "verdict": "no-checkable-source",
       "sources": [],
@@ -2566,7 +2562,7 @@
       ]
     },
     "C-0079": {
-      "file": "claims/C-0079-ancient-tools-unexpected-strata.md",
+      "file": "D:\\truth\\claims\\C-0079-ancient-tools-unexpected-strata.md",
       "confidence": "SPECULATIVE",
       "verdict": "no-checkable-source",
       "sources": [],
@@ -2579,7 +2575,7 @@
       ]
     },
     "C-0080": {
-      "file": "claims/C-0080-cas-orphan-train-records.md",
+      "file": "D:\\truth\\claims\\C-0080-cas-orphan-train-records.md",
       "confidence": "SPECULATIVE",
       "verdict": "no-checkable-source",
       "sources": [],
@@ -2597,14 +2593,14 @@
       ]
     },
     "C-0081": {
-      "file": "claims/C-0081-european-foundling-hospitals.md",
+      "file": "D:\\truth\\claims\\C-0081-european-foundling-hospitals.md",
       "confidence": "SPECULATIVE",
       "verdict": "no-checkable-source",
       "sources": [],
       "bodyUrls": []
     },
     "C-0082": {
-      "file": "claims/C-0082-baby-farms-19th-century.md",
+      "file": "D:\\truth\\claims\\C-0082-baby-farms-19th-century.md",
       "confidence": "CONTESTED",
       "verdict": "no-checkable-source",
       "sources": [],
@@ -2617,15 +2613,15 @@
       ]
     },
     "C-0083": {
-      "file": "claims/C-0083-chicago-white-city-construction-methods.md",
+      "file": "D:\\truth\\claims\\C-0083-chicago-white-city-construction-methods.md",
       "confidence": "SPECULATIVE",
       "verdict": "failed",
       "sources": [
         {
           "id": "S-0124",
-          "url": "https://www.loc.gov/item/123456789",
-          "status": 403,
-          "verdict": "BLOCKED"
+          "url": "https://www.loc.gov/pictures/collection/wce/",
+          "status": 404,
+          "verdict": "FAILED"
         },
         {
           "id": "S-0125",
@@ -2648,7 +2644,7 @@
       ]
     },
     "C-0084": {
-      "file": "claims/C-0084-st-louis-fair-architectural-style.md",
+      "file": "D:\\truth\\claims\\C-0084-st-louis-fair-architectural-style.md",
       "confidence": "SPECULATIVE",
       "verdict": "failed",
       "sources": [
@@ -2675,7 +2671,7 @@
       ]
     },
     "C-0085": {
-      "file": "claims/C-0085-crystal-palace-demolition-timeline.md",
+      "file": "D:\\truth\\claims\\C-0085-crystal-palace-demolition-timeline.md",
       "confidence": "SPECULATIVE",
       "verdict": "verified",
       "sources": [
@@ -2695,7 +2691,7 @@
       "bodyUrls": []
     },
     "C-0086": {
-      "file": "claims/C-0086-shem-lineage-territories.md",
+      "file": "D:\\truth\\claims\\C-0086-shem-lineage-territories.md",
       "confidence": "DOCUMENTED",
       "verdict": "verified",
       "sources": [
@@ -2715,9 +2711,9 @@
       "bodyUrls": []
     },
     "C-0087": {
-      "file": "claims/C-0087-ham-lineage-territories.md",
+      "file": "D:\\truth\\claims\\C-0087-ham-lineage-territories.md",
       "confidence": "SPECULATIVE",
-      "verdict": "failed",
+      "verdict": "verified",
       "sources": [
         {
           "id": "S-0132",
@@ -2746,7 +2742,7 @@
       ]
     },
     "C-0088": {
-      "file": "claims/C-0088-japheth-lineage-european-tribes.md",
+      "file": "D:\\truth\\claims\\C-0088-japheth-lineage-european-tribes.md",
       "confidence": "DOCUMENTED",
       "verdict": "verified",
       "sources": [
@@ -2766,7 +2762,7 @@
       "bodyUrls": []
     },
     "C-0089": {
-      "file": "claims/C-0089-giant-skeleton-smithsonian-accession.md",
+      "file": "D:\\truth\\claims\\C-0089-giant-skeleton-smithsonian-accession.md",
       "confidence": "SPECULATIVE",
       "verdict": "no-checkable-source",
       "sources": [],
@@ -2779,7 +2775,7 @@
       ]
     },
     "C-0092": {
-      "file": "claims/C-0092-bretton-woods-1944.md",
+      "file": "D:\\truth\\claims\\C-0092-bretton-woods-1944.md",
       "confidence": "DOCUMENTED",
       "verdict": "verified",
       "sources": [
@@ -2793,7 +2789,7 @@
       "bodyUrls": []
     },
     "C-0093": {
-      "file": "claims/C-0093-selective-burn-patterns-lahaina-2023.md",
+      "file": "D:\\truth\\claims\\C-0093-selective-burn-patterns-lahaina-2023.md",
       "confidence": "SPECULATIVE",
       "verdict": "verified",
       "sources": [
@@ -2813,7 +2809,7 @@
       "bodyUrls": []
     },
     "C-0094": {
-      "file": "claims/C-0094-material-selective-combustion-wildfires.md",
+      "file": "D:\\truth\\claims\\C-0094-material-selective-combustion-wildfires.md",
       "confidence": "SPECULATIVE",
       "verdict": "verified",
       "sources": [
@@ -2833,7 +2829,7 @@
       "bodyUrls": []
     },
     "C-0095": {
-      "file": "claims/C-0095-fema-response-timelines-wildfires.md",
+      "file": "D:\\truth\\claims\\C-0095-fema-response-timelines-wildfires.md",
       "confidence": "SPECULATIVE",
       "verdict": "verified",
       "sources": [
