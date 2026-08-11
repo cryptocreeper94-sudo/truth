@@ -144,6 +144,40 @@ The goal: show coincidence first, eliminate ordinary explanations systematically
 | NOAA HF propagation reports | HF band conditions | Hourly |
 | Public spectrum monitoring | RF power in monitored bands | As available |
 
+### Layer 5 — Ecological indicators and atmospheric chemistry
+
+This layer tracks biological and chemical signals that may reflect long-term or cumulative environmental change. It is intentionally kept separate from atmospheric event detection (Layers 1–4). Ecological signals operate on timescales of weeks to years, not minutes. They provide context for longer-term pattern analysis and for evaluating whether atmospheric observations correlate with measurable biological or chemical changes on the ground.
+
+| Source | What | Interval |
+|---|---|---|
+| USGS National Water Quality Portal | Trace metal concentrations (Al, Ba, Sr, Ti, and others) in surface water and snow samples | As published |
+| EPA Air Quality System (AQS) public API | Particulate matter, metal deposition, chemical speciation data from monitoring stations | Daily |
+| NADP National Atmospheric Deposition Program | Wet and dry deposition chemistry — sulfate, nitrate, trace metals | Weekly composite |
+| USDA / state agricultural extension reports | Crop health, pollinator population indices, soil reports | As published |
+| USGS Bee Inventory and Monitoring Lab | Native bee and pollinator population data | As published |
+| Independent peer-reviewed aerosol studies | Snow, soil, and air samples with documented chain of custody and laboratory methods | As published — cite DOI |
+| iNaturalist API (public) | Citizen-science species observation counts — pollinators, insects, wild plants | Weekly aggregate |
+| CoCoRaHS precipitation chemistry reports | Community rain-gauge network — precipitation quantity and local anomaly flags | Daily |
+
+#### Skeptic requirements specific to this layer
+
+Before any ecological or chemical observation is linked to an atmospheric event or infrastructure activity in the Observatory, the following must be established:
+
+1. **Chain of custody** — sample collection method, storage, laboratory, and instrument calibration must be documented
+2. **Baseline comparison** — what were levels at the same site in prior years, and what do peer-reviewed studies identify as background concentrations?
+3. **Source attribution alternatives** — industrial emissions, agricultural inputs, mining activity, road dust, natural mineral weathering, and laboratory contamination must each be evaluated and either ruled out or noted as unresolved
+4. **Geographic control** — are elevated levels specific to a region coincident with atmospheric events, or are they uniform across unaffected regions?
+5. **Independent replication** — a single sample or researcher's report is insufficient; look for multiple independent sources covering the same region and period
+6. **Species-decline alternative explanations** — habitat loss, pesticide use, disease vectors, invasive species, climate-range shifts, and survey-methodology changes must be tested before attributing decline to atmospheric inputs
+
+#### What this layer can and cannot establish
+
+It **can** establish that certain chemical concentrations or ecological observations are anomalous relative to documented baselines, that they coincide in time and geography with other Observatory events, and that they have been independently measured and published.
+
+It **cannot** establish causation from correlation alone. A simultaneous decline in pollinators and an elevated aluminum reading at the same location does not prove that the aluminum caused the decline, even if both are real and anomalous.
+
+> **Data-gap rule:** citizen-science and independent researcher data must record the organization, methodology, and sample count. An unattributed graph or video is logged as `DATA-GAP` until a verifiable primary source is found.
+
 > **Important naming rule:** HAARP is a specific facility in Gakona, Alaska. There are other ionospheric heaters worldwide (EISCAT, Sura, HIPAS, HAARP-like systems). Every facility must be identified by its real name and documented operating frequency — not generically called a "HAARP array." This protects the archive from technical dismissal.
 
 > **5G / cell tower rule:** the presence of a tower near an atmospheric event is a geographic coincidence, not evidence of effect. The system must record whether RF energy was independently measured, not only whether a tower exists nearby.

@@ -53,6 +53,12 @@ Major storms and multi-stream coincidences must be surfaced within 24 hours — 
 - NOTAMs and cloud-seeding permits (FAA)
 - Cell tower infrastructure (FCC DB + OpenCelliD)
 - HAARP and ionospheric research facilities (by real name, not generic label)
+- **Ecological indicators and atmospheric chemistry** (Layer 5 — see OBSERVATORY.md):
+  - Trace metal deposition in soil, snow, and water (Al, Ba, Sr) — USGS, EPA AQS, NADP
+  - Pollinator and native insect population indices — USGS Bee Lab, iNaturalist
+  - Wild plant and species observation trends — iNaturalist API
+  - Independent peer-reviewed aerosol and sample studies (DOI-cited, chain-of-custody required)
+  - All ecological observations require baseline comparison, source attribution alternatives, geographic controls, and independent replication before linking to atmospheric events
 
 ### Architecture
 All Observatory components follow the **DDA 42-Doctrine / Deterministic Dissolution Ladder** — same architecture as the Truth Sentinel daemon. Read the module map in `OBSERVATORY.md` before writing any collector, normalizer, or detector script. Every script must declare its doctrine nodes in its header comment.
