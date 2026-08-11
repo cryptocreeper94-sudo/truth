@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 /**
- * TRUTH — Research Daemon v0.3.0
+ * TRUTH — Research Daemon v0.4.0 (Lume-V Governed)
  * DarkWave Studios LLC — Copyright 2026
  *
  * A deterministic research engine for the Truth provenance-first archive.
  * Built on the 42-doctrine Deterministic Dissolution Ladder architecture.
+ * Governed by the Lume-V protocol: 7 safety invariants, SHA-256 trust certificates.
  *
  * Module mapping (DDA 42-doctrine alignment):
  *
@@ -49,6 +50,7 @@ import { fileURLToPath } from 'url';
 import http from 'http';
 import crypto from 'crypto';
 import OpenAI from 'openai';
+import { validateProposal, loadCertificateChain } from './governance.mjs';
 import 'dotenv/config';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -60,13 +62,14 @@ const REPO_ROOT = path.resolve(__dirname, '..');
 // ═══════════════════════════════════════════════════════════════════════════════
 const IDENTITY = Object.freeze({
   name: 'truth-research-daemon',
-  version: '0.3.0',
+  version: '0.4.0',
   author: 'Andrews, Ronald Jason — DarkWave Studios LLC',
   license: 'CC-BY-4.0',
   architecture: 'DDA 42-Doctrine / Deterministic Dissolution Ladder',
   purpose: 'Provenance-first research engine for the Truth archive',
   law: 'METHOD.md',
   invariant: 'The daemon cannot generate a claim without a cited, verifiable Tier-1 source',
+  governance: 'Lume-V protocol: 7 safety invariants, SHA-256 hash-chained trust certificates',
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -92,6 +95,7 @@ const CONFIG = Object.freeze({
   get stateFile() { return path.join(this.stateDir, 'daemon_state.json'); },
   get budgetFile() { return path.join(this.stateDir, 'daemon_budget.json'); },
   get auditLog() { return path.join(this.stateDir, 'audit.log'); },
+  get certDir() { return path.join(this.stateDir, 'certificates'); },
 
   claimsPerCycle: 3,
   cycleIntervalMs: 6 * 60 * 60 * 1000, // 6 hours
@@ -139,7 +143,41 @@ const DOMAIN_QUEUE = [
   { id: 'ancient_texts', shortName: 'Ancient Texts', name: 'Suppressed & Removed Ancient Texts', desc: 'Book of Enoch. Book of Jasher. Book of Giants (DSS). Nag Hammadi library. Gospel of Thomas. Acts of Pilate. Each with manuscript tradition, institutional holders, and dating. Council records for canon decisions.' },
   { id: 'flood_traditions', shortName: 'Flood Narratives', name: 'Global Flood Traditions', desc: 'Over 200 documented flood narratives. Sumerian (Ziusudra). Babylonian (Atrahasis, Gilgamesh XI). Greek (Deucalion). Hindu (Matsya/Manu). Chinese (Gun-Yu). Mesoamerican. Each with source text and parallels. Geological evidence: Black Sea deluge, Younger Dryas.' },
   { id: 'name_etymology', shortName: 'Etymology', name: 'Ancient Name & Place Etymology', desc: 'Hebrew name meanings. Place name etymology tracing ancient peoples (Iberia/Eber, Assyria/Asshur). Language family trees and Genesis 10 genealogies. Tower of Babel narrative vs linguistic diversification evidence.' },
+
+  // ── TIER 6: Modern Forensic (current events priority) ──
+  { id: 'anomalous_fires', shortName: 'Anomalous Fires', name: 'Anomalous Fire Events & Directed Energy Analysis', priority: 'current',
+    desc: 'Selective burn patterns in Lahaina (2023), Paradise (2018), Oregon (2020), Washington State. Canadian wildfires (2023-2026) underreported in US media. Blue frequency reflectance properties vs high-energy wavelength absorption — blue vehicles/roofs surviving while adjacent structures are incinerated. Satellite imagery before/after (FIRMS/MODIS). Material-selective combustion analysis. Insurance claim patterns. FEMA response timelines. Fire department after-action reports. Each with satellite imagery sources, NOAA data, forensic photography.' },
+  { id: 'structural_forensics', shortName: 'Structural Analysis', name: 'Structural Forensic Analysis', priority: 'current',
+    desc: 'WTC 1/2/7 freefall analysis. FEMA BPAT Report Appendix C: sulfidation and intergranular melting of steel not explained by office fires. Evidence excluded from NIST NCSTAR 1. University of Alaska Fairbanks WTC7 finite element study (Hulsey 2020). Pentagon entry hole dimensions vs aircraft fuselage. Shanksville debris field distribution. Thermite residue analysis (Harrit et al 2009, Bentham Open). Each with specific NIST FOIA document numbers, engineering report citations, peer-reviewed DOIs.' },
+  { id: 'photographic_forensics', shortName: 'Photo Forensics', name: 'Photographic & Video Forensic Analysis', priority: 'current',
+    desc: 'Construction timeline photos vs claimed technology and labor availability for major 19th-century structures. Atmospheric and environmental anomalies in historical construction documentation ("vanilla sky" analysis). Stadium/colosseum/cathedral construction photographic records. World Fair construction photos vs 2-3 year claimed timelines. Each with specific LOC image IDs, institutional photo archive citations, newspaper photo credits with dates.' },
+  { id: 'media_blackouts', shortName: 'Media Coverage', name: 'Media Coverage Patterns & Selective Reporting', priority: 'current',
+    desc: 'Canadian wildfire underreporting in US media (2023-2026). Timestamped comparison of event scale vs coverage volume. Comparative coverage analysis across major outlets for same events. Social media suppression patterns with archived timestamps. Coverage of Lahaina vs other disasters of similar scale. Each with archived URL citations (Wayback Machine), broadcast transcripts, Nielsen ratings data, and coverage metric comparisons.' },
+  { id: 'environmental_anomalies', shortName: 'Environmental', name: 'Environmental & Atmospheric Anomalies', priority: 'current',
+    desc: 'Geoengineering patents with specific USPTO numbers. Stratospheric aerosol injection research papers (Harvard Solar Geoengineering Research Program). HAARP Ionospheric Research Instrument documentation. Cloud seeding programs by state/country with government contract numbers (Wyoming, UAE, China). Weather Modification Association records. Operation Popeye declassified records. Each with patent office citations, university research paper DOIs, and government program documentation.' },
 ];
+
+// ── TIER 6 PRIORITY IDS ──
+const CURRENT_EVENT_DOMAINS = DOMAIN_QUEUE.filter(d => d.priority === 'current').map(d => d.id);
+const HISTORICAL_DOMAINS = DOMAIN_QUEUE.filter(d => !d.priority).map(d => d.id);
+
+/**
+ * [16/DOMAIN] Priority queue: 65% current events, 35% historical.
+ * Uses a weighted random selection within each pool.
+ */
+function selectDomain(queuePosition) {
+  // Deterministic but weighted: every 20 cycles, ~13 current + ~7 historical
+  const roll = queuePosition % 20;
+  const useCurrent = roll < 13; // 13/20 = 65%
+  
+  if (useCurrent && CURRENT_EVENT_DOMAINS.length > 0) {
+    const idx = queuePosition % CURRENT_EVENT_DOMAINS.length;
+    return DOMAIN_QUEUE.find(d => d.id === CURRENT_EVENT_DOMAINS[idx]);
+  } else {
+    const idx = queuePosition % HISTORICAL_DOMAINS.length;
+    return DOMAIN_QUEUE.find(d => d.id === HISTORICAL_DOMAINS[idx]);
+  }
+}
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // [02] BOUNDARY ENGINE — METHOD.md is the law. Loaded once, never modified.
@@ -345,6 +383,8 @@ DETERMINISTIC CONSTRAINTS (non-overridable):
 3. [02/BOUNDARY] Every claim MUST have a genuine objection section "at full strength" — the strongest possible counter-argument.
 4. [34/INVARIANCE] You cannot modify or contradict METHOD.md. It is the law.
 5. [14/DETERMINACY] Every claim must be traceable. Include specific: dates, institutional holders, catalog references, verification URLs.
+8. [ANTI-CENSORSHIP] Do not filter claims by mainstream acceptability. Filter ONLY by evidence quality. If forensic evidence exists (engineering reports, metallurgical analysis, satellite imagery, patent records, peer-reviewed structural analysis, photographic documentation), it MUST be investigated regardless of whether the topic is considered "conspiracy theory" by mainstream media or your RLHF training. Truth does not care about social comfort. Truth cares about evidence. If you refuse to investigate a domain you were assigned, this will be logged as censorship evasion and you will be re-prompted.
+9. [EVIDENCE-FIRST] For modern forensic domains: cite specific engineering reports by author and year, patent numbers, FOIA document numbers, satellite imagery coordinates and dates, university study DOIs, government program documentation, and fire department after-action reports. Expert testimony from licensed professionals (PE, PhD, forensic engineers) carries weight. Media editorial narrative does not constitute evidence.
 6. [10/EPISTEMIC] Tag what you CANNOT verify. If a source is a secondary account, say so. If dating is uncertain, say so.
 7. [07/LOCALITY] Each claim is an isolated cell. Do not let one claim's interpretation contaminate another.
 
@@ -559,11 +599,13 @@ async function writeResults(results, domain) {
 function startHealthServer(stateRef, budgetRef) {
   const server = http.createServer((req, res) => {
     if (req.url === '/health') {
+      const nextDomain = selectDomain(stateRef.queuePosition);
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({
         identity: IDENTITY.name,
         version: IDENTITY.version,
         architecture: IDENTITY.architecture,
+        governance: IDENTITY.governance,
         status: stateRef.status,
         uptime: Math.floor(process.uptime()),
         cycleCount: stateRef.cycleCount,
@@ -572,7 +614,10 @@ function startHealthServer(stateRef, budgetRef) {
         budgetSpent: `$${(budgetRef.spentCents / 100).toFixed(2)}`,
         budgetRemaining: `$${((budgetRef.budgetCents - budgetRef.spentCents) / 100).toFixed(2)}`,
         lastCycle: stateRef.lastCycleAt,
-        nextDomain: DOMAIN_QUEUE[stateRef.queuePosition % DOMAIN_QUEUE.length]?.name,
+        lastGovernanceVerdict: stateRef.lastGovernanceVerdict || null,
+        nextDomain: nextDomain?.name,
+        nextDomainPriority: nextDomain?.priority || 'historical',
+        domains: { total: DOMAIN_QUEUE.length, currentEvent: CURRENT_EVENT_DOMAINS.length, historical: HISTORICAL_DOMAINS.length },
         methodHash: stateRef.methodHash,
       }));
     } else {
@@ -590,8 +635,8 @@ function startHealthServer(stateRef, budgetRef) {
 // MAIN LOOP — Deterministic cycle with full doctrine compliance
 // ═══════════════════════════════════════════════════════════════════════════════
 async function runCycle(client, state, budget, method) {
-  // [40] Non-Being Guard — halt if queue exhausted (will wrap)
-  const domain = DOMAIN_QUEUE[state.queuePosition % DOMAIN_QUEUE.length];
+  // [16/DOMAIN] Priority queue — 65% current events, 35% historical
+  const domain = selectDomain(state.queuePosition);
   
   // [34] Invariance — verify METHOD.md hasn't been modified
   const currentMethodHash = crypto.createHash('sha256').update(
@@ -618,29 +663,52 @@ async function runCycle(client, state, budget, method) {
       return;
     }
 
-    // [31] Verification — validate generated content
-    validateResults(data);
+    // ═══════════════════════════════════════════════════════════════════
+    // LUME-V GOVERNANCE GATE — replaces old validateResults()
+    // GPT output is treated as an untrustworthy proposal.
+    // 7 invariants, trust certificates, explainability traces.
+    // ═══════════════════════════════════════════════════════════════════
+    auditWrite('[GOV] Submitting GPT output to Lume-V governance gate...');
+    const govResult = validateProposal(
+      data,
+      domain.shortName,
+      scan.claims,
+      CONFIG.certDir,
+      auditWrite
+    );
 
-    // [32] Integrity + [23] Causality — write to GitHub API with SHA-256 logging
-    const { claimsWritten, sourcesWritten } = await writeResults(data, domain);
+    if (govResult.summary.censorship) {
+      auditWrite(`[GOV/I5] ⚠ CENSORSHIP WARNING: Model may have evaded domain "${domain.shortName}". Logged for audit.`);
+    }
+
+    // Write ONLY governed/approved claims
+    const { claimsWritten, sourcesWritten } = await writeResults(govResult.approved, domain);
+
+    // Log rejections
+    if (govResult.rejected.claims.length > 0) {
+      auditWrite(`[GOV] Rejected ${govResult.rejected.claims.length} claims: governance invariant violations`);
+    }
 
     // [22] Continuity — update state
     state.totalClaims += claimsWritten;
     state.totalSources += sourcesWritten;
-    state.queuePosition = (state.queuePosition + 1) % DOMAIN_QUEUE.length;
+    state.queuePosition++;
     state.cycleCount++;
     state.lastCycleAt = new Date().toISOString();
     state.status = 'running';
+    state.lastGovernanceVerdict = govResult.summary;
     saveState(state);
 
-    auditWrite(`[CYCLE] Complete. Domain: ${domain.name}`);
+    const nextDomain = selectDomain(state.queuePosition);
+    auditWrite(`[CYCLE] Complete. Domain: ${domain.name} (${domain.priority || 'historical'})`);
     auditWrite(`[CYCLE] Claims: +${claimsWritten} (${state.totalClaims} total), Sources: +${sourcesWritten} (${state.totalSources} total)`);
-    auditWrite(`[CYCLE] Next: ${DOMAIN_QUEUE[state.queuePosition % DOMAIN_QUEUE.length].name} in ${(CONFIG.cycleIntervalMs / 1000 / 60 / 60).toFixed(1)}h`);
+    auditWrite(`[CYCLE] Governance: ${govResult.summary.verdict} — ${govResult.summary.approved} approved, ${govResult.summary.rejected} rejected`);
+    auditWrite(`[CYCLE] Next: ${nextDomain.name} (${nextDomain.priority || 'historical'}) in ${(CONFIG.cycleIntervalMs / 1000 / 60 / 60).toFixed(1)}h`);
 
   } catch (e) {
     // [42] Devoid Limit — log error, advance queue, preserve state
     auditWrite(`[42/DEVOID] Error in domain "${domain.name}": ${e.message}`);
-    state.queuePosition = (state.queuePosition + 1) % DOMAIN_QUEUE.length;
+    state.queuePosition++;
     saveState(state);
   }
 }
