@@ -786,10 +786,46 @@ body {
   .hero h1 { font-size: 2rem; }
   .hero p { font-size: 0.95rem; }
 
+  /* GLOBAL mobile overflow prevention */
+  * { max-width: 100%; }
+  .page { padding: 20px 12px 60px; overflow-x: hidden; }
+
   /* Content */
-  .document { padding: 20px 16px; }
-  .document h2 { font-size: 1.1rem; }
-  .document h3 { font-size: 0.95rem; }
+  .document { padding: 20px 14px; word-wrap: break-word; overflow-wrap: break-word; }
+  .document h1 { font-size: 1.1rem; word-break: break-word; }
+  .document h2 { font-size: 1rem; }
+  .document h3 { font-size: 0.9rem; }
+  .document p { word-wrap: break-word; overflow-wrap: break-word; }
+  .document code {
+    word-break: break-all;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    font-size: 0.78em;
+  }
+  .document a {
+    word-break: break-all;
+    overflow-wrap: break-word;
+  }
+
+  /* Detail page — single column on mobile */
+  .detail-layout {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .detail-main { min-width: 0; }
+  .detail-sidebar {
+    position: static;
+    padding: 16px 14px;
+  }
+  .sidebar-card { padding: 16px 14px; }
+
+  /* Compliance warning */
+  .compliance-warning {
+    padding: 14px;
+    font-size: 0.75rem;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
 
   /* Tables — horizontal scroll wrapper */
   .document table {
@@ -805,6 +841,21 @@ body {
     min-width: 80px;
   }
   .document th { font-size: 10px; }
+
+  /* Entry cards */
+  .entry-card {
+    min-width: 0;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+  .entry-title {
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+  .entry-meta {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
 
   /* Stats */
   .stats-row { grid-template-columns: 1fr 1fr; gap: 1px; }
