@@ -322,7 +322,7 @@ async function githubApiPut(path, content, message) {
 }
 
 async function scanArchive() {
-  const scan = { claims: [], sources: [], digs: [], maxClaimId: 0, maxSourceId: 0 };
+  const scan = { claims: [], sources: [], digs: [], claimIds: new Set(), sourceIds: new Set(), maxClaimId: 0, maxSourceId: 0 };
 
   // Scan claims via GitHub API
   const claimsDir = await githubApiGet('claims');
@@ -333,6 +333,7 @@ async function scanArchive() {
         if (match) {
           const id = parseInt(match[1]);
           if (id > scan.maxClaimId) scan.maxClaimId = id;
+          scan.claimIds.add(`C-${String(id).padStart(4, '0')}`);
           scan.claims.push(f.name);
         }
       }
@@ -348,6 +349,7 @@ async function scanArchive() {
         if (match) {
           const id = parseInt(match[1]);
           if (id > scan.maxSourceId) scan.maxSourceId = id;
+          scan.sourceIds.add(`S-${String(id).padStart(4, '0')}`);
           scan.sources.push(f.name);
         }
       }
@@ -360,7 +362,7 @@ async function scanArchive() {
     scan.digs = digsDir.filter(f => f.name.endsWith('.md')).map(f => f.name);
   }
 
-  auditWrite(`[20/COHERENCE] Archive: ${scan.claims.length} claims (max C-${String(scan.maxClaimId).padStart(4, '0')}), ${scan.sources.length} sources (max S-${String(scan.maxSourceId).padStart(4, '0')}), ${scan.digs.length} digs`);
+  auditWrite(`[20/COHERENCE] Archive: ${scan.claims.length} claims (max C-${String(scan.maxClaimId).padStart(4, '0')}, ${scan.claimIds.size} unique IDs), ${scan.sources.length} sources (max S-${String(scan.maxSourceId).padStart(4, '0')}, ${scan.sourceIds.size} unique IDs), ${scan.digs.length} digs`);
   return scan;
 }
 
@@ -516,7 +518,7 @@ Generate ${CONFIG.claimsPerCycle} NEW claims with supporting sources. Each claim
 // [32] INTEGRITY LAYER + [23] CAUSALITY ENGINE
 // Write files via GitHub API — each file is a commit in the cryptographic chain
 // ═══════════════════════════════════════════════════════════════════════════════
-async function writeResults(results, domain) {
+async function writeResults(results, domain, scan) {
   let claimsWritten = 0;
   let sourcesWritten = 0;
 
@@ -524,6 +526,16 @@ async function writeResults(results, domain) {
     for (const claim of results.claims) {
       if (claim._rejected) continue;
       try {
+        // [20/COHERENCE] Check for ID collision (not just filename)
+        const claimIdMatch = claim.filename.match(/C-(\d+)/);
+        if (claimIdMatch) {
+          const claimIdStr = `C-${String(parseInt(claimIdMatch[1])).padStart(4, '0')}`;
+          const existingWithId = scan?.claims?.find(f => f.includes(claimIdStr) && f !== claim.filename);
+          if (existingWithId) {
+            auditWrite(`[20/COHERENCE] ID COLLISION: ${claim.filename} collides with existing ${existingWithId}. Skipping.`);
+            continue;
+          }
+        }
         const ghPath = `claims/${claim.filename}`;
         const existing = await githubApiGet(ghPath);
         if (existing) {
@@ -545,6 +557,16 @@ async function writeResults(results, domain) {
   if (results.sources) {
     for (const source of results.sources) {
       try {
+        // [20/COHERENCE] Check for ID collision (not just filename)
+        const sourceIdMatch = source.filename.match(/S-(\d+)/);
+        if (sourceIdMatch) {
+          const sourceIdStr = `S-${String(parseInt(sourceIdMatch[1])).padStart(4, '0')}`;
+          const existingWithId = scan?.sources?.find(f => f.includes(sourceIdStr) && f !== source.filename);
+          if (existingWithId) {
+            auditWrite(`[20/COHERENCE] ID COLLISION: ${source.filename} collides with existing ${existingWithId}. Skipping.`);
+            continue;
+          }
+        }
         const ghPath = `sources/tier-1/${source.filename}`;
         const existing = await githubApiGet(ghPath);
         if (existing) {
@@ -655,7 +677,7 @@ async function runCycle(client, state, budget, method) {
     }
 
     // Write ONLY governed/approved claims
-    const { claimsWritten, sourcesWritten } = await writeResults(govResult.approved, domain);
+    const { claimsWritten, sourcesWritten } = await writeResults(govResult.approved, domain, scan);
 
     // Log rejections
     if (govResult.rejected.claims.length > 0) {
