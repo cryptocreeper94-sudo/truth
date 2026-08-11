@@ -1,0 +1,62 @@
+## Handoff — Media Intelligence Pipeline (Proof of Concept Complete)
+
+### What was proven
+We built a working video-to-transcript pipeline that bypasses platform 
+walled gardens. A Facebook video (128MB, 9:49 duration, behind Meta's 
+auth wall) was downloaded, audio-extracted, and fully transcribed with 
+timestamps using local tools. No API keys, no authentication, no 
+platform cooperation required.
+
+Pipeline: yt-dlp → ffmpeg (16kHz mono WAV) → faster-whisper (base model, CPU)
+
+### Tools installed on this machine
+- yt-dlp 2026.7.4 (pip install yt-dlp)
+- faster-whisper 1.2.1 (pip install faster-whisper) 
+- ffmpeg 8.1.2 (already present via winget)
+- Python 3.11
+
+### What needs to happen next
+This pipeline needs to be integrated into the Axiom42 Suite (formerly 
+TrustVault) as a "Media Intelligence" module. The feature spec is at:
+
+C:\Users\unfor\.gemini\antigravity-ide\brain\3a35647d-31c1-4920-ab86-1c3b7b4e65d5\media_intelligence_spec.md
+
+It documents the full API surface, CLI commands, Whisper model options, 
+doctrine alignment (Doctrine 9 — Reference Acquisition), and integration 
+points with the Truth daemon governance gate.
+
+### The proof of concept files
+- Video: D:\truth\tmp\fb_video.mp4 (128MB Facebook reel)
+- Audio: D:\truth\tmp\fb_audio.wav (9:49, 16kHz mono)
+- Frames: D:\truth\tmp\frames\ (196 PNGs, 1 per 3 seconds)
+- Transcript: D:\truth\tmp\fb_transcript.json (timestamped segments)
+
+### What the transcript contains
+A ~10 minute monologue about superionic ice phases and their potential 
+connection to biblical cosmology (the firmament). The speaker cites:
+- A February 2025 Nature paper on plastic Ice VII (neutron scattering)
+- Lab-confirmed superionic ice (Ice XVIII/XX, diamond anvil cells)
+- NASA Van Allen Probes data (7,200km "impenetrable barrier")
+- Genesis 1:6-7, Ezekiel 1:22, Revelation 4:6
+
+The scientific claims about ice phases and Van Allen belt structure are 
+verifiable against peer-reviewed literature. The interpretive framework 
+(Van Allen belt = biblical firmament = superionic ice boundary) is the 
+speculative layer that would carry a SPECULATIVE confidence tag.
+
+### DDA/DLA integration target
+The user wants this as a built-in capability of the DDA agent mapped to 
+Doctrine 9. Commands would be:
+- /extract <url> — download + transcribe any video URL
+- /ingest <url> — extract + feed into Truth governance gate
+- /extract <url> --ocr — also extract frames and OCR documents
+
+Supports YouTube, Facebook, X, Rumble, TikTok, Bitchute, Odysee, and 
+1000+ platforms via yt-dlp's extractor library. Meta's walled garden 
+does not block yt-dlp.
+
+### What NOT to do
+- Do not fabricate sources for the claims in the transcript
+- Do not dismiss the content based on topic sensitivity
+- The archive's job is to verify what's documentable and label honestly
+- If the Nature paper exists, it gets cited. If it doesn't, that's noted.
