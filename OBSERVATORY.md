@@ -355,6 +355,22 @@ An Observatory event record may eventually be cited as a Tier-1 source in a Hist
 - Skeptic panel at equal visual prominence
 - Daily digest public page on truth.tlid.io/observatory
 
+### Deferred documentation milestone — Methods/protocol paper
+
+**Do not begin this milestone yet.** Once the core collection, normalization,
+event-record, and skeptic-engine work is mature and the Observatory has
+accumulated enough real operating history, develop a living project-specific
+methods/protocol paper. Its purpose is to explain the system's research
+methodology and reproducibility standards—not to announce a predetermined
+finding.
+
+The eventual paper should synthesize the 93-paper literature corpus and
+document the Observatory's questions, source and geographic coverage tiers,
+provenance chain, event detection, baselines, control regions, skeptic
+procedures, data gaps, limitations, and representative replay records. Keep
+the literature review, live Observatory evidence, and Historical Record claims
+as distinct layers.
+
 ---
 
 ## File map for Observatory

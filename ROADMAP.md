@@ -73,6 +73,35 @@ All Observatory components follow the **DDA 42-Doctrine / Deterministic Dissolut
 5. Stage 5 — Autonomous daemon + daily digest generator
 6. Stage 6 — Public visual interface (synchronized replay map, daily digest page)
 
+### Deferred deliverable — Truth Observatory methods/protocol paper
+
+**Status: DEFERRED — do not begin drafting yet.**
+
+After the Observatory has matured beyond the initial implementation and has
+produced a meaningful body of event records, create a project-specific
+methods/protocol paper. This is a documentation and methodology deliverable,
+not a claim that the Observatory has already established a particular
+explanation for any phenomenon.
+
+The paper should make the project understandable as a coherent, reproducible
+research system rather than a collection of unrelated tools. It should
+eventually cover:
+
+- the Observatory's research questions, scope, and geographic coverage tiers
+- the literature foundation, including the 93-paper research corpus
+- source selection, access boundaries, collection cadence, and provenance
+- normalization, event detection, baselines, and control-region comparisons
+- the mandatory skeptic engine and falsification procedures
+- how observations are kept separate from interpretations and Historical Record claims
+- evidence, uncertainty, data gaps, retention, and known limitations
+- representative event records and synchronized replay examples
+
+**Start condition:** begin only after Stages 2–3 are substantially developed
+and there is enough real Observatory operation to document actual methods and
+limitations. Until then, keep `OBSERVATORY.md`, `METHOD.md`, source notes,
+event schemas, and implementation records current; do not create the paper
+itself or present preliminary observations as conclusions.
+
 ## Phase 1a — Domain Navigation & Content Quality ✅ COMPLETE
 
 - [x] 19 domain categories (Biblical Lineage, Cartography, Intelligence Programs, etc.)
