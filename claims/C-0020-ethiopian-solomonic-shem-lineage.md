@@ -9,7 +9,7 @@ dig: digs/lineage-of-nations.md
 status: active
 verification: failed
 verified-on: 2026-08-10
-verification: failed
+verification: unverifiable
 verified-on: 2026-08-11
 ---
 

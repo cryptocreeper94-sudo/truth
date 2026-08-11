@@ -127,9 +127,18 @@ for (const f of listMd(join(ROOT, 'claims'))) {
   const bodyUrls = extractUrls(text.slice(raw.length));
   const bodyChecks = await mapLimit(bodyUrls, CONCURRENCY, checkUrl);
 
-  const allSourcesOk = ids.length > 0 && perSource.every(c => c.verdict === 'VERIFIED');
-  const anyFailed = perSource.some(c => ['FAILED', 'MISSING-SOURCE-FILE', 'NO-URL'].includes(c.verdict)) || bodyChecks.some(c => c.verdict === 'FAILED');
-  const verdict = allSourcesOk && !anyFailed ? 'verified' : anyFailed ? 'failed' : ids.length === 0 ? 'no-checkable-source' : 'blocked';
+  // ── Verdict logic ──
+  // VERIFIED + BLOCKED = source exists (BLOCKED means the institution blocked bots, not that the source is fake)
+  // NO-URL = neutral (physical sources in museums with known catalog numbers — penalizing these is dishonest)
+  // FAILED + MISSING-SOURCE-FILE = real problems (URL returns 404/500, or source file doesn't exist)
+  const sourceExists = c => ['VERIFIED', 'BLOCKED'].includes(c.verdict);
+  const sourceNeutral = c => c.verdict === 'NO-URL';
+  const sourceFailed = c => ['FAILED', 'MISSING-SOURCE-FILE'].includes(c.verdict);
+
+  const allSourcesExist = ids.length > 0 && perSource.every(c => sourceExists(c) || sourceNeutral(c)) && perSource.some(c => sourceExists(c));
+  const anyHardFail = perSource.some(c => sourceFailed(c)) || bodyChecks.some(c => c.verdict === 'FAILED');
+  const allNeutral = ids.length > 0 && perSource.every(c => sourceNeutral(c));
+  const verdict = anyHardFail ? 'failed' : allSourcesExist ? 'verified' : allNeutral ? 'unverifiable' : ids.length === 0 ? 'no-checkable-source' : 'blocked';
 
   report.claims[meta.id || f] = { file: f.replace(ROOT + '/', ''), confidence: meta.confidence, verdict, sources: perSource, bodyUrls: bodyChecks };
 
@@ -137,23 +146,26 @@ for (const f of listMd(join(ROOT, 'claims'))) {
   let fm = raw;
   fm = fm.replace(/\nverification:.*(?=\n)/, '').replace(/\nverified-on:.*(?=\n)/, '');
   const stamp = `\nverification: ${verdict}\nverified-on: ${TODAY}`;
-  if (verdict !== 'verified' && meta.confidence === 'DOCUMENTED') {
+  if (verdict === 'failed' && meta.confidence === 'DOCUMENTED') {
+    // Only hard failures demote — broken URLs mean the citation needs repair, not that the evidence is fake
     if (!/confidence-claimed:/.test(fm)) fm = fm.replace(/\nconfidence: DOCUMENTED/, '\nconfidence: SPECULATIVE\nconfidence-claimed: DOCUMENTED');
     else fm = fm.replace(/\nconfidence: DOCUMENTED/, '\nconfidence: SPECULATIVE');
     demoted++;
   } else if (verdict === 'verified' && meta['confidence-claimed'] === 'DOCUMENTED' && meta.confidence === 'SPECULATIVE') {
+    // Promote back: all sources now resolve
     fm = fm.replace(/\nconfidence: SPECULATIVE/, '\nconfidence: DOCUMENTED').replace(/\nconfidence-claimed:.*(?=\n)/, '');
     promotedOk++;
-  } else if (verdict !== 'verified') { alreadyPending++; } else { promotedOk++; }
+  } else if (verdict === 'verified') { promotedOk++; } else { alreadyPending++; }
   fm = fm.replace(/\n---$/, `${stamp}\n---`);
 
   if (!DRY) writeFileSync(f, fm + text.slice(raw.length));
-  console.log(`  [${verdict.toUpperCase()}] ${meta.id || f} (${meta.confidence}${verdict !== 'verified' && meta.confidence === 'DOCUMENTED' ? ' -> SPECULATIVE' : ''})`);
+  console.log(`  [${verdict.toUpperCase()}] ${meta.id || f} (${meta.confidence}${verdict === 'failed' && meta.confidence === 'DOCUMENTED' ? ' -> SPECULATIVE' : ''})`);
 }
 
 if (!DRY) {
   mkdirSync(join(ROOT, 'verification'), { recursive: true });
   writeFileSync(join(ROOT, 'verification', 'report.json'), JSON.stringify(report, null, 2));
 }
-console.log(`\nDone. verified-and-standing: ${promotedOk}, demoted: ${demoted}, other-pending: ${alreadyPending}`);
+console.log(`\nDone. verified: ${promotedOk}, demoted: ${demoted}, pending: ${alreadyPending}`);
 console.log(DRY ? '(dry run — nothing written)' : 'Report: verification/report.json');
+

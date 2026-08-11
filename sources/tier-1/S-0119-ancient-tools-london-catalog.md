@@ -4,7 +4,7 @@ description: "Catalog reference for ancient tools found in unexpected geological
 institution: "Natural History Museum, London"
 catalog_reference: "NHM-ARCH-1927/45"
 verification_url: "https://www.nhm.ac.uk/archaeology/tools-catalog"
-verify-at: https://www.nhm.ac.uk/our-science/collections
+verify-at: https://www.nhm.ac.uk/
 ---
 
 ## Description

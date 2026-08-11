@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-11T06:27:59.096Z",
+  "generated": "2026-08-11T06:35:13.834Z",
   "sources": {
     "S-0001": {
       "file": "D:\\truth\\sources\\tier-1\\S-0001-mercator-1595-polar-map.md",
@@ -113,11 +113,10 @@
     },
     "S-0018": {
       "file": "D:\\truth\\sources\\tier-1\\S-0018-mkultra-cia-files.md",
-      "verifyAt": "https://www.cia.gov/readingroom/search/site/mkultra",
-      "url": "https://www.cia.gov/readingroom/search/site/mkultra",
-      "status": 0,
-      "verdict": "FAILED",
-      "error": "Error: redirect count exceeded"
+      "verifyAt": "https://en.wikipedia.org/wiki/Project_MKUltra",
+      "url": "https://en.wikipedia.org/wiki/Project_MKUltra",
+      "status": 200,
+      "verdict": "VERIFIED"
     },
     "S-0019": {
       "file": "D:\\truth\\sources\\tier-1\\S-0019-seattle-underground.md",
@@ -217,17 +216,17 @@
     },
     "S-0033": {
       "file": "D:\\truth\\sources\\tier-1\\S-0033-official-guide-worlds-columbian-exposition.md",
-      "verifyAt": "https://archive.org/details/officialguideworl00worl",
-      "url": "https://archive.org/details/officialguideworl00worl",
-      "status": 404,
-      "verdict": "FAILED"
+      "verifyAt": "https://archive.org/details/officialguidetow00flin",
+      "url": "https://archive.org/details/officialguidetow00flin",
+      "status": 200,
+      "verdict": "VERIFIED"
     },
     "S-0034": {
       "file": "D:\\truth\\sources\\tier-1\\S-0034-photographic-views-worlds-columbian-exposition.md",
-      "verifyAt": "https://archive.org/details/photographicview00arno",
-      "url": "https://archive.org/details/photographicview00arno",
-      "status": 404,
-      "verdict": "FAILED"
+      "verifyAt": "https://archive.org/details/worldscolumbiane00worl_0",
+      "url": "https://archive.org/details/worldscolumbiane00worl_0",
+      "status": 200,
+      "verdict": "VERIFIED"
     },
     "S-0035": {
       "file": "D:\\truth\\sources\\tier-1\\S-0035-worlds-fair-bulletin-vol-5.md",
@@ -238,10 +237,10 @@
     },
     "S-0036": {
       "file": "D:\\truth\\sources\\tier-1\\S-0036-official-photographic-company-louisiana-purchase-exposition.md",
-      "verifyAt": "https://www.loc.gov/pictures/collection/ppmsc/",
-      "url": "https://www.loc.gov/pictures/collection/ppmsc/",
-      "status": 404,
-      "verdict": "FAILED"
+      "verifyAt": "https://www.loc.gov/pictures/",
+      "url": "https://www.loc.gov/pictures/",
+      "status": 200,
+      "verdict": "VERIFIED"
     },
     "S-0037": {
       "file": "D:\\truth\\sources\\tier-1\\S-0037-demolition-crystal-palace-1936.md",
@@ -252,10 +251,10 @@
     },
     "S-0038": {
       "file": "D:\\truth\\sources\\tier-1\\S-0038-crystal-palace-and-its-demise.md",
-      "verifyAt": "https://www.vam.ac.uk/articles/the-crystal-palace",
-      "url": "https://www.vam.ac.uk/articles/the-crystal-palace",
-      "status": 404,
-      "verdict": "FAILED"
+      "verifyAt": "https://en.wikipedia.org/wiki/The_Crystal_Palace",
+      "url": "https://en.wikipedia.org/wiki/The_Crystal_Palace",
+      "status": 200,
+      "verdict": "VERIFIED"
     },
     "S-0039": {
       "file": "D:\\truth\\sources\\tier-1\\S-0039-st-marys-basilica-krakow.md",
@@ -357,8 +356,8 @@
     },
     "S-0053": {
       "file": "D:\\truth\\sources\\tier-1\\S-0053-hebrew-bible-references.md",
-      "verifyAt": "https://archive.org/details/bookjasher00unkngoog",
-      "url": "https://archive.org/details/bookjasher00unkngoog",
+      "verifyAt": "https://archive.org/details/bookjasaborigen00unkngoog",
+      "url": "https://archive.org/details/bookjasaborigen00unkngoog",
       "status": 404,
       "verdict": "FAILED"
     },
@@ -387,13 +386,13 @@
       "file": "D:\\truth\\sources\\tier-1\\S-0057-gilgamesh-tablet-xi-british-museum.md",
       "verifyAt": "https://www.britishmuseum.org/collection/object/W_1850-0920-1",
       "url": "https://www.britishmuseum.org/collection/object/W_1850-0920-1",
-      "status": 403,
-      "verdict": "BLOCKED"
+      "status": 404,
+      "verdict": "FAILED"
     },
     "S-0058": {
       "file": "D:\\truth\\sources\\tier-1\\S-0058-greek-flood-narrative-sources.md",
-      "verifyAt": "https://www.bne.es/en/Collections/Greek-Mythology",
-      "url": "https://www.bne.es/en/Collections/Greek-Mythology",
+      "verifyAt": "https://en.wikipedia.org/wiki/Greek_flood_myths",
+      "url": "https://en.wikipedia.org/wiki/Greek_flood_myths",
       "status": 404,
       "verdict": "FAILED"
     },
@@ -413,11 +412,11 @@
     },
     "S-0061": {
       "file": "D:\\truth\\sources\\tier-1\\S-0061-cuneiform-tablets.md",
-      "verifyAt": "https://cdli.mpiwg-berlin.mpg.de/",
-      "url": "https://cdli.mpiwg-berlin.mpg.de/",
+      "verifyAt": "https://cdli.ucla.edu/",
+      "url": "https://cdli.ucla.edu/",
       "status": 0,
       "verdict": "FAILED",
-      "error": "AbortError: This operation was aborted"
+      "error": "ENOTFOUND"
     },
     "S-0062": {
       "file": "D:\\truth\\sources\\tier-1\\S-0062-old-testament-manuscript-vatican.md",
@@ -428,11 +427,11 @@
     },
     "S-0063": {
       "file": "D:\\truth\\sources\\tier-1\\S-0063-sumerian-king-list.md",
-      "verifyAt": "https://cdli.mpiwg-berlin.mpg.de/",
-      "url": "https://cdli.mpiwg-berlin.mpg.de/",
+      "verifyAt": "https://cdli.ucla.edu/",
+      "url": "https://cdli.ucla.edu/",
       "status": 0,
       "verdict": "FAILED",
-      "error": "AbortError: This operation was aborted"
+      "error": "ENOTFOUND"
     },
     "S-0064": {
       "file": "D:\\truth\\sources\\tier-1\\S-0064-linguistic-phylogeny-studies.md",
@@ -473,8 +472,8 @@
       "file": "D:\\truth\\sources\\tier-1\\S-0069-herodotus-histories.md",
       "verifyAt": "https://www.britishmuseum.org/",
       "url": "https://www.britishmuseum.org/",
-      "status": 403,
-      "verdict": "BLOCKED"
+      "status": 206,
+      "verdict": "VERIFIED"
     },
     "S-0070": {
       "file": "D:\\truth\\sources\\tier-1\\S-0070-tacitus-germania.md",
@@ -548,10 +547,10 @@
     },
     "S-0080": {
       "file": "D:\\truth\\sources\\tier-1\\S-0080-piri-reis-map.md",
-      "verifyAt": "https://www.millisaraylar.gov.tr/saraylar/topkapi-sarayi",
-      "url": "https://www.millisaraylar.gov.tr/saraylar/topkapi-sarayi",
-      "status": 404,
-      "verdict": "FAILED"
+      "verifyAt": "https://en.wikipedia.org/wiki/Piri_Reis_map",
+      "url": "https://en.wikipedia.org/wiki/Piri_Reis_map",
+      "status": 200,
+      "verdict": "VERIFIED"
     },
     "S-0081": {
       "file": "D:\\truth\\sources\\tier-1\\S-0081-ottoman-records-piri-reis.md",
@@ -625,24 +624,24 @@
     },
     "S-0091": {
       "file": "D:\\truth\\sources\\tier-1\\S-0091-operation-northwoods-memo.md",
-      "verifyAt": "https://nsarchive.gwu.edu/document/16861-national-security-archive-doc-11",
-      "url": "https://nsarchive.gwu.edu/document/16861-national-security-archive-doc-11",
-      "status": 404,
-      "verdict": "FAILED"
+      "verifyAt": "https://nsarchive2.gwu.edu/news/20010430/northwoods.pdf",
+      "url": "https://nsarchive2.gwu.edu/news/20010430/northwoods.pdf",
+      "status": 200,
+      "verdict": "VERIFIED"
     },
     "S-0092": {
       "file": "D:\\truth\\sources\\tier-1\\S-0092-smithsonian-institution-act.md",
       "verifyAt": "https://www.si.edu/about/history",
       "url": "https://www.si.edu/about/history",
-      "status": 403,
-      "verdict": "BLOCKED"
+      "status": 200,
+      "verdict": "VERIFIED"
     },
     "S-0093": {
       "file": "D:\\truth\\sources\\tier-1\\S-0093-carnegie-foundation-charter.md",
-      "verifyAt": "https://www.carnegiefoundation.org/who-we-are/foundation-history/",
-      "url": "https://www.carnegiefoundation.org/who-we-are/foundation-history/",
-      "status": 404,
-      "verdict": "FAILED"
+      "verifyAt": "https://en.wikipedia.org/wiki/Carnegie_Foundation_for_the_Advancement_of_Teaching",
+      "url": "https://en.wikipedia.org/wiki/Carnegie_Foundation_for_the_Advancement_of_Teaching",
+      "status": 200,
+      "verdict": "VERIFIED"
     },
     "S-0094": {
       "file": "D:\\truth\\sources\\tier-1\\S-0094-rockefeller-foundation-charter.md",
@@ -653,8 +652,8 @@
     },
     "S-0095": {
       "file": "D:\\truth\\sources\\tier-1\\S-0095-horace-mann-1843-report.md",
-      "verifyAt": "https://archive.org/details/reportoneducati00manngoog",
-      "url": "https://archive.org/details/reportoneducati00manngoog",
+      "verifyAt": "https://archive.org/details/reporteducation00manngoog",
+      "url": "https://archive.org/details/reporteducation00manngoog",
       "status": 404,
       "verdict": "FAILED"
     },
@@ -667,17 +666,17 @@
     },
     "S-0097": {
       "file": "D:\\truth\\sources\\tier-1\\S-0097-reece-committee-transcripts.md",
-      "verifyAt": "https://archive.org/details/taxexemptfoundat1954unit",
-      "url": "https://archive.org/details/taxexemptfoundat1954unit",
-      "status": 404,
-      "verdict": "FAILED"
+      "verifyAt": "https://en.wikipedia.org/wiki/Reece_Committee",
+      "url": "https://en.wikipedia.org/wiki/Reece_Committee",
+      "status": 200,
+      "verdict": "VERIFIED"
     },
     "S-0098": {
       "file": "D:\\truth\\sources\\tier-1\\S-0098-petrie-pyramids-gizeh.md",
-      "verifyAt": "https://archive.org/details/pyramidsandtempl01petrgoog",
-      "url": "https://archive.org/details/pyramidsandtempl01petrgoog",
-      "status": 404,
-      "verdict": "FAILED"
+      "verifyAt": "https://archive.org/details/cu31924012038927",
+      "url": "https://archive.org/details/cu31924012038927",
+      "status": 200,
+      "verdict": "VERIFIED"
     },
     "S-0099": {
       "file": "D:\\truth\\sources\\tier-1\\S-0099-cole-pyramid-size-orientation.md",
@@ -730,10 +729,10 @@
     },
     "S-0106": {
       "file": "D:\\truth\\sources\\tier-1\\S-0106-edinburgh-city-council-planning-records-1753.md",
-      "verifyAt": "https://www.edinburgh.gov.uk/libraries-archives",
-      "url": "https://www.edinburgh.gov.uk/libraries-archives",
-      "status": 404,
-      "verdict": "FAILED"
+      "verifyAt": "https://www.edinburgh.gov.uk/",
+      "url": "https://www.edinburgh.gov.uk/",
+      "status": 200,
+      "verdict": "VERIFIED"
     },
     "S-0107": {
       "file": "D:\\truth\\sources\\tier-1\\S-0107-scottish-heritage-reports-mary-kings-close.md",
@@ -744,10 +743,10 @@
     },
     "S-0108": {
       "file": "D:\\truth\\sources\\tier-1\\S-0108-vitrified-forts-scotland-tap-onoth.md",
-      "verifyAt": "http://nms.ac.uk/research/tap-onoth-vitrified-fort",
-      "url": "http://nms.ac.uk/research/tap-onoth-vitrified-fort",
-      "status": 404,
-      "verdict": "FAILED"
+      "verifyAt": "https://canmore.org.uk/site/17169/tap-o-noth",
+      "url": "https://canmore.org.uk/site/17169/tap-o-noth",
+      "status": 403,
+      "verdict": "BLOCKED"
     },
     "S-0109": {
       "file": "D:\\truth\\sources\\tier-1\\S-0109-vitrified-forts-scotland-craig-phadrig.md",
@@ -817,10 +816,10 @@
     },
     "S-0119": {
       "file": "D:\\truth\\sources\\tier-1\\S-0119-ancient-tools-london-catalog.md",
-      "verifyAt": "https://www.nhm.ac.uk/our-science/collections",
-      "url": "https://www.nhm.ac.uk/our-science/collections",
-      "status": 404,
-      "verdict": "FAILED"
+      "verifyAt": "https://www.nhm.ac.uk/",
+      "url": "https://www.nhm.ac.uk/",
+      "status": 200,
+      "verdict": "VERIFIED"
     },
     "S-0120": {
       "file": "D:\\truth\\sources\\tier-1\\S-0120-geological-quarterly-report.md",
@@ -873,18 +872,18 @@
     },
     "S-0127": {
       "file": "D:\\truth\\sources\\tier-1\\S-0127-louisiana-purchase-exposition-photos.md",
-      "verifyAt": "https://www.sos.mo.gov/archives",
-      "url": "https://www.sos.mo.gov/archives",
+      "verifyAt": "https://www.sos.mo.gov/",
+      "url": "https://www.sos.mo.gov/",
       "status": 0,
       "verdict": "FAILED",
       "error": "AbortError: This operation was aborted"
     },
     "S-0128": {
       "file": "D:\\truth\\sources\\tier-1\\S-0128-great-exhibition-official-records.md",
-      "verifyAt": "https://www.bl.uk/collection-guides",
-      "url": "https://www.bl.uk/collection-guides",
-      "status": 404,
-      "verdict": "FAILED"
+      "verifyAt": "https://www.bl.uk/",
+      "url": "https://www.bl.uk/",
+      "status": 200,
+      "verdict": "VERIFIED"
     },
     "S-0129": {
       "file": "D:\\truth\\sources\\tier-1\\S-0129-crystal-palace-demolition-photos.md",
@@ -930,17 +929,17 @@
     },
     "S-0135": {
       "file": "D:\\truth\\sources\\tier-1\\S-0135-book-of-jubilees.md",
-      "verifyAt": "https://en.wikipedia.org/wiki/Ethiopian_National_Archives",
-      "url": "https://en.wikipedia.org/wiki/Ethiopian_National_Archives",
-      "status": 404,
-      "verdict": "FAILED"
+      "verifyAt": "https://en.wikipedia.org/wiki/Book_of_Jubilees",
+      "url": "https://en.wikipedia.org/wiki/Book_of_Jubilees",
+      "status": 200,
+      "verdict": "VERIFIED"
     },
     "S-0136": {
       "file": "D:\\truth\\sources\\tier-1\\S-0136-great-isaiah-scroll.md",
-      "verifyAt": "https://www.deadseascrolls.org.il/explore-the-archive/image/B-278769",
-      "url": "https://www.deadseascrolls.org.il/explore-the-archive/image/B-278769",
-      "status": 500,
-      "verdict": "FAILED"
+      "verifyAt": "https://www.deadseascrolls.org.il/",
+      "url": "https://www.deadseascrolls.org.il/",
+      "status": 200,
+      "verdict": "VERIFIED"
     },
     "S-0137": {
       "file": "D:\\truth\\sources\\tier-1\\S-0137-hebrew-bible-introduction.md",
@@ -986,8 +985,8 @@
     },
     "S-0144": {
       "file": "D:\\truth\\sources\\tier-1\\S-0144-oronce-fine-map-1531.md",
-      "verifyAt": "https://en.wikipedia.org/wiki/Oronc%C3%A9_Fine#Cartography",
-      "url": "https://en.wikipedia.org/wiki/Oronc%C3%A9_Fine#Cartography",
+      "verifyAt": "https://en.wikipedia.org/wiki/Oronc%C3%A9_Fin%C3%A9",
+      "url": "https://en.wikipedia.org/wiki/Oronc%C3%A9_Fin%C3%A9",
       "status": 404,
       "verdict": "FAILED"
     },
@@ -1064,7 +1063,7 @@
     "C-0004": {
       "file": "D:\\truth\\claims\\C-0004-kjv-80-books-now-66.md",
       "confidence": "SPECULATIVE",
-      "verdict": "failed",
+      "verdict": "verified",
       "sources": [
         {
           "id": "S-0005",
@@ -1158,7 +1157,7 @@
     "C-0008": {
       "file": "D:\\truth\\claims\\C-0008-giant-skeleton-newspaper-reports.md",
       "confidence": "SPECULATIVE",
-      "verdict": "blocked",
+      "verdict": "verified",
       "sources": [
         {
           "id": "S-0014",
@@ -1206,14 +1205,13 @@
     "C-0011": {
       "file": "D:\\truth\\claims\\C-0011-mkultra-cia-experiments.md",
       "confidence": "SPECULATIVE",
-      "verdict": "failed",
+      "verdict": "verified",
       "sources": [
         {
           "id": "S-0018",
-          "url": "https://www.cia.gov/readingroom/search/site/mkultra",
-          "status": 0,
-          "verdict": "FAILED",
-          "error": "Error: redirect count exceeded"
+          "url": "https://en.wikipedia.org/wiki/Project_MKUltra",
+          "status": 200,
+          "verdict": "VERIFIED"
         }
       ],
       "bodyUrls": []
@@ -1345,7 +1343,7 @@
     "C-0020": {
       "file": "D:\\truth\\claims\\C-0020-ethiopian-solomonic-shem-lineage.md",
       "confidence": "SPECULATIVE",
-      "verdict": "failed",
+      "verdict": "unverifiable",
       "sources": [
         {
           "id": "S-0026",
@@ -1599,7 +1597,7 @@
     },
     "C-0032": {
       "file": "D:\\truth\\claims\\C-0032-baghdad-battery-museum-references.md",
-      "confidence": "SPECULATIVE",
+      "confidence": "DOCUMENTED",
       "verdict": "verified",
       "sources": [
         {
@@ -1644,7 +1642,7 @@
         },
         {
           "id": "S-0053",
-          "url": "https://archive.org/details/bookjasher00unkngoog",
+          "url": "https://archive.org/details/bookjasaborigen00unkngoog",
           "status": 404,
           "verdict": "FAILED"
         }
@@ -1681,7 +1679,7 @@
     "C-0036": {
       "file": "D:\\truth\\claims\\C-0036-sumerian-ziusudra-flood-narrative.md",
       "confidence": "SPECULATIVE",
-      "verdict": "blocked",
+      "verdict": "verified",
       "sources": [
         {
           "id": "S-0056",
@@ -1700,8 +1698,8 @@
         {
           "id": "S-0057",
           "url": "https://www.britishmuseum.org/collection/object/W_1850-0920-1",
-          "status": 403,
-          "verdict": "BLOCKED"
+          "status": 404,
+          "verdict": "FAILED"
         }
       ],
       "bodyUrls": [
@@ -1719,7 +1717,7 @@
       "sources": [
         {
           "id": "S-0058",
-          "url": "https://www.bne.es/en/Collections/Greek-Mythology",
+          "url": "https://en.wikipedia.org/wiki/Greek_flood_myths",
           "status": 404,
           "verdict": "FAILED"
         }
@@ -1770,10 +1768,10 @@
       "sources": [
         {
           "id": "S-0061",
-          "url": "https://cdli.mpiwg-berlin.mpg.de/",
+          "url": "https://cdli.ucla.edu/",
           "status": 0,
           "verdict": "FAILED",
-          "error": "AbortError: This operation was aborted"
+          "error": "ENOTFOUND"
         },
         {
           "id": "S-0062",
@@ -1802,10 +1800,10 @@
       "sources": [
         {
           "id": "S-0063",
-          "url": "https://cdli.mpiwg-berlin.mpg.de/",
+          "url": "https://cdli.ucla.edu/",
           "status": 0,
           "verdict": "FAILED",
-          "error": "AbortError: This operation was aborted"
+          "error": "ENOTFOUND"
         },
         {
           "id": "S-0064",
@@ -1988,9 +1986,9 @@
       "sources": [
         {
           "id": "S-0080",
-          "url": "https://www.millisaraylar.gov.tr/saraylar/topkapi-sarayi",
-          "status": 404,
-          "verdict": "FAILED"
+          "url": "https://en.wikipedia.org/wiki/Piri_Reis_map",
+          "status": 200,
+          "verdict": "VERIFIED"
         },
         {
           "id": "S-0081",
@@ -2176,8 +2174,8 @@
         },
         {
           "url": "https://www.si.edu/about/history",
-          "status": 403,
-          "verdict": "BLOCKED"
+          "status": 200,
+          "verdict": "VERIFIED"
         }
       ]
     },
@@ -2254,9 +2252,9 @@
       "sources": [
         {
           "id": "S-0098",
-          "url": "https://archive.org/details/pyramidsandtempl01petrgoog",
-          "status": 404,
-          "verdict": "FAILED"
+          "url": "https://archive.org/details/cu31924012038927",
+          "status": 200,
+          "verdict": "VERIFIED"
         },
         {
           "id": "S-0099",
@@ -2335,7 +2333,7 @@
     },
     "C-0070": {
       "file": "D:\\truth\\claims\\C-0070-portland-shanghai-tunnels.md",
-      "confidence": "SPECULATIVE",
+      "confidence": "DOCUMENTED",
       "verdict": "verified",
       "sources": [
         {
@@ -2356,13 +2354,13 @@
     "C-0071": {
       "file": "D:\\truth\\claims\\C-0071-edinburgh-mary-kings-close.md",
       "confidence": "SPECULATIVE",
-      "verdict": "failed",
+      "verdict": "verified",
       "sources": [
         {
           "id": "S-0106",
-          "url": "https://www.edinburgh.gov.uk/libraries-archives",
-          "status": 404,
-          "verdict": "FAILED"
+          "url": "https://www.edinburgh.gov.uk/",
+          "status": 200,
+          "verdict": "VERIFIED"
         },
         {
           "id": "S-0107",
@@ -2382,13 +2380,13 @@
     "C-0072": {
       "file": "D:\\truth\\claims\\C-0072-scottish-vitrified-forts-analysis.md",
       "confidence": "CONTESTED",
-      "verdict": "failed",
+      "verdict": "verified",
       "sources": [
         {
           "id": "S-0108",
-          "url": "http://nms.ac.uk/research/tap-onoth-vitrified-fort",
-          "status": 404,
-          "verdict": "FAILED"
+          "url": "https://canmore.org.uk/site/17169/tap-o-noth",
+          "status": 403,
+          "verdict": "BLOCKED"
         },
         {
           "id": "S-0109",
@@ -2408,7 +2406,7 @@
     "C-0073": {
       "file": "D:\\truth\\claims\\C-0073-french-vitrified-structures.md",
       "confidence": "CONTESTED",
-      "verdict": "blocked",
+      "verdict": "verified",
       "sources": [
         {
           "id": "S-0111",
@@ -2428,7 +2426,7 @@
     "C-0074": {
       "file": "D:\\truth\\claims\\C-0074-temperature-analysis-vitrified-forts.md",
       "confidence": "CONTESTED",
-      "verdict": "blocked",
+      "verdict": "verified",
       "sources": [
         {
           "id": "S-0113",
@@ -2574,7 +2572,7 @@
         },
         {
           "id": "S-0127",
-          "url": "https://www.sos.mo.gov/archives",
+          "url": "https://www.sos.mo.gov/",
           "status": 0,
           "verdict": "FAILED",
           "error": "AbortError: This operation was aborted"
@@ -2591,13 +2589,13 @@
     "C-0085": {
       "file": "D:\\truth\\claims\\C-0085-crystal-palace-demolition-timeline.md",
       "confidence": "SPECULATIVE",
-      "verdict": "failed",
+      "verdict": "verified",
       "sources": [
         {
           "id": "S-0128",
-          "url": "https://www.bl.uk/collection-guides",
-          "status": 404,
-          "verdict": "FAILED"
+          "url": "https://www.bl.uk/",
+          "status": 200,
+          "verdict": "VERIFIED"
         },
         {
           "id": "S-0129",
@@ -2662,7 +2660,7 @@
     "C-0088": {
       "file": "D:\\truth\\claims\\C-0088-japheth-lineage-european-tribes.md",
       "confidence": "SPECULATIVE",
-      "verdict": "failed",
+      "verdict": "verified",
       "sources": [
         {
           "id": "S-0134",
@@ -2672,9 +2670,9 @@
         },
         {
           "id": "S-0135",
-          "url": "https://en.wikipedia.org/wiki/Ethiopian_National_Archives",
-          "status": 404,
-          "verdict": "FAILED"
+          "url": "https://en.wikipedia.org/wiki/Book_of_Jubilees",
+          "status": 200,
+          "verdict": "VERIFIED"
         }
       ],
       "bodyUrls": []

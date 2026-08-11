@@ -7,7 +7,7 @@ sources: [S-0111, S-0112]
 status: active
 verification: failed
 verified-on: 2026-08-10
-verification: blocked
+verification: verified
 verified-on: 2026-08-11
 ---
 

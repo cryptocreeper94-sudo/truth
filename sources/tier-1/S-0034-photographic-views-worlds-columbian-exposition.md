@@ -4,7 +4,7 @@ author: "C.D. Arnold and H.D. Higinbotham"
 year: 1893
 institution: "Library of Congress"
 catalog_reference: "LC Control No. 2001699850"
-verify-at: https://archive.org/details/photographicview00arno
+verify-at: https://archive.org/details/worldscolumbiane00worl_0
 ---
 
 ## Description

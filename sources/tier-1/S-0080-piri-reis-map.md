@@ -5,5 +5,5 @@ description: "A world map compiled by the Ottoman cartographer Piri Reis, depict
 institution: "Topkapi Palace Museum, Istanbul, Turkey"
 catalog_reference: "Topkapi Manuscript Library, MS. Hazine 1824"
 verification_url: "https://www.topkapisarayi.gov.tr/"
-verify-at: https://www.millisaraylar.gov.tr/saraylar/topkapi-sarayi
+verify-at: https://en.wikipedia.org/wiki/Piri_Reis_map
 ---

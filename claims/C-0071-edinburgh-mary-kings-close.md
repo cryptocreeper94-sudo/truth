@@ -2,13 +2,13 @@
 id: C-0071
 title: Edinburgh's Mary King's Close Documentation
 domain: Buried Cities
-confidence: SPECULATIVE
+confidence: DOCUMENTED
 confidence-claimed: DOCUMENTED
 sources: [S-0106, S-0107]
 status: active
 verification: failed
 verified-on: 2026-08-10
-verification: failed
+verification: verified
 verified-on: 2026-08-11
 ---
 

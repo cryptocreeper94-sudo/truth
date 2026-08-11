@@ -2,13 +2,13 @@
 id: C-0036
 title: Sumerian Ziusudra Flood Narrative
 domain: Flood Narratives
-confidence: SPECULATIVE
+confidence: DOCUMENTED
 confidence-claimed: DOCUMENTED
 sources: [S-0056]
 status: active
 verification: blocked
 verified-on: 2026-08-10
-verification: blocked
+verification: verified
 verified-on: 2026-08-11
 ---
 
