@@ -7,3 +7,4 @@
 - [Truth project](truth-project.md) — current product combines a METHOD-governed Historical Record with a separate provenance-first Observatory section; "Strata" is obsolete.
 - [Observatory API quirks](observatory-api-quirks.md) — confirmed working/broken seismic API endpoints; ISC text-only, NOAA NGDC for volcanoes, USGS VHP/QFaults WFS all broken.
 - [HappyEats payment handles](happyeats-payment-handles.md) — Venmo and Cash App intentionally use different handles; never normalize them to one shared account name.
+- [DarkWave site deployment](darkwave-deploy.md) — darkwavestudios.io deploys from DarkWaveStudiosLLC repo via Coolify (app maybe named "v2"); old darkwavestudios repos are archived; auto-deploy may not fire.
