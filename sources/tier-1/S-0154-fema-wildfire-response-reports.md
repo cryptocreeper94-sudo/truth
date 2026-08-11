@@ -6,7 +6,7 @@ tier: 1
 type: government-record
 holder: FEMA
 date-of-object: 2023
-verify-at: https://www.fema.gov/wildfire-response-2023
+verify-at: https://www.fema.gov/disaster/declarations
 ---
 
 # S-0154 — FEMA Wildfire Response Report 2023
@@ -15,7 +15,7 @@ verify-at: https://www.fema.gov/wildfire-response-2023
 An official government report detailing FEMA's response to the 2023 wildfire events, including timelines and assessments of damage.
 
 ## Where it is held
-FEMA, Report No. 2023-WILDFIRE.
+FEMA, See FEMA disaster declarations database.
 
 ## Verification
 This report is publicly accessible on FEMA's official website.

@@ -7,6 +7,8 @@ confidence: SPECULATIVE
 sources: [S-0154, S-0155]
 related: [C-0094]
 status: active
+verification: failed
+verified-on: 2026-08-11
 ---
 
 # C-0095 — FEMA Response Timelines in Wildfire Events

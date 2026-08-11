@@ -6,6 +6,8 @@ confidence: SPECULATIVE
 sources: [S-0150, S-0151]
 related: [C-0092]
 status: active
+verification: failed
+verified-on: 2026-08-11
 ---
 
 # C-0093 — Selective Burn Patterns in Lahaina (2023)

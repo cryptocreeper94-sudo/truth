@@ -6,6 +6,8 @@ title: Bretton Woods Conference of 1944 and Its Monetary Implications
  sources: [S-0149]
  related: [C-0009, C-0090]
  status: active
+verification: failed
+verified-on: 2026-08-11
 ---
 
 # C-0092 — Bretton Woods Conference of 1944 and Its Monetary Implications

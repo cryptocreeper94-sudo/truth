@@ -6,7 +6,7 @@ tier: 1
 type: government-record
 holder: California Department of Insurance
 date-of-object: 2020
-verify-at: https://www.insurance.ca.gov/studies/2020-fire-loss
+verify-at: https://www.insurance.ca.gov/01-consumers/140-catastrophes/WildfireResources.cfm
 ---
 
 # S-0153 — California Department of Insurance Study on Fire Losses

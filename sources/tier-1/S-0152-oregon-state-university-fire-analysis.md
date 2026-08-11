@@ -6,7 +6,7 @@ tier: 1
 type: forensic-photography
 holder: Oregon State University
 date-of-object: 2020
-verify-at: https://www.osu.edu/fire-analysis
+verify-at: https://www.oregonstate.edu/
 ---
 
 # S-0152 — Forensic Photography Analysis of Wildfire Effects

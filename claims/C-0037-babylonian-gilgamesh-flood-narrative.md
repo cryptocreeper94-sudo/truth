@@ -2,13 +2,13 @@
 id: C-0037
 title: Babylonian Gilgamesh Flood Narrative
 domain: Flood Narratives
-confidence: SPECULATIVE
+confidence: DOCUMENTED
 confidence-claimed: DOCUMENTED
 sources: [S-0057]
 status: active
 verification: blocked
 verified-on: 2026-08-10
-verification: failed
+verification: verified
 verified-on: 2026-08-11
 ---
 

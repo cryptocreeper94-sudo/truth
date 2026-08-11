@@ -7,6 +7,8 @@ confidence: SPECULATIVE
 sources: [S-0152, S-0153]
 related: [C-0093]
 status: active
+verification: failed
+verified-on: 2026-08-11
 ---
 
 # C-0094 — Material Selective Combustion in Recent Wildfires
