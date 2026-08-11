@@ -499,45 +499,18 @@ Generate ${CONFIG.claimsPerCycle} NEW claims with supporting sources. Each claim
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// [31] VERIFICATION LAYER — Post-generation validation
+// [31] VERIFICATION LAYER — SUPERSEDED by Lume-V Governance Engine
+//
+// The original validateResults() function (v0.1–v0.3) performed basic checks:
+//   - Content length ≥200 chars
+//   - YAML frontmatter present
+//   - Source citation present
+//   - Objection section present
+//
+// As of v0.4.0, all post-generation validation is performed by governance.mjs
+// which implements 8 deterministic safety invariants with SHA-256 trust
+// certificates and explainability traces. See governance.mjs for details.
 // ═══════════════════════════════════════════════════════════════════════════════
-function validateResults(results) {
-  let valid = true;
-
-  if (results.claims) {
-    for (const claim of results.claims) {
-      // [37] Null Boundary: must have content
-      if (!claim.content || claim.content.length < 200) {
-        auditWrite(`[37/NULL-BOUNDARY] Claim ${claim.id} has insufficient content. Rejecting.`);
-        claim._rejected = true;
-        valid = false;
-        continue;
-      }
-      // [31] Verification: must have YAML frontmatter
-      if (!claim.content.includes('---')) {
-        auditWrite(`[31/VERIFICATION] Claim ${claim.id} missing YAML frontmatter. Rejecting.`);
-        claim._rejected = true;
-        valid = false;
-        continue;
-      }
-      // [37] Null Boundary: must cite at least one source
-      if (!claim.content.toLowerCase().includes('source') && !claim.content.includes('S-')) {
-        auditWrite(`[37/NULL-BOUNDARY] Claim ${claim.id} does not cite a source. Rejecting.`);
-        claim._rejected = true;
-        valid = false;
-        continue;
-      }
-      // [02] Boundary: must have objection
-      if (!claim.content.toLowerCase().includes('objection')) {
-        auditWrite(`[02/BOUNDARY] Claim ${claim.id} missing objection section. Rejecting.`);
-        claim._rejected = true;
-        valid = false;
-      }
-    }
-  }
-
-  return valid;
-}
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // [32] INTEGRITY LAYER + [23] CAUSALITY ENGINE

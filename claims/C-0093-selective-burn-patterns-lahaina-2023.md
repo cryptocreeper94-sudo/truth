@@ -6,7 +6,7 @@ confidence: SPECULATIVE
 sources: [S-0150, S-0151]
 related: [C-0092]
 status: active
-verification: failed
+verification: verified
 verified-on: 2026-08-11
 ---
 

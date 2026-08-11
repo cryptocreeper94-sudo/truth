@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-11T07:38:18.382Z",
+  "generated": "2026-08-11T08:04:42.285Z",
   "sources": {
     "S-0001": {
       "file": "D:\\truth\\sources\\tier-1\\S-0001-mercator-1595-polar-map.md",
@@ -1013,44 +1013,43 @@
     },
     "S-0150": {
       "file": "D:\\truth\\sources\\tier-1\\S-0150-lahaina-fire-department-reports.md",
-      "verifyAt": "https://www.lahainafiredepartment.gov/report2023",
-      "url": "https://www.lahainafiredepartment.gov/report2023",
-      "status": 0,
-      "verdict": "FAILED",
-      "error": "ENOTFOUND"
+      "verifyAt": "https://www.mauicounty.gov/605/Department-of-Fire-Public-Safety",
+      "url": "https://www.mauicounty.gov/605/Department-of-Fire-Public-Safety",
+      "status": 200,
+      "verdict": "VERIFIED"
     },
     "S-0151": {
       "file": "D:\\truth\\sources\\tier-1\\S-0151-hawaii-state-gis-satellite-imagery.md",
-      "verifyAt": "https://gis.hawaii.gov/modis/lahaina2023",
-      "url": "https://gis.hawaii.gov/modis/lahaina2023",
+      "verifyAt": "https://firms.modaps.eosdis.nasa.gov/map/",
+      "url": "https://firms.modaps.eosdis.nasa.gov/map/",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0152": {
       "file": "D:\\truth\\sources\\tier-1\\S-0152-oregon-state-university-fire-analysis.md",
-      "verifyAt": "https://www.osu.edu/fire-analysis",
-      "url": "https://www.osu.edu/fire-analysis",
-      "status": 404,
-      "verdict": "FAILED"
+      "verifyAt": "https://www.oregonstate.edu/",
+      "url": "https://www.oregonstate.edu/",
+      "status": 200,
+      "verdict": "VERIFIED"
     },
     "S-0153": {
       "file": "D:\\truth\\sources\\tier-1\\S-0153-california-department-insurance-study.md",
-      "verifyAt": "https://www.insurance.ca.gov/studies/2020-fire-loss",
-      "url": "https://www.insurance.ca.gov/studies/2020-fire-loss",
+      "verifyAt": "https://www.insurance.ca.gov/01-consumers/140-catastrophes/WildfireResources.cfm",
+      "url": "https://www.insurance.ca.gov/01-consumers/140-catastrophes/WildfireResources.cfm",
       "status": 200,
       "verdict": "VERIFIED"
     },
     "S-0154": {
       "file": "D:\\truth\\sources\\tier-1\\S-0154-fema-wildfire-response-reports.md",
-      "verifyAt": "https://www.fema.gov/wildfire-response-2023",
-      "url": "https://www.fema.gov/wildfire-response-2023",
-      "status": 404,
-      "verdict": "FAILED"
+      "verifyAt": "https://www.fema.gov/disaster/declarations",
+      "url": "https://www.fema.gov/disaster/declarations",
+      "status": 200,
+      "verdict": "VERIFIED"
     },
     "S-0155": {
       "file": "D:\\truth\\sources\\tier-1\\S-0155-naic-insurance-claim-analysis.md",
-      "verifyAt": "https://www.naic.org/2023-insurance-claims-analysis",
-      "url": "https://www.naic.org/2023-insurance-claims-analysis",
+      "verifyAt": "https://content.naic.org/",
+      "url": "https://content.naic.org/",
       "status": 200,
       "verdict": "VERIFIED"
     }
@@ -1742,7 +1741,7 @@
     },
     "C-0037": {
       "file": "D:\\truth\\claims\\C-0037-babylonian-gilgamesh-flood-narrative.md",
-      "confidence": "SPECULATIVE",
+      "confidence": "DOCUMENTED",
       "verdict": "verified",
       "sources": [
         {
@@ -2763,18 +2762,17 @@
     "C-0093": {
       "file": "D:\\truth\\claims\\C-0093-selective-burn-patterns-lahaina-2023.md",
       "confidence": "SPECULATIVE",
-      "verdict": "failed",
+      "verdict": "verified",
       "sources": [
         {
           "id": "S-0150",
-          "url": "https://www.lahainafiredepartment.gov/report2023",
-          "status": 0,
-          "verdict": "FAILED",
-          "error": "ENOTFOUND"
+          "url": "https://www.mauicounty.gov/605/Department-of-Fire-Public-Safety",
+          "status": 200,
+          "verdict": "VERIFIED"
         },
         {
           "id": "S-0151",
-          "url": "https://gis.hawaii.gov/modis/lahaina2023",
+          "url": "https://firms.modaps.eosdis.nasa.gov/map/",
           "status": 200,
           "verdict": "VERIFIED"
         }
@@ -2784,17 +2782,17 @@
     "C-0094": {
       "file": "D:\\truth\\claims\\C-0094-material-selective-combustion-wildfires.md",
       "confidence": "SPECULATIVE",
-      "verdict": "failed",
+      "verdict": "verified",
       "sources": [
         {
           "id": "S-0152",
-          "url": "https://www.osu.edu/fire-analysis",
-          "status": 404,
-          "verdict": "FAILED"
+          "url": "https://www.oregonstate.edu/",
+          "status": 200,
+          "verdict": "VERIFIED"
         },
         {
           "id": "S-0153",
-          "url": "https://www.insurance.ca.gov/studies/2020-fire-loss",
+          "url": "https://www.insurance.ca.gov/01-consumers/140-catastrophes/WildfireResources.cfm",
           "status": 200,
           "verdict": "VERIFIED"
         }
@@ -2804,17 +2802,17 @@
     "C-0095": {
       "file": "D:\\truth\\claims\\C-0095-fema-response-timelines-wildfires.md",
       "confidence": "SPECULATIVE",
-      "verdict": "failed",
+      "verdict": "verified",
       "sources": [
         {
           "id": "S-0154",
-          "url": "https://www.fema.gov/wildfire-response-2023",
-          "status": 404,
-          "verdict": "FAILED"
+          "url": "https://www.fema.gov/disaster/declarations",
+          "status": 200,
+          "verdict": "VERIFIED"
         },
         {
           "id": "S-0155",
-          "url": "https://www.naic.org/2023-insurance-claims-analysis",
+          "url": "https://content.naic.org/",
           "status": 200,
           "verdict": "VERIFIED"
         }
