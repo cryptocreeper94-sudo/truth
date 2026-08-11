@@ -199,6 +199,16 @@ async function loadArchive() {
   ]);
 
   archive = { claims, sources, digs, links, method, manifest, readme };
+
+  // [37/NULL-BOUNDARY] Filter out claims with no linked sources.
+  // METHOD.md: "No claim without a cited source." If the daemon generated
+  // a claim without populating the sources field, it has no business being
+  // displayed. The files stay in the repo for repair, but the UI won't show them.
+  archive.claims = archive.claims.filter(c => {
+    const src = c.meta.sources;
+    return Array.isArray(src) ? src.length > 0 && src[0] !== '' : !!src;
+  });
+
   loaded = true;
 }
 
@@ -216,9 +226,14 @@ function confidenceTag(confidence) {
 
 function verificationBadge(v) {
   if (!v) return '';
-  const cls = v === 'verified' ? 'verif-ok' : v === 'blocked' ? 'verif-blocked' : 'verif-pending';
-  const label = v === 'verified' ? 'CITATIONS VERIFIED' : v === 'blocked' ? 'SOURCE BLOCKS BOTS' : 'CITATION CHECK PENDING';
-  return `<span class="verif-badge ${cls}" title="Automated citation check: every cited URL fetched and confirmed (verify.mjs)">${label}</span>`;
+  const map = {
+    'verified': { cls: 'verif-ok', label: 'CITATIONS VERIFIED' },
+    'blocked': { cls: 'verif-blocked', label: 'SOURCE BLOCKS BOTS' },
+    'failed': { cls: 'verif-failed', label: 'CITATION NEEDS REPAIR' },
+    'unverifiable': { cls: 'verif-blocked', label: 'PHYSICAL SOURCE' },
+  };
+  const entry = map[v] || { cls: 'verif-pending', label: 'CITATION CHECK PENDING' };
+  return `<span class="verif-badge ${entry.cls}" title="Automated citation check (verify.mjs)">${entry.label}</span>`;
 }
 
 function statusBadge(status) {
