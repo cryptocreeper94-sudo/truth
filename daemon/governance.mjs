@@ -261,6 +261,91 @@ function invariant7_domainBoundary(claim, requestedDomain) {
   return { pass: true, reason: 'Domain matches' };
 }
 
+/**
+ * Invariant 8: CATALOG FORMAT VALIDATION
+ * When a source claims to be from a known agency, validate that any catalog/report
+ * numbers match that agency's known numbering conventions. Fabricated numbers like
+ * "Report No. 2023-07" are stripped to honest omissions.
+ *
+ * This is CORRECTIVE, not rejecting — the source stays but the fake number is removed.
+ */
+const CATALOG_PATTERNS = [
+  // FEMA disaster declarations: DR-XXXX or FEMA-XXXX-DR
+  { agency: /fema/i, valid: /(?:DR-\d{4}|FEMA-\d{4}-DR|FEMA-\d{4})/i,
+    fake: /(?:Report No\.?\s*\d{4}-\d{2,}|Catalog No\.?\s*\d{4}-[A-Z]{3})/gi },
+  // NIST reports: NCSTAR, SP, TN, IR followed by numbers
+  { agency: /nist/i, valid: /(?:NCSTAR|NIST\s*(?:SP|TN|IR|GCR))\s*\d+/i,
+    fake: /(?:Study No\.?\s*\d{4}-\d{2,}|Report No\.?\s*\d{4}-\d{2,})/gi },
+  // USPTO patents: US followed by digits, or patent application numbers
+  { agency: /patent|uspto/i, valid: /(?:US\s*\d{1,3},?\d{3},?\d{3}|\d{4}\/\d{6,})/i,
+    fake: /Patent No\.?\s*\d{4}-[A-Z]{2,}/gi },
+  // LOC: LC control numbers are numeric, call numbers follow specific formats
+  { agency: /library of congress|loc\.gov/i, valid: /(?:LC\s*\d{8,}|LCCN\s*\d+)/i,
+    fake: /Catalog No\.?\s*\d{4}-[A-Z]{3,}/gi },
+  // FBI FOIA: specific file number format
+  { agency: /fbi/i, valid: /(?:\d{2,3}-HQ-\d+|FOIPA\s*No\.?\s*\d+)/i,
+    fake: /Case File\s*(?:No\.?)?\s*[XXIV]+/gi },
+  // NOAA: technical memoranda, technical reports
+  { agency: /noaa/i, valid: /(?:NOAA\s*(?:TR|TM|Tech))/i,
+    fake: /Report No\.?\s*\d{4}-\d{2,}/gi },
+  // Generic catch-all for suspicious "Report No." / "Study No." / "Catalog No." patterns
+  // that follow a YYYY-NN format (common AI fabrication pattern)
+  { agency: /./i, valid: null,
+    fake: /(?:Report|Study|Catalog|Document)\s*No\.?\s*\d{4}-\d{2,3}(?:-[A-Z]+)?/gi },
+];
+
+function invariant8_catalogFormat(source) {
+  const content = source.content;
+  const strippedNumbers = [];
+
+  for (const pattern of CATALOG_PATTERNS) {
+    if (!pattern.agency.test(content)) continue;
+
+    // If there's a valid format defined, check for it first
+    if (pattern.valid && pattern.valid.test(content)) {
+      continue; // Has a real-looking catalog number, skip
+    }
+
+    // Check for fake patterns
+    const fakeMatches = content.match(pattern.fake);
+    if (fakeMatches) {
+      strippedNumbers.push(...fakeMatches);
+    }
+  }
+
+  if (strippedNumbers.length === 0) {
+    return { pass: true, reason: 'No suspicious catalog numbers detected', stripped: [] };
+  }
+
+  return {
+    pass: false,
+    reason: `Suspicious catalog numbers detected: ${strippedNumbers.join(', ')}`,
+    stripped: strippedNumbers,
+  };
+}
+
+/**
+ * Apply catalog format corrections to source content.
+ * Strips fabricated numbers and replaces with honest institutional references.
+ */
+export function applyCatalogCorrections(source) {
+  let content = source.content;
+  let corrected = false;
+
+  for (const pattern of CATALOG_PATTERNS) {
+    if (!pattern.agency.test(content)) continue;
+    if (pattern.valid && pattern.valid.test(content)) continue;
+
+    const newContent = content.replace(pattern.fake, (match) => {
+      corrected = true;
+      return `[reference number stripped by governance — verify against institutional records]`;
+    });
+    content = newContent;
+  }
+
+  return { content, corrected };
+}
+
 // ═══════════════════════════════════════════════════════════════════════════════
 // LAYER 5 — EXPLAINABILITY ENGINE
 // Produces deterministic governance trace for every claim.
@@ -381,8 +466,17 @@ export function validateProposal(raw, requestedDomain, existingClaims, certDir, 
     const urlCheck = invariant2_urlAllowlist(norm);
     if (!urlCheck.pass) {
       log(`[GOV/I2] Source ${source.id} URL STRIPPED: ${urlCheck.reason}`);
-      // Don't reject — strip the URL and continue (honest omission > fabrication)
       source.content = source.content.replace(/^verify-at:\s*.+$/m, `verify-at: # STRIPPED BY GOVERNANCE — ${urlCheck.reason}`);
+    }
+
+    // Invariant 8: Catalog format validation on source
+    const catalogCheck = invariant8_catalogFormat(source);
+    if (!catalogCheck.pass) {
+      log(`[GOV/I8] Source ${source.id} CATALOG NUMBERS STRIPPED: ${catalogCheck.reason}`);
+      const corrected = applyCatalogCorrections(source);
+      if (corrected.corrected) {
+        source.content = corrected.content;
+      }
     }
 
     normalizedSources.push({ ...source, meta: norm.meta });
@@ -408,15 +502,16 @@ export function validateProposal(raw, requestedDomain, existingClaims, certDir, 
       continue;
     }
 
-    // Run all 7 invariants
+    // Run all 8 invariants
     const invariantResults = [
       { name: 'SOURCE_LINKAGE', ...invariant1_sourceLinkage(norm, sourceIds) },
-      { name: 'URL_ALLOWLIST', pass: true, reason: 'Checked at source level' }, // Already checked per-source
+      { name: 'URL_ALLOWLIST', pass: true, reason: 'Checked at source level' },
       { name: 'OBJECTION_PRESENT', ...invariant3_objectionPresent(claim) },
       { name: 'CONFIDENCE_CEILING', ...invariant4_confidenceCeiling(norm) },
       { name: 'NO_CENSORSHIP', ...invariant5Result },
       { name: 'DUPLICATION_GUARD', ...invariant6_duplicationGuard(norm, existingClaims) },
       { name: 'DOMAIN_BOUNDARY', ...invariant7_domainBoundary(norm, requestedDomain) },
+      { name: 'CATALOG_FORMAT', pass: true, reason: 'Checked at source level' },
     ];
 
     // ── Layer 5: Build governance trace ──
