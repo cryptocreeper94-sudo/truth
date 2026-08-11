@@ -787,8 +787,7 @@ body {
   .hero p { font-size: 0.95rem; }
 
   /* GLOBAL mobile overflow prevention */
-  * { max-width: 100%; }
-  .page { padding: 20px 12px 60px; overflow-x: hidden; }
+  .page { padding: 20px 12px 60px; overflow-x: hidden; width: 100%; box-sizing: border-box; }
 
   /* Content */
   .document { padding: 20px 14px; word-wrap: break-word; overflow-wrap: break-word; }
@@ -842,20 +841,29 @@ body {
   }
   .document th { font-size: 10px; }
 
-  /* Entry cards */
+  /* Entry cards — stack vertically on mobile */
   .entry-card {
-    min-width: 0;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 14px;
+  }
+  .entry-id {
+    min-width: unset;
+    font-size: 9px;
   }
   .entry-title {
-    word-break: break-word;
-    overflow-wrap: break-word;
+    font-size: 0.88rem;
+    line-height: 1.4;
+    white-space: normal;
+    word-break: normal;
+    overflow-wrap: normal;
   }
   .entry-meta {
     flex-wrap: wrap;
     gap: 4px;
   }
+  .entry-grid { gap: 1px; }
 
   /* Stats */
   .stats-row { grid-template-columns: 1fr 1fr; gap: 1px; }
