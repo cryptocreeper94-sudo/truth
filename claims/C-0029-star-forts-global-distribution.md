@@ -5,7 +5,7 @@ domain: Star Forts
 confidence: SPECULATIVE
 sources: [S-0043, S-0044]
 status: active
-verification: failed
+verification: verified
 verified-on: 2026-08-11
 ---
 

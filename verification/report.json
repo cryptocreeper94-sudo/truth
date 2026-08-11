@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-11T08:17:08.515Z",
+  "generated": "2026-08-11T08:23:22.206Z",
   "sources": {
     "S-0001": {
       "file": "sources/tier-1/S-0001-mercator-1595-polar-map.md",
@@ -33,8 +33,8 @@
       "file": "sources/tier-1/S-0005-kjv-1611-first-edition.md",
       "verifyAt": "https://www.kingjamesbibleonline.org",
       "url": "https://www.kingjamesbibleonline.org",
-      "status": 403,
-      "verdict": "BLOCKED"
+      "status": 200,
+      "verdict": "VERIFIED"
     },
     "S-0007": {
       "file": "sources/tier-1/S-0007-modern-kjv-no-apocrypha.md",
@@ -295,9 +295,8 @@
       "file": "sources/tier-1/S-0044-fort-ticonderoga-new-york.md",
       "verifyAt": "https://www.fortticonderoga.org/",
       "url": "https://www.fortticonderoga.org/",
-      "status": 0,
-      "verdict": "FAILED",
-      "error": "AbortError: This operation was aborted"
+      "status": 200,
+      "verdict": "VERIFIED"
     },
     "S-0045": {
       "file": "sources/tier-1/S-0045-waldemar-julsrud-collection.md",
@@ -466,9 +465,8 @@
       "file": "sources/tier-1/S-0068-canaanite-city-records-tel-hazor.md",
       "verifyAt": "https://www.antiquities.org.il/",
       "url": "https://www.antiquities.org.il/",
-      "status": 0,
-      "verdict": "FAILED",
-      "error": "AbortError: This operation was aborted"
+      "status": 200,
+      "verdict": "VERIFIED"
     },
     "S-0069": {
       "file": "sources/tier-1/S-0069-herodotus-histories.md",
@@ -621,8 +619,8 @@
       "file": "sources/tier-1/S-0090-fbi-cointelpro-files.md",
       "verifyAt": "https://vault.fbi.gov/cointel-pro",
       "url": "https://vault.fbi.gov/cointel-pro",
-      "status": 403,
-      "verdict": "BLOCKED"
+      "status": 206,
+      "verdict": "VERIFIED"
     },
     "S-0091": {
       "file": "sources/tier-1/S-0091-operation-northwoods-memo.md",
@@ -1144,8 +1142,8 @@
         {
           "id": "S-0005",
           "url": "https://www.kingjamesbibleonline.org",
-          "status": 403,
-          "verdict": "BLOCKED"
+          "status": 200,
+          "verdict": "VERIFIED"
         }
       ],
       "bodyUrls": []
@@ -1158,8 +1156,8 @@
         {
           "id": "S-0005",
           "url": "https://www.kingjamesbibleonline.org",
-          "status": 403,
-          "verdict": "BLOCKED"
+          "status": 200,
+          "verdict": "VERIFIED"
         },
         {
           "id": "S-0007",
@@ -1608,7 +1606,7 @@
     "C-0029": {
       "file": "claims/C-0029-star-forts-global-distribution.md",
       "confidence": "SPECULATIVE",
-      "verdict": "failed",
+      "verdict": "verified",
       "sources": [
         {
           "id": "S-0043",
@@ -1619,9 +1617,8 @@
         {
           "id": "S-0044",
           "url": "https://www.fortticonderoga.org/",
-          "status": 0,
-          "verdict": "FAILED",
-          "error": "AbortError: This operation was aborted"
+          "status": 200,
+          "verdict": "VERIFIED"
         }
       ],
       "bodyUrls": []
@@ -1841,8 +1838,8 @@
         },
         {
           "url": "https://www.nlg.gr",
-          "status": 200,
-          "verdict": "VERIFIED"
+          "status": 403,
+          "verdict": "BLOCKED"
         },
         {
           "url": "https://www.jhl.org",
@@ -2224,8 +2221,8 @@
       "bodyUrls": [
         {
           "url": "https://vault.fbi.gov/cointel-pro",
-          "status": 403,
-          "verdict": "BLOCKED"
+          "status": 206,
+          "verdict": "VERIFIED"
         },
         {
           "url": "https://catalog.archives.gov/id/193875",

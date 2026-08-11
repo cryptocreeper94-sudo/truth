@@ -144,7 +144,13 @@ for (const f of listMd(join(ROOT, 'claims'))) {
 
   // Rewrite frontmatter
   let fm = raw;
-  fm = fm.replace(/\nverification:.*(?=\n)/, '').replace(/\nverified-on:.*(?=\n)/, '');
+  // Verification is a current status, not an append-only history. Remove
+  // every prior stamp before writing the new pair. The previous expressions
+  // matched only the first occurrence, so repeated verification runs could
+  // accumulate duplicate verification/verified-on fields in frontmatter.
+  fm = fm
+    .replace(/\r?\nverification:[^\r\n]*/g, '')
+    .replace(/\r?\nverified-on:[^\r\n]*/g, '');
   const stamp = `\nverification: ${verdict}\nverified-on: ${TODAY}`;
   if (verdict === 'failed' && meta.confidence === 'DOCUMENTED') {
     // Only hard failures demote — broken URLs mean the citation needs repair, not that the evidence is fake
