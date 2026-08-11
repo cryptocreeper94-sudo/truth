@@ -1,0 +1,77 @@
+## Handoff — Deterministic Verification Engine (DVE) Product
+
+### The Idea
+A public-facing platform where users submit any social media video URL 
+and receive a governed verification report. Every claim in the video is 
+extracted, independently verified against institutional/peer-reviewed 
+sources, and returned with honest confidence tags (DOCUMENTED, SPECULATIVE, 
+CONTESTED, SUPPRESSED-IF-TRUE, REFUTED). Counter-exhibits mandatory. 
+No editorial bias. No opinions. Just evidence.
+
+Tagline: "Stop scrolling, start verifying."
+
+### Proof of Concept (completed 2026-08-11)
+We downloaded a 128MB Facebook video (Meta's walled garden bypassed via 
+yt-dlp), extracted audio with ffmpeg, transcribed the full narration with 
+faster-whisper (Whisper AI), pulled out claims about superionic ice and 
+the Van Allen belt, then independently verified every scientific claim 
+against Nature (Feb 2025 paper), NASA Van Allen Probes data, and 
+Physical Review Letters. Three of four hard science claims verified as 
+DOCUMENTED. The interpretive layer tagged SPECULATIVE with full 
+counter-exhibits. This was done in one sitting — pipeline works.
+
+### Pipeline
+yt-dlp (download, 1000+ platforms) → ffmpeg (audio extraction) → 
+faster-whisper (speech-to-text) → Lume-V governed claim extraction → 
+source verification engine → 8-invariant governance gate → report
+
+### Architecture Doc
+Full product architecture is at:
+C:\Users\unfor\.gemini\antigravity-ide\brain\3a35647d-31c1-4920-ab86-1c3b7b4e65d5\dve_product_architecture.md
+
+It covers: subscription tiers (Free/Researcher $15/Scholar $35/
+Institutional $99), tech stack, ecosystem integration, phased build 
+plan, and doctrine alignment (maps to D8-D12 Cognition & Reference, 
+D13-D17 Constraint & Determinacy in the 42-Doctrine ladder).
+
+### CRITICAL — Lume Programming Language Mandate
+ALL new ecosystem projects MUST be built using the Lume programming 
+language (D:\lume, npm: lume-lang). This is now a global rule in 
+C:\Users\unfor\.gemini\config\AGENTS.md.
+
+Lume is DarkWave Studios' deterministic natural-language programming 
+language. It compiles to JavaScript. It has its own lexer, parser, 
+transpiler, and runtime. Patent pending (U.S. Pat. App. No. 64/047,512). 
+CHI paper submitted. 16.5K+ lines of source. Features include English 
+mode (154+ patterns), native LLM keywords (ask, think, generate), 
+voice-to-code, self-sustaining runtime, and Lume-V governance engine.
+
+Write .lume files, NOT raw .js/.mjs/.ts. Infrastructure files 
+(Dockerfiles, CI/CD, shell scripts) are exempt. Python tools (yt-dlp, 
+whisper) are called as subprocesses from Lume orchestration code.
+
+Reference: D:\lume\README.md | D:\lume\docs\ | D:\lume\examples\
+
+### What the DVE Integrates With
+- Truth Daemon (D:\truth) — governance gate, source verification, 
+  existing claim archive (96 claims, 164 sources)
+- Axiom42 Suite — pipeline orchestration
+- Lume-V — deterministic AI governance (no hallucination)
+- DDA Agent (D:\dda) — automated research for source chasing
+- Observatory (not yet built) — environmental/geophysical data feeds
+
+### Design Constraints
+- NO PM2 — Coolify containers with Dockerfiles and health checks only
+- NO editorial override — engine outputs evidence, not opinions
+- NO hallucinated sources — every URL verified, every hash stored
+- Digital absence is a data point — not excluded
+- Counter-exhibits mandatory for every claim
+- Apex UI standard — brutalist, professional, analytical, no gamification
+- 42-Doctrine alignment mandatory
+
+### Build Priority
+Phase 1: CLI prototype (single Lume script, prove the loop)
+Phase 2: API service (Express + BullMQ + PostgreSQL)
+Phase 3: User dashboard (Next.js, Apex UI)
+Phase 4: Payments + launch (Stripe subscriptions)
+Phase 5: Scale (GPU workers, OCR, browser extension, PWA)
