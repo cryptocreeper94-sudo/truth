@@ -7,8 +7,6 @@ sources: [S-0002, S-0003]
 dig: digs/new-madrid-1811.md
 status: active
 verification: verified
-verified-on: 2026-08-10
-verification: verified
 verified-on: 2026-08-11
 ---
 

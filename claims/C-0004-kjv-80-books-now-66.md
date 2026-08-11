@@ -7,8 +7,6 @@ confidence-claimed: DOCUMENTED
 sources: [S-0005, S-0007]
 dig: digs/book-removal.md
 status: active
-verification: failed
-verified-on: 2026-08-10
 verification: verified
 verified-on: 2026-08-11
 ---

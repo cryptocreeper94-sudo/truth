@@ -7,8 +7,6 @@ confidence-claimed: DOCUMENTED
 sources: [S-0018]
 dig: digs/institutional-capture.md
 status: active
-verification: failed
-verified-on: 2026-08-10
 verification: verified
 verified-on: 2026-08-11
 ---

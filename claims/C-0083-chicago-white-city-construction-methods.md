@@ -6,8 +6,6 @@ confidence: SPECULATIVE
 sources: [S-0124, S-0125]
 status: active
 verification: failed
-verified-on: 2026-08-10
-verification: failed
 verified-on: 2026-08-11
 ---
 

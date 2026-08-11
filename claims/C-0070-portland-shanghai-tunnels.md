@@ -6,8 +6,6 @@ confidence: DOCUMENTED
 confidence-claimed: DOCUMENTED
 sources: [S-0104, S-0105]
 status: active
-verification: failed
-verified-on: 2026-08-10
 verification: verified
 verified-on: 2026-08-11
 ---

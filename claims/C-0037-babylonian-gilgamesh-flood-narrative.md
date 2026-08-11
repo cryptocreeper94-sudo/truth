@@ -6,8 +6,6 @@ confidence: DOCUMENTED
 confidence-claimed: DOCUMENTED
 sources: [S-0057]
 status: active
-verification: blocked
-verified-on: 2026-08-10
 verification: verified
 verified-on: 2026-08-11
 ---

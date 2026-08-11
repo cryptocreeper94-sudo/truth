@@ -6,8 +6,6 @@ confidence: SPECULATIVE
 confidence-claimed: DOCUMENTED
 sources: [S-0058]
 status: active
-verification: blocked
-verified-on: 2026-08-10
 verification: failed
 verified-on: 2026-08-11
 ---

@@ -6,8 +6,6 @@ confidence: SPECULATIVE
 sources: [S-0043, S-0044]
 status: active
 verification: failed
-verified-on: 2026-08-10
-verification: verified
 verified-on: 2026-08-11
 ---
 

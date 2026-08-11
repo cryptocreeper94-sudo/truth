@@ -7,8 +7,6 @@ confidence-claimed: DOCUMENTED
 sources: [S-0010, S-0011]
 status: active
 verification: failed
-verified-on: 2026-08-10
-verification: failed
 verified-on: 2026-08-11
 ---
 

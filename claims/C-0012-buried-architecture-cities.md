@@ -7,8 +7,6 @@ sources: [S-0019]
 dig: digs/buried-architecture.md
 status: active
 verification: verified
-verified-on: 2026-08-10
-verification: verified
 verified-on: 2026-08-11
 ---
 

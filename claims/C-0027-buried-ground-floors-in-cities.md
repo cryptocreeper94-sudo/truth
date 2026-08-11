@@ -5,8 +5,6 @@ domain: Buried Cities
 confidence: SPECULATIVE
 sources: [S-0039, S-0040]
 status: active
-verification: failed
-verified-on: 2026-08-10
 verification: verified
 verified-on: 2026-08-11
 ---

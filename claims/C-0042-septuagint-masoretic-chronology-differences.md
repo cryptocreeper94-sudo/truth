@@ -6,8 +6,6 @@ confidence: SUPPRESSED-IF-TRUE
 sources: []
 status: active
 verification: no-checkable-source
-verified-on: 2026-08-10
-verification: no-checkable-source
 verified-on: 2026-08-11
 ---
 

@@ -1,12 +1,10 @@
 ---
 id: C-0079
 title: Ancient Tools Found in Unexpected Strata
-domain: Calendar Systems
+domain: Suppressed Finds
 confidence: SPECULATIVE
 sources: []
 status: active
-verification: no-checkable-source
-verified-on: 2026-08-10
 verification: no-checkable-source
 verified-on: 2026-08-11
 ---

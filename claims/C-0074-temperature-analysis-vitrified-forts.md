@@ -5,8 +5,6 @@ domain: Star Forts
 confidence: CONTESTED
 sources: [S-0113, S-0114]
 status: active
-verification: failed
-verified-on: 2026-08-10
 verification: verified
 verified-on: 2026-08-11
 ---

@@ -7,8 +7,6 @@ sources: [S-0008, S-0009]
 dig: digs/orphan-trains.md
 status: active
 verification: verified
-verified-on: 2026-08-10
-verification: verified
 verified-on: 2026-08-11
 ---
 

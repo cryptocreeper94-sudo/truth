@@ -7,8 +7,6 @@ confidence-claimed: DOCUMENTED
 sources: [S-0012, S-0013]
 dig: digs/calendar-reform.md
 status: active
-verification: failed
-verified-on: 2026-08-10
 verification: verified
 verified-on: 2026-08-11
 ---

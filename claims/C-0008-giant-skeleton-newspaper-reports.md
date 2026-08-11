@@ -7,8 +7,6 @@ confidence-claimed: DOCUMENTED
 sources: [S-0014]
 dig: digs/giant-skeleton-reports.md
 status: active
-verification: blocked
-verified-on: 2026-08-10
 verification: verified
 verified-on: 2026-08-11
 ---

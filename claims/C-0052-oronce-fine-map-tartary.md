@@ -6,8 +6,6 @@ confidence: DOCUMENTED
 sources: [S-0082, S-0083]
 status: active
 verification: verified
-verified-on: 2026-08-10
-verification: verified
 verified-on: 2026-08-11
 ---
 
