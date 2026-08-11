@@ -1,0 +1,69 @@
+# Truth Observatory
+
+> Read `OBSERVATORY.md` in the repo root before working on this directory.
+> Read `ROADMAP.md` for cross-agent coordination and implementation stage status.
+
+The Observatory is the daily-cadence atmospheric and geophysical monitoring section of Truth.
+It is NOT a separate product. It lives inside Truth alongside the Historical Record.
+
+## Directory structure
+
+```
+observatory/
+  README.md              — this file
+  start.sh               — Coolify/Docker entrypoint (no PM2, no process managers)
+  collectors/
+    nexrad.mjs            — NEXRAD Level II radar (Unidata public S3 mirror, 5 min interval)
+    goes.mjs              — NOAA GOES-19/18 satellite imagery (public S3, 10 min interval)
+  raw/                   — raw downloaded files (on /app/state volume in production)
+    nexrad/<year>/<mm>/<dd>/<SITE>/<filename>
+    goes/<GOES19|GOES18>/<product>/<year>/<doy>/<hour>/<filename>
+  state/                 — manifests and collector state (on /app/state volume)
+    nexrad-manifest.jsonl — append-only provenance record for every NEXRAD file
+    goes-manifest.jsonl   — append-only provenance record for every GOES file
+  events/                — OBS-nnnn event records (Stage 3+)
+  digests/               — daily evidence digests (Stage 5+)
+  normalizers/           — normalizer scripts, one per source (Stage 2+)
+  detectors/             — event detector and skeptic engine (Stage 3+)
+```
+
+## Container deployment (Coolify)
+
+- Use `Dockerfile.observatory` at repo root
+- Volume mount: `/app/state` (NOT `/app/observatory` — avoids overlaying code)
+- No PM2. The `start.sh` supervisor restarts crashed collectors with exponential backoff
+- Auto-deploy is OFF — manual deploy from Coolify after every push
+- Environment variables to set in Coolify:
+  - `STATE_DIR` — defaults to `/app/state/observatory`
+  - `RAW_DIR` — defaults to `/app/state/observatory/raw`
+  - `NEXRAD_INTERVAL_MS` — defaults to `300000` (5 min)
+  - `GOES_INTERVAL_MS` — defaults to `600000` (10 min)
+  - `NEXRAD_SITES` — comma-separated list of 4-letter site IDs (defaults to 20 priority sites)
+
+## Stage 1 status (current) ✅
+
+- [x] NEXRAD collector — fetches Level II scans from NOAA public S3; SHA-256 hash + manifest
+- [x] GOES collector — fetches GOES-19/18 NetCDF files from NOAA public S3; SHA-256 hash + manifest
+- [x] Dockerfile.observatory — node:20-slim, no PM2, /app/state volume, Coolify-ready
+- [x] start.sh supervisor — pure bash, restarts collectors on exit with backoff
+- [x] Live-tested 2026-08-10: real NEXRAD scans + GOES-19/18 imagery downloaded, SHA-256 verified
+- [x] Retention pruning: raw files pruned after RETENTION_DAYS (default 7); manifests never pruned
+- [ ] Deploy Observatory container in Coolify (separate from Truth Sentinel)
+
+## Stage 2 (next)
+
+Add collectors for: solar/space weather (NOAA SWPC), geomagnetic (INTERMAGNET),
+lightning (Blitzortung), power grid (EIA-930), Schumann resonance.
+Build normalizer for NEXRAD and GOES.
+Wire event detector with 15-minute coincidence window.
+
+## 42-doctrine alignment
+
+Every collector script declares its doctrine nodes in its header comment.
+See `OBSERVATORY.md` for the full module map.
+Key rules:
+- [13] Skeptic engine is non-overridable — never disable
+- [26] Verdict is deterministic rules, not AI judgment
+- [32] SHA-256 hash every raw file before any processing
+- [37] No event published without two independent streams confirming
+- [40] Data gaps are recorded explicitly — never silently skipped

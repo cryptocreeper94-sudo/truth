@@ -1,0 +1,27 @@
+FROM node:20-slim
+
+WORKDIR /app
+
+# Cache-bust: ensures fresh code on every build
+ARG CACHEBUST=1
+
+# Copy observatory directory
+COPY observatory/ observatory/
+
+RUN chmod +x observatory/start.sh
+
+# State and raw data live on a mounted volume at /app/state
+# Coolify volume: /app/state (NOT /app/observatory — avoids overlaying code)
+ENV STATE_DIR=/app/state/observatory
+ENV RAW_DIR=/app/state/observatory/raw
+
+# Collector intervals (override in Coolify env vars)
+ENV NEXRAD_INTERVAL_MS=300000
+ENV GOES_INTERVAL_MS=600000
+
+# No port needed — pure data collector, no HTTP server
+# Coolify health check: watch the manifest file grow
+HEALTHCHECK --interval=120s --timeout=10s --start-period=60s --retries=3 \
+  CMD test -d /app/state/observatory && echo "ok" || exit 1
+
+CMD ["bash", "observatory/start.sh"]

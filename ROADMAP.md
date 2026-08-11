@@ -58,11 +58,15 @@ Major storms and multi-stream coincidences must be surfaced within 24 hours — 
 All Observatory components follow the **DDA 42-Doctrine / Deterministic Dissolution Ladder** — same architecture as the Truth Sentinel daemon. Read the module map in `OBSERVATORY.md` before writing any collector, normalizer, or detector script. Every script must declare its doctrine nodes in its header comment.
 
 ### Implementation stages (next agent: start at Stage 1)
-1. **Stage 1 — Foundation** ← START HERE
-   - Create `/observatory/` directory structure
-   - Define OBS-nnnn event record schema
-   - Build NEXRAD + GOES collectors with provenance writer (hash + retrieval manifest)
-   - No AI, no analysis — collection and preservation only
+1. **Stage 1 — Foundation** ✅ COLLECTORS BUILT & LIVE-TESTED (2026-08-10, main agent)
+   - [x] `/observatory/` directory structure (see observatory/README.md)
+   - [x] NEXRAD collector (`observatory/collectors/nexrad.mjs`) — verified live: real Level II scans downloaded, SHA-256 hashes confirmed against re-computation
+   - [x] GOES collector (`observatory/collectors/goes.mjs`) — verified live: GOES-19/18 CONUS imagery, lightning (GLM), rainfall rate
+   - [x] `Dockerfile.observatory` + `observatory/start.sh` — Coolify container, NO PM2, volume at `/app/state`
+   - [x] Retention pruning (default 7 days) — manifests are the permanent provenance record, never pruned
+   - [ ] Deploy Observatory container in Coolify (Jason: new service from Dockerfile.observatory, volume `/app/state`)
+   - [ ] OBS-nnnn event record schema (define in Stage 3 when detector exists)
+   - **Live-verified source notes:** NOAA primary NEXRAD bucket denies anonymous listing — use `unidata-nexrad-level2` mirror. GOES-19 replaced GOES-16 as GOES-East (noaa-goes16 has no 2026 data). Full-disk imagery is 250-390 MB/file — CONUS products are the sustainable default; enable full-disk with `GOES_INCLUDE_MCMIPF=1`.
 2. Stage 2 — Multi-stream expansion (solar, geomagnetic, lightning, grid, Schumann)
 3. Stage 3 — Skeptic engine + event record writer
 4. Stage 4 — Infrastructure layers (towers, facilities, aircraft, NOTAMs)
