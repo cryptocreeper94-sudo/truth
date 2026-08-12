@@ -8,6 +8,9 @@ ARG CACHEBUST=1
 # Copy observatory directory
 COPY observatory/ observatory/
 
+# Install dependencies (dotenv for EIA API key)
+RUN cd observatory && npm ci --omit=dev 2>/dev/null || npm install --omit=dev
+
 RUN chmod +x observatory/start.sh
 
 # State and raw data live on a mounted volume at /app/state
@@ -18,6 +21,16 @@ ENV RAW_DIR=/app/state/observatory/raw
 # Collector intervals (override in Coolify env vars)
 ENV NEXRAD_INTERVAL_MS=300000
 ENV GOES_INTERVAL_MS=600000
+ENV EARTHQUAKE_INTERVAL_MS=900000
+ENV SOLAR_INTERVAL_MS=900000
+ENV LIGHTNING_INTERVAL_MS=300000
+ENV GRID_INTERVAL_MS=3600000
+ENV GEOMAG_INTERVAL_MS=900000
+ENV IONO_INTERVAL_MS=900000
+ENV SCHUMANN_INTERVAL_MS=3600000
+
+# EIA API key — MUST be set in Coolify env vars
+# ENV EIA_API_KEY=
 
 # No port needed — pure data collector, no HTTP server
 # Coolify health check: watch the manifest file grow
