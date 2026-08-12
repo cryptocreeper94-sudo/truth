@@ -55,6 +55,7 @@ export default function Home() {
               <a href="/api/demo/compose.html" className="font-mono text-[11px] tracking-widest text-[rgba(255,255,255,0.55)] hover:text-[#22d3ee] transition-colors uppercase">Compose</a>
               <a href="/api/demo/index.html" className="font-mono text-[11px] tracking-widest text-[rgba(255,255,255,0.55)] hover:text-[#22d3ee] transition-colors uppercase">Chat</a>
               <a href="/api/demo/image.html" className="font-mono text-[11px] tracking-widest text-[rgba(255,255,255,0.55)] hover:text-[#22d3ee] transition-colors uppercase">Images</a>
+              <a href={`${import.meta.env.BASE_URL.replace(/\/$/, "")}/verify`} className="font-mono text-[11px] tracking-widest text-[rgba(255,255,255,0.55)] hover:text-[#22d3ee] transition-colors uppercase">Verify</a>
             </div>
             <div className="hidden md:flex items-center gap-2 px-3 py-1 bg-[rgba(26,26,46,0.80)] rounded-sm border border-[rgba(255,255,255,0.12)]">
               <div className="w-2 h-2 rounded-full bg-[#22d3ee] animate-pulse" />
