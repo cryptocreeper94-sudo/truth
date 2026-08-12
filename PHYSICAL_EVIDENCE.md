@@ -28,6 +28,61 @@ These extend the Observatory principles and METHOD.md to experimental case files
 
 7. **Ridicule and dismissal are not documented.**  How a finding was received socially is irrelevant to the case file.  The record documents the measurement, not the reaction.
 
+8. **Both sides are preserved.**  A case file may link sources that support different interpretations.  The record should expose disagreement, not collapse it into a single approved narrative.
+
+---
+
+## Documentary source classes
+
+Physical Evidence is not limited to video experiments.  Every source is classified before it is used:
+
+| Class | Examples | Evidentiary role |
+|---|---|---|
+| `PRIMARY_MEASUREMENT` | Instrument log, survey notebook, raw image, original video, field sheet | Direct record of an observation or measurement |
+| `TECHNICAL_REPORT` | Government report, observatory bulletin, engineering report, expedition record | Documents methods, measurements, or stated institutional conclusions |
+| `PEER_REVIEWED_RESEARCH` | Journal paper, conference paper, dissertation | Documents a published method, result, or replication |
+| `ARCHIVAL_RECORD` | Historical map, chart, ledger, newspaper scan, original correspondence | Documents what existed or was stated at a historical time |
+| `PUBLIC_DATASET` | Raw or downloadable catalog, weather series, survey data | Reusable machine-readable observations |
+| `INDEPENDENT_REPLICATION` | A separate group's repeat measurement or critique | Tests reproducibility |
+| `MEDIA_REPORT` | News article, interview, documentary, explainer | Leads to underlying sources; not a substitute for them |
+| `COMMENTARY` | Blog, forum post, social post, advocacy video, debate clip | Records a claim or framing; requires underlying-source recovery |
+
+`MEDIA_REPORT` and `COMMENTARY` sources are valuable for locating evidence and documenting public framing, but they do not inherit the evidentiary strength of the source they discuss.  The underlying report, dataset, or measurement must be linked separately.
+
+### Source record fields
+
+Every source linked to a case file should include:
+
+```
+SOURCE_ID             Stable source identifier
+SOURCE_CLASS          One class from the table above
+AUTHOR_OR_ORG         Named author, institution, or "unknown"
+TITLE
+PUBLICATION_DATE      Date stated by the source, if known
+RETRIEVED_AT          ISO 8601 retrieval timestamp
+CANONICAL_URL         Original URL, DOI, archive pointer, or catalog identifier
+MIRROR_URLS           Optional independent mirrors or archive.org snapshots
+ARTIFACT_HASH         SHA-256 of the preserved file when available
+PAGES_OR_TIMECODES    Exact pages, figures, tables, or video timecodes used
+CLAIMS_EXTRACTED      Neutral statements supported or asserted by the source
+METHOD_EXTRACTED      Instruments, sample, controls, and analysis described
+LIMITATIONS_EXTRACTED Uncertainty, missing controls, and stated limitations
+RELATED_SOURCES       Primary source, replication, correction, or response links
+```
+
+### Agenda and framing record
+
+The project may document advocacy, funding, affiliations, editorial choices, and omitted controls, but it must not present an inferred motive as fact.  Use three separate fields:
+
+```
+DECLARED_INTERESTS    Interests the author or organization explicitly discloses
+OBSERVED_FRAMING      Verifiable wording, selection, omissions, or edits in the source
+MOTIVE_STATUS         "documented" | "plausible but unverified" | "unknown"
+```
+
+"This source advocates model X" can be documented from its wording.
+"This source is intentionally lying" requires evidence beyond disagreement and must not be asserted by the engine.
+
 ---
 
 ## Case file schema

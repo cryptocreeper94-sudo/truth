@@ -41,6 +41,32 @@ Photographs show the Chicago skyline visible from the Michigan shoreline at appr
 
 ---
 
+### Documentary evidence intake and source graph
+
+**Rationale:** Physical Evidence must not become a video-only archive.  Technical reports, peer-reviewed papers, public datasets, archival maps, survey records, instrument manuals, independent replications, news reports, and commentary all contain relevant material — but they carry different evidentiary weight.  A claim that travels from an original measurement through an institution's report through a news article through a viral video clip has lost traceability at each step.  The intake workflow must classify every source, recover the underlying primary source where possible, make framing visible without inferring intent, and preserve the full chain from raw observation to public claim.
+
+**Done looks like:**
+- Every source is assigned one of eight source classes: `PRIMARY_MEASUREMENT`, `TECHNICAL_REPORT`, `PEER_REVIEWED_RESEARCH`, `ARCHIVAL_RECORD`, `PUBLIC_DATASET`, `INDEPENDENT_REPLICATION`, `MEDIA_REPORT`, or `COMMENTARY`
+- Every source record stores canonical URL, retrieval timestamp, artifact hash when available, exact pages or timecodes used, extracted claims, methods, and stated limitations
+- `MEDIA_REPORT` and `COMMENTARY` sources can create leads to underlying sources but cannot inherit their evidentiary status
+- Source relationships are explicit: primary source, replication, correction, response, or commentary
+- Declared interests and observed framing are recorded separately from unverified motive using `DECLARED_INTERESTS`, `OBSERVED_FRAMING`, and `MOTIVE_STATUS` fields
+- A source graph is derivable from linked `RELATED_SOURCES` fields showing how a claim traveled from measurement to public discourse
+- A source can be marked `UNDERLYING SOURCE NOT RECOVERED` rather than silently treated as primary evidence
+
+---
+
+### Research-group and public-record discovery
+
+**Rationale:** Useful evidence is distributed across university repositories, government archives, observatory bulletins, research-group pages, historical map collections, technical forums, geodetic surveys, and public datasets.  Discovery driven only by viral clips or first-page search results will systematically miss the strongest evidence on all sides.  Discovery notes must be preserved so the research path is reproducible — not dependent on an agent's ephemeral memory or a search-result ranking that changes tomorrow.
+
+**Done looks like:**
+- Each case file includes a `DISCOVERY_LOG` section recording: search date, search terms, archives or databases searched, candidate sources found, sources excluded and why, and the next underlying source to locate
+- A research-group index is maintained listing organizations, individuals, and archives actively publishing relevant primary measurements (both institutional and independent)
+- At least one `PRIMARY_MEASUREMENT` or `TECHNICAL_REPORT` source is sought for every major claimed result before the case file moves past `PRELIMINARY`
+- Conflicting sources are linked to the same case rather than discarded
+- The discovery path can be reproduced by a future researcher without relying on the original conversation or a disappeared search result
+
 ---
 
 ## Completed
