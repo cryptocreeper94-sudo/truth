@@ -1,6 +1,45 @@
-# Observatory Roadmap
+# Truth Project Roadmap
 
-This file tracks planned Observatory evidence layers, data quality improvements, and infrastructure work.  Each item includes a rationale and the done-looks-like criteria used to assess completion.
+This file tracks planned work across all three Truth evidence layers: the **Observatory** (continuous physical measurement), the **Physical Evidence** layer (documented experiments and reproducible observations), and the **Historical Record** (claims, sources, and digs governed by METHOD.md).  Each item includes a rationale and the done-looks-like criteria used to assess completion.
+
+The three layers are part of one project in one monorepo.  Do not create separate apps or repositories for Physical Evidence work.  See `PHYSICAL_EVIDENCE.md` for the case file schema and governing principles, `OBSERVATORY.md` for the observation layer overview, and `METHOD.md` for the Historical Record provenance standard.
+
+---
+
+## Physical Evidence layer
+
+The Physical Evidence layer documents independently reproducible experiments and observations that bear on contested physical questions — surface geometry, long-baseline optical propagation, celestial mechanics, gravitational effects, and atmospheric behaviour.  Case files live in `evidence/` and follow the schema in `PHYSICAL_EVIDENCE.md`.
+
+### First case files — construction
+
+**Rationale:** Two high-profile experiments are documented in the public record and ready for structured case file construction.  Neither has been analysed under the full Physical Evidence schema.  Building these first two establishes the workflow for all future cases.
+
+**Case PE-2026-001 — Great Salt Lake long-baseline laser**
+A laser was reportedly aligned on equal-height tripods across a 70+ mile stretch of the Great Salt Lake and reached the receiver with no measurable vertical drop.  The experiment has been widely circulated but never analysed against a complete setup record.
+
+**Case PE-2026-002 — Chicago skyline visibility across Lake Michigan**
+Photographs show the Chicago skyline visible from the Michigan shoreline at approximately 50–55 miles.  The disputed question is whether lower building structure is visible, not just upper floors.
+
+**Done looks like:**
+- `evidence/PE-2026-001.md` and `evidence/PE-2026-002.md` exist with all required schema fields populated or explicitly marked `MISSING — [reason]`
+- Competing model predictions (spherical no refraction, spherical with standard refraction, flat plane) are calculated and recorded for each experiment's stated setup
+- Original source media is linked with retrieval timestamps
+- Each case carries a justified STATUS code per the codes defined in `PHYSICAL_EVIDENCE.md`
+- Neither case asserts a conclusion beyond what the documented evidence supports
+
+---
+
+### Case file tooling — extraction and verification pipeline
+
+**Rationale:** Case files will increasingly be sourced from video and photographic evidence.  Manual extraction of setup data from video is slow and error-prone.  A lightweight pipeline that extracts stated measurements, flags missing fields, and reconstructs geometry against model predictions will accelerate case construction and ensure consistency.
+
+**Done looks like:**
+- A CLI or script accepts a video URL or local file and extracts: stated distances, heights, instrument descriptions, and location claims as structured text
+- A geometry module takes those inputs and calculates spherical and flat predictions with stated formulas and inputs
+- Output is a partially pre-populated case file template ready for human review and completion
+- Missing required fields are flagged explicitly, not silently omitted
+
+---
 
 ---
 

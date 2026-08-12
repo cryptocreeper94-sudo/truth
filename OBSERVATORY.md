@@ -1,6 +1,11 @@
 # Observatory
 
-The Observatory is a continuously collected, provenance-preserving record of atmospheric, geophysical, infrastructure, and RF observations.  It is a component of the Truth project — a separately governed dataset that may provide documented source material for historical-record claims, but observation and interpretation remain strictly separate.
+The Observatory is a continuously collected, provenance-preserving record of atmospheric, geophysical, infrastructure, and RF observations.  It is a component of the Truth project — a separately governed dataset that may provide documented source material for historical-record claims and Physical Evidence case files, but observation and interpretation remain strictly separate.
+
+The Truth project has three evidence layers sharing the same provenance discipline:
+- **Observatory** — this file; continuous automated measurement
+- **Physical Evidence** — documented experiments and reproducible observations; see `PHYSICAL_EVIDENCE.md`
+- **Historical Record** — claims, sources, and digs governed by `METHOD.md`
 
 Observations are collected from authoritative public sources, normalized into a common schema, and stored with full retrieval metadata.  The Observatory does not explain events.  It documents that they occurred, when, where, how they were measured, and what uncertainties the source reported.
 
