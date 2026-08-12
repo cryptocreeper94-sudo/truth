@@ -55,8 +55,26 @@ run_collector() {
 }
 
 # ── Launch collectors ────────────────────────────────────────────────────────
-run_collector "NEXRAD"  "$SCRIPT_DIR/collectors/nexrad.mjs" &
-run_collector "GOES"    "$SCRIPT_DIR/collectors/goes.mjs"   &
+# Stage 1 — Foundation (existing)
+run_collector "NEXRAD"      "$SCRIPT_DIR/collectors/nexrad.mjs"               &
+sleep 2
+run_collector "GOES"        "$SCRIPT_DIR/collectors/goes.mjs"                 &
+sleep 2
 
-echo "[SUPERVISOR] All collectors launched. Waiting..."
+# Stage 2 — Multi-stream expansion
+run_collector "SEISMIC"     "$SCRIPT_DIR/collectors/usgs-earthquake.mjs"      &
+sleep 2
+run_collector "SOLAR"       "$SCRIPT_DIR/collectors/solar-swpc.mjs"           &
+sleep 2
+run_collector "LIGHTNING"   "$SCRIPT_DIR/collectors/lightning-glm.mjs"        &
+sleep 2
+run_collector "GRID"        "$SCRIPT_DIR/collectors/grid-eia930.mjs"          &
+sleep 2
+run_collector "GEOMAG"      "$SCRIPT_DIR/collectors/geomagnetic-intermagnet.mjs" &
+sleep 2
+run_collector "IONOSONDE"   "$SCRIPT_DIR/collectors/ionosonde-giro.mjs"       &
+sleep 2
+run_collector "SCHUMANN"    "$SCRIPT_DIR/collectors/schumann-aggregator.mjs"  &
+
+echo "[SUPERVISOR] All collectors launched (9 total — 2 Stage 1 + 7 Stage 2). Waiting..."
 wait

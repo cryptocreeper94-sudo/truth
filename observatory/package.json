@@ -1,0 +1,16 @@
+{
+  "name": "observatory",
+  "version": "1.0.0",
+  "description": "> Read `OBSERVATORY.md` in the repo root before working on this directory.\r > Read `ROADMAP.md` for cross-agent coordination and implementation stage status.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "dotenv": "^17.4.2"
+  }
+}
