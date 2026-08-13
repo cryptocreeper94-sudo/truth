@@ -25,3 +25,9 @@ The Deterministic Verification Engine (DVE) owns media ingestion and decompositi
 **Why:** DVE answers “what claims are in this media and what evidence bears on each claim?” A Physical Evidence case file answers “what exact physical setup, observation, competing predictions, controls, and replication record can be preserved?” The scopes overlap at the source and claim layers but are not the same artifact.
 
 **How to apply:** keep generic videos as DVE reports. Only offer a later “promote to Physical Evidence” flow when a source documents a qualifying physical experiment or observation. Map timecodes, extracted measurements, hashes, and linked sources into a draft case file, explicitly flag missing setup/environmental fields, and require human review. Do not build a second video-to-case-file extraction engine.
+
+Truth product direction: keep the research corpus and methodology public; position DVE as a provenance and verification workspace inside Truth. Paid plans may add saved history, privacy, throughput, exports, source depth, and collaboration, but never a more favorable verdict or hidden standard of truth. The recommended default is public reports with paid unlisted/private controls.
+
+**Why:** a public method and report corpus builds trust and network value, while paid workflow features cover media-processing costs without turning Truth into a paywalled authority.
+
+**How to apply:** use `DVE_PRODUCT_SPEC.md` as the living product brief. Keep video support first, add documents only when page-level provenance is ready, and preserve the distinction between DVE reports and Physical Evidence case files.
