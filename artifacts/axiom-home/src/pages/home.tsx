@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { ArrowRight, Terminal, Shield, Cpu, FileText, Crosshair, ChevronRight, Activity, Lock, Database, ImageIcon } from "lucide-react";
 import heroBgPath from "@assets/generated_images/hero-bg.jpg";
@@ -52,6 +53,7 @@ export default function Home() {
           </div>
           <div className="flex items-center gap-6">
             <div className="hidden md:flex items-center gap-5">
+              <Link href="/verify" className="font-mono text-[11px] tracking-widest text-[#22d3ee] transition-colors uppercase font-bold">Verify</Link>
               <a href="/api/demo/compose.html" className="font-mono text-[11px] tracking-widest text-[rgba(255,255,255,0.55)] hover:text-[#22d3ee] transition-colors uppercase">Compose</a>
               <a href="/api/demo/index.html" className="font-mono text-[11px] tracking-widest text-[rgba(255,255,255,0.55)] hover:text-[#22d3ee] transition-colors uppercase">Chat</a>
               <a href="/api/demo/image.html" className="font-mono text-[11px] tracking-widest text-[rgba(255,255,255,0.55)] hover:text-[#22d3ee] transition-colors uppercase">Images</a>
@@ -95,19 +97,19 @@ export default function Home() {
             </motion.p>
             
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }} className="flex flex-col sm:flex-row gap-4">
-              <a 
-                href="/api/demo/compose.html" 
+              <Link 
+                href="/verify" 
                 className="group relative inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#22d3ee] text-[#0c0c14] font-mono text-sm font-bold tracking-wider hover:bg-[#2dd4bf] transition-all"
               >
-                OPEN DOCUMENT COMPOSER
+                VERIFY VIDEO
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </a>
+              </Link>
               
               <a 
-                href="/api/demo/index.html" 
+                href="/api/demo/compose.html" 
                 className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-transparent text-[#f0f0f8] hover:text-[#22d3ee] font-mono text-sm font-bold tracking-wider border border-[rgba(255,255,255,0.2)] hover:border-[#22d3ee] transition-all"
               >
-                OPEN CHAT
+                OPEN COMPOSER
                 <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </a>
             </motion.div>
@@ -270,28 +272,28 @@ export default function Home() {
           </h2>
           <p className="font-mono text-[rgba(255,255,255,0.5)] text-sm mb-12 tracking-wide">Select your operation.</p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <a 
-              href="/api/demo/compose.html" 
+            <Link 
+              href="/verify" 
               className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#22d3ee] text-[#0c0c14] font-mono text-sm font-bold tracking-wider hover:bg-[#2dd4bf] transition-all"
             >
-              <FileText className="w-4 h-4" />
-              DOCUMENT COMPOSER
+              <Shield className="w-4 h-4" />
+              VERIFY VIDEO
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
+            <a 
+              href="/api/demo/compose.html" 
+              className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-transparent text-[#f0f0f8] hover:text-[#22d3ee] font-mono text-sm font-bold tracking-wider border border-[rgba(255,255,255,0.2)] hover:border-[#22d3ee] transition-all"
+            >
+              <FileText className="w-4 h-4" />
+              COMPOSER
+              <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </a>
             <a 
               href="/api/demo/index.html" 
               className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-transparent text-[#f0f0f8] hover:text-[#22d3ee] font-mono text-sm font-bold tracking-wider border border-[rgba(255,255,255,0.2)] hover:border-[#22d3ee] transition-all"
             >
               <Terminal className="w-4 h-4" />
-              CHAT INTERFACE
-              <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </a>
-            <a 
-              href="/api/demo/image.html"
-              className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-transparent text-[#f0f0f8] hover:text-[#c084fc] font-mono text-sm font-bold tracking-wider border border-[rgba(255,255,255,0.2)] hover:border-[#c084fc] transition-all"
-            >
-              <ImageIcon className="w-4 h-4" />
-              IMAGE GENERATION
+              CHAT
               <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </a>
           </div>

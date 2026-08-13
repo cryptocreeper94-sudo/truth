@@ -1,330 +1,331 @@
 import { Router, type Request, type Response } from "express";
 import { z } from "zod";
-import { db, dveJobsTable } from "@workspace/db";
+import { db, axiomVerifyJobsTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
-import { execFile } from "node:child_process";
-import { promisify } from "node:util";
-import { mkdtemp, rm } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import path from "node:path";
-import type { VerifyClaim, VerifyResult, VerifyStep } from "@workspace/db";
+import { FAILURES } from "../lib/verify/errors";
+import {
+  isAllowedPlatformHost,
+  resolvesToPublicAddresses,
+  SUPPORTED_PLATFORMS_HINT,
+} from "../lib/verify/url-policy";
+import { enqueueJob, findInFlightJob } from "../lib/verify/pipeline";
+import type { VerifiedClaim } from "../lib/verify/analysis";
 
 const router = Router();
-const execFileAsync = promisify(execFile);
 
-// ── ID / slug generation ────────────────────────────────────────────────────
-const BASE62 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-function randomId(len = 12): string {
-  const bytes = new Uint8Array(len);
-  crypto.getRandomValues(bytes);
-  return Array.from(bytes).map((b) => BASE62[b % BASE62.length]).join("");
-}
+// ── plain-English step labels ───────────────────────────────────────────────
+const STEP_LABELS: Record<string, string> = {
+  queued: "Waiting in line",
+  downloading: "Downloading the video",
+  transcribing: "Transcribing the audio",
+  extracting: "Extracting claims",
+  verifying: "Verifying claims against sources",
+  done: "Done",
+  failed: "Failed",
+};
 
-// ── Persist step updates ─────────────────────────────────────────────────────
-async function setStep(id: string, step: VerifyStep, error?: string) {
-  await db
-    .update(dveJobsTable)
-    .set({ step, error: error ?? null, updated_at: new Date() })
-    .where(eq(dveJobsTable.id, id));
-}
+// ── serialization ───────────────────────────────────────────────────────────
+type JobRow = typeof axiomVerifyJobsTable.$inferSelect;
 
-async function setResult(id: string, result: VerifyResult) {
-  const slug = randomId(10);
-  await db
-    .update(dveJobsTable)
-    .set({ step: "done", result, share_slug: slug, updated_at: new Date() })
-    .where(eq(dveJobsTable.id, id));
-}
-
-// ── Platform label from URL ──────────────────────────────────────────────────
-function detectPlatform(url: string): string {
-  if (/youtube\.com|youtu\.be/i.test(url)) return "YouTube";
-  if (/facebook\.com|fb\.watch/i.test(url)) return "Facebook";
-  if (/rumble\.com/i.test(url)) return "Rumble";
-  if (/tiktok\.com/i.test(url)) return "TikTok";
-  if (/twitter\.com|x\.com/i.test(url)) return "X (Twitter)";
-  if (/bitchute\.com/i.test(url)) return "BitChute";
-  if (/odysee\.com|lbry\.tv/i.test(url)) return "Odysee";
-  return "Web";
-}
-
-// ── Claim extraction + verification via OpenAI ───────────────────────────────
-async function extractAndVerifyClaims(
-  transcript: string,
-  videoTitle: string
-): Promise<{ summary: string; claims: VerifyClaim[] }> {
-  const baseUrl = process.env["AI_INTEGRATIONS_OPENAI_BASE_URL"];
-  const apiKey = process.env["AI_INTEGRATIONS_OPENAI_API_KEY"];
-  if (!baseUrl || !apiKey) throw new Error("AI integration not configured");
-
-  const { default: OpenAI } = (await import("openai")) as {
-    default: typeof import("openai").default;
-  };
-  const openai = new OpenAI({ apiKey, baseURL: baseUrl });
-
-  const systemPrompt = `You are a deterministic evidence analyst. Your job is to:
-1. Extract every discrete, testable factual claim from the provided transcript
-2. Assign each claim one of exactly five labels:
-   - DOCUMENTED: The claim is supported by peer-reviewed research, primary data, or official institutional records that can be cited
-   - CONTESTED: The claim is disputed between credible sources — real scientific or institutional disagreement exists
-   - SPECULATIVE: The claim goes beyond what current evidence supports, but is not definitively refuted
-   - REFUTED: The claim is contradicted by strong, documented evidence
-   - UNVERIFIABLE: The claim cannot be checked against any retrievable source
-3. Write a one-sentence plain-English rationale for each label — no jargon, no hedging
-4. Provide up to 3 real source URLs for DOCUMENTED and REFUTED claims only (leave empty array for others)
-5. Write a one-sentence plain-English summary of what the video is about overall
-
-CRITICAL RULES:
-- Do NOT fabricate source URLs. Only include URLs you are confident are real and retrievable
-- If you cannot find a real source, mark the claim UNVERIFIABLE rather than inventing one
-- Keep claim statements neutral — do not editorialize or take sides
-- Each claim must be a complete, standalone statement
-- The timecode field should reflect roughly when in the video the claim appears based on transcript position
-
-Respond with valid JSON in exactly this format:
-{
-  "summary": "One sentence describing what this video is about.",
-  "claims": [
-    {
-      "id": 1,
-      "text": "Plain-English statement of the claim",
-      "label": "DOCUMENTED",
-      "rationale": "One sentence explaining why this label applies.",
-      "timecode": "1:23",
-      "sources": [{"title": "Source title", "url": "https://..."}]
-    }
-  ]
-}`;
-
-  const userPrompt = `Video title: "${videoTitle}"\n\nTranscript:\n${transcript.slice(0, 12000)}`;
-
-  const completion = await openai.chat.completions.create({
-    model: "gpt-4o",
-    messages: [
-      { role: "system", content: systemPrompt },
-      { role: "user", content: userPrompt },
-    ],
-    temperature: 0.1,
-    max_tokens: 4000,
-    response_format: { type: "json_object" },
-  });
-
-  const raw = completion.choices[0]?.message?.content ?? "{}";
-  const parsed = JSON.parse(raw) as { summary?: string; claims?: VerifyClaim[] };
+function serializeJob(job: JobRow) {
   return {
-    summary: parsed.summary ?? "No summary available.",
-    claims: parsed.claims ?? [],
+    job_id: job.id,
+    status: job.status,
+    progress: job.progress,
+    step_label: STEP_LABELS[job.status] ?? job.status,
+    error_message: job.status === "failed" ? job.error_message : null,
+    video_title: job.video_title,
+    video_thumbnail: job.video_thumbnail,
+    platform: job.platform,
+    duration_seconds: job.duration_seconds,
+    summary: job.status === "done" ? job.summary : null,
+    claims: job.status === "done" ? (job.claims as VerifiedClaim[]) : null,
+    share_slug: job.share_slug,
+    created_at: job.created_at?.toISOString() ?? null,
   };
 }
 
-// ── Background pipeline ──────────────────────────────────────────────────────
-async function runPipeline(jobId: string, url: string) {
-  const workDir = await mkdtemp(path.join(tmpdir(), "dve-"));
-  try {
-    // ── Step 1: Download audio via yt-dlp ───────────────────────────────────
-    await setStep(jobId, "downloading");
-    const audioPath = path.join(workDir, "audio.wav");
-
-    let videoTitle = "Unknown video";
-    let thumbnailUrl: string | undefined;
-
-    try {
-      // Get metadata first
-      const { stdout: metaJson } = await execFileAsync("yt-dlp", [
-        "--dump-json",
-        "--no-playlist",
-        url,
-      ], { timeout: 60_000 });
-      const meta = JSON.parse(metaJson.trim()) as {
-        title?: string;
-        thumbnail?: string;
-      };
-      videoTitle = meta.title ?? videoTitle;
-      thumbnailUrl = meta.thumbnail;
-    } catch {
-      // metadata fetch failed — continue without it
-    }
-
-    // Download audio only
-    await execFileAsync("yt-dlp", [
-      "--no-playlist",
-      "--extract-audio",
-      "--audio-format", "wav",
-      "--audio-quality", "5",
-      "--postprocessor-args", "ffmpeg:-ar 16000 -ac 1",
-      "--output", audioPath,
-      url,
-    ], { timeout: 300_000 });
-
-    // ── Step 2: Transcribe via faster-whisper ────────────────────────────────
-    await setStep(jobId, "transcribing");
-    const transcriptPath = path.join(workDir, "transcript.json");
-
-    const transcribeScript = `
-import json, sys
-from faster_whisper import WhisperModel
-
-model = WhisperModel("base", device="cpu", compute_type="int8")
-segments, _ = model.transcribe(sys.argv[1], beam_size=5)
-result = []
-for seg in segments:
-    result.append({"start": seg.start, "end": seg.end, "text": seg.text.strip()})
-with open(sys.argv[2], "w") as f:
-    json.dump(result, f)
-print("done")
-`;
-    const scriptPath = path.join(workDir, "transcribe.py");
-    const { writeFile } = await import("node:fs/promises");
-    await writeFile(scriptPath, transcribeScript);
-
-    await execFileAsync("python3", [scriptPath, audioPath, transcriptPath], {
-      timeout: 600_000,
-    });
-
-    const { readFile } = await import("node:fs/promises");
-    const transcriptRaw = JSON.parse(await readFile(transcriptPath, "utf8")) as Array<{
-      start: number;
-      end: number;
-      text: string;
-    }>;
-
-    // Build full transcript text with approximate timecodes
-    const transcript = transcriptRaw
-      .map((s) => {
-        const mins = Math.floor(s.start / 60);
-        const secs = Math.floor(s.start % 60).toString().padStart(2, "0");
-        return `[${mins}:${secs}] ${s.text}`;
-      })
-      .join("\n");
-
-    // ── Step 3: Extract claims ───────────────────────────────────────────────
-    await setStep(jobId, "extracting");
-
-    // ── Step 4: Verify claims ────────────────────────────────────────────────
-    await setStep(jobId, "verifying");
-    const { summary, claims } = await extractAndVerifyClaims(transcript, videoTitle);
-
-    // ── Step 5: Persist result ───────────────────────────────────────────────
-    const result: VerifyResult = {
-      videoTitle,
-      videoPlatform: detectPlatform(url),
-      thumbnailUrl,
-      summary,
-      claims,
-    };
-    await setResult(jobId, result);
-  } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    // Produce a user-friendly error
-    let userMessage = "Something went wrong while processing this video.";
-    if (message.includes("unsupported URL") || message.includes("No supported")) {
-      userMessage = "We couldn't reach that video. Make sure the URL is public and from a supported platform.";
-    } else if (message.includes("private") || message.includes("login")) {
-      userMessage = "This video is private or requires sign-in. We can only verify publicly accessible videos.";
-    } else if (message.includes("geo") || message.includes("not available in your country")) {
-      userMessage = "This video is geo-restricted and couldn't be accessed from our servers.";
-    } else if (message.includes("AI integration")) {
-      userMessage = "The verification engine is not yet fully configured. Please try again later.";
-    }
-    await setStep(jobId, "error", userMessage);
-  } finally {
-    await rm(workDir, { recursive: true, force: true }).catch(() => {});
-  }
+async function loadJob(jobId: string): Promise<JobRow | null> {
+  const rows = await db
+    .select()
+    .from(axiomVerifyJobsTable)
+    .where(eq(axiomVerifyJobsTable.id, jobId))
+    .limit(1);
+  return rows[0] ?? null;
 }
 
-// ── POST /api/v1/verify ──────────────────────────────────────────────────────
-const verifySchema = z.object({
-  url: z.string().url("A valid video URL is required"),
+// ── URL validation ──────────────────────────────────────────────────────────
+const submitSchema = z.object({
+  url: z.string().min(1).max(2000),
 });
 
+/**
+ * Normalize and vet a submitted URL before it ever reaches yt-dlp.
+ *
+ * SSRF policy (yt-dlp is a server-side network client, so this is strict):
+ * 1. https/http only, no credentials, no ports other than default.
+ * 2. Hostname MUST be on the explicit video-platform allowlist — arbitrary
+ *    hosts are rejected, so redirects from attacker-controlled servers are
+ *    impossible (yt-dlp never contacts a non-allowlisted origin server).
+ * 3. Defense in depth: the hostname must resolve exclusively to public
+ *    addresses at submission time.
+ *
+ * Returns the normalized URL, or a plain-English rejection reason.
+ */
+async function normalizeUrl(
+  raw: string,
+): Promise<{ url: string } | { reject: string }> {
+  const invalid = { reject: FAILURES.invalidUrl.message };
+  let candidate = raw.trim();
+  if (!/^https?:\/\//i.test(candidate)) candidate = `https://${candidate}`;
+  let parsed: URL;
+  try {
+    parsed = new URL(candidate);
+  } catch {
+    return invalid;
+  }
+  if (parsed.protocol !== "https:" && parsed.protocol !== "http:")
+    return invalid;
+  if (parsed.username || parsed.password) return invalid;
+  if (parsed.port && parsed.port !== "80" && parsed.port !== "443")
+    return invalid;
+
+  const host = parsed.hostname;
+  if (!isAllowedPlatformHost(host)) {
+    return {
+      reject: `We can only verify videos from known platforms right now (${SUPPORTED_PLATFORMS_HINT}). That link's site isn't supported yet.`,
+    };
+  }
+
+  // Defense in depth: even an allowlisted domain must resolve publicly.
+  if (!(await resolvesToPublicAddresses(host))) {
+    return {
+      reject:
+        "We couldn't reach that video. Make sure the URL is public and try again.",
+    };
+  }
+
+  return { url: parsed.toString() };
+}
+
+// ── simple per-IP rate limit (Phase 1) ──────────────────────────────────────
+const RATE_LIMIT = 5; // submissions
+const RATE_WINDOW_MS = 10 * 60_000; // per 10 minutes
+const submissions = new Map<string, number[]>();
+
+function rateLimited(ip: string): boolean {
+  const now = Date.now();
+  const recent = (submissions.get(ip) ?? []).filter(
+    (t) => now - t < RATE_WINDOW_MS,
+  );
+  if (recent.length >= RATE_LIMIT) {
+    submissions.set(ip, recent);
+    return true;
+  }
+  recent.push(now);
+  submissions.set(ip, recent);
+  return false;
+}
+
+// Periodically drop stale entries so the map can't grow unbounded.
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, times] of submissions) {
+    const recent = times.filter((t) => now - t < RATE_WINDOW_MS);
+    if (recent.length === 0) submissions.delete(ip);
+    else submissions.set(ip, recent);
+  }
+}, RATE_WINDOW_MS).unref();
+
+// ── POST /v1/verify ─────────────────────────────────────────────────────────
 router.post("/v1/verify", async (req: Request, res: Response) => {
-  const parsed = verifySchema.safeParse(req.body);
+  const parsed = submitSchema.safeParse(req.body);
   if (!parsed.success) {
-    res.status(400).json({ error: "Invalid URL", detail: "Please provide a valid video URL." });
+    res.status(400).json({ error: FAILURES.invalidUrl.message });
     return;
   }
 
-  const { url } = parsed.data;
-  const jobId = randomId(16);
+  const vetted = await normalizeUrl(parsed.data.url);
+  if ("reject" in vetted) {
+    res.status(400).json({ error: vetted.reject });
+    return;
+  }
+  const url = vetted.url;
 
-  // Insert job record
-  await db.insert(dveJobsTable).values({
-    id: jobId,
-    url,
-    step: "queued",
-  });
+  if (
+    !process.env["AI_INTEGRATIONS_OPENAI_BASE_URL"] ||
+    !process.env["AI_INTEGRATIONS_OPENAI_API_KEY"]
+  ) {
+    res.status(503).json({ error: FAILURES.notConfigured.message });
+    return;
+  }
 
-  // Fire pipeline in background — do NOT await
-  runPipeline(jobId, url).catch(console.error);
+  // Reuse an in-flight job for the same URL instead of duplicating work.
+  const existing = findInFlightJob(url);
+  if (existing) {
+    res.status(202).json({ job_id: existing });
+    return;
+  }
 
-  res.status(202).json({ jobId });
+  const ip = req.ip ?? "unknown";
+  if (rateLimited(ip)) {
+    res.status(429).json({
+      error:
+        "You've submitted several videos in a short time. Please wait a few minutes and try again.",
+    });
+    return;
+  }
+
+  const jobId = crypto.randomUUID();
+  try {
+    await db.insert(axiomVerifyJobsTable).values({
+      id: jobId,
+      url,
+      status: "queued",
+      progress: 0,
+    });
+  } catch (err) {
+    req.log.error({ err }, "Failed to insert verify job");
+    res.status(500).json({ error: FAILURES.internal.message });
+    return;
+  }
+
+  enqueueJob(jobId, url);
+  res.status(202).json({ job_id: jobId });
 });
 
-// ── GET /api/v1/verify/:jobId ────────────────────────────────────────────────
+// ── GET /v1/verify/share/:slug ──────────────────────────────────────────────
+// NOTE: must be registered before /v1/verify/:jobId so "share" isn't
+// swallowed by the :jobId param.
+router.get("/v1/verify/share/:slug", async (req: Request, res: Response) => {
+  const slug = String(req.params["slug"] ?? "");
+  if (!/^[A-Za-z0-9]{1,32}$/.test(slug)) {
+    res.status(404).json({ error: "Share link not found." });
+    return;
+  }
+
+  let rows: JobRow[];
+  try {
+    rows = await db
+      .select()
+      .from(axiomVerifyJobsTable)
+      .where(eq(axiomVerifyJobsTable.share_slug, slug))
+      .limit(1);
+  } catch (err) {
+    req.log.error({ err }, "Failed to fetch shared verify report");
+    res.status(500).json({ error: FAILURES.internal.message });
+    return;
+  }
+
+  const job = rows[0];
+  if (!job || job.status !== "done") {
+    res.status(404).json({
+      error: "This share link doesn't exist or the report is no longer available.",
+    });
+    return;
+  }
+
+  res.json(serializeJob(job));
+});
+
+// ── GET /v1/verify/:jobId ───────────────────────────────────────────────────
 router.get("/v1/verify/:jobId", async (req: Request, res: Response) => {
   const jobId = String(req.params["jobId"] ?? "");
-  if (!jobId) {
-    res.status(400).json({ error: "Missing job ID" });
+  if (!/^[0-9a-f-]{36}$/.test(jobId)) {
+    res.status(404).json({ error: "We couldn't find that verification job." });
     return;
   }
 
-  const rows = await db
-    .select()
-    .from(dveJobsTable)
-    .where(eq(dveJobsTable.id, jobId))
-    .limit(1);
+  let job: JobRow | null;
+  try {
+    job = await loadJob(jobId);
+  } catch (err) {
+    req.log.error({ err }, "Failed to fetch verify job");
+    res.status(500).json({ error: FAILURES.internal.message });
+    return;
+  }
 
-  const job = rows[0];
   if (!job) {
-    res.status(404).json({ error: "Job not found" });
+    res.status(404).json({ error: "We couldn't find that verification job." });
     return;
   }
 
-  // Step → display label + progress %
-  const stepMeta: Record<string, { label: string; pct: number }> = {
-    queued:       { label: "Queued",              pct: 0  },
-    downloading:  { label: "Downloading video",   pct: 15 },
-    transcribing: { label: "Transcribing audio",  pct: 40 },
-    extracting:   { label: "Reading claims",      pct: 65 },
-    verifying:    { label: "Checking sources",    pct: 85 },
-    done:         { label: "Done",                pct: 100 },
-    error:        { label: "Error",               pct: 0  },
-  };
-
-  const meta = stepMeta[job.step] ?? { label: "Processing", pct: 50 };
-
-  res.json({
-    jobId: job.id,
-    step: job.step,
-    stepLabel: meta.label,
-    progress: meta.pct,
-    error: job.error ?? null,
-    shareSlug: job.share_slug ?? null,
-    result: job.result ?? null,
-  });
+  res.json(serializeJob(job));
 });
 
-// ── GET /api/verify/share/:slug ──────────────────────────────────────────────
-router.get("/verify/share/:slug", async (req: Request, res: Response) => {
-  const slug = String(req.params["slug"] ?? "");
+// ── POST /v1/verify/:jobId/share ────────────────────────────────────────────
+const BASE62 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+function generateSlug(): string {
+  const bytes = new Uint8Array(10);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes)
+    .map((b) => BASE62[b % BASE62.length])
+    .join("");
+}
+
+router.post("/v1/verify/:jobId/share", async (req: Request, res: Response) => {
+  const jobId = String(req.params["jobId"] ?? "");
+  if (!/^[0-9a-f-]{36}$/.test(jobId)) {
+    res.status(404).json({ error: "We couldn't find that verification job." });
+    return;
+  }
+
+  let job: JobRow | null;
+  try {
+    job = await loadJob(jobId);
+  } catch (err) {
+    req.log.error({ err }, "Failed to fetch verify job for sharing");
+    res.status(500).json({ error: FAILURES.internal.message });
+    return;
+  }
+
+  if (!job) {
+    res.status(404).json({ error: "We couldn't find that verification job." });
+    return;
+  }
+  if (job.status !== "done") {
+    res.status(409).json({
+      error: "This report isn't finished yet. Wait for verification to complete before sharing.",
+    });
+    return;
+  }
+
+  // Idempotent: reuse the existing slug.
+  let slug = job.share_slug;
   if (!slug) {
-    res.status(400).json({ error: "Missing slug" });
-    return;
+    slug = generateSlug();
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const clash = await db
+        .select({ id: axiomVerifyJobsTable.id })
+        .from(axiomVerifyJobsTable)
+        .where(eq(axiomVerifyJobsTable.share_slug, slug))
+        .limit(1);
+      if (clash.length === 0) break;
+      slug = generateSlug();
+    }
+    try {
+      await db
+        .update(axiomVerifyJobsTable)
+        .set({ share_slug: slug })
+        .where(eq(axiomVerifyJobsTable.id, jobId));
+    } catch (err) {
+      req.log.error({ err }, "Failed to persist verify share slug");
+      res.status(500).json({ error: FAILURES.internal.message });
+      return;
+    }
   }
 
-  const rows = await db
-    .select()
-    .from(dveJobsTable)
-    .where(eq(dveJobsTable.share_slug, slug))
-    .limit(1);
+  // The share viewer is the SPA route /verify/share/:slug on the web app.
+  const proto =
+    (req.headers["x-forwarded-proto"] as string | undefined) ?? req.protocol;
+  const host =
+    (req.headers["x-forwarded-host"] as string | undefined) ??
+    req.get("host") ??
+    "localhost";
+  const url = `${proto}://${host}/verify/share/${slug}`;
 
-  const job = rows[0];
-  if (!job || job.step !== "done" || !job.result) {
-    res.status(404).json({ error: "Report not found or not yet complete." });
-    return;
-  }
-
-  res.json({ shareSlug: slug, result: job.result });
+  res.status(201).json({ slug, url });
 });
 
 export default router;

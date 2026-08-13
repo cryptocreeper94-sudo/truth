@@ -8,3 +8,108 @@
 export interface HealthStatus {
   status: string;
 }
+
+export interface VerifyUrlInput {
+  /**
+   * Public video URL (YouTube, Facebook, Rumble, etc.)
+   * @minLength 1
+   * @maxLength 2000
+   */
+  url: string;
+}
+
+export interface VerifyJobCreated {
+  job_id: string;
+}
+
+export interface VerifyError {
+  error: string;
+  /** @nullable */
+  detail?: string | null;
+}
+
+export interface VerifySource {
+  title: string;
+  url: string;
+}
+
+export type VerifyClaimLabel =
+  (typeof VerifyClaimLabel)[keyof typeof VerifyClaimLabel];
+
+export const VerifyClaimLabel = {
+  documented: "documented",
+  contested: "contested",
+  speculative: "speculative",
+  refuted: "refuted",
+  unverifiable: "unverifiable",
+} as const;
+
+export interface VerifyClaim {
+  number: number;
+  text: string;
+  label: VerifyClaimLabel;
+  /** One-sentence plain-English explanation of the label */
+  rationale: string;
+  /**
+   * What is established (for speculative/contested claims)
+   * @nullable
+   */
+  established?: string | null;
+  /**
+   * What is not established (for speculative/contested claims)
+   * @nullable
+   */
+  not_established?: string | null;
+  sources: VerifySource[];
+}
+
+export type VerifyJobStatus =
+  (typeof VerifyJobStatus)[keyof typeof VerifyJobStatus];
+
+export const VerifyJobStatus = {
+  queued: "queued",
+  downloading: "downloading",
+  transcribing: "transcribing",
+  extracting: "extracting",
+  verifying: "verifying",
+  done: "done",
+  failed: "failed",
+} as const;
+
+export interface VerifyJob {
+  job_id: string;
+  status: VerifyJobStatus;
+  /** 0-100 coarse progress */
+  progress: number;
+  /** Plain-English label for the current step */
+  step_label: string;
+  /**
+   * Plain-English error message when status is failed
+   * @nullable
+   */
+  error_message?: string | null;
+  /** @nullable */
+  video_title?: string | null;
+  /** @nullable */
+  video_thumbnail?: string | null;
+  /** @nullable */
+  platform?: string | null;
+  /** @nullable */
+  duration_seconds?: number | null;
+  /**
+   * One-sentence plain-English summary of the video's subject
+   * @nullable
+   */
+  summary?: string | null;
+  /** @nullable */
+  claims?: VerifyClaim[] | null;
+  /** @nullable */
+  share_slug?: string | null;
+  /** @nullable */
+  created_at?: string | null;
+}
+
+export interface VerifyShare {
+  slug: string;
+  url: string;
+}

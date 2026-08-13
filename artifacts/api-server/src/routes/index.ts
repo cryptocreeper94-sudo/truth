@@ -14,9 +14,9 @@ router.use(healthRouter);
 router.use(keyManagementRouter);
 router.use(composeRouter);
 router.use(composeShareRouter);
+router.use(verifyRouter);
 router.use(imageGenRouter);
 router.use(exportPdfRouter);
 router.use(demoRouter);
-router.use(verifyRouter);
 
 export default router;

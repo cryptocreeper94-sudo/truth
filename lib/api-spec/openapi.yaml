@@ -10,7 +10,124 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: verify
+    description: Deterministic Verification Engine operations
 paths:
+  /v1/verify:
+    post:
+      operationId: submitVerifyJob
+      tags: [verify]
+      summary: Submit a video URL for verification
+      description: Queues a verification job for a public video URL and returns a job ID.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VerifyUrlInput"
+      responses:
+        "202":
+          description: Job accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VerifyJobCreated"
+        "400":
+          description: Invalid URL
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VerifyError"
+        "429":
+          description: Rate limit reached
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VerifyError"
+        "503":
+          description: Verification engine not configured
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VerifyError"
+  /v1/verify/{jobId}:
+    get:
+      operationId: getVerifyJob
+      tags: [verify]
+      summary: Get verification job status and report
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Current job state (includes the report when done)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VerifyJob"
+        "404":
+          description: Job not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VerifyError"
+  /v1/verify/{jobId}/share:
+    post:
+      operationId: shareVerifyJob
+      tags: [verify]
+      summary: Create a stable share link for a finished report
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "201":
+          description: Share link created (or returned if it already exists)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VerifyShare"
+        "404":
+          description: Job not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VerifyError"
+        "409":
+          description: Job is not finished yet
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VerifyError"
+  /v1/verify/share/{slug}:
+    get:
+      operationId: getSharedVerifyReport
+      tags: [verify]
+      summary: Get a shared verification report by slug
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Shared report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VerifyJob"
+        "404":
+          description: Share link not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VerifyError"
   /healthz:
     get:
       operationId: healthCheck
@@ -33,4 +150,106 @@ components:
           type: string
       required:
         - status
+    VerifyUrlInput:
+      type: object
+      required: [url]
+      properties:
+        url:
+          type: string
+          minLength: 1
+          maxLength: 2000
+          description: Public video URL (YouTube, Facebook, Rumble, etc.)
+    VerifyJobCreated:
+      type: object
+      required: [job_id]
+      properties:
+        job_id:
+          type: string
+    VerifyError:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+        detail:
+          type: ["string", "null"]
+    VerifySource:
+      type: object
+      required: [title, url]
+      properties:
+        title:
+          type: string
+        url:
+          type: string
+    VerifyClaim:
+      type: object
+      required: [number, text, label, rationale, sources]
+      properties:
+        number:
+          type: integer
+        text:
+          type: string
+        label:
+          type: string
+          enum: [documented, contested, speculative, refuted, unverifiable]
+        rationale:
+          type: string
+          description: One-sentence plain-English explanation of the label
+        established:
+          type: ["string", "null"]
+          description: What is established (for speculative/contested claims)
+        not_established:
+          type: ["string", "null"]
+          description: What is not established (for speculative/contested claims)
+        sources:
+          type: array
+          items:
+            $ref: "#/components/schemas/VerifySource"
+    VerifyJob:
+      type: object
+      required: [job_id, status, progress, step_label]
+      properties:
+        job_id:
+          type: string
+        status:
+          type: string
+          enum:
+            [queued, downloading, transcribing, extracting, verifying, done, failed]
+        progress:
+          type: integer
+          description: 0-100 coarse progress
+        step_label:
+          type: string
+          description: Plain-English label for the current step
+        error_message:
+          type: ["string", "null"]
+          description: Plain-English error message when status is failed
+        video_title:
+          type: ["string", "null"]
+        video_thumbnail:
+          type: ["string", "null"]
+        platform:
+          type: ["string", "null"]
+        duration_seconds:
+          type: ["integer", "null"]
+        summary:
+          type: ["string", "null"]
+          description: One-sentence plain-English summary of the video's subject
+        claims:
+          type: ["array", "null"]
+          items:
+            $ref: "#/components/schemas/VerifyClaim"
+        share_slug:
+          type: ["string", "null"]
+        created_at:
+          type: ["string", "null"]
+          format: date-time
+    VerifyShare:
+      type: object
+      required: [slug, url]
+      properties:
+        slug:
+          type: string
+        url:
+          type: string
 

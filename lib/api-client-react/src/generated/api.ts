@@ -5,24 +5,381 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
+  MutationFunction,
   QueryFunction,
   QueryKey,
+  UseMutationOptions,
+  UseMutationResult,
   UseQueryOptions,
   UseQueryResult,
 } from "@tanstack/react-query";
 
-import type { HealthStatus } from "./api.schemas";
+import type {
+  HealthStatus,
+  VerifyError,
+  VerifyJob,
+  VerifyJobCreated,
+  VerifyShare,
+  VerifyUrlInput,
+} from "./api.schemas";
 
 import { customFetch } from "../custom-fetch";
-import type { ErrorType } from "../custom-fetch";
+import type { ErrorType, BodyType } from "../custom-fetch";
 
 type AwaitedInput<T> = PromiseLike<T> | T;
 
 type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+/**
+ * Queues a verification job for a public video URL and returns a job ID.
+ * @summary Submit a video URL for verification
+ */
+export const getSubmitVerifyJobUrl = () => {
+  return `/api/v1/verify`;
+};
+
+export const submitVerifyJob = async (
+  verifyUrlInput: VerifyUrlInput,
+  options?: RequestInit,
+): Promise<VerifyJobCreated> => {
+  return customFetch<VerifyJobCreated>(getSubmitVerifyJobUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(verifyUrlInput),
+  });
+};
+
+export const getSubmitVerifyJobMutationOptions = <
+  TError = ErrorType<VerifyError>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof submitVerifyJob>>,
+    TError,
+    { data: BodyType<VerifyUrlInput> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof submitVerifyJob>>,
+  TError,
+  { data: BodyType<VerifyUrlInput> },
+  TContext
+> => {
+  const mutationKey = ["submitVerifyJob"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof submitVerifyJob>>,
+    { data: BodyType<VerifyUrlInput> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return submitVerifyJob(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SubmitVerifyJobMutationResult = NonNullable<
+  Awaited<ReturnType<typeof submitVerifyJob>>
+>;
+export type SubmitVerifyJobMutationBody = BodyType<VerifyUrlInput>;
+export type SubmitVerifyJobMutationError = ErrorType<VerifyError>;
+
+/**
+ * @summary Submit a video URL for verification
+ */
+export const useSubmitVerifyJob = <
+  TError = ErrorType<VerifyError>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof submitVerifyJob>>,
+    TError,
+    { data: BodyType<VerifyUrlInput> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof submitVerifyJob>>,
+  TError,
+  { data: BodyType<VerifyUrlInput> },
+  TContext
+> => {
+  return useMutation(getSubmitVerifyJobMutationOptions(options));
+};
+
+/**
+ * @summary Get verification job status and report
+ */
+export const getGetVerifyJobUrl = (jobId: string) => {
+  return `/api/v1/verify/${jobId}`;
+};
+
+export const getVerifyJob = async (
+  jobId: string,
+  options?: RequestInit,
+): Promise<VerifyJob> => {
+  return customFetch<VerifyJob>(getGetVerifyJobUrl(jobId), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetVerifyJobQueryKey = (jobId: string) => {
+  return [`/api/v1/verify/${jobId}`] as const;
+};
+
+export const getGetVerifyJobQueryOptions = <
+  TData = Awaited<ReturnType<typeof getVerifyJob>>,
+  TError = ErrorType<VerifyError>,
+>(
+  jobId: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getVerifyJob>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetVerifyJobQueryKey(jobId);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getVerifyJob>>> = ({
+    signal,
+  }) => getVerifyJob(jobId, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!jobId,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getVerifyJob>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetVerifyJobQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getVerifyJob>>
+>;
+export type GetVerifyJobQueryError = ErrorType<VerifyError>;
+
+/**
+ * @summary Get verification job status and report
+ */
+
+export function useGetVerifyJob<
+  TData = Awaited<ReturnType<typeof getVerifyJob>>,
+  TError = ErrorType<VerifyError>,
+>(
+  jobId: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getVerifyJob>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetVerifyJobQueryOptions(jobId, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Create a stable share link for a finished report
+ */
+export const getShareVerifyJobUrl = (jobId: string) => {
+  return `/api/v1/verify/${jobId}/share`;
+};
+
+export const shareVerifyJob = async (
+  jobId: string,
+  options?: RequestInit,
+): Promise<VerifyShare> => {
+  return customFetch<VerifyShare>(getShareVerifyJobUrl(jobId), {
+    ...options,
+    method: "POST",
+  });
+};
+
+export const getShareVerifyJobMutationOptions = <
+  TError = ErrorType<VerifyError>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof shareVerifyJob>>,
+    TError,
+    { jobId: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof shareVerifyJob>>,
+  TError,
+  { jobId: string },
+  TContext
+> => {
+  const mutationKey = ["shareVerifyJob"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof shareVerifyJob>>,
+    { jobId: string }
+  > = (props) => {
+    const { jobId } = props ?? {};
+
+    return shareVerifyJob(jobId, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ShareVerifyJobMutationResult = NonNullable<
+  Awaited<ReturnType<typeof shareVerifyJob>>
+>;
+
+export type ShareVerifyJobMutationError = ErrorType<VerifyError>;
+
+/**
+ * @summary Create a stable share link for a finished report
+ */
+export const useShareVerifyJob = <
+  TError = ErrorType<VerifyError>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof shareVerifyJob>>,
+    TError,
+    { jobId: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof shareVerifyJob>>,
+  TError,
+  { jobId: string },
+  TContext
+> => {
+  return useMutation(getShareVerifyJobMutationOptions(options));
+};
+
+/**
+ * @summary Get a shared verification report by slug
+ */
+export const getGetSharedVerifyReportUrl = (slug: string) => {
+  return `/api/v1/verify/share/${slug}`;
+};
+
+export const getSharedVerifyReport = async (
+  slug: string,
+  options?: RequestInit,
+): Promise<VerifyJob> => {
+  return customFetch<VerifyJob>(getGetSharedVerifyReportUrl(slug), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetSharedVerifyReportQueryKey = (slug: string) => {
+  return [`/api/v1/verify/share/${slug}`] as const;
+};
+
+export const getGetSharedVerifyReportQueryOptions = <
+  TData = Awaited<ReturnType<typeof getSharedVerifyReport>>,
+  TError = ErrorType<VerifyError>,
+>(
+  slug: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getSharedVerifyReport>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetSharedVerifyReportQueryKey(slug);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getSharedVerifyReport>>
+  > = ({ signal }) =>
+    getSharedVerifyReport(slug, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!slug,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getSharedVerifyReport>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetSharedVerifyReportQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getSharedVerifyReport>>
+>;
+export type GetSharedVerifyReportQueryError = ErrorType<VerifyError>;
+
+/**
+ * @summary Get a shared verification report by slug
+ */
+
+export function useGetSharedVerifyReport<
+  TData = Awaited<ReturnType<typeof getSharedVerifyReport>>,
+  TError = ErrorType<VerifyError>,
+>(
+  slug: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getSharedVerifyReport>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetSharedVerifyReportQueryOptions(slug, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
 
 /**
  * Returns server health status

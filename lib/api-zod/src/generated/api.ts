@@ -8,6 +8,167 @@
 import * as zod from "zod";
 
 /**
+ * Queues a verification job for a public video URL and returns a job ID.
+ * @summary Submit a video URL for verification
+ */
+export const submitVerifyJobBodyUrlMax = 2000;
+
+export const SubmitVerifyJobBody = zod.object({
+  url: zod
+    .string()
+    .min(1)
+    .max(submitVerifyJobBodyUrlMax)
+    .describe("Public video URL (YouTube, Facebook, Rumble, etc.)"),
+});
+
+/**
+ * @summary Get verification job status and report
+ */
+export const GetVerifyJobParams = zod.object({
+  jobId: zod.coerce.string(),
+});
+
+export const GetVerifyJobResponse = zod.object({
+  job_id: zod.string(),
+  status: zod.enum([
+    "queued",
+    "downloading",
+    "transcribing",
+    "extracting",
+    "verifying",
+    "done",
+    "failed",
+  ]),
+  progress: zod.number().describe("0-100 coarse progress"),
+  step_label: zod.string().describe("Plain-English label for the current step"),
+  error_message: zod
+    .string()
+    .nullish()
+    .describe("Plain-English error message when status is failed"),
+  video_title: zod.string().nullish(),
+  video_thumbnail: zod.string().nullish(),
+  platform: zod.string().nullish(),
+  duration_seconds: zod.number().nullish(),
+  summary: zod
+    .string()
+    .nullish()
+    .describe("One-sentence plain-English summary of the video's subject"),
+  claims: zod
+    .array(
+      zod.object({
+        number: zod.number(),
+        text: zod.string(),
+        label: zod.enum([
+          "documented",
+          "contested",
+          "speculative",
+          "refuted",
+          "unverifiable",
+        ]),
+        rationale: zod
+          .string()
+          .describe("One-sentence plain-English explanation of the label"),
+        established: zod
+          .string()
+          .nullish()
+          .describe("What is established (for speculative\/contested claims)"),
+        not_established: zod
+          .string()
+          .nullish()
+          .describe(
+            "What is not established (for speculative\/contested claims)",
+          ),
+        sources: zod.array(
+          zod.object({
+            title: zod.string(),
+            url: zod.string(),
+          }),
+        ),
+      }),
+    )
+    .nullish(),
+  share_slug: zod.string().nullish(),
+  created_at: zod.date().nullish(),
+});
+
+/**
+ * @summary Create a stable share link for a finished report
+ */
+export const ShareVerifyJobParams = zod.object({
+  jobId: zod.coerce.string(),
+});
+
+/**
+ * @summary Get a shared verification report by slug
+ */
+export const GetSharedVerifyReportParams = zod.object({
+  slug: zod.coerce.string(),
+});
+
+export const GetSharedVerifyReportResponse = zod.object({
+  job_id: zod.string(),
+  status: zod.enum([
+    "queued",
+    "downloading",
+    "transcribing",
+    "extracting",
+    "verifying",
+    "done",
+    "failed",
+  ]),
+  progress: zod.number().describe("0-100 coarse progress"),
+  step_label: zod.string().describe("Plain-English label for the current step"),
+  error_message: zod
+    .string()
+    .nullish()
+    .describe("Plain-English error message when status is failed"),
+  video_title: zod.string().nullish(),
+  video_thumbnail: zod.string().nullish(),
+  platform: zod.string().nullish(),
+  duration_seconds: zod.number().nullish(),
+  summary: zod
+    .string()
+    .nullish()
+    .describe("One-sentence plain-English summary of the video's subject"),
+  claims: zod
+    .array(
+      zod.object({
+        number: zod.number(),
+        text: zod.string(),
+        label: zod.enum([
+          "documented",
+          "contested",
+          "speculative",
+          "refuted",
+          "unverifiable",
+        ]),
+        rationale: zod
+          .string()
+          .describe("One-sentence plain-English explanation of the label"),
+        established: zod
+          .string()
+          .nullish()
+          .describe("What is established (for speculative\/contested claims)"),
+        not_established: zod
+          .string()
+          .nullish()
+          .describe(
+            "What is not established (for speculative\/contested claims)",
+          ),
+        sources: zod.array(
+          zod.object({
+            title: zod.string(),
+            url: zod.string(),
+          }),
+        ),
+      }),
+    )
+    .nullish(),
+  share_slug: zod.string().nullish(),
+  created_at: zod.date().nullish(),
+});
+
+/**
  * Returns server health status
  * @summary Health check
  */
