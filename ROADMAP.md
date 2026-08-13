@@ -1,8 +1,90 @@
 # Truth Project Roadmap
 
-This file tracks planned work across all three Truth evidence layers: the **Observatory** (continuous physical measurement), the **Physical Evidence** layer (documented experiments and reproducible observations), and the **Historical Record** (claims, sources, and digs governed by METHOD.md).  Each item includes a rationale and the done-looks-like criteria used to assess completion.
+This file tracks planned work across all three Truth evidence layers: the **Observatory** (continuous physical measurement), the **Physical Evidence** layer (documented experiments and reproducible observations), and the **Historical Record** (claims, sources, and digs governed by METHOD.md).  It also tracks the **Deterministic Verification Engine (DVE)**, a separate media-analysis pipeline that generates claim-level verification reports from public video URLs.
 
-The three layers are part of one project in one monorepo.  Do not create separate apps or repositories for Physical Evidence work.  See `PHYSICAL_EVIDENCE.md` for the case file schema and governing principles, `OBSERVATORY.md` for the observation layer overview, and `METHOD.md` for the Historical Record provenance standard.
+Each item includes a rationale and the done-looks-like criteria used to assess completion.
+
+The three evidence layers are part of one project in one monorepo.  Do not create separate apps or repositories for Physical Evidence work.  See `PHYSICAL_EVIDENCE.md` for the case file schema and governing principles, `OBSERVATORY.md` for the observation layer overview, and `METHOD.md` for the Historical Record provenance standard.
+
+---
+
+## Deterministic Verification Engine (DVE)
+
+The DVE is a media-analysis pipeline that downloads any public video URL, transcribes it with timestamps, extracts every verifiable claim, and labels each claim with one of five statuses: `DOCUMENTED`, `CONTESTED`, `SPECULATIVE`, `REFUTED`, or `UNVERIFIABLE`.  The result is a shareable plain-English report.  DVE is distinct from the Physical Evidence case file system — it analyzes media and surfaces claims; Physical Evidence records the physical experimental record.  A future adapter may allow promoting a DVE report into a Physical Evidence case file draft, but that is not in scope yet.
+
+### Phase 1 — Submit a URL, get a verification report ✅ COMPLETE
+
+**What was built:**
+- `POST /api/v1/verify` — accepts a public video URL, launches a background pipeline
+- Background pipeline: `yt-dlp` download → `ffmpeg` audio conversion → `faster-whisper` timestamped transcription → OpenAI claim extraction and labeling → result persisted to DB
+- `GET /api/v1/verify/:jobId` — polls job progress through named steps (`downloading`, `transcribing`, `analyzing`, `done`, `error`)
+- `GET /api/verify/share/:slug` — serves a stable shareable report by slug
+- Frontend at `/verify` — submit form with progress tracker, report view with expandable claim cards, share button; styled to match Axiom visual language (alternating crème/black, 4% noise overlay, brutalist typography, tilt cards)
+- Frontend at `/verify/report/:slug` — stable shared-report page, usable without an account
+- `lib/db/src/schema/verify-jobs.ts` — Drizzle schema for `dve_jobs` table
+- Nav link added to Axiom home page
+
+**Environment notes (critical for any agent picking this up):**
+- `yt-dlp` and `faster-whisper` are Python packages.  They must be installed via plain `pip` — the managed package installer fails trying to write into a protected Nix store path.  They are recorded in `requirements.txt` but may not survive an environment rebuild.  If jobs fail at the `downloading` or `transcribing` step, run: `pip install yt-dlp faster-whisper`
+- OpenAI access goes through Replit AI Integrations (env vars `AI_INTEGRATIONS_OPENAI_BASE_URL` and `AI_INTEGRATIONS_OPENAI_API_KEY`).  On a fresh environment or a self-hosted deployment (e.g. Coolify), you must provide a real OpenAI API key and set `OPENAI_API_KEY` (or update the client in the verify route to read from your preferred env var).  See `artifacts/api-server/src/routes/verify.ts` for the client initialization.
+
+---
+
+### Phase 2 — Job persistence across server restarts
+
+**Rationale:** DVE jobs run in-process.  If the API server restarts mid-job (deploy, crash, workflow restart), the job dies silently and the frontend polls forever.  Jobs that were in a non-terminal state must be detected on startup and either re-queued or marked failed with a clear user message.
+
+**Done looks like:**
+- On API server startup, all jobs with a non-terminal `step` value are set to `error` with `error = "Server restarted — please resubmit"`
+- (Stretch) in-progress jobs are re-queued and resume from the last completed step if the transcript was already saved
+- The polling UI surfaces the error state instead of hanging
+
+**Relevant files:**
+- `artifacts/api-server/src/routes/verify.ts`
+- `lib/db/src/schema/verify-jobs.ts`
+- `artifacts/axiom-home/src/pages/verify.tsx`
+
+---
+
+### Phase 3 — Rate limiting and resource caps
+
+**Rationale:** Video download + transcription + LLM calls are expensive and slow.  A single user or bot submitting many URLs could exhaust disk, CPU, and AI credits.  There are currently no guards.
+
+**Done looks like:**
+- Per-IP submission rate limit (e.g. 5 jobs per hour); excess requests get a `429` with a plain message
+- A configurable cap on concurrent in-flight jobs; new submissions queue or are rejected gracefully when the cap is reached
+- Videos over a configurable duration or file size are rejected up front with a clear explanation before download begins
+
+**Relevant files:**
+- `artifacts/api-server/src/routes/verify.ts`
+- `artifacts/axiom-home/src/pages/verify.tsx`
+
+---
+
+### Phase 4 — Source verification
+
+**Rationale:** Phase 1 asks the language model for supporting source URLs but never fetches them.  Links can be dead, wrong, or fabricated.  For a product whose core promise is verification, sources must be checked.
+
+**Done looks like:**
+- Each source URL returned by the model is fetched server-side before the report is saved
+- Dead or unreachable links are dropped or flagged `UNREACHABLE`
+- Source titles come from the actual fetched page, not the model
+- Claims whose sources all fail verification are downgraded to `UNVERIFIABLE` or clearly marked with a warning badge
+
+**Relevant files:**
+- `artifacts/api-server/src/routes/verify.ts`
+- `lib/db/src/schema/verify-jobs.ts`
+
+---
+
+### Phase 5 — Physical Evidence promotion adapter
+
+**Rationale:** A DVE report surfaces claims with timecodes and source links.  A Physical Evidence case file records the physical experimental record with setup data, environmental controls, and competing model predictions.  These are different things.  However, a DVE report on an experiment video (e.g. the GSL laser or Chicago skyline experiments) could pre-populate the `SOURCES` section and `DISCOVERY_LOG` of a case file, reducing manual entry.
+
+**Done looks like:**
+- A researcher can select a completed DVE report and click "Start case file from this report"
+- A pre-populated `PRELIMINARY` case file draft is created in `evidence/` using the DVE report's video metadata, source list, and extracted claims as the `DISCOVERY_LOG`
+- All required schema fields are either filled from the report or explicitly marked `MISSING — requires field observation`
 
 ---
 
@@ -32,6 +114,8 @@ Photographs show the Chicago skyline visible from the Michigan shoreline at appr
 ### Case file tooling — extraction and verification pipeline
 
 **Rationale:** Case files will increasingly be sourced from video and photographic evidence.  Manual extraction of setup data from video is slow and error-prone.  A lightweight pipeline that extracts stated measurements, flags missing fields, and reconstructs geometry against model predictions will accelerate case construction and ensure consistency.
+
+> **Note:** This work overlaps significantly with DVE Phase 1, which is now complete.  Before building a separate CLI here, evaluate whether the DVE pipeline's transcript and claim extraction can serve as the input to this tooling rather than re-implementing video download and transcription.
 
 **Done looks like:**
 - A CLI or script accepts a video URL or local file and extracts: stated distances, heights, instrument descriptions, and location claims as structured text
@@ -86,6 +170,9 @@ Photographs show the Chicago skyline visible from the Michigan shoreline at appr
 - GeoJSON map layer generation (independently identifiable event overlays)
 - NDJSON file store with per-day files and deduplication on write
 - CLI runner (`observatory/run.ts`) with incremental and full-backfill modes
+
+### DVE Phase 1 — submit a URL, get a verification report
+See the DVE section above for the full record.  Short summary: video URL in, timestamped claim report out, shareable link.  Working end-to-end as of August 2026.
 
 ---
 
