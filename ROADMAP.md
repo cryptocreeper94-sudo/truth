@@ -1,6 +1,6 @@
 # Truth Project Roadmap
 
-This file tracks planned work across all three Truth evidence layers: the **Observatory** (continuous physical measurement), the **Physical Evidence** layer (documented experiments and reproducible observations), and the **Historical Record** (claims, sources, and digs governed by METHOD.md).  It also tracks the **Deterministic Verification Engine (DVE)**, a separate media-analysis pipeline that generates claim-level verification reports from public video URLs.
+This file tracks planned work across all three Truth evidence layers: the **Observatory** (continuous physical measurement), the **Physical Evidence** layer (documented experiments and reproducible observations), and the **Historical Record** (claims, sources, and digs governed by METHOD.md).  It also tracks the **Deterministic Verification Engine (DVE)**, Truth's media-analysis and research-workspace layer.
 
 Each item includes a rationale and the done-looks-like criteria used to assess completion.
 
@@ -10,7 +10,20 @@ The three evidence layers are part of one project in one monorepo.  Do not creat
 
 ## Deterministic Verification Engine (DVE)
 
-The DVE is a media-analysis pipeline that downloads any public video URL, transcribes it with timestamps, extracts every verifiable claim, and labels each claim with one of five statuses: `DOCUMENTED`, `CONTESTED`, `SPECULATIVE`, `REFUTED`, or `UNVERIFIABLE`.  The result is a shareable plain-English report.  DVE is distinct from the Physical Evidence case file system — it analyzes media and surfaces claims; Physical Evidence records the physical experimental record.  A future adapter may allow promoting a DVE report into a Physical Evidence case file draft, but that is not in scope yet.
+The DVE is a provenance and verification workspace inside Truth. It downloads supported public media, transcribes it with timestamps, extracts claims, and labels each claim with one of five statuses: `DOCUMENTED`, `CONTESTED`, `SPECULATIVE`, `REFUTED`, or `UNVERIFIABLE`. The result is a shareable plain-English report. DVE is distinct from the Physical Evidence case file system — it analyzes media and surfaces claims; Physical Evidence records the physical experimental record.
+
+The product direction is documented in `DVE_PRODUCT_SPEC.md`. The public Truth site remains open and research-oriented. DVE's paid layer should charge for saved workflow, privacy, throughput, source depth, exports, and collaboration — never for a more favorable verdict or a hidden standard of truth.
+
+### Product direction — approved
+
+- **Public/free:** limited analysis, public reports, stable sharing, and access to the method and published research corpus.
+- **Pro:** saved library, private reports, exports, priority processing, re-analysis, and watchlists.
+- **Research/team:** collaboration, API/batch access, source archiving, custom reference packs, and Physical Evidence promotion.
+- **Visibility:** public by default for corpus growth, with unlisted/private controls for paid users.
+- **Canonical reports:** matching source media and analysis versions should reuse a cached report rather than paying the processing cost twice.
+- **Rollout:** video first; YouTube/Rumble reliability next; uploaded media and documents only after their provenance and citation model is ready.
+
+This is a product direction, not a commitment to specific prices. Validate compute costs, user retention, and trust before finalizing plan limits.
 
 ### Phase 1 — Submit a URL, get a verification report ✅ COMPLETE
 
