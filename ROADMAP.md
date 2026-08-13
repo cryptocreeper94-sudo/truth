@@ -8,6 +8,38 @@ The three evidence layers are part of one project in one monorepo.  Do not creat
 
 ---
 
+## Repository and branch handoff
+
+**Read this before changing code.** The GitHub repository currently contains two branches with separate histories:
+
+- **`main`** — the existing production Truth/Coolify codebase. This is the branch used by the live site and contains the Truth Sentinel/Observatory daemon history.
+- **`master`** — the Replit development branch used for the DVE implementation in this workspace. It contains the DVE API/UI, DVE database schema, this expanded roadmap, and `DVE_PRODUCT_SPEC.md`.
+
+The DVE work has **not** been merged into `main`. Do not force-push, reset, or blindly merge these branches. First inspect both trees and determine which production architecture should own the DVE routes, frontend, and database records.
+
+### Decision options for the next agent
+
+Present these options to the owner before making a cross-branch change:
+
+1. **Recommended — port DVE into `main`:** preserve the production site's deployment architecture, then adapt the DVE backend, UI, schema, and self-hosted environment configuration to it. Keep the DVE product brief and this roadmap in `main` after the port.
+2. **Keep DVE on `master` temporarily:** use `master` as a reference/development branch while the production integration is designed. This is safe but does not make DVE available to Coolify.
+3. **Consolidate histories later:** only after reviewing conflicts and deployment assumptions. Do not use an automatic unrelated-history merge as a substitute for architectural integration.
+
+### Required handoff checklist
+
+Before implementing the next DVE phase:
+
+- Confirm which branch Coolify deploys and whether deployment is automatic or manual.
+- Compare the API, frontend, database, package manager, and process model on `main` with the DVE implementation on `master`.
+- Decide where DVE belongs within the production Truth product; it should remain a Truth section, not become a competing standalone product.
+- Port or reimplement the DVE pieces deliberately, preserving the claim labels, provenance rules, report visibility model, and distinction between DVE reports and Physical Evidence case files.
+- Recreate self-hosted environment requirements on Coolify: `yt-dlp`, `faster-whisper`, `ffmpeg`, durable storage, database access, and OpenAI credentials.
+- Run a real supported-video verification test after integration and record the result here.
+
+`DVE_PRODUCT_SPEC.md` is the product-direction companion to this technical roadmap. It explains the public/free, Pro, and Research/Team possibilities; do not finalize pricing or paywall methodology before validating compute costs and user demand.
+
+---
+
 ## Deterministic Verification Engine (DVE)
 
 The DVE is a provenance and verification workspace inside Truth. It downloads supported public media, transcribes it with timestamps, extracts claims, and labels each claim with one of five statuses: `DOCUMENTED`, `CONTESTED`, `SPECULATIVE`, `REFUTED`, or `UNVERIFIABLE`. The result is a shareable plain-English report. DVE is distinct from the Physical Evidence case file system — it analyzes media and surfaces claims; Physical Evidence records the physical experimental record.
