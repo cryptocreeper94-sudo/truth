@@ -1,0 +1,130 @@
+# Infrastructure Stabilization — Walkthrough
+
+## What We Started With
+- Server disaster recovery after `docker system prune` wiped all persistent data
+- CX33 server at 100% disk, Redis crashed, Coolify down
+- 5 of 14 congressional domains offline
+- No SSH access (password auth not working)
+- No health checks, no backups, no protection against repeat disaster
+
+---
+
+## What We Accomplished
+
+### 1. Server Upgrade ✅
+- **CX33 → CX43** in Hetzner (8 vCPUs, 16 GB RAM)
+- Doubles compute capacity for the 29-app ecosystem
+
+### 2. Coolify Recovery ✅
+- Fixed Redis RDB snapshot permissions (`chown -R 999:999 /data/coolify/redis`)
+- Restored Coolify dashboard from 500 error
+- Synced Sentinel on CPX42 (Axiom Agent) — both servers now green
+- Restored Coolify's SSH deploy keys after accidental overwrite
+
+### 3. SSH Key Access ✅
+- Installed ed25519 public key on CX43 via Coolify Terminal
+- Agent can now SSH directly: `ssh -i ~/.ssh/id_ed25519 root@95.217.135.158`
+- No more VNC console needed
+
+### 4. Disk Space Recovery ✅
+- **Before**: 51 MB free (100% full)
+- **After**: 24 GB free (67%)
+- Cleared 7.4 GB Docker build cache
+- Removed 19.6 GB unused Docker images
+- **Rule**: Never run `docker system prune`, `docker volume prune`, or `docker image prune` without the `--filter` flag
+
+### 5. All 14 Domains Live ✅
+
+| Domain | Status | Fix Applied |
+|--------|--------|-------------|
+| darkwavestudios.io | ✅ 200 | — |
+| invariant.tlid.io | ✅ 200 | — |
+| trustlayer.tlid.io | ✅ 200 | — |
+| axiom42news.com | ✅ 200 | Self-recovered after disk freed |
+| fla.tlid.io | ✅ 200 | — |
+| lume42.com | ✅ 200 | Label reset + redeploy |
+| lumescan.tech | ✅ 200 | — |
+| meridiancanon.com | ✅ 200 | Redeploy after SSH key fix |
+| axiomstudio.dev | ✅ 200 | — |
+| axiom42suite.com | ✅ 200 | NIXPACKS_SPA_OUTPUT_DIR fix |
+| trustgen.design | ✅ 200 | Redeploy after SSH key fix |
+| lumeauto.tech | ✅ 200 | — |
+| axiom42.com | ✅ 200 | CPX42 (unaffected) |
+| study.tlid.io | ✅ 200 | — |
+
+### 6. Health Checks — All 31 Apps ✅
+- Configured via Coolify API batch script
+- Each app has HTTP health check with correct port (80 for static, 3000/4000/5000 for Node apps)
+- Activates on next redeploy of each app
+
+### 7. Database Protection ✅
+
+**11 PostgreSQL databases** — all backed up to host filesystem:
+
+| Database | Size | Data |
+|----------|------|------|
+| HappyEats-db | 178 KB | 🔴 Live business — real customer data |
+| Trust-Layer-db | 77 MB | 🔴 Largest DB — real accumulated data |
+| Lume-db | 9 KB | Schema + small data |
+| Makers-Collective-db | 6.7 KB | Schema + small data |
+| 7 others | 3.5 KB each | Empty/fresh schemas |
+
+**Backup location**: `/data/db-backups/` on host filesystem (survives docker prune)
+
+**Daily automated backup**: Cron at 3 AM UTC, 7-day retention
+```
+0 3 * * * /opt/daily_backup.sh >> /var/log/db-backup.log 2>&1
+```
+
+---
+
+## Useful Commands Reference
+
+**Check all domains:**
+```powershell
+$domains = @("darkwavestudios.io","invariant.tlid.io","trustlayer.tlid.io","axiom42news.com","fla.tlid.io","lume42.com","lumescan.tech","meridiancanon.com","axiomstudio.dev","axiom42suite.com","trustgen.design","lumeauto.tech","axiom42.com","study.tlid.io"); foreach ($d in $domains) { try { $r = Invoke-WebRequest -Uri "https://$d" -TimeoutSec 8 -UseBasicParsing -ErrorAction Stop; Write-Host "✅ $d — $($r.StatusCode)" } catch { Write-Host "❌ $d — $($_.Exception.Message)" } }
+```
+
+**SSH into CX43:**
+```
+ssh -i C:\Users\unfor\.ssh\id_ed25519 root@95.217.135.158
+```
+
+**Check disk space:**
+```bash
+df -h /
+```
+
+**Clean Docker build cache (safe):**
+```bash
+docker builder prune -f
+```
+
+**Manual database backup:**
+```bash
+bash /opt/daily_backup.sh
+```
+
+**Check backup status:**
+```bash
+ls -lh /data/db-backups/ && cat /var/log/db-backup.log
+```
+
+---
+
+## Still Available When Ready
+
+| Task | Priority | Effort |
+|------|----------|--------|
+| Off-server backups (Backblaze B2 or AWS S3) | Medium | 10 min |
+| Hetzner Volume for extra disk | Low | 5 min |
+| Coolify update (v4.3.2 → latest) | Low | 5 min, after full stability |
+| Migrate Docker volumes to host mounts | Low | 30 min per DB |
+| SSH key on CPX42 (Axiom Agent) | Medium | 5 min |
+| FLA whitelabel decision / second CX43 | When ready | — |
+
+---
+
+> [!IMPORTANT]
+> **Coolify API Token** for future automation: `1|XHYzsiPbTwyPaeiXiDnFKuL73T9zFZQYo5Gf1OBm29dbadea`
+> Stored in Coolify → Keys & Tokens. Can be revoked/rotated anytime.
