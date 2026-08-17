@@ -76,7 +76,29 @@ run_collector "IONOSONDE"   "$SCRIPT_DIR/collectors/ionosonde-giro.mjs"       &
 sleep 2
 run_collector "SCHUMANN"    "$SCRIPT_DIR/collectors/schumann-aggregator.mjs"  &
 
-echo "[SUPERVISOR] All collectors launched (9 total — 2 Stage 1 + 7 Stage 2). Waiting..."
+echo "[SUPERVISOR] All Stage 1+2 collectors launched (9 total). Starting Stage 3..."
+
+# Stage 3 — Full spectrum expansion
+sleep 2
+run_collector "SURFACE"     "$SCRIPT_DIR/collectors/surface-asos.mjs"          &
+sleep 2
+run_collector "BLITZ"       "$SCRIPT_DIR/collectors/blitzortung.mjs"           &
+sleep 2
+run_collector "ADSB"        "$SCRIPT_DIR/collectors/adsb-exchange.mjs"         &
+sleep 2
+run_collector "NOTAM"       "$SCRIPT_DIR/collectors/notam-cloudseeding.mjs"    &
+sleep 2
+run_collector "CELLTOWER"   "$SCRIPT_DIR/collectors/celltower-registry.mjs"    &
+sleep 2
+run_collector "HEATER"      "$SCRIPT_DIR/collectors/ionospheric-heaters.mjs"   &
+sleep 2
+run_collector "METALS"      "$SCRIPT_DIR/collectors/trace-metals.mjs"          &
+sleep 2
+run_collector "ECOLOGY"     "$SCRIPT_DIR/collectors/pollinator-ecology.mjs"    &
+sleep 2
+run_collector "DEPOSITION"  "$SCRIPT_DIR/collectors/atmospheric-deposition.mjs" &
+
+echo "[SUPERVISOR] All collectors launched (18 total — 9 Stage 1+2 + 9 Stage 3)."
 
 # ── API Server (serves dashboard + REST API) ────────────────────────────────
 echo "[SUPERVISOR] Starting API server on port ${PORT:-3000}..."
