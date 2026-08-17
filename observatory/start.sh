@@ -104,4 +104,8 @@ echo "[SUPERVISOR] All collectors launched (18 total — 9 Stage 1+2 + 9 Stage 3
 echo "[SUPERVISOR] Starting API server on port ${PORT:-3000}..."
 node "$SCRIPT_DIR/server.mjs" &
 
+# ── Correlation Engine (pattern recognition + cross-feed analysis) ──────
+echo "[SUPERVISOR] Starting correlation engine..."
+node "$SCRIPT_DIR/correlation-engine.mjs" &
+
 wait

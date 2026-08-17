@@ -52,6 +52,16 @@ const FEEDS = [
   { id: 'geomag',     manifest: 'geomagnetic-manifest.jsonl',  name: 'Geomagnetic',         domain: 'Space Weather',  icon: '◈', interval: 900000 },
   { id: 'ionosonde',  manifest: 'ionosonde-manifest.jsonl',    name: 'Ionospheric TEC',     domain: 'Space Weather',  icon: '◇', interval: 900000 },
   { id: 'schumann',   manifest: 'schumann-manifest.jsonl',     name: 'Schumann Resonance',  domain: 'Geophysical',    icon: '∿', interval: 3600000 },
+  // Stage 3
+  { id: 'surface',    manifest: 'surface-manifest.jsonl',      name: 'Surface Stations',    domain: 'Atmospheric',    icon: '◫', interval: 900000 },
+  { id: 'blitzortung', manifest: 'blitzortung-manifest.jsonl', name: 'Blitzortung',         domain: 'Atmospheric',    icon: '↯', interval: 600000 },
+  { id: 'aircraft',   manifest: 'aircraft-manifest.jsonl',     name: 'ADS-B Aircraft',      domain: 'Infrastructure', icon: '✈', interval: 300000 },
+  { id: 'notam',      manifest: 'notam-manifest.jsonl',        name: 'NOTAMs / Cloud Seeding', domain: 'Airspace',    icon: '⚐', interval: 3600000 },
+  { id: 'celltower',  manifest: 'celltower-manifest.jsonl',    name: 'Cell Towers',         domain: 'Infrastructure', icon: '⌁', interval: 86400000 },
+  { id: 'heater',     manifest: 'heater-manifest.jsonl',       name: 'Iono. Heaters',       domain: 'RF Research',    icon: '⏛', interval: 21600000 },
+  { id: 'metals',     manifest: 'trace-metals-manifest.jsonl', name: 'Trace Metals',        domain: 'Ecological',     icon: '⬡', interval: 86400000 },
+  { id: 'ecology',    manifest: 'ecology-manifest.jsonl',      name: 'Pollinator Index',    domain: 'Ecological',     icon: '❀', interval: 86400000 },
+  { id: 'deposition', manifest: 'deposition-manifest.jsonl',   name: 'Atmo. Deposition',    domain: 'Ecological',     icon: '◌', interval: 86400000 },
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -158,18 +168,41 @@ const server = createServer((req, res) => {
     return res.end(JSON.stringify({ ...status, recentEntries: entries.slice(-20) }));
   }
 
-  if (path === '/api/events') {
-    // Phase 2: read detected events
-    const eventsDir = join(STATE_DIR, 'events');
-    const events = [];
-    if (existsSync(eventsDir)) {
-      const files = readdirSync(eventsDir).filter(f => f.endsWith('.json')).sort().reverse().slice(0, 50);
-      for (const f of files) {
-        try { events.push(JSON.parse(readFileSync(join(eventsDir, f), 'utf-8'))); } catch {}
-      }
+  if (path === '/api/events' || path === '/api/correlations') {
+    // Read from correlation engine output
+    const corrFile = join(STATE_DIR, 'correlations.json');
+    if (existsSync(corrFile)) {
+      try {
+        const data = JSON.parse(readFileSync(corrFile, 'utf-8'));
+        if (path === '/api/events') {
+          // Return patterns in the events format for the frontend
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({
+            timestamp: new Date().toISOString(),
+            events: (data.patterns || []).map(p => ({
+              title: p.title,
+              confidence: p.confidence,
+              summary: p.summary,
+              skepticNote: p.skepticNote,
+              feeds: p.domains,
+              occurrences: p.occurrences,
+              avgLagMinutes: p.avgLagMinutes,
+              verdict: p.verdict,
+              latestEvent: p.latestEvent,
+            })),
+          }));
+        }
+        // /api/correlations — full analysis output
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify(data));
+      } catch {}
     }
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    return res.end(JSON.stringify({ timestamp: new Date().toISOString(), events }));
+    return res.end(JSON.stringify({
+      timestamp: new Date().toISOString(),
+      events: [],
+      message: 'Correlation engine is modeling baselines. Patterns will appear as deviations are identified.',
+    }));
   }
 
   if (path === '/api/digests') {
