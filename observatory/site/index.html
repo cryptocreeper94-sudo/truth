@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Observatory — Truth Sensor Array</title>
+  <meta name="description" content="9-feed real-time environmental sensor array. NEXRAD Doppler, GOES satellite, solar wind, ionospheric TEC, geomagnetic indices, Schumann resonance, and power grid telemetry.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&family=Inter:wght@400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <!-- Noise Overlay -->
+  <div class="noise"></div>
+
+  <!-- Navigation -->
+  <nav class="apex-nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-brand">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>
+        OBSERVATORY
+      </a>
+      <div class="nav-links">
+        <a href="#feeds">Feeds</a>
+        <a href="#patterns">Patterns</a>
+        <a href="https://truth.tlid.io" target="_blank">Truth Archive</a>
+        <a href="https://invariant.tlid.io" target="_blank">Invariant</a>
+        <div class="status-pill" id="nav-status">
+          <div class="status-dot" id="nav-dot"></div>
+          <span id="nav-status-text">Connecting...</span>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero-sec section-dark">
+    <div class="hero-bg" style="background-image:url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1600&q=80');"></div>
+    <div class="hero-bg" style="background-image:url('https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=1600&q=80');"></div>
+    <div class="hero-bg" style="background-image:url('https://images.unsplash.com/photo-1534996858221-380b92700493?w=1600&q=80');"></div>
+    <div class="hero-overlay"></div>
+    <div class="container" style="text-align:center;">
+      <div class="reveal">
+        <p class="eyebrow">DarkWave Studios — Deterministic Truth Platform</p>
+      </div>
+      <h1 class="title-monolith reveal">TRUTH<br>OBSERVATORY</h1>
+      <div class="reveal" style="max-width:700px;margin:32px auto 0;">
+        <p class="text-stark" style="text-align:center;margin:0 auto;">
+          9 independent sensor feeds. Real-time atmospheric, geophysical, and infrastructure monitoring.
+          Every reading hashed. Every gap recorded. Nothing interpolated.
+        </p>
+      </div>
+      <div class="reveal" style="margin-top:32px;">
+        <div class="hero-stats" id="hero-stats">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Feed Status Grid -->
+  <section class="section section-cream" id="feeds">
+    <div class="container">
+      <div class="reveal">
+        <p class="eyebrow" style="color:var(--text-secondary);">Sensor Array</p>
+        <h2 class="section-title" style="color:#0a0a0a;">Live Feed Status</h2>
+        <p class="section-desc" style="color:rgba(0,0,0,0.5);">
+          Each feed runs independently. Status updates every 30 seconds. Sparklines show 24-hour collection density.
+        </p>
+      </div>
+      <div class="feed-grid reveal" id="feed-grid">
+        <!-- Populated by JS -->
+        <div class="feed-loading">Connecting to sensor array...</div>
+      </div>
+      <!-- Carousel Nav (for mobile horizontal scroll) -->
+      <div class="carousel-nav reveal">
+        <button class="carousel-btn" id="feeds-prev" aria-label="Previous">‹</button>
+        <div class="carousel-dots" id="feeds-dots"></div>
+        <button class="carousel-btn" id="feeds-next" aria-label="Next">›</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Patterns Section (Phase 2 - placeholder) -->
+  <section class="section section-dark" id="patterns">
+    <div class="container">
+      <div class="reveal">
+        <p class="eyebrow">Pattern Engine</p>
+        <h2 class="section-title">Detected Correlations</h2>
+        <p class="section-desc">
+          The pattern engine scans all 9 feeds for temporal and spatial coincidences.
+          When 2+ independent feeds show anomalous readings in overlapping windows, a pattern is flagged.
+        </p>
+      </div>
+      <div class="pattern-carousel reveal" id="pattern-carousel">
+        <!-- Populated by JS when events exist -->
+      </div>
+      <div class="carousel-nav reveal" id="pattern-nav" style="display:none;">
+        <button class="carousel-btn" id="patterns-prev" aria-label="Previous">‹</button>
+        <div class="carousel-dots" id="patterns-dots"></div>
+        <button class="carousel-btn" id="patterns-next" aria-label="Next">›</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Architecture Section -->
+  <section class="section section-cream">
+    <div class="container">
+      <div class="split-grid">
+        <div class="reveal">
+          <p class="eyebrow" style="color:var(--text-secondary);">Architecture</p>
+          <h2 class="section-title" style="color:#0a0a0a;">Deterministic<br>Sensor Network</h2>
+          <div style="font-size:1.05rem;line-height:1.8;color:rgba(0,0,0,0.6);max-width:500px;">
+            <p style="margin-bottom:16px;">
+              Every collector runs in isolation. Every file is SHA-256 hashed at intake.
+              Every data gap is recorded explicitly — never silently skipped.
+            </p>
+            <p>
+              The pattern engine uses deterministic rules, not AI judgment.
+              The skeptic engine generates mundane explanations and scores them
+              <em>higher</em> than anomalous interpretations by default.
+            </p>
+          </div>
+        </div>
+        <div class="reveal" style="display:flex;justify-content:center;">
+          <div class="glass-panel" style="padding:32px;max-width:420px;width:100%;">
+            <div class="panel-header">42-Doctrine Alignment</div>
+            <div class="doctrine-row"><span>[13] Constraint</span><span class="doctrine-val">Skeptic non-overridable</span></div>
+            <div class="doctrine-row"><span>[26] Verdict</span><span class="doctrine-val">Deterministic rules only</span></div>
+            <div class="doctrine-row"><span>[32] Integrity</span><span class="doctrine-val">SHA-256 every raw file</span></div>
+            <div class="doctrine-row"><span>[37] Null Guard</span><span class="doctrine-val">2+ feeds required</span></div>
+            <div class="doctrine-row" style="border:none;"><span>[40] Non-Being</span><span class="doctrine-val">Gaps recorded explicitly</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section section-dark">
+    <div class="container" style="text-align:center;">
+      <div class="reveal">
+        <h2 class="title-monolith" style="font-size:clamp(2rem,5vw,4rem);margin-bottom:16px;">
+          Every Reading.<br>Every Gap.<br>Recorded.
+        </h2>
+        <p class="text-stark" style="text-align:center;margin:0 auto 48px;">
+          No interpolation. No narrative. Raw sensor data with deterministic pattern detection.
+        </p>
+        <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+          <a href="https://truth.tlid.io" target="_blank" class="btn-brutal btn-solid">Truth Archive</a>
+          <a href="https://dve.tlid.io" target="_blank" class="btn-brutal">Verification Engine</a>
+          <a href="https://invariant.tlid.io" target="_blank" class="btn-brutal">Invariant Nexus</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="apex-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">OBSERVATORY — Truth Sensor Array</div>
+      <div class="footer-right">
+        <div class="footer-legal">© 2026 DarkWave Studios LLC. All Rights Reserved.</div>
+        <div class="footer-patent">Patent 64/032,339 & 64/047,737 Pending</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Back Button (global nav) -->
+  <a href="https://invariant.tlid.io" class="back-btn" title="Back to Invariant">← Back</a>
+
+  <script src="/app.js"></script>
+</body>
+</html>

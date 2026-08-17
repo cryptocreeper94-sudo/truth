@@ -77,4 +77,9 @@ sleep 2
 run_collector "SCHUMANN"    "$SCRIPT_DIR/collectors/schumann-aggregator.mjs"  &
 
 echo "[SUPERVISOR] All collectors launched (9 total — 2 Stage 1 + 7 Stage 2). Waiting..."
+
+# ── API Server (serves dashboard + REST API) ────────────────────────────────
+echo "[SUPERVISOR] Starting API server on port ${PORT:-3000}..."
+node "$SCRIPT_DIR/server.mjs" &
+
 wait

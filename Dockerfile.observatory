@@ -29,12 +29,17 @@ ENV GEOMAG_INTERVAL_MS=900000
 ENV IONO_INTERVAL_MS=900000
 ENV SCHUMANN_INTERVAL_MS=3600000
 
+# API server port
+ENV PORT=3000
+
 # EIA API key — MUST be set in Coolify env vars
 # ENV EIA_API_KEY=
 
-# No port needed — pure data collector, no HTTP server
-# Coolify health check: watch the manifest file grow
-HEALTHCHECK --interval=120s --timeout=10s --start-period=60s --retries=3 \
-  CMD test -d /app/state/observatory && echo "ok" || exit 1
+# Expose HTTP port for API + dashboard
+EXPOSE 3000
+
+# Health check via API server
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+  CMD node -e "fetch('http://localhost:3000/api/health').then(r=>{if(!r.ok)throw 1;process.exit(0)}).catch(()=>process.exit(1))"
 
 CMD ["bash", "observatory/start.sh"]
