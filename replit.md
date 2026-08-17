@@ -208,6 +208,12 @@ All L-SOC papers follow the DarkWave Studios LLC Canon³ Technical Paper Series 
 | `4-lume-safety-certification-paper.md` | Safety and Certification — Architecture Vol. V | IEC 61508 / ISO 26262 / IEC 61511 framework. Translates organism formal properties to regulatory language. SIL assessment, ASIL D for HydroCore Drive H₂ isolation, safety case structure. |
 | `4-lume-cortex-paper.md` | Lume-Cortex — Architecture Vol. VI | Deterministic meta-OS for the organism stack. Five modules: Lifecycle Manager, Coupling Registry, Query Router, State Display, Policy Enforcer. CCD version control. DLA as OS interface. |
 
+### L-SOC Papers — Atmospheric Series
+
+| File | Title | Notes |
+|------|-------|-------|
+| `atmoscore-paper.md` | AtmosCore: A Four-Primitive Deterministic Atmospheric Flow Organism — Atmospheric Vol. I | First atmospheric organism in the Lume stack. Four primitives: Thermodynamic Flow, Optical Propagation Flow, Dynamic Flow, Temporal Stability Flow. 42 nodes. Novel nodes: OP5 refraction coefficient for geometry, OP10 long-baseline propagation quality, TS3 temperature inversion persistence, FS10 observer-condition flow state. Three HCs: observer safety, optical propagation validity, data provenance. Direct Physical Evidence ENVIRONMENTAL export. Truth Observatory primary measurement contribution. Couples to Verdara Ultra (Weather Flow) and BioCore. |
+
 ### L-SOC Papers — Infrastructure Series
 
 | File | Title | Notes |
