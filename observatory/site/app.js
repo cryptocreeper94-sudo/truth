@@ -184,8 +184,8 @@
     if (!data || !data.events || data.events.length === 0) {
       carousel.innerHTML = `
         <div class="pattern-empty">
-          Pattern engine is collecting baseline data.<br>
-          Correlations will appear here when 2+ feeds show coincident anomalies.
+          Correlation engine is modeling feed baselines.<br>
+          Recognized patterns will appear here as cross-feed deviations are identified.
         </div>
       `;
       nav.style.display = 'none';

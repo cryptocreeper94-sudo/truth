@@ -81,15 +81,16 @@
     </div>
   </section>
 
-  <!-- Patterns Section (Phase 2 - placeholder) -->
+  <!-- Correlations Section (Phase 2) -->
   <section class="section section-dark" id="patterns">
     <div class="container">
       <div class="reveal">
-        <p class="eyebrow">Pattern Engine</p>
-        <h2 class="section-title">Detected Correlations</h2>
+        <p class="eyebrow">Correlation Engine</p>
+        <h2 class="section-title">Recognized Patterns</h2>
         <p class="section-desc">
-          The pattern engine scans all 9 feeds for temporal and spatial coincidences.
-          When 2+ independent feeds show anomalous readings in overlapping windows, a pattern is flagged.
+          The correlation engine models baseline behavior for each feed, then identifies deviations
+          and cross-correlates them across all 9 streams — including lagged relationships.
+          Correlation is never presented as causation.
         </p>
       </div>
       <div class="pattern-carousel reveal" id="pattern-carousel">
@@ -112,23 +113,25 @@
           <h2 class="section-title" style="color:#0a0a0a;">Deterministic<br>Sensor Network</h2>
           <div style="font-size:1.05rem;line-height:1.8;color:rgba(0,0,0,0.6);max-width:500px;">
             <p style="margin-bottom:16px;">
-              Every collector runs in isolation. Every file is SHA-256 hashed at intake.
-              Every data gap is recorded explicitly — never silently skipped.
-            </p>
-            <p>
-              The pattern engine uses deterministic rules, not AI judgment.
-              The skeptic engine generates mundane explanations and scores them
-              <em>higher</em> than anomalous interpretations by default.
-            </p>
+            Every collector runs in isolation. Every file is SHA-256 hashed at intake.
+            Every data gap is recorded explicitly — never silently skipped.
+          </p>
+          <p>
+            The correlation engine uses deterministic statistical methods — cross-correlation,
+            lag analysis, and baseline deviation scoring. The skeptic engine generates
+            mundane explanations and scores them <em>higher</em> than anomalous interpretations by default.
+            Correlation is never presented as causation.
+          </p>
           </div>
         </div>
         <div class="reveal" style="display:flex;justify-content:center;">
           <div class="glass-panel" style="padding:32px;max-width:420px;width:100%;">
             <div class="panel-header">42-Doctrine Alignment</div>
             <div class="doctrine-row"><span>[13] Constraint</span><span class="doctrine-val">Skeptic non-overridable</span></div>
-            <div class="doctrine-row"><span>[26] Verdict</span><span class="doctrine-val">Deterministic rules only</span></div>
+            <div class="doctrine-row"><span>[14] Determinacy</span><span class="doctrine-val">Statistical, not AI judgment</span></div>
+            <div class="doctrine-row"><span>[26] Verdict</span><span class="doctrine-val">Correlation ≠ causation</span></div>
             <div class="doctrine-row"><span>[32] Integrity</span><span class="doctrine-val">SHA-256 every raw file</span></div>
-            <div class="doctrine-row"><span>[37] Null Guard</span><span class="doctrine-val">2+ feeds required</span></div>
+            <div class="doctrine-row"><span>[37] Null Guard</span><span class="doctrine-val">2+ independent feeds</span></div>
             <div class="doctrine-row" style="border:none;"><span>[40] Non-Being</span><span class="doctrine-val">Gaps recorded explicitly</span></div>
           </div>
         </div>
@@ -144,7 +147,7 @@
           Every Reading.<br>Every Gap.<br>Recorded.
         </h2>
         <p class="text-stark" style="text-align:center;margin:0 auto 48px;">
-          No interpolation. No narrative. Raw sensor data with deterministic pattern detection.
+          No interpolation. No narrative. Raw sensor data with deterministic pattern recognition and cross-feed correlation analysis.
         </p>
         <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
           <a href="https://truth.tlid.io" target="_blank" class="btn-brutal btn-solid">Truth Archive</a>
