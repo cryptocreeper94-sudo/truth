@@ -101,4 +101,14 @@ docker run -e OPENAI_API_KEY=xxx truth-sentinel
 
 ---
 
-*Part of the Invariant Ecosystem — DarkWave Studios LLC*
+## Ecosystem
+
+| Node | URL |
+|------|-----|
+| Truth Archive | [truth.tlid.io](https://truth.tlid.io) |
+| Observatory | [observatory.tlid.io](https://observatory.tlid.io) |
+| DVE | [dve.tlid.io](https://dve.tlid.io) |
+| Invariant Nexus | [invariant.tlid.io](https://invariant.tlid.io) |
+| DarkWave Studios | [darkwavestudios.io](https://darkwavestudios.io) |
+
+Patent 64/032,339 & 64/047,737 Pending · © 2026 DarkWave Studios LLC
