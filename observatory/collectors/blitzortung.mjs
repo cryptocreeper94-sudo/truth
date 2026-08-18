@@ -80,8 +80,8 @@ async function fetchWithRetry(url, retries = CONFIG.maxRetries) {
   }
 }
 
-function pruneOldFiles(rootDir, retentionDays) {
-  const cutoff = Date.now() - retentionDays * 86400000;
+function pruneOldFiles(rootDir, retentionHours) {
+  const cutoff = Date.now() - retentionHours * 3600000;
   let pruned = 0;
   function walk(dir) {
     let entries;
@@ -93,9 +93,9 @@ function pruneOldFiles(rootDir, retentionDays) {
     }
   }
   walk(rootDir);
-  if (pruned > 0) appendManifest({ type: 'RETENTION-PRUNE', prunedFiles: pruned, retentionDays, at: new Date().toISOString() });
+  if (pruned > 0) appendManifest({ type: 'RETENTION-PRUNE', prunedFiles: pruned, retentionHours, at: new Date().toISOString() });
 }
-const RETENTION_DAYS = parseInt(process.env.RETENTION_DAYS || '7', 10);
+const RETENTION_HOURS = parseInt(process.env.RETENTION_HOURS || '4', 10);
 
 let consecutiveFailures = 0;
 
@@ -129,7 +129,7 @@ async function runCycle() {
     strokes: strokeCount, bytes: result.body.length,
   });
   console.log(`  [OK] ${strokeCount} strokes, SHA-256: ${result.sha256.slice(0, 16)}...`);
-  pruneOldFiles(RAW_DIR, RETENTION_DAYS);
+  pruneOldFiles(RAW_DIR, RETENTION_HOURS);
 }
 
 console.log(`[BLITZ] ${IDENTITY.name} v${IDENTITY.version}`);

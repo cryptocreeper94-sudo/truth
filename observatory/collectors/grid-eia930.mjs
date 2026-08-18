@@ -165,8 +165,8 @@ async function fetchWithRetry(url, retries = CONFIG.maxRetries) {
 // ═══════════════════════════════════════════════════════════════════════════════
 // [22] CONTINUITY LAYER (retention)
 // ═══════════════════════════════════════════════════════════════════════════════
-function pruneOldFiles(rootDir, retentionDays) {
-  const cutoff = Date.now() - retentionDays * 86400000;
+function pruneOldFiles(rootDir, retentionHours) {
+  const cutoff = Date.now() - retentionHours * 3600000;
   let pruned = 0;
   function walk(dir) {
     let entries;
@@ -183,11 +183,11 @@ function pruneOldFiles(rootDir, retentionDays) {
   }
   walk(rootDir);
   if (pruned > 0) {
-    appendManifest({ type: 'RETENTION-PRUNE', prunedFiles: pruned, retentionDays, at: new Date().toISOString() });
-    console.log(`  [PRUNE] removed ${pruned} raw files older than ${retentionDays} days`);
+    appendManifest({ type: 'RETENTION-PRUNE', prunedFiles: pruned, retentionHours, at: new Date().toISOString() });
+    console.log(`  [PRUNE] removed ${pruned} raw files older than ${retentionHours} hours`);
   }
 }
-const RETENTION_DAYS = parseInt(process.env.RETENTION_DAYS || '7', 10);
+const RETENTION_HOURS = parseInt(process.env.RETENTION_HOURS || '4', 10);
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // [35] COLLAPSE DETECTION
@@ -283,7 +283,7 @@ async function runCycle() {
     consecutiveFailures = 0;
   }
 
-  pruneOldFiles(RAW_DIR, RETENTION_DAYS);
+  pruneOldFiles(RAW_DIR, RETENTION_HOURS);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════

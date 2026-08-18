@@ -67,15 +67,15 @@ async function safeFetch(url, headers = {}) {
   } catch (err) { return { ok: false, error: err.message }; }
 }
 
-function pruneOldFiles(rootDir, retentionDays) {
-  const cutoff = Date.now() - retentionDays * 86400000; let pruned = 0;
+function pruneOldFiles(rootDir, retentionHours) {
+  const cutoff = Date.now() - retentionHours * 3600000; let pruned = 0;
   function walk(dir) { let entries; try { entries = readdirSync(dir, { withFileTypes: true }); } catch { return; }
     for (const e of entries) { const p = join(dir, e.name); if (e.isDirectory()) walk(p);
       else { try { if (statSync(p).mtimeMs < cutoff) { unlinkSync(p); pruned++; } } catch {} } } }
   walk(rootDir);
-  if (pruned > 0) appendManifest({ type: 'RETENTION-PRUNE', prunedFiles: pruned, retentionDays, at: new Date().toISOString() });
+  if (pruned > 0) appendManifest({ type: 'RETENTION-PRUNE', prunedFiles: pruned, retentionHours, at: new Date().toISOString() });
 }
-const RETENTION_DAYS = parseInt(process.env.RETENTION_DAYS || '30', 10);
+const RETENTION_HOURS = parseInt(process.env.RETENTION_HOURS || '4', 10);
 
 let consecutiveFailures = 0;
 
@@ -118,7 +118,7 @@ async function runCycle() {
 
   if (anySuccess) consecutiveFailures = 0;
   else { consecutiveFailures++; if (consecutiveFailures >= IDENTITY.maxConsecutiveFailures) { console.error('  [COLLAPSE] Halting'); process.exit(1); } }
-  pruneOldFiles(RAW_DIR, RETENTION_DAYS);
+  pruneOldFiles(RAW_DIR, RETENTION_HOURS);
 }
 
 console.log(`[CELLTOWER] ${IDENTITY.name} v${IDENTITY.version}`);
