@@ -145,9 +145,17 @@ function s3ListUrl(bucket, product, satellite, year, doy, hour) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// [32] INTEGRITY LAYER — Download + hash
+// [32] INTEGRITY LAYER — Stream-hash only (no raw file storage)
+//
+// ARCHITECTURE DECISION (2026-08-18): Raw GOES NetCDF files are 10–200 MB each.
+// Downloading them consumed 14 GB in 9 hours and repeatedly crashed the VPS.
+// The deterministic trust model only requires the SHA-256 hash to prove that a
+// specific file existed at a specific time on NOAA's CDN.  The raw file can
+// always be re-fetched from the public S3 bucket using the s3Key recorded in
+// the manifest.  The Observatory UI links directly to NOAA's image viewer for
+// visual rendering.
 // ═══════════════════════════════════════════════════════════════════════════════
-async function downloadFile(url, destPath, retries = CONFIG.maxRetries) {
+async function hashFile(url, retries = CONFIG.maxRetries) {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       const controller = new AbortController();
@@ -160,19 +168,16 @@ async function downloadFile(url, destPath, retries = CONFIG.maxRetries) {
         throw new Error(`HTTP ${res.status}`);
       }
 
-      const chunks = [];
+      // Stream the response — hash every chunk but discard it immediately.
+      // This uses ~64KB of memory regardless of file size.
       const hash = createHash('sha256');
+      let bytes = 0;
       for await (const chunk of res.body) {
         hash.update(chunk);
-        chunks.push(chunk);
+        bytes += chunk.length;
       }
-      const sha256 = hash.digest('hex');
-      const buf = Buffer.concat(chunks);
 
-      mkdirSync(dirname(destPath), { recursive: true });
-      writeFileSync(destPath, buf);
-
-      return { status: res.status, sha256, bytes: buf.length };
+      return { status: res.status, sha256: hash.digest('hex'), bytes };
     } catch (err) {
       if (attempt === retries) return { status: 'FETCH_ERROR', error: err.message, sha256: null, bytes: 0 };
       await new Promise(r => setTimeout(r, CONFIG.retryDelayMs * attempt));
@@ -244,12 +249,9 @@ async function collectProduct(sat, productDef, seen, now = new Date()) {
 
   for (const key of toFetch) {
     const filename = key.split('/').pop();
-    const destPath = join(RAW_DIR, sat.id, productDef.product, year, doy, hour, filename);
-
-    if (existsSync(destPath)) { seen.add(filename); continue; }
 
     const fileUrl = `https://${sat.bucket}.s3.amazonaws.com/${key}`;
-    const result = await downloadFile(fileUrl, destPath);
+    const result = await hashFile(fileUrl);
 
     if (result.status === 200 && result.sha256) {
       seen.add(filename);
@@ -265,7 +267,7 @@ async function collectProduct(sat, productDef, seen, now = new Date()) {
         filename,
         s3Key: key,
         sourceUrl: fileUrl,
-        localPath: `observatory/raw/goes/${sat.id}/${productDef.product}/${year}/${doy}/${hour}/${filename}`,
+        noaaViewerUrl: `https://www.star.nesdis.noaa.gov/goes/sector.php?sat=${sat.id}&sector=conus`,
         retrievedAt: new Date().toISOString(),
         sha256: result.sha256,
         bytes: result.bytes,
