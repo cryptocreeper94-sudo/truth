@@ -20,17 +20,17 @@ const Observatory = {
     lightning: 'assets/lightning.jpg',
     grid: 'assets/grid.jpg',
     geomag: 'assets/geomag.jpg',
-    ionosonde: 'assets/geomag.jpg',
-    schumann: 'assets/geomag.jpg',
-    surface: 'assets/nexrad.jpg',
-    blitzortung: 'assets/lightning.jpg',
-    aircraft: 'assets/goes.jpg',
-    notam: 'assets/nexrad.jpg',
-    celltower: 'assets/grid.jpg',
-    heater: 'assets/goes.jpg',
-    metals: 'assets/seismic.jpg',
-    ecology: 'assets/geomag.jpg',
-    deposition: 'assets/nexrad.jpg',
+    ionosonde: 'assets/ionosonde.jpg',
+    schumann: 'assets/schumann.jpg',
+    surface: 'assets/surface.jpg',
+    blitzortung: 'assets/blitzortung.jpg',
+    aircraft: 'assets/aircraft.jpg',
+    notam: 'assets/notam.jpg',
+    celltower: 'assets/celltower.jpg',
+    heater: 'assets/heater.jpg',
+    metals: 'assets/metals.jpg',
+    ecology: 'assets/ecology.jpg',
+    deposition: 'assets/deposition.jpg',
   },
 
   // ── State ────────────────────────────────────────────────────
@@ -176,10 +176,12 @@ const Observatory = {
           <img class="bento-tile__image" src="${imgSrc}" alt="${feed.name}" loading="lazy">
           <div class="bento-tile__image-overlay"></div>
           <span class="bento-tile__badge bento-tile__badge--${feed.status}">${feed.status.toUpperCase()}</span>
+          <div class="bento-tile__label">
+            <div class="bento-tile__name">${feed.name}</div>
+            <div class="bento-tile__domain">${feed.domain}</div>
+          </div>
         </div>
         <div class="bento-tile__content">
-          <div class="bento-tile__name">${feed.name}</div>
-          <div class="bento-tile__domain">${feed.domain}</div>
           ${conditionText ? `<div class="bento-tile__condition" style="color: ${conditionText.color}">${conditionText.text}</div>` : ''}
           <canvas class="bento-tile__sparkline" id="${sparkId}" width="200" height="28"></canvas>
           <div class="bento-tile__footer">
@@ -556,11 +558,26 @@ const Observatory = {
     document.getElementById('corr-prev').addEventListener('click', () => track.scrollBy({ left: -320, behavior: 'smooth' }));
     document.getElementById('corr-next').addEventListener('click', () => track.scrollBy({ left: 320, behavior: 'smooth' }));
 
-    // Bottom nav
+    // Refresh button
+    const refreshBtn = document.getElementById('refresh-map');
+    if (refreshBtn) {
+      refreshBtn.addEventListener('click', () => {
+        refreshBtn.classList.add('refresh-btn--spin');
+        this.updateMapOverlays();
+        this.fetchAll().then(() => {
+          setTimeout(() => refreshBtn.classList.remove('refresh-btn--spin'), 800);
+        });
+      });
+    }
+
+    // Bottom nav — view switching
     document.querySelectorAll('.bottomnav__btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.bottomnav__btn').forEach(b => b.classList.remove('bottomnav__btn--active'));
         btn.classList.add('bottomnav__btn--active');
+        const view = btn.dataset.view;
+        const cockpit = document.getElementById('cockpit');
+        cockpit.dataset.view = view;
       });
     });
 

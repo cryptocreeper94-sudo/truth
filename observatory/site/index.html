@@ -47,13 +47,43 @@
       <div class="panel-header">
         <span class="panel-header__icon">&#9678;</span>
         <span class="panel-header__title">GEOSPATIAL OVERLAY</span>
+        <button class="refresh-btn" id="refresh-map" title="Refresh overlays">&#8635;</button>
         <span class="panel-header__badge" id="map-layers">1 layers active</span>
       </div>
       <div class="layer-toggles" id="layer-toggles">
         <label class="layer-toggle"><input type="checkbox" data-layer="radar" checked> RADAR</label>
         <label class="layer-toggle"><input type="checkbox" data-layer="satellite"> SATELLITE</label>
       </div>
-      <div id="map" class="map-container"></div>
+      <div id="map" class="map-container">
+        <!-- Map Legend -->
+        <div class="map-legend" id="map-legend">
+          <div class="map-legend__title">LEGEND</div>
+          <div class="map-legend__section">
+            <div class="map-legend__heading">RADAR REFLECTIVITY</div>
+            <div class="map-legend__bar">
+              <span style="background:#00ff00"></span>
+              <span style="background:#00cc00"></span>
+              <span style="background:#ffff00"></span>
+              <span style="background:#ff9900"></span>
+              <span style="background:#ff0000"></span>
+              <span style="background:#cc0000"></span>
+              <span style="background:#ff00ff"></span>
+            </div>
+            <div class="map-legend__labels">
+              <span>Light</span><span>Mod</span><span>Heavy</span><span>Extreme</span>
+            </div>
+          </div>
+          <div class="map-legend__section">
+            <div class="map-legend__heading">EARTHQUAKES (24H)</div>
+            <div class="map-legend__items">
+              <div class="map-legend__item"><span class="map-legend__dot" style="background:#06b6d4;width:8px;height:8px"></span> M2.5&ndash;2.9</div>
+              <div class="map-legend__item"><span class="map-legend__dot" style="background:#ffd60a;width:10px;height:10px"></span> M3.0&ndash;3.9</div>
+              <div class="map-legend__item"><span class="map-legend__dot" style="background:#ff9500;width:12px;height:12px"></span> M4.0&ndash;4.9</div>
+              <div class="map-legend__item"><span class="map-legend__dot" style="background:#ff3b30;width:14px;height:14px"></span> M5.0+</div>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- RIGHT: BENTO GRID -->
