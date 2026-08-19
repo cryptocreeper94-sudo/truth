@@ -15,14 +15,14 @@
   <!-- ═══ TOP STATUS BAR ═══ -->
   <header class="topbar" id="topbar">
     <div class="topbar__left">
-      <span class="topbar__logo">◉</span>
+      <span class="topbar__logo">&#9673;</span>
       <span class="topbar__title">TRUTH OBSERVATORY</span>
       <span class="topbar__version">v2.0</span>
     </div>
     <div class="topbar__center">
       <div class="topbar__stat">
         <span class="topbar__stat-label">FEEDS</span>
-        <span class="topbar__stat-value" id="stat-live">—/18</span>
+        <span class="topbar__stat-value" id="stat-live">&mdash;/18</span>
       </div>
       <div class="topbar__stat">
         <span class="topbar__stat-label">CORRELATION</span>
@@ -45,9 +45,13 @@
     <!-- LEFT: MAP PANEL -->
     <section class="cockpit__map" id="map-panel">
       <div class="panel-header">
-        <span class="panel-header__icon">◎</span>
+        <span class="panel-header__icon">&#9678;</span>
         <span class="panel-header__title">GEOSPATIAL OVERLAY</span>
-        <span class="panel-header__badge" id="map-layers">0 layers</span>
+        <span class="panel-header__badge" id="map-layers">1 layers active</span>
+      </div>
+      <div class="layer-toggles" id="layer-toggles">
+        <label class="layer-toggle"><input type="checkbox" data-layer="radar" checked> RADAR</label>
+        <label class="layer-toggle"><input type="checkbox" data-layer="satellite"> SATELLITE</label>
       </div>
       <div id="map" class="map-container"></div>
     </section>
@@ -55,7 +59,7 @@
     <!-- RIGHT: BENTO GRID -->
     <section class="cockpit__feeds" id="feeds-panel">
       <div class="panel-header">
-        <span class="panel-header__icon">▣</span>
+        <span class="panel-header__icon">&#9635;</span>
         <span class="panel-header__title">DATA STREAMS</span>
         <div class="panel-header__filters" id="domain-filters">
           <button class="filter-btn filter-btn--active" data-domain="all">ALL</button>
@@ -66,15 +70,13 @@
           <button class="filter-btn" data-domain="Ecological">ECO</button>
         </div>
       </div>
-      <div class="bento-grid" id="bento-grid">
-        <!-- Tiles injected by JS -->
-      </div>
+      <div class="bento-grid" id="bento-grid"></div>
     </section>
 
     <!-- BOTTOM: CORRELATION BAR -->
     <section class="cockpit__corr" id="corr-panel">
       <div class="panel-header">
-        <span class="panel-header__icon">⟁</span>
+        <span class="panel-header__icon">&#10689;</span>
         <span class="panel-header__title">CORRELATION ENGINE</span>
         <span class="panel-header__badge" id="corr-count">0 patterns</span>
       </div>
@@ -85,9 +87,9 @@
           </div>
         </div>
         <div class="corr-carousel__nav">
-          <button class="corr-nav-btn" id="corr-prev">‹</button>
+          <button class="corr-nav-btn" id="corr-prev">&#8249;</button>
           <div class="corr-carousel__dots" id="corr-dots"></div>
-          <button class="corr-nav-btn" id="corr-next">›</button>
+          <button class="corr-nav-btn" id="corr-next">&#8250;</button>
         </div>
       </div>
     </section>
@@ -102,7 +104,7 @@
           <h2 class="modal__title" id="modal-title"></h2>
           <span class="modal__badge" id="modal-badge"></span>
         </div>
-        <button class="modal__close" id="modal-close">✕</button>
+        <button class="modal__close" id="modal-close">&#10005;</button>
       </div>
       <div class="modal__body">
         <div class="modal__meta" id="modal-meta"></div>
@@ -116,7 +118,7 @@
         </div>
       </div>
       <div class="modal__footer">
-        <button class="modal__back-btn" id="modal-back">← BACK TO COCKPIT</button>
+        <button class="modal__back-btn" id="modal-back">&larr; BACK TO COCKPIT</button>
       </div>
     </div>
   </div>
@@ -124,19 +126,19 @@
   <!-- ═══ BOTTOM NAV ═══ -->
   <nav class="bottomnav" id="bottomnav">
     <button class="bottomnav__btn bottomnav__btn--active" data-view="cockpit">
-      <span class="bottomnav__icon">◉</span>
+      <span class="bottomnav__icon">&#9673;</span>
       <span class="bottomnav__label">Cockpit</span>
     </button>
     <button class="bottomnav__btn" data-view="feeds">
-      <span class="bottomnav__icon">▣</span>
+      <span class="bottomnav__icon">&#9635;</span>
       <span class="bottomnav__label">Feeds</span>
     </button>
     <button class="bottomnav__btn" data-view="correlations">
-      <span class="bottomnav__icon">⟁</span>
+      <span class="bottomnav__icon">&#10689;</span>
       <span class="bottomnav__label">Correlations</span>
     </button>
     <button class="bottomnav__btn" data-view="map">
-      <span class="bottomnav__icon">◎</span>
+      <span class="bottomnav__icon">&#9678;</span>
       <span class="bottomnav__label">Map</span>
     </button>
   </nav>

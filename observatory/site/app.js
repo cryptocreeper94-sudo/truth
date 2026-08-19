@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════
- *  TRUTH OBSERVATORY — Cockpit Controller
+ *  TRUTH OBSERVATORY — Cockpit Controller v2
  *  DarkWave Studios LLC — Copyright 2026
  *
  *  [01] Identity    → OBSERVATORY_COCKPIT
@@ -11,10 +11,33 @@
 
 const Observatory = {
 
+  // ── Feed Image Mapping ───────────────────────────────────────
+  feedImages: {
+    nexrad: 'assets/nexrad.jpg',
+    goes: 'assets/goes.jpg',
+    solar: 'assets/solar.jpg',
+    earthquake: 'assets/seismic.jpg',
+    lightning: 'assets/lightning.jpg',
+    grid: 'assets/grid.jpg',
+    geomag: 'assets/geomag.jpg',
+    ionosonde: 'assets/geomag.jpg',
+    schumann: 'assets/geomag.jpg',
+    surface: 'assets/nexrad.jpg',
+    blitzortung: 'assets/lightning.jpg',
+    aircraft: 'assets/goes.jpg',
+    notam: 'assets/nexrad.jpg',
+    celltower: 'assets/grid.jpg',
+    heater: 'assets/goes.jpg',
+    metals: 'assets/seismic.jpg',
+    ecology: 'assets/geomag.jpg',
+    deposition: 'assets/nexrad.jpg',
+  },
+
   // ── State ────────────────────────────────────────────────────
   feeds: [],
   correlations: [],
   map: null,
+  mapLayers: {},
   markers: { earthquakes: [], lightning: [] },
   refreshInterval: 60000,
   currentFilter: 'all',
@@ -39,7 +62,7 @@ const Observatory = {
     setInterval(tick, 1000);
   },
 
-  // ── Map Init ─────────────────────────────────────────────────
+  // ── Map Init with Layer Controls ─────────────────────────────
   initMap() {
     this.map = L.map('map', {
       center: [39.5, -98.35],
@@ -48,11 +71,46 @@ const Observatory = {
       attributionControl: false,
     });
 
-    // CartoDB dark tiles — free, Apex-aesthetic
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    // Base layer — CartoDB dark
+    const baseDark = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
       maxZoom: 19,
       subdomains: 'abcd',
     }).addTo(this.map);
+
+    // NOAA Radar overlay
+    this.mapLayers.radar = L.tileLayer.wms('https://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0q.cgi', {
+      layers: 'nexrad-n0q-900913',
+      format: 'image/png',
+      transparent: true,
+      opacity: 0.6,
+      attribution: 'NOAA/NWS',
+    });
+
+    // GOES Satellite IR overlay
+    this.mapLayers.satellite = L.tileLayer('https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/goes-vis-1km-900913/{z}/{x}/{y}.png', {
+      opacity: 0.4,
+      maxZoom: 8,
+    });
+
+    // Temperature overlay
+    this.mapLayers.temp = L.tileLayer('https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=demo', {
+      opacity: 0.4,
+      maxZoom: 19,
+    });
+
+    // Default: show radar
+    this.mapLayers.radar.addTo(this.map);
+
+    // Update layer count
+    this.updateLayerCount();
+  },
+
+  updateLayerCount() {
+    let count = 0;
+    Object.values(this.mapLayers).forEach(layer => {
+      if (this.map.hasLayer(layer)) count++;
+    });
+    document.getElementById('map-layers').textContent = `${count + 1} layers active`;
   },
 
   // ── Fetch All Data ───────────────────────────────────────────
@@ -75,7 +133,6 @@ const Observatory = {
         this.renderCorrelations(corrRes);
       }
 
-      // Pulse the global indicator
       const pulse = document.getElementById('global-pulse');
       pulse.style.background = 'var(--signal-live)';
     } catch (err) {
@@ -111,29 +168,76 @@ const Observatory = {
 
       const ago = this.timeAgo(feed.last);
       const sparkId = `spark-${feed.id}`;
+      const imgSrc = this.feedImages[feed.id] || 'assets/nexrad.jpg';
+      const conditionText = this.getConditionText(feed);
 
       tile.innerHTML = `
-        <div class="bento-tile__header">
-          <span class="bento-tile__icon">${feed.icon || '◉'}</span>
+        <div class="bento-tile__image-wrap">
+          <img class="bento-tile__image" src="${imgSrc}" alt="${feed.name}" loading="lazy">
+          <div class="bento-tile__image-overlay"></div>
           <span class="bento-tile__badge bento-tile__badge--${feed.status}">${feed.status.toUpperCase()}</span>
         </div>
-        <div class="bento-tile__name">${feed.name}</div>
-        <div class="bento-tile__domain">${feed.domain}</div>
-        <canvas class="bento-tile__sparkline" id="${sparkId}" width="200" height="24"></canvas>
-        <div class="bento-tile__footer">
-          <span class="bento-tile__entries">${feed.entries} obs</span>
-          <span class="bento-tile__ago">${ago}</span>
+        <div class="bento-tile__content">
+          <div class="bento-tile__name">${feed.name}</div>
+          <div class="bento-tile__domain">${feed.domain}</div>
+          ${conditionText ? `<div class="bento-tile__condition" style="color: ${conditionText.color}">${conditionText.text}</div>` : ''}
+          <canvas class="bento-tile__sparkline" id="${sparkId}" width="200" height="28"></canvas>
+          <div class="bento-tile__footer">
+            <span class="bento-tile__entries">${feed.entries} obs</span>
+            <span class="bento-tile__ago">${ago}</span>
+          </div>
         </div>
       `;
 
+      // 3D tilt effect
+      tile.addEventListener('mousemove', (e) => this.handleTilt(e, tile));
+      tile.addEventListener('mouseleave', () => {
+        tile.style.transform = 'perspective(600px) rotateX(0) rotateY(0)';
+      });
       tile.addEventListener('click', () => this.openDetail(feed));
       grid.appendChild(tile);
 
-      // Draw sparkline
       requestAnimationFrame(() => this.drawSparkline(sparkId, feed.sparkline, feed.status));
     }
+  },
 
-    document.getElementById('map-layers').textContent = `${this.feeds.filter(f => f.status === 'live').length} live`;
+  // ── 3D Tilt Effect ───────────────────────────────────────────
+  handleTilt(e, tile) {
+    const rect = tile.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    tile.style.transform = `perspective(600px) rotateY(${x * 8}deg) rotateX(${-y * 8}deg)`;
+  },
+
+  // ── Condition Text (data-driven) ─────────────────────────────
+  getConditionText(feed) {
+    if (feed.status === 'offline') return { text: 'NO DATA', color: 'var(--signal-offline)' };
+
+    const rate = feed.sparkline ? feed.sparkline[feed.sparkline.length - 1] || 0 : 0;
+    const avg = feed.sparkline ? feed.sparkline.reduce((a, b) => a + b, 0) / feed.sparkline.length : 0;
+
+    if (feed.id === 'earthquake') {
+      if (feed.entries > 20) return { text: `${feed.entries} EVENTS — ELEVATED`, color: 'var(--signal-stale)' };
+      return { text: `${feed.entries} events — normal`, color: 'var(--signal-live)' };
+    }
+    if (feed.id === 'solar') {
+      if (rate > avg * 2) return { text: 'ELEVATED ACTIVITY', color: 'var(--signal-stale)' };
+      return { text: 'NOMINAL', color: 'var(--signal-live)' };
+    }
+    if (feed.id === 'geomag') {
+      if (rate > avg * 2) return { text: 'STORM CONDITIONS', color: 'var(--signal-offline)' };
+      return { text: 'QUIET', color: 'var(--signal-live)' };
+    }
+    if (feed.id === 'grid') {
+      return { text: 'GRID MONITORING', color: 'var(--signal-cyan)' };
+    }
+    if (rate > avg * 1.5 && avg > 0) {
+      return { text: 'HIGH ACTIVITY', color: 'var(--signal-stale)' };
+    }
+    if (rate === 0 && feed.status === 'live') {
+      return { text: 'COLLECTING', color: 'var(--text-dim)' };
+    }
+    return null;
   },
 
   // ── Draw Sparkline ───────────────────────────────────────────
@@ -142,6 +246,7 @@ const Observatory = {
     if (!canvas || !data?.length) return;
 
     const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
     const w = canvas.width;
     const h = canvas.height;
     const max = Math.max(...data, 1);
@@ -149,30 +254,42 @@ const Observatory = {
 
     ctx.clearRect(0, 0, w, h);
 
-    // Fill
-    ctx.beginPath();
-    ctx.moveTo(0, h);
-    data.forEach((v, i) => {
-      ctx.lineTo(i * step, h - (v / max) * (h - 2));
-    });
-    ctx.lineTo(w, h);
-    ctx.closePath();
-
     const color = status === 'live' ? '0, 255, 136' :
                   status === 'stale' ? '255, 149, 0' : '255, 59, 48';
-    ctx.fillStyle = `rgba(${color}, 0.08)`;
+
+    // Gradient fill
+    const gradient = ctx.createLinearGradient(0, 0, 0, h);
+    gradient.addColorStop(0, `rgba(${color}, 0.15)`);
+    gradient.addColorStop(1, `rgba(${color}, 0.01)`);
+
+    ctx.beginPath();
+    ctx.moveTo(0, h);
+    data.forEach((v, i) => ctx.lineTo(i * step, h - (v / max) * (h - 3)));
+    ctx.lineTo(w, h);
+    ctx.closePath();
+    ctx.fillStyle = gradient;
     ctx.fill();
 
     // Line
     ctx.beginPath();
     data.forEach((v, i) => {
       const x = i * step;
-      const y = h - (v / max) * (h - 2);
+      const y = h - (v / max) * (h - 3);
       i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
     });
-    ctx.strokeStyle = `rgba(${color}, 0.6)`;
+    ctx.strokeStyle = `rgba(${color}, 0.7)`;
     ctx.lineWidth = 1.5;
     ctx.stroke();
+
+    // End dot
+    if (data.length > 0) {
+      const lastX = (data.length - 1) * step;
+      const lastY = h - (data[data.length - 1] / max) * (h - 3);
+      ctx.beginPath();
+      ctx.arc(lastX, lastY, 2.5, 0, Math.PI * 2);
+      ctx.fillStyle = `rgb(${color})`;
+      ctx.fill();
+    }
   },
 
   // ── Draw Large Sparkline (modal) ─────────────────────────────
@@ -188,7 +305,7 @@ const Observatory = {
 
     ctx.clearRect(0, 0, w, h);
 
-    // Grid lines
+    // Grid
     ctx.strokeStyle = 'rgba(30, 30, 40, 0.8)';
     ctx.lineWidth = 0.5;
     for (let i = 1; i < 4; i++) {
@@ -198,16 +315,20 @@ const Observatory = {
       ctx.stroke();
     }
 
-    // Fill
+    const color = status === 'live' ? '0, 255, 136' :
+                  status === 'stale' ? '255, 149, 0' : '255, 59, 48';
+
+    // Gradient fill
+    const gradient = ctx.createLinearGradient(0, 0, 0, h);
+    gradient.addColorStop(0, `rgba(${color}, 0.2)`);
+    gradient.addColorStop(1, `rgba(${color}, 0.02)`);
+
     ctx.beginPath();
     ctx.moveTo(0, h);
     data.forEach((v, i) => ctx.lineTo(i * step, h - (v / max) * (h - 4)));
     ctx.lineTo(w, h);
     ctx.closePath();
-
-    const color = status === 'live' ? '0, 255, 136' :
-                  status === 'stale' ? '255, 149, 0' : '255, 59, 48';
-    ctx.fillStyle = `rgba(${color}, 0.1)`;
+    ctx.fillStyle = gradient;
     ctx.fill();
 
     // Line
@@ -221,15 +342,22 @@ const Observatory = {
     ctx.lineWidth = 2;
     ctx.stroke();
 
-    // Dots at each point
+    // Dots
     data.forEach((v, i) => {
       const x = i * step;
       const y = h - (v / max) * (h - 4);
       ctx.beginPath();
-      ctx.arc(x, y, 2, 0, Math.PI * 2);
+      ctx.arc(x, y, 2.5, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(${color}, 0.5)`;
       ctx.fill();
     });
+
+    // Hour labels
+    ctx.fillStyle = 'rgba(136, 136, 160, 0.5)';
+    ctx.font = '9px JetBrains Mono';
+    for (let i = 0; i < data.length; i += 6) {
+      ctx.fillText(`-${data.length - i}h`, i * step, h - 2);
+    }
   },
 
   // ── Open Detail Modal ────────────────────────────────────────
@@ -237,16 +365,17 @@ const Observatory = {
     const overlay = document.getElementById('modal-overlay');
     overlay.classList.add('modal-overlay--open');
 
-    document.getElementById('modal-icon').textContent = feed.icon || '◉';
+    const imgSrc = this.feedImages[feed.id] || 'assets/nexrad.jpg';
+    document.getElementById('modal-icon').innerHTML = `<img src="${imgSrc}" class="modal__icon-img" alt="">`;
     document.getElementById('modal-title').textContent = feed.name;
 
     const badge = document.getElementById('modal-badge');
     badge.textContent = feed.status.toUpperCase();
     badge.className = `modal__badge bento-tile__badge--${feed.status}`;
 
-    // Meta
     const meta = document.getElementById('modal-meta');
     const ago = this.timeAgo(feed.last);
+    const condition = this.getConditionText(feed);
     meta.innerHTML = `
       <div class="meta-item">
         <div class="meta-item__label">STATUS</div>
@@ -260,12 +389,22 @@ const Observatory = {
         <div class="meta-item__label">LAST UPDATE</div>
         <div class="meta-item__value">${ago}</div>
       </div>
+      <div class="meta-item">
+        <div class="meta-item__label">DOMAIN</div>
+        <div class="meta-item__value">${feed.domain}</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-item__label">CONDITION</div>
+        <div class="meta-item__value" style="color: ${condition?.color || 'var(--text-secondary)'}">${condition?.text || '—'}</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-item__label">FEED ID</div>
+        <div class="meta-item__value" style="font-size: 0.7rem">${feed.id}</div>
+      </div>
     `;
 
-    // Sparkline
     this.drawSparklineLarge(feed.sparkline, feed.status);
 
-    // Fetch recent entries
     try {
       const res = await fetch(`/api/feed/${feed.id}?limit=50`);
       const data = await res.json();
@@ -299,7 +438,6 @@ const Observatory = {
     }
   },
 
-  // ── Close Modal ──────────────────────────────────────────────
   closeModal() {
     document.getElementById('modal-overlay').classList.remove('modal-overlay--open');
   },
@@ -327,9 +465,10 @@ const Observatory = {
     patterns.forEach((p, i) => {
       const card = document.createElement('div');
       card.className = 'corr-card';
+      const confColor = p.confidence > 0.7 ? 'var(--signal-live)' : p.confidence > 0.4 ? 'var(--signal-stale)' : 'var(--text-dim)';
       card.innerHTML = `
         <div class="corr-card__title">${p.title || 'Pattern Detected'}</div>
-        <div class="corr-card__confidence">CONFIDENCE: ${((p.confidence || 0) * 100).toFixed(1)}% | ${p.verdict || 'ANALYZING'}</div>
+        <div class="corr-card__confidence" style="color: ${confColor}">CONFIDENCE: ${((p.confidence || 0) * 100).toFixed(1)}% · ${p.verdict || 'ANALYZING'}</div>
         <div class="corr-card__summary">${p.summary || ''}</div>
         ${p.skepticNote ? `<div class="corr-card__skeptic">${p.skepticNote}</div>` : ''}
       `;
@@ -343,61 +482,44 @@ const Observatory = {
 
   // ── Map Overlays ─────────────────────────────────────────────
   async updateMapOverlays() {
-    // Clear old markers
     this.markers.earthquakes.forEach(m => this.map.removeLayer(m));
     this.markers.lightning.forEach(m => this.map.removeLayer(m));
     this.markers.earthquakes = [];
     this.markers.lightning = [];
 
-    // Earthquake markers from USGS
+    // Earthquake markers
     try {
       const res = await fetch('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson');
       const data = await res.json();
       if (data?.features) {
-        data.features.slice(0, 50).forEach(f => {
+        data.features.slice(0, 80).forEach(f => {
           const [lng, lat] = f.geometry.coordinates;
           const mag = f.properties.mag;
+          const color = mag >= 5 ? '#ff3b30' : mag >= 4 ? '#ff9500' : mag >= 3 ? '#ffd60a' : '#06b6d4';
           const marker = L.circleMarker([lat, lng], {
-            radius: Math.max(3, mag * 2.5),
-            color: '#ff3b30',
-            fillColor: '#ff3b30',
-            fillOpacity: 0.3,
-            weight: 1,
+            radius: Math.max(4, mag * 3),
+            color: color,
+            fillColor: color,
+            fillOpacity: 0.35,
+            weight: 1.5,
           }).addTo(this.map);
-          marker.bindPopup(`<b>M${mag}</b><br>${f.properties.place}<br>${new Date(f.properties.time).toISOString().slice(0, 19)}`);
+          marker.bindPopup(`
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #e8e8f0; background: #0a0a0e; padding: 8px; border: 1px solid #2a2a38; border-radius: 2px; min-width: 180px;">
+              <div style="color: ${color}; font-weight: 700; font-size: 14px; margin-bottom: 4px;">M${mag.toFixed(1)}</div>
+              <div style="color: #8888a0; margin-bottom: 2px;">${f.properties.place}</div>
+              <div style="color: #555568; font-size: 9px;">${new Date(f.properties.time).toISOString().slice(0, 19)} UTC</div>
+            </div>
+          `, { className: 'obs-popup' });
           this.markers.earthquakes.push(marker);
         });
       }
     } catch {}
 
-    // Lightning from Blitzortung (if available)
-    try {
-      const lightningFeed = this.feeds.find(f => f.id === 'blitzortung');
-      if (lightningFeed?.status === 'live') {
-        const res = await fetch('/api/feed/blitzortung?limit=20');
-        const data = await res.json();
-        (data.recentEntries || []).forEach(e => {
-          if (e.lat && e.lon) {
-            const marker = L.circleMarker([e.lat, e.lon], {
-              radius: 2,
-              color: '#0af',
-              fillColor: '#0af',
-              fillOpacity: 0.6,
-              weight: 0,
-            }).addTo(this.map);
-            this.markers.lightning.push(marker);
-          }
-        });
-      }
-    } catch {}
-
-    document.getElementById('map-layers').textContent =
-      `${this.markers.earthquakes.length} quakes · ${this.markers.lightning.length} strikes`;
+    this.updateLayerCount();
   },
 
   // ── Bind Events ──────────────────────────────────────────────
   bindEvents() {
-    // Modal close
     document.getElementById('modal-close').addEventListener('click', () => this.closeModal());
     document.getElementById('modal-back').addEventListener('click', () => this.closeModal());
     document.getElementById('modal-overlay').addEventListener('click', (e) => {
@@ -408,39 +530,40 @@ const Observatory = {
     document.getElementById('domain-filters').addEventListener('click', (e) => {
       const btn = e.target.closest('.filter-btn');
       if (!btn) return;
-
       document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('filter-btn--active'));
       btn.classList.add('filter-btn--active');
-
       this.currentFilter = btn.dataset.domain;
       document.querySelectorAll('.bento-tile').forEach(tile => {
-        if (this.currentFilter === 'all' || tile.dataset.domain === this.currentFilter) {
-          tile.dataset.hidden = 'false';
-        } else {
-          tile.dataset.hidden = 'true';
-        }
+        tile.dataset.hidden = (this.currentFilter !== 'all' && tile.dataset.domain !== this.currentFilter) ? 'true' : 'false';
       });
     });
 
-    // Correlation carousel navigation
+    // Map layer toggles
+    document.getElementById('layer-toggles').addEventListener('change', (e) => {
+      const cb = e.target;
+      const layerName = cb.dataset.layer;
+      if (!layerName || !this.mapLayers[layerName]) return;
+      if (cb.checked) {
+        this.mapLayers[layerName].addTo(this.map);
+      } else {
+        this.map.removeLayer(this.mapLayers[layerName]);
+      }
+      this.updateLayerCount();
+    });
+
+    // Correlation carousel
     const track = document.getElementById('corr-track');
-    document.getElementById('corr-prev').addEventListener('click', () => {
-      track.scrollBy({ left: -320, behavior: 'smooth' });
-    });
-    document.getElementById('corr-next').addEventListener('click', () => {
-      track.scrollBy({ left: 320, behavior: 'smooth' });
-    });
+    document.getElementById('corr-prev').addEventListener('click', () => track.scrollBy({ left: -320, behavior: 'smooth' }));
+    document.getElementById('corr-next').addEventListener('click', () => track.scrollBy({ left: 320, behavior: 'smooth' }));
 
     // Bottom nav
     document.querySelectorAll('.bottomnav__btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.bottomnav__btn').forEach(b => b.classList.remove('bottomnav__btn--active'));
         btn.classList.add('bottomnav__btn--active');
-        // Future: view switching logic
       });
     });
 
-    // Keyboard: Escape closes modal
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') this.closeModal();
     });
@@ -457,7 +580,6 @@ const Observatory = {
   },
 };
 
-// ── Boot ───────────────────────────────────────────────────────
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => Observatory.init());
 } else {
