@@ -1,320 +1,465 @@
 /**
- * TRUTH Observatory — Dashboard Application
- * DarkWave Studios LLC — Copyright 2026
+ * ═══════════════════════════════════════════════════════════════
+ *  TRUTH OBSERVATORY — Cockpit Controller
+ *  DarkWave Studios LLC — Copyright 2026
  *
- * Polls the Observatory API, renders feed status cards with sparklines,
- * detected patterns, and manages carousel navigation + 3D tilt effects.
+ *  [01] Identity    → OBSERVATORY_COCKPIT
+ *  [14] Determinacy → Same API data → same render
+ *  [32] Integrity   → Raw manifest data displayed unmodified
+ * ═══════════════════════════════════════════════════════════════
  */
 
-(function() {
-  'use strict';
+const Observatory = {
 
-  const API_BASE = '';  // Same origin
-  const POLL_INTERVAL = 30000;  // 30 seconds
+  // ── State ────────────────────────────────────────────────────
+  feeds: [],
+  correlations: [],
+  map: null,
+  markers: { earthquakes: [], lightning: [] },
+  refreshInterval: 60000,
+  currentFilter: 'all',
 
-  // ═══════════════════════════════════════════════════════════════════════
-  // Reveal Observer
-  // ═══════════════════════════════════════════════════════════════════════
-  const revealObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('active');
-        revealObserver.unobserve(entry.target);
+  // ── Init ─────────────────────────────────────────────────────
+  async init() {
+    this.startClock();
+    this.initMap();
+    this.bindEvents();
+    await this.fetchAll();
+    setInterval(() => this.fetchAll(), this.refreshInterval);
+  },
+
+  // ── UTC Clock ────────────────────────────────────────────────
+  startClock() {
+    const el = document.getElementById('utc-clock');
+    const tick = () => {
+      const now = new Date();
+      el.textContent = now.toISOString().slice(11, 19) + ' UTC';
+    };
+    tick();
+    setInterval(tick, 1000);
+  },
+
+  // ── Map Init ─────────────────────────────────────────────────
+  initMap() {
+    this.map = L.map('map', {
+      center: [39.5, -98.35],
+      zoom: 4,
+      zoomControl: true,
+      attributionControl: false,
+    });
+
+    // CartoDB dark tiles — free, Apex-aesthetic
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      maxZoom: 19,
+      subdomains: 'abcd',
+    }).addTo(this.map);
+  },
+
+  // ── Fetch All Data ───────────────────────────────────────────
+  async fetchAll() {
+    try {
+      const [feedsRes, corrRes] = await Promise.all([
+        fetch('/api/feeds').then(r => r.json()).catch(() => null),
+        fetch('/api/correlations').then(r => r.json()).catch(() => null),
+      ]);
+
+      if (feedsRes?.feeds) {
+        this.feeds = feedsRes.feeds;
+        this.renderFeeds();
+        this.updateTopbar(feedsRes);
+        this.updateMapOverlays();
       }
-    });
-  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
 
-  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
-  setTimeout(() => {
-    document.querySelectorAll('.reveal').forEach(el => {
-      if (el.getBoundingClientRect().top < window.innerHeight) el.classList.add('active');
-    });
-  }, 100);
+      if (corrRes) {
+        this.correlations = corrRes.patterns || corrRes.events || [];
+        this.renderCorrelations(corrRes);
+      }
 
-  // ═══════════════════════════════════════════════════════════════════════
-  // 3D Tilt Effect
-  // ═══════════════════════════════════════════════════════════════════════
-  function applyTilt(card) {
-    card.addEventListener('mousemove', (e) => {
-      const rect = card.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width - 0.5;
-      const y = (e.clientY - rect.top) / rect.height - 0.5;
-      card.style.transform = `perspective(800px) rotateY(${x * 8}deg) rotateX(${-y * 8}deg) translateY(-4px)`;
-    });
-    card.addEventListener('mouseleave', () => {
-      card.style.transform = '';
-    });
-  }
-
-  // ═══════════════════════════════════════════════════════════════════════
-  // Sparkline Renderer (Canvas)
-  // ═══════════════════════════════════════════════════════════════════════
-  function renderSparkline(canvas, data, status) {
-    const ctx = canvas.getContext('2d');
-    const w = canvas.width = canvas.offsetWidth * 2;
-    const h = canvas.height = canvas.offsetHeight * 2;
-    ctx.clearRect(0, 0, w, h);
-
-    if (!data || data.length === 0) return;
-
-    const max = Math.max(...data, 1);
-    const barW = Math.floor(w / data.length) - 1;
-    const colorMap = { live: '#2ecc71', stale: '#e67e22', offline: '#e74c3c' };
-    const baseColor = colorMap[status] || '#888';
-
-    for (let i = 0; i < data.length; i++) {
-      const barH = (data[i] / max) * (h - 4);
-      const x = i * (barW + 1);
-      const y = h - barH;
-
-      // Gradient: stronger for more recent bars
-      const alpha = 0.25 + (i / data.length) * 0.75;
-      ctx.fillStyle = baseColor;
-      ctx.globalAlpha = alpha;
-      ctx.fillRect(x, y, barW, barH);
+      // Pulse the global indicator
+      const pulse = document.getElementById('global-pulse');
+      pulse.style.background = 'var(--signal-live)';
+    } catch (err) {
+      console.warn('[Observatory] Fetch error:', err.message);
+      const pulse = document.getElementById('global-pulse');
+      pulse.style.background = 'var(--signal-stale)';
     }
-    ctx.globalAlpha = 1;
-  }
+  },
 
-  // ═══════════════════════════════════════════════════════════════════════
-  // Time Formatter
-  // ═══════════════════════════════════════════════════════════════════════
-  function timeAgo(ts) {
-    if (!ts) return 'never';
-    const diff = Date.now() - new Date(ts).getTime();
-    if (diff < 60000) return 'just now';
-    if (diff < 3600000) return Math.floor(diff / 60000) + 'm ago';
-    if (diff < 86400000) return Math.floor(diff / 3600000) + 'h ago';
-    return Math.floor(diff / 86400000) + 'd ago';
-  }
+  // ── Update Topbar ────────────────────────────────────────────
+  updateTopbar(data) {
+    const liveEl = document.getElementById('stat-live');
+    const live = data.live || 0;
+    liveEl.textContent = `${live}/${data.total || 18}`;
+    liveEl.style.color = live === data.total ? 'var(--signal-live)' :
+                         live > 0 ? 'var(--signal-stale)' : 'var(--signal-offline)';
+  },
 
-  // ═══════════════════════════════════════════════════════════════════════
-  // Feed Grid Renderer
-  // ═══════════════════════════════════════════════════════════════════════
-  function renderFeeds(data) {
-    const grid = document.getElementById('feed-grid');
-    if (!data || !data.feeds) {
-      grid.innerHTML = '<div class="feed-loading">Unable to connect to sensor array</div>';
-      return;
-    }
-
+  // ── Render Feed Tiles ────────────────────────────────────────
+  renderFeeds() {
+    const grid = document.getElementById('bento-grid');
     grid.innerHTML = '';
 
-    data.feeds.forEach(feed => {
-      const card = document.createElement('div');
-      card.className = 'feed-card';
-      card.innerHTML = `
-        <div class="feed-icon">${feed.icon}</div>
-        <div class="feed-name">${feed.name}</div>
-        <div class="feed-domain">${feed.domain}</div>
-        <div class="feed-meta">
-          <div class="feed-status-badge ${feed.status}">
-            <div class="badge-dot"></div>
-            ${feed.status.toUpperCase()}
-          </div>
-          <div class="feed-entries">${feed.entries.toLocaleString()} records</div>
+    for (const feed of this.feeds) {
+      const tile = document.createElement('div');
+      tile.className = `bento-tile bento-tile--${feed.status}`;
+      tile.dataset.domain = feed.domain;
+      tile.dataset.feedId = feed.id;
+
+      if (this.currentFilter !== 'all' && feed.domain !== this.currentFilter) {
+        tile.dataset.hidden = 'true';
+      }
+
+      const ago = this.timeAgo(feed.last);
+      const sparkId = `spark-${feed.id}`;
+
+      tile.innerHTML = `
+        <div class="bento-tile__header">
+          <span class="bento-tile__icon">${feed.icon || '◉'}</span>
+          <span class="bento-tile__badge bento-tile__badge--${feed.status}">${feed.status.toUpperCase()}</span>
         </div>
-        <div class="feed-last">Last: ${timeAgo(feed.last)}</div>
-        <div class="sparkline-wrap">
-          <canvas class="sparkline-canvas"></canvas>
+        <div class="bento-tile__name">${feed.name}</div>
+        <div class="bento-tile__domain">${feed.domain}</div>
+        <canvas class="bento-tile__sparkline" id="${sparkId}" width="200" height="24"></canvas>
+        <div class="bento-tile__footer">
+          <span class="bento-tile__entries">${feed.entries} obs</span>
+          <span class="bento-tile__ago">${ago}</span>
         </div>
       `;
 
-      grid.appendChild(card);
-      applyTilt(card);
+      tile.addEventListener('click', () => this.openDetail(feed));
+      grid.appendChild(tile);
 
-      // Render sparkline after DOM insertion
-      requestAnimationFrame(() => {
-        const canvas = card.querySelector('.sparkline-canvas');
-        if (canvas) renderSparkline(canvas, feed.sparkline, feed.status);
-      });
+      // Draw sparkline
+      requestAnimationFrame(() => this.drawSparkline(sparkId, feed.sparkline, feed.status));
+    }
+
+    document.getElementById('map-layers').textContent = `${this.feeds.filter(f => f.status === 'live').length} live`;
+  },
+
+  // ── Draw Sparkline ───────────────────────────────────────────
+  drawSparkline(canvasId, data, status) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas || !data?.length) return;
+
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width;
+    const h = canvas.height;
+    const max = Math.max(...data, 1);
+    const step = w / (data.length - 1 || 1);
+
+    ctx.clearRect(0, 0, w, h);
+
+    // Fill
+    ctx.beginPath();
+    ctx.moveTo(0, h);
+    data.forEach((v, i) => {
+      ctx.lineTo(i * step, h - (v / max) * (h - 2));
     });
+    ctx.lineTo(w, h);
+    ctx.closePath();
 
-    // Update hero stats
-    const statsEl = document.getElementById('hero-stats');
-    const liveCount = data.feeds.filter(f => f.status === 'live').length;
-    const totalEntries = data.feeds.reduce((sum, f) => sum + f.entries, 0);
-    statsEl.innerHTML = `
-      <div class="hero-stat">
-        <div class="hero-stat-value">${data.total}</div>
-        <div class="hero-stat-label">SENSOR FEEDS</div>
+    const color = status === 'live' ? '0, 255, 136' :
+                  status === 'stale' ? '255, 149, 0' : '255, 59, 48';
+    ctx.fillStyle = `rgba(${color}, 0.08)`;
+    ctx.fill();
+
+    // Line
+    ctx.beginPath();
+    data.forEach((v, i) => {
+      const x = i * step;
+      const y = h - (v / max) * (h - 2);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.strokeStyle = `rgba(${color}, 0.6)`;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  },
+
+  // ── Draw Large Sparkline (modal) ─────────────────────────────
+  drawSparklineLarge(data, status) {
+    const canvas = document.getElementById('modal-sparkline');
+    if (!canvas || !data?.length) return;
+
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width;
+    const h = canvas.height;
+    const max = Math.max(...data, 1);
+    const step = w / (data.length - 1 || 1);
+
+    ctx.clearRect(0, 0, w, h);
+
+    // Grid lines
+    ctx.strokeStyle = 'rgba(30, 30, 40, 0.8)';
+    ctx.lineWidth = 0.5;
+    for (let i = 1; i < 4; i++) {
+      ctx.beginPath();
+      ctx.moveTo(0, (h / 4) * i);
+      ctx.lineTo(w, (h / 4) * i);
+      ctx.stroke();
+    }
+
+    // Fill
+    ctx.beginPath();
+    ctx.moveTo(0, h);
+    data.forEach((v, i) => ctx.lineTo(i * step, h - (v / max) * (h - 4)));
+    ctx.lineTo(w, h);
+    ctx.closePath();
+
+    const color = status === 'live' ? '0, 255, 136' :
+                  status === 'stale' ? '255, 149, 0' : '255, 59, 48';
+    ctx.fillStyle = `rgba(${color}, 0.1)`;
+    ctx.fill();
+
+    // Line
+    ctx.beginPath();
+    data.forEach((v, i) => {
+      const x = i * step;
+      const y = h - (v / max) * (h - 4);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.strokeStyle = `rgba(${color}, 0.8)`;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Dots at each point
+    data.forEach((v, i) => {
+      const x = i * step;
+      const y = h - (v / max) * (h - 4);
+      ctx.beginPath();
+      ctx.arc(x, y, 2, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${color}, 0.5)`;
+      ctx.fill();
+    });
+  },
+
+  // ── Open Detail Modal ────────────────────────────────────────
+  async openDetail(feed) {
+    const overlay = document.getElementById('modal-overlay');
+    overlay.classList.add('modal-overlay--open');
+
+    document.getElementById('modal-icon').textContent = feed.icon || '◉';
+    document.getElementById('modal-title').textContent = feed.name;
+
+    const badge = document.getElementById('modal-badge');
+    badge.textContent = feed.status.toUpperCase();
+    badge.className = `modal__badge bento-tile__badge--${feed.status}`;
+
+    // Meta
+    const meta = document.getElementById('modal-meta');
+    const ago = this.timeAgo(feed.last);
+    meta.innerHTML = `
+      <div class="meta-item">
+        <div class="meta-item__label">STATUS</div>
+        <div class="meta-item__value" style="color: var(--signal-${feed.status === 'live' ? 'live' : feed.status === 'stale' ? 'stale' : 'offline'})">${feed.status.toUpperCase()}</div>
       </div>
-      <div class="hero-stat">
-        <div class="hero-stat-value">${liveCount}</div>
-        <div class="hero-stat-label">LIVE</div>
+      <div class="meta-item">
+        <div class="meta-item__label">OBSERVATIONS</div>
+        <div class="meta-item__value">${feed.entries}</div>
       </div>
-      <div class="hero-stat">
-        <div class="hero-stat-value">${formatCount(totalEntries)}</div>
-        <div class="hero-stat-label">TOTAL RECORDS</div>
-      </div>
-      <div class="hero-stat">
-        <div class="hero-stat-value">SHA-256</div>
-        <div class="hero-stat-label">HASH ALGORITHM</div>
+      <div class="meta-item">
+        <div class="meta-item__label">LAST UPDATE</div>
+        <div class="meta-item__value">${ago}</div>
       </div>
     `;
 
-    // Update nav status
-    const navDot = document.getElementById('nav-dot');
-    const navText = document.getElementById('nav-status-text');
-    if (liveCount > 0) {
-      navDot.className = 'status-dot live';
-      navText.textContent = liveCount + '/' + data.total + ' LIVE';
-    } else {
-      navDot.className = 'status-dot';
-      navText.textContent = 'OFFLINE';
+    // Sparkline
+    this.drawSparklineLarge(feed.sparkline, feed.status);
+
+    // Fetch recent entries
+    try {
+      const res = await fetch(`/api/feed/${feed.id}?limit=50`);
+      const data = await res.json();
+      const list = document.getElementById('modal-entry-list');
+      list.innerHTML = '';
+
+      const entries = (data.recentEntries || []).slice(-15).reverse();
+      for (const e of entries) {
+        const time = e.retrievedAt || e.timestamp || e.fetchedAt || e.collected_at || '';
+        const type = e.type || 'DATA';
+        const detail = e.filename || e.source || e.product || e.satellite || JSON.stringify(e).slice(0, 80);
+        const hash = e.sha256 ? e.sha256.slice(0, 12) + '…' : '';
+
+        const row = document.createElement('div');
+        row.className = 'entry-row';
+        row.innerHTML = `
+          <span class="entry-row__time">${time ? new Date(time).toISOString().slice(0, 19).replace('T', ' ') : '—'}</span>
+          <span class="entry-row__type">${type}</span>
+          <span class="entry-row__detail">${detail}</span>
+          ${hash ? `<span class="entry-row__hash">${hash}</span>` : ''}
+        `;
+        list.appendChild(row);
+      }
+
+      if (entries.length === 0) {
+        list.innerHTML = '<div class="entry-row"><span class="entry-row__detail">No recent observations</span></div>';
+      }
+    } catch (err) {
+      document.getElementById('modal-entry-list').innerHTML =
+        '<div class="entry-row"><span class="entry-row__detail" style="color:var(--signal-offline)">Failed to fetch entries</span></div>';
     }
+  },
 
-    // Build carousel dots
-    buildCarouselDots('feed-grid', 'feeds-dots', 'feeds-prev', 'feeds-next');
-  }
+  // ── Close Modal ──────────────────────────────────────────────
+  closeModal() {
+    document.getElementById('modal-overlay').classList.remove('modal-overlay--open');
+  },
 
-  function formatCount(n) {
-    if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
-    if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
-    return n.toString();
-  }
+  // ── Render Correlations ──────────────────────────────────────
+  renderCorrelations(data) {
+    const track = document.getElementById('corr-track');
+    const dots = document.getElementById('corr-dots');
+    const patterns = data.patterns || data.events || [];
 
-  // ═══════════════════════════════════════════════════════════════════════
-  // Pattern Renderer
-  // ═══════════════════════════════════════════════════════════════════════
-  function renderPatterns(data) {
-    const carousel = document.getElementById('pattern-carousel');
-    const nav = document.getElementById('pattern-nav');
+    document.getElementById('corr-count').textContent = `${patterns.length} patterns`;
+    document.getElementById('stat-corr').textContent = patterns.length > 0 ? `${patterns.length} ACTIVE` : 'MODELING';
 
-    if (!data || !data.events || data.events.length === 0) {
-      carousel.innerHTML = `
-        <div class="pattern-empty">
-          Correlation engine is modeling feed baselines.<br>
-          Recognized patterns will appear here as cross-feed deviations are identified.
-        </div>
-      `;
-      nav.style.display = 'none';
+    if (patterns.length === 0) {
+      track.innerHTML = `<div class="corr-card corr-card--empty">
+        <p class="corr-card__msg">${data.message || 'Correlation engine is modeling baselines. Patterns appear as deviations are identified.'}</p>
+      </div>`;
+      dots.innerHTML = '';
       return;
     }
 
-    nav.style.display = 'flex';
-    carousel.innerHTML = '';
+    track.innerHTML = '';
+    dots.innerHTML = '';
 
-    data.events.forEach(evt => {
+    patterns.forEach((p, i) => {
       const card = document.createElement('div');
-      card.className = 'pattern-card';
-
-      const feedTags = (evt.feeds || []).map(f =>
-        '<span class="pattern-feed-tag">' + f + '</span>'
-      ).join('');
-
+      card.className = 'corr-card';
       card.innerHTML = `
-        <div class="pattern-title">${evt.title || 'Unnamed Pattern'}</div>
-        <div class="pattern-confidence">${(evt.confidence || 'UNKNOWN').toUpperCase()}</div>
-        <div class="pattern-summary">${evt.summary || ''}</div>
-        <div class="pattern-skeptic">
-          <strong>⚖ Skeptic:</strong> ${evt.skepticNote || 'No counter-explanation generated.'}
-        </div>
-        <div class="pattern-feeds">${feedTags}</div>
+        <div class="corr-card__title">${p.title || 'Pattern Detected'}</div>
+        <div class="corr-card__confidence">CONFIDENCE: ${((p.confidence || 0) * 100).toFixed(1)}% | ${p.verdict || 'ANALYZING'}</div>
+        <div class="corr-card__summary">${p.summary || ''}</div>
+        ${p.skepticNote ? `<div class="corr-card__skeptic">${p.skepticNote}</div>` : ''}
       `;
+      track.appendChild(card);
 
-      carousel.appendChild(card);
-      applyTilt(card);
-    });
-
-    buildCarouselDots('pattern-carousel', 'patterns-dots', 'patterns-prev', 'patterns-next');
-  }
-
-  // ═══════════════════════════════════════════════════════════════════════
-  // Carousel Navigation
-  // ═══════════════════════════════════════════════════════════════════════
-  function buildCarouselDots(trackId, dotsId, prevId, nextId) {
-    const track = document.getElementById(trackId);
-    const dotsContainer = document.getElementById(dotsId);
-    const prevBtn = document.getElementById(prevId);
-    const nextBtn = document.getElementById(nextId);
-
-    if (!track || !dotsContainer) return;
-
-    const cards = track.children;
-    const count = cards.length;
-    if (count <= 1) { dotsContainer.innerHTML = ''; return; }
-
-    // How many dots? Based on visible cards
-    const cardWidth = cards[0] ? cards[0].offsetWidth + 12 : 280;
-    const visible = Math.floor(track.offsetWidth / cardWidth) || 1;
-    const pages = Math.ceil(count / visible);
-
-    dotsContainer.innerHTML = '';
-    for (let i = 0; i < Math.min(pages, 12); i++) {
       const dot = document.createElement('div');
-      dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
-      dot.addEventListener('click', () => {
-        track.scrollTo({ left: i * cardWidth * visible, behavior: 'smooth' });
-      });
-      dotsContainer.appendChild(dot);
-    }
-
-    // Scroll handler to update dots
-    track.addEventListener('scroll', () => {
-      const scrollPos = track.scrollLeft;
-      const currentPage = Math.round(scrollPos / (cardWidth * visible));
-      dotsContainer.querySelectorAll('.carousel-dot').forEach((d, i) => {
-        d.classList.toggle('active', i === currentPage);
-      });
+      dot.className = `corr-dot${i === 0 ? ' corr-dot--active' : ''}`;
+      dots.appendChild(dot);
     });
+  },
 
-    // Arrow buttons
-    if (prevBtn) prevBtn.addEventListener('click', () => {
-      track.scrollBy({ left: -cardWidth, behavior: 'smooth' });
-    });
-    if (nextBtn) nextBtn.addEventListener('click', () => {
-      track.scrollBy({ left: cardWidth, behavior: 'smooth' });
-    });
-  }
+  // ── Map Overlays ─────────────────────────────────────────────
+  async updateMapOverlays() {
+    // Clear old markers
+    this.markers.earthquakes.forEach(m => this.map.removeLayer(m));
+    this.markers.lightning.forEach(m => this.map.removeLayer(m));
+    this.markers.earthquakes = [];
+    this.markers.lightning = [];
 
-  // ═══════════════════════════════════════════════════════════════════════
-  // Data Fetching
-  // ═══════════════════════════════════════════════════════════════════════
-  async function fetchFeeds() {
+    // Earthquake markers from USGS
     try {
-      const res = await fetch(API_BASE + '/api/feeds');
-      if (!res.ok) throw new Error(res.statusText);
+      const res = await fetch('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson');
       const data = await res.json();
-      renderFeeds(data);
-    } catch (err) {
-      console.error('[Observatory] Feed fetch error:', err);
-      renderFeeds(null);
-    }
-  }
+      if (data?.features) {
+        data.features.slice(0, 50).forEach(f => {
+          const [lng, lat] = f.geometry.coordinates;
+          const mag = f.properties.mag;
+          const marker = L.circleMarker([lat, lng], {
+            radius: Math.max(3, mag * 2.5),
+            color: '#ff3b30',
+            fillColor: '#ff3b30',
+            fillOpacity: 0.3,
+            weight: 1,
+          }).addTo(this.map);
+          marker.bindPopup(`<b>M${mag}</b><br>${f.properties.place}<br>${new Date(f.properties.time).toISOString().slice(0, 19)}`);
+          this.markers.earthquakes.push(marker);
+        });
+      }
+    } catch {}
 
-  async function fetchPatterns() {
+    // Lightning from Blitzortung (if available)
     try {
-      const res = await fetch(API_BASE + '/api/events');
-      if (!res.ok) throw new Error(res.statusText);
-      const data = await res.json();
-      renderPatterns(data);
-    } catch (err) {
-      console.error('[Observatory] Pattern fetch error:', err);
-      renderPatterns(null);
-    }
-  }
+      const lightningFeed = this.feeds.find(f => f.id === 'blitzortung');
+      if (lightningFeed?.status === 'live') {
+        const res = await fetch('/api/feed/blitzortung?limit=20');
+        const data = await res.json();
+        (data.recentEntries || []).forEach(e => {
+          if (e.lat && e.lon) {
+            const marker = L.circleMarker([e.lat, e.lon], {
+              radius: 2,
+              color: '#0af',
+              fillColor: '#0af',
+              fillOpacity: 0.6,
+              weight: 0,
+            }).addTo(this.map);
+            this.markers.lightning.push(marker);
+          }
+        });
+      }
+    } catch {}
 
-  // ═══════════════════════════════════════════════════════════════════════
-  // Init
-  // ═══════════════════════════════════════════════════════════════════════
-  fetchFeeds();
-  fetchPatterns();
+    document.getElementById('map-layers').textContent =
+      `${this.markers.earthquakes.length} quakes · ${this.markers.lightning.length} strikes`;
+  },
 
-  // Poll
-  setInterval(fetchFeeds, POLL_INTERVAL);
-  setInterval(fetchPatterns, POLL_INTERVAL * 2);
+  // ── Bind Events ──────────────────────────────────────────────
+  bindEvents() {
+    // Modal close
+    document.getElementById('modal-close').addEventListener('click', () => this.closeModal());
+    document.getElementById('modal-back').addEventListener('click', () => this.closeModal());
+    document.getElementById('modal-overlay').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) this.closeModal();
+    });
 
-  // Handle window resize for sparklines
-  let resizeTimeout;
-  window.addEventListener('resize', () => {
-    clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(() => {
-      document.querySelectorAll('.sparkline-canvas').forEach(c => {
-        // Re-render on resize — data is in feed status, but for now just clear
-        // Next fetch cycle will re-render
+    // Domain filters
+    document.getElementById('domain-filters').addEventListener('click', (e) => {
+      const btn = e.target.closest('.filter-btn');
+      if (!btn) return;
+
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('filter-btn--active'));
+      btn.classList.add('filter-btn--active');
+
+      this.currentFilter = btn.dataset.domain;
+      document.querySelectorAll('.bento-tile').forEach(tile => {
+        if (this.currentFilter === 'all' || tile.dataset.domain === this.currentFilter) {
+          tile.dataset.hidden = 'false';
+        } else {
+          tile.dataset.hidden = 'true';
+        }
       });
-    }, 250);
-  });
+    });
 
-})();
+    // Correlation carousel navigation
+    const track = document.getElementById('corr-track');
+    document.getElementById('corr-prev').addEventListener('click', () => {
+      track.scrollBy({ left: -320, behavior: 'smooth' });
+    });
+    document.getElementById('corr-next').addEventListener('click', () => {
+      track.scrollBy({ left: 320, behavior: 'smooth' });
+    });
+
+    // Bottom nav
+    document.querySelectorAll('.bottomnav__btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.bottomnav__btn').forEach(b => b.classList.remove('bottomnav__btn--active'));
+        btn.classList.add('bottomnav__btn--active');
+        // Future: view switching logic
+      });
+    });
+
+    // Keyboard: Escape closes modal
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') this.closeModal();
+    });
+  },
+
+  // ── Utilities ────────────────────────────────────────────────
+  timeAgo(isoStr) {
+    if (!isoStr) return '—';
+    const ms = Date.now() - new Date(isoStr).getTime();
+    if (ms < 60000) return `${Math.floor(ms / 1000)}s ago`;
+    if (ms < 3600000) return `${Math.floor(ms / 60000)}m ago`;
+    if (ms < 86400000) return `${Math.floor(ms / 3600000)}h ago`;
+    return `${Math.floor(ms / 86400000)}d ago`;
+  },
+};
+
+// ── Boot ───────────────────────────────────────────────────────
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => Observatory.init());
+} else {
+  Observatory.init();
+}

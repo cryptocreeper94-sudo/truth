@@ -3,175 +3,145 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Observatory — Truth Sensor Array</title>
-  <meta name="description" content="9-feed real-time environmental sensor array. NEXRAD Doppler, GOES satellite, solar wind, ionospheric TEC, geomagnetic indices, Schumann resonance, and power grid telemetry.">
+  <title>Truth Observatory — Mission Control</title>
+  <meta name="description" content="18-stream atmospheric, geophysical, and infrastructure monitoring cockpit. Live feeds, cross-feed correlation, SHA-256 integrity. The system watches. The data decides.">
+  <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&family=Inter:wght@400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔭</text></svg>">
 </head>
 <body>
-  <!-- Noise Overlay -->
-  <div class="noise"></div>
-
-  <!-- Navigation -->
-  <nav class="apex-nav">
-    <div class="nav-inner">
-      <a href="/" class="nav-brand">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>
-        OBSERVATORY
-      </a>
-      <div class="nav-links">
-        <a href="#feeds">Feeds</a>
-        <a href="#patterns">Patterns</a>
-        <a href="https://truth.tlid.io" target="_blank">Truth Archive</a>
-        <a href="https://invariant.tlid.io" target="_blank">Invariant</a>
-        <div class="status-pill" id="nav-status">
-          <div class="status-dot" id="nav-dot"></div>
-          <span id="nav-status-text">Connecting...</span>
-        </div>
+  <!-- ═══ TOP STATUS BAR ═══ -->
+  <header class="topbar" id="topbar">
+    <div class="topbar__left">
+      <span class="topbar__logo">◉</span>
+      <span class="topbar__title">TRUTH OBSERVATORY</span>
+      <span class="topbar__version">v2.0</span>
+    </div>
+    <div class="topbar__center">
+      <div class="topbar__stat">
+        <span class="topbar__stat-label">FEEDS</span>
+        <span class="topbar__stat-value" id="stat-live">—/18</span>
+      </div>
+      <div class="topbar__stat">
+        <span class="topbar__stat-label">CORRELATION</span>
+        <span class="topbar__stat-value" id="stat-corr">MODELING</span>
+      </div>
+      <div class="topbar__stat">
+        <span class="topbar__stat-label">RETENTION</span>
+        <span class="topbar__stat-value" id="stat-retention">4H</span>
       </div>
     </div>
+    <div class="topbar__right">
+      <span class="topbar__clock" id="utc-clock">00:00:00 UTC</span>
+      <span class="topbar__pulse" id="global-pulse"></span>
+    </div>
+  </header>
+
+  <!-- ═══ MAIN COCKPIT ═══ -->
+  <main class="cockpit" id="cockpit">
+
+    <!-- LEFT: MAP PANEL -->
+    <section class="cockpit__map" id="map-panel">
+      <div class="panel-header">
+        <span class="panel-header__icon">◎</span>
+        <span class="panel-header__title">GEOSPATIAL OVERLAY</span>
+        <span class="panel-header__badge" id="map-layers">0 layers</span>
+      </div>
+      <div id="map" class="map-container"></div>
+    </section>
+
+    <!-- RIGHT: BENTO GRID -->
+    <section class="cockpit__feeds" id="feeds-panel">
+      <div class="panel-header">
+        <span class="panel-header__icon">▣</span>
+        <span class="panel-header__title">DATA STREAMS</span>
+        <div class="panel-header__filters" id="domain-filters">
+          <button class="filter-btn filter-btn--active" data-domain="all">ALL</button>
+          <button class="filter-btn" data-domain="Atmospheric">ATMO</button>
+          <button class="filter-btn" data-domain="Space Weather">SPACE</button>
+          <button class="filter-btn" data-domain="Infrastructure">INFRA</button>
+          <button class="filter-btn" data-domain="Geological">GEO</button>
+          <button class="filter-btn" data-domain="Ecological">ECO</button>
+        </div>
+      </div>
+      <div class="bento-grid" id="bento-grid">
+        <!-- Tiles injected by JS -->
+      </div>
+    </section>
+
+    <!-- BOTTOM: CORRELATION BAR -->
+    <section class="cockpit__corr" id="corr-panel">
+      <div class="panel-header">
+        <span class="panel-header__icon">⟁</span>
+        <span class="panel-header__title">CORRELATION ENGINE</span>
+        <span class="panel-header__badge" id="corr-count">0 patterns</span>
+      </div>
+      <div class="corr-carousel" id="corr-carousel">
+        <div class="corr-carousel__track" id="corr-track">
+          <div class="corr-card corr-card--empty">
+            <p class="corr-card__msg">Correlation engine is modeling baselines. Patterns appear as deviations are identified.</p>
+          </div>
+        </div>
+        <div class="corr-carousel__nav">
+          <button class="corr-nav-btn" id="corr-prev">‹</button>
+          <div class="corr-carousel__dots" id="corr-dots"></div>
+          <button class="corr-nav-btn" id="corr-next">›</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ═══ DETAIL MODAL ═══ -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal" id="detail-modal">
+      <div class="modal__header">
+        <div class="modal__title-row">
+          <span class="modal__icon" id="modal-icon"></span>
+          <h2 class="modal__title" id="modal-title"></h2>
+          <span class="modal__badge" id="modal-badge"></span>
+        </div>
+        <button class="modal__close" id="modal-close">✕</button>
+      </div>
+      <div class="modal__body">
+        <div class="modal__meta" id="modal-meta"></div>
+        <div class="modal__sparkline-lg">
+          <canvas id="modal-sparkline" width="600" height="120"></canvas>
+          <span class="modal__sparkline-label">24-HOUR ACTIVITY</span>
+        </div>
+        <div class="modal__entries" id="modal-entries">
+          <h3 class="modal__section-title">RECENT OBSERVATIONS</h3>
+          <div class="modal__entry-list" id="modal-entry-list"></div>
+        </div>
+      </div>
+      <div class="modal__footer">
+        <button class="modal__back-btn" id="modal-back">← BACK TO COCKPIT</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ BOTTOM NAV ═══ -->
+  <nav class="bottomnav" id="bottomnav">
+    <button class="bottomnav__btn bottomnav__btn--active" data-view="cockpit">
+      <span class="bottomnav__icon">◉</span>
+      <span class="bottomnav__label">Cockpit</span>
+    </button>
+    <button class="bottomnav__btn" data-view="feeds">
+      <span class="bottomnav__icon">▣</span>
+      <span class="bottomnav__label">Feeds</span>
+    </button>
+    <button class="bottomnav__btn" data-view="correlations">
+      <span class="bottomnav__icon">⟁</span>
+      <span class="bottomnav__label">Correlations</span>
+    </button>
+    <button class="bottomnav__btn" data-view="map">
+      <span class="bottomnav__icon">◎</span>
+      <span class="bottomnav__label">Map</span>
+    </button>
   </nav>
 
-  <!-- Hero -->
-  <section class="hero-sec section-dark">
-    <div class="hero-bg" style="background-image:url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1600&q=80');"></div>
-    <div class="hero-bg" style="background-image:url('https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=1600&q=80');"></div>
-    <div class="hero-bg" style="background-image:url('https://images.unsplash.com/photo-1534996858221-380b92700493?w=1600&q=80');"></div>
-    <div class="hero-overlay"></div>
-    <div class="container" style="text-align:center;">
-      <div class="reveal">
-        <p class="eyebrow">DarkWave Studios — Deterministic Truth Platform</p>
-      </div>
-      <h1 class="title-monolith reveal">TRUTH<br>OBSERVATORY</h1>
-      <div class="reveal" style="max-width:700px;margin:32px auto 0;">
-        <p class="text-stark" style="text-align:center;margin:0 auto;">
-          9 independent sensor feeds. Real-time atmospheric, geophysical, and infrastructure monitoring.
-          Every reading hashed. Every gap recorded. Nothing interpolated.
-        </p>
-      </div>
-      <div class="reveal" style="margin-top:32px;">
-        <div class="hero-stats" id="hero-stats">
-          <!-- Populated by JS -->
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Feed Status Grid -->
-  <section class="section section-cream" id="feeds">
-    <div class="container">
-      <div class="reveal">
-        <p class="eyebrow" style="color:var(--text-secondary);">Sensor Array</p>
-        <h2 class="section-title" style="color:#0a0a0a;">Live Feed Status</h2>
-        <p class="section-desc" style="color:rgba(0,0,0,0.5);">
-          Each feed runs independently. Status updates every 30 seconds. Sparklines show 24-hour collection density.
-        </p>
-      </div>
-      <div class="feed-grid reveal" id="feed-grid">
-        <!-- Populated by JS -->
-        <div class="feed-loading">Connecting to sensor array...</div>
-      </div>
-      <!-- Carousel Nav (for mobile horizontal scroll) -->
-      <div class="carousel-nav reveal">
-        <button class="carousel-btn" id="feeds-prev" aria-label="Previous">‹</button>
-        <div class="carousel-dots" id="feeds-dots"></div>
-        <button class="carousel-btn" id="feeds-next" aria-label="Next">›</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- Correlations Section (Phase 2) -->
-  <section class="section section-dark" id="patterns">
-    <div class="container">
-      <div class="reveal">
-        <p class="eyebrow">Correlation Engine</p>
-        <h2 class="section-title">Recognized Patterns</h2>
-        <p class="section-desc">
-          The correlation engine models baseline behavior for each feed, then identifies deviations
-          and cross-correlates them across all 9 streams — including lagged relationships.
-          Correlation is never presented as causation.
-        </p>
-      </div>
-      <div class="pattern-carousel reveal" id="pattern-carousel">
-        <!-- Populated by JS when events exist -->
-      </div>
-      <div class="carousel-nav reveal" id="pattern-nav" style="display:none;">
-        <button class="carousel-btn" id="patterns-prev" aria-label="Previous">‹</button>
-        <div class="carousel-dots" id="patterns-dots"></div>
-        <button class="carousel-btn" id="patterns-next" aria-label="Next">›</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- Architecture Section -->
-  <section class="section section-cream">
-    <div class="container">
-      <div class="split-grid">
-        <div class="reveal">
-          <p class="eyebrow" style="color:var(--text-secondary);">Architecture</p>
-          <h2 class="section-title" style="color:#0a0a0a;">Deterministic<br>Sensor Network</h2>
-          <div style="font-size:1.05rem;line-height:1.8;color:rgba(0,0,0,0.6);max-width:500px;">
-            <p style="margin-bottom:16px;">
-            Every collector runs in isolation. Every file is SHA-256 hashed at intake.
-            Every data gap is recorded explicitly — never silently skipped.
-          </p>
-          <p>
-            The correlation engine uses deterministic statistical methods — cross-correlation,
-            lag analysis, and baseline deviation scoring. The skeptic engine generates
-            mundane explanations and scores them <em>higher</em> than anomalous interpretations by default.
-            Correlation is never presented as causation.
-          </p>
-          </div>
-        </div>
-        <div class="reveal" style="display:flex;justify-content:center;">
-          <div class="glass-panel" style="padding:32px;max-width:420px;width:100%;">
-            <div class="panel-header">42-Doctrine Alignment</div>
-            <div class="doctrine-row"><span>[13] Constraint</span><span class="doctrine-val">Skeptic non-overridable</span></div>
-            <div class="doctrine-row"><span>[14] Determinacy</span><span class="doctrine-val">Statistical, not AI judgment</span></div>
-            <div class="doctrine-row"><span>[26] Verdict</span><span class="doctrine-val">Correlation ≠ causation</span></div>
-            <div class="doctrine-row"><span>[32] Integrity</span><span class="doctrine-val">SHA-256 every raw file</span></div>
-            <div class="doctrine-row"><span>[37] Null Guard</span><span class="doctrine-val">2+ independent feeds</span></div>
-            <div class="doctrine-row" style="border:none;"><span>[40] Non-Being</span><span class="doctrine-val">Gaps recorded explicitly</span></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- CTA -->
-  <section class="section section-dark">
-    <div class="container" style="text-align:center;">
-      <div class="reveal">
-        <h2 class="title-monolith" style="font-size:clamp(2rem,5vw,4rem);margin-bottom:16px;">
-          Every Reading.<br>Every Gap.<br>Recorded.
-        </h2>
-        <p class="text-stark" style="text-align:center;margin:0 auto 48px;">
-          No interpolation. No narrative. Raw sensor data with deterministic pattern recognition and cross-feed correlation analysis.
-        </p>
-        <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
-          <a href="https://truth.tlid.io" target="_blank" class="btn-brutal btn-solid">Truth Archive</a>
-          <a href="https://dve.tlid.io" target="_blank" class="btn-brutal">Verification Engine</a>
-          <a href="https://invariant.tlid.io" target="_blank" class="btn-brutal">Invariant Nexus</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Footer -->
-  <footer class="apex-footer">
-    <div class="footer-inner">
-      <div class="footer-brand">OBSERVATORY — Truth Sensor Array</div>
-      <div class="footer-right">
-        <div class="footer-legal">© 2026 DarkWave Studios LLC. All Rights Reserved.</div>
-        <div class="footer-patent">Patent 64/032,339 & 64/047,737 Pending</div>
-      </div>
-    </div>
-  </footer>
-
-  <!-- Back Button (global nav) -->
-  <a href="https://invariant.tlid.io" class="back-btn" title="Back to Invariant">← Back</a>
-
-  <script src="/app.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
