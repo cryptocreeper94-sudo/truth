@@ -1,11 +1,14 @@
 /**
  * ═══════════════════════════════════════════════════════════════
- *  TRUTH OBSERVATORY — Cockpit Controller v2
+ *  TRUTH OBSERVATORY — Cockpit Controller v3
  *  DarkWave Studios LLC — Copyright 2026
  *
  *  [01] Identity    → OBSERVATORY_COCKPIT
  *  [14] Determinacy → Same API data → same render
  *  [32] Integrity   → Raw manifest data displayed unmodified
+ *
+ *  v3: AtmosCore backbone, domain carousels, dynamic legend,
+ *      expanded map layers, share, rich conditions
  * ═══════════════════════════════════════════════════════════════
  */
 
@@ -33,6 +36,45 @@ const Observatory = {
     deposition: 'assets/deposition.jpg',
   },
 
+  // ── Domain Config ────────────────────────────────────────────
+  domains: {
+    'Atmospheric':    { color: '#1E6FA8', order: 1 },
+    'Space Weather':  { color: '#D4A017', order: 2 },
+    'Geological':     { color: '#D4601A', order: 3 },
+    'RF Research':    { color: '#a855f7', order: 4 },
+    'Infrastructure': { color: '#5A7A8A', order: 5 },
+    'Ecological':     { color: '#06b6d4', order: 6 },
+  },
+
+  // ── Layer definitions with legend configs ────────────────────
+  layerDefs: {
+    radar: {
+      name: 'NEXRAD Radar',
+      info: { source: 'NOAA NWS via Iowa State Mesonet', what: 'Base reflectivity (N0Q) from 160 WSR-88D radar stations. Shows precipitation intensity.', update: 'Every 5 minutes', attribution: 'NOAA/NWS' },
+      legend: { type: 'gradient', heading: 'RADAR REFLECTIVITY', colors: ['#00ff00','#00cc00','#ffff00','#ff9900','#ff0000','#cc0000','#ff00ff'], labels: ['Light','Mod','Heavy','Extreme'] },
+    },
+    satellite: {
+      name: 'GOES Visible',
+      info: { source: 'NOAA GOES-East/West via Iowa State', what: 'Visible satellite imagery. Shows cloud cover, fog, and surface features in reflected sunlight.', update: 'Every 5 minutes (daylight only)', attribution: 'NOAA/NESDIS' },
+      legend: { type: 'gradient', heading: 'GOES VISIBLE', colors: ['#111','#444','#888','#ccc','#fff'], labels: ['Clear','Thin Cloud','Thick Cloud'] },
+    },
+    infrared: {
+      name: 'GOES Infrared',
+      info: { source: 'NOAA GOES-East/West via Iowa State WMS', what: 'Infrared imagery showing cloud-top temperatures. Colder = higher clouds = stronger convection.', update: 'Every 15 minutes', attribution: 'NOAA/NESDIS' },
+      legend: { type: 'gradient', heading: 'INFRARED (CLOUD TOP TEMP)', colors: ['#000033','#0000cc','#00ccff','#00ff00','#ffff00','#ff6600','#ff0000'], labels: ['Warm/Low','Mid','Cold/High'] },
+    },
+    watervapor: {
+      name: 'Water Vapor',
+      info: { source: 'NOAA GOES via Iowa State WMS', what: 'Mid-level moisture transport in the 6.5-7.0 µm band. Shows atmospheric rivers and dry air intrusions.', update: 'Every 15 minutes', attribution: 'NOAA/NESDIS' },
+      legend: { type: 'gradient', heading: 'WATER VAPOR', colors: ['#330000','#663300','#996600','#cccc00','#00cc66','#0066cc','#ffffff'], labels: ['Dry','Moderate','Moist'] },
+    },
+    precip: {
+      name: 'Precipitation',
+      info: { source: 'RainViewer Global Radar', what: 'Global precipitation radar composite from weather radar stations worldwide.', update: 'Every 10 minutes', attribution: 'RainViewer' },
+      legend: { type: 'gradient', heading: 'PRECIPITATION', colors: ['transparent','#00ccff','#0066ff','#00ff00','#ffff00','#ff0000'], labels: ['None','Light','Mod','Heavy'] },
+    },
+  },
+
   // ── State ────────────────────────────────────────────────────
   feeds: [],
   correlations: [],
@@ -40,13 +82,17 @@ const Observatory = {
   mapLayers: {},
   markers: { earthquakes: [], lightning: [] },
   refreshInterval: 60000,
-  currentFilter: 'all',
 
   // ── Init ─────────────────────────────────────────────────────
   async init() {
     this.startClock();
     this.initMap();
     this.bindEvents();
+
+    // Initialize AtmosCore engine
+    AtmosCore.init();
+    AtmosCoreViz.init('atmoscore-ring');
+
     await this.fetchAll();
     setInterval(() => this.fetchAll(), this.refreshInterval);
   },
@@ -62,7 +108,7 @@ const Observatory = {
     setInterval(tick, 1000);
   },
 
-  // ── Map Init with Layer Controls ─────────────────────────────
+  // ── Map Init with Expanded Layers ────────────────────────────
   initMap() {
     this.map = L.map('map', {
       center: [39.5, -98.35],
@@ -72,37 +118,61 @@ const Observatory = {
     });
 
     // Base layer — CartoDB dark
-    const baseDark = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
       maxZoom: 19,
       subdomains: 'abcd',
     }).addTo(this.map);
 
-    // NOAA Radar overlay
+    // NOAA Radar
     this.mapLayers.radar = L.tileLayer.wms('https://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0q.cgi', {
-      layers: 'nexrad-n0q-900913',
-      format: 'image/png',
-      transparent: true,
-      opacity: 0.6,
-      attribution: 'NOAA/NWS',
+      layers: 'nexrad-n0q-900913', format: 'image/png', transparent: true, opacity: 0.6,
     });
 
-    // GOES Satellite IR overlay
+    // GOES Visible
     this.mapLayers.satellite = L.tileLayer('https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/goes-vis-1km-900913/{z}/{x}/{y}.png', {
-      opacity: 0.4,
-      maxZoom: 8,
+      opacity: 0.4, maxZoom: 8,
     });
 
-    // Temperature overlay
-    this.mapLayers.temp = L.tileLayer('https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=demo', {
-      opacity: 0.4,
-      maxZoom: 19,
+    // GOES Infrared — Iowa State tile cache
+    this.mapLayers.infrared = L.tileLayer('https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/goes-east-ir-4km-900913/{z}/{x}/{y}.png', {
+      opacity: 0.5, maxZoom: 8,
     });
+
+    // Water Vapor — Iowa State tile cache
+    this.mapLayers.watervapor = L.tileLayer('https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/goes-east-wv-4km-900913/{z}/{x}/{y}.png', {
+      opacity: 0.5, maxZoom: 8,
+    });
+
+    // Precipitation — RainViewer (free, no API key)
+    this.mapLayers.precip = L.tileLayer('', { opacity: 0.5, maxZoom: 18 });
+    this._loadRainViewerTiles();
 
     // Default: show radar
     this.mapLayers.radar.addTo(this.map);
 
-    // Update layer count
     this.updateLayerCount();
+    this.updateDynamicLegend();
+  },
+
+  // ── RainViewer precipitation tiles ───────────────────────────
+  async _loadRainViewerTiles() {
+    try {
+      const res = await fetch('https://api.rainviewer.com/public/weather-maps.json');
+      const data = await res.json();
+      const latest = data.radar.past[data.radar.past.length - 1];
+      if (latest) {
+        const newLayer = L.tileLayer(`https://tilecache.rainviewer.com${latest.path}/512/{z}/{x}/{y}/2/1_1.png`, {
+          opacity: 0.5, maxZoom: 18,
+        });
+        // Swap into mapLayers
+        const wasActive = this.map.hasLayer(this.mapLayers.precip);
+        if (wasActive) this.map.removeLayer(this.mapLayers.precip);
+        this.mapLayers.precip = newLayer;
+        if (wasActive) newLayer.addTo(this.map);
+      }
+    } catch (e) {
+      console.warn('[Observatory] RainViewer load failed:', e.message);
+    }
   },
 
   updateLayerCount() {
@@ -111,6 +181,77 @@ const Observatory = {
       if (this.map.hasLayer(layer)) count++;
     });
     document.getElementById('map-layers').textContent = `${count + 1} layers active`;
+  },
+
+  // ── Dynamic Legend ───────────────────────────────────────────
+  updateDynamicLegend() {
+    const legend = document.getElementById('map-legend');
+    let html = '<div class="map-legend__title">LEGEND</div>';
+    let hasActive = false;
+
+    for (const [key, def] of Object.entries(this.layerDefs)) {
+      if (!this.mapLayers[key] || !this.map.hasLayer(this.mapLayers[key])) continue;
+      hasActive = true;
+      const leg = def.legend;
+
+      html += `<div class="map-legend__section">`;
+      html += `<div class="map-legend__heading">${leg.heading}<button class="map-legend__info-btn" data-layer-info="${key}" title="Layer info">ⓘ</button></div>`;
+
+      if (leg.type === 'gradient') {
+        html += `<div class="map-legend__bar">`;
+        for (const c of leg.colors) {
+          html += `<span style="background:${c}"></span>`;
+        }
+        html += `</div>`;
+        html += `<div class="map-legend__labels">`;
+        for (const l of leg.labels) {
+          html += `<span>${l}</span>`;
+        }
+        html += `</div>`;
+      }
+      html += `</div>`;
+    }
+
+    // Always show earthquake legend (from map markers)
+    if (this.markers.earthquakes.length > 0) {
+      hasActive = true;
+      html += `<div class="map-legend__section">
+        <div class="map-legend__heading">EARTHQUAKES (24H)</div>
+        <div class="map-legend__sublabel">Circle size = magnitude</div>
+        <div class="map-legend__items">
+          <div class="map-legend__item"><span class="map-legend__dot" style="background:#06b6d4;width:8px;height:8px"></span> M2.5–2.9 · Minor</div>
+          <div class="map-legend__item"><span class="map-legend__dot" style="background:#ffd60a;width:10px;height:10px"></span> M3.0–3.9 · Light</div>
+          <div class="map-legend__item"><span class="map-legend__dot" style="background:#ff9500;width:12px;height:12px"></span> M4.0–4.9 · Moderate</div>
+          <div class="map-legend__item"><span class="map-legend__dot" style="background:#ff3b30;width:14px;height:14px"></span> M5.0+ · Strong</div>
+        </div>
+      </div>`;
+    }
+
+    legend.innerHTML = hasActive ? html : '';
+
+    // Bind info buttons
+    legend.querySelectorAll('.map-legend__info-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.showLayerInfo(btn.dataset.layerInfo);
+      });
+    });
+  },
+
+  showLayerInfo(layerKey) {
+    const def = this.layerDefs[layerKey];
+    if (!def) return;
+
+    const overlay = document.getElementById('legend-info-overlay');
+    document.getElementById('legend-info-title').textContent = def.name;
+    document.getElementById('legend-info-body').innerHTML = `
+      <div class="info-row"><strong>Source</strong><span>${def.info.source}</span></div>
+      <div class="info-row"><strong>What it shows</strong></div>
+      <p style="margin: 4px 0 8px; color: var(--text-secondary)">${def.info.what}</p>
+      <div class="info-row"><strong>Update freq</strong><span>${def.info.update}</span></div>
+      <div class="info-row"><strong>Attribution</strong><span>${def.info.attribution}</span></div>
+    `;
+    overlay.classList.add('legend-info-overlay--open');
   },
 
   // ── Fetch All Data ───────────────────────────────────────────
@@ -123,9 +264,14 @@ const Observatory = {
 
       if (feedsRes?.feeds) {
         this.feeds = feedsRes.feeds;
-        this.renderFeeds();
+        this.renderCarousels();
         this.updateTopbar(feedsRes);
         this.updateMapOverlays();
+
+        // ── AtmosCore compute ──────────────────────────────
+        AtmosCore.compute(this.feeds);
+        AtmosCoreViz.update(AtmosCore);
+        this.updateAtmosCoreUI();
       }
 
       if (corrRes) {
@@ -151,95 +297,282 @@ const Observatory = {
                          live > 0 ? 'var(--signal-stale)' : 'var(--signal-offline)';
   },
 
-  // ── Render Feed Tiles ────────────────────────────────────────
-  renderFeeds() {
-    const grid = document.getElementById('bento-grid');
-    grid.innerHTML = '';
+  // ── Update AtmosCore UI ──────────────────────────────────────
+  updateAtmosCoreUI() {
+    const P = AtmosCore.primitives;
+    const suit = AtmosCore.suitability;
+    const prov = AtmosCore.getProvenanceSummary();
 
-    for (const feed of this.feeds) {
-      const tile = document.createElement('div');
-      tile.className = `bento-tile bento-tile--${feed.status}`;
-      tile.dataset.domain = feed.domain;
-      tile.dataset.feedId = feed.id;
-
-      if (this.currentFilter !== 'all' && feed.domain !== this.currentFilter) {
-        tile.dataset.hidden = 'true';
+    // Primitive readouts
+    for (const key of ['TH', 'OP', 'DY', 'TS']) {
+      const el = document.getElementById(`prim-${key}`);
+      if (el) {
+        const v = P[key].value;
+        el.textContent = v >= 0 ? `+${v.toFixed(2)}` : v.toFixed(2);
+        el.style.color = AtmosCore.getBandColor(v);
       }
+    }
 
-      const ago = this.timeAgo(feed.last);
-      const sparkId = `spark-${feed.id}`;
-      const imgSrc = this.feedImages[feed.id] || 'assets/nexrad.jpg';
-      const conditionText = this.getConditionText(feed);
+    // Suitability
+    const scoreEl = document.getElementById('atmoscore-suit-score');
+    const statusEl = document.getElementById('atmoscore-suit-status');
+    const trendEl = document.getElementById('atmoscore-suit-trend');
 
-      tile.innerHTML = `
-        <div class="bento-tile__image-wrap">
-          <img class="bento-tile__image" src="${imgSrc}" alt="${feed.name}" loading="lazy">
-          <div class="bento-tile__image-overlay"></div>
-          <span class="bento-tile__badge bento-tile__badge--${feed.status}">${feed.status.toUpperCase()}</span>
-          <div class="bento-tile__label">
-            <div class="bento-tile__name">${feed.name}</div>
-            <div class="bento-tile__domain">${feed.domain}</div>
-          </div>
-        </div>
-        <div class="bento-tile__content">
-          ${conditionText ? `<div class="bento-tile__condition" style="color: ${conditionText.color}">${conditionText.text}</div>` : ''}
-          <canvas class="bento-tile__sparkline" id="${sparkId}" width="200" height="28"></canvas>
-          <div class="bento-tile__footer">
-            <span class="bento-tile__entries">${feed.entries} obs</span>
-            <span class="bento-tile__ago">${ago}</span>
-          </div>
-        </div>
-      `;
+    if (scoreEl) {
+      const v = suit.overall;
+      scoreEl.textContent = v >= 0 ? `+${v.toFixed(2)}` : v.toFixed(2);
+      scoreEl.style.color = AtmosCore.getBandColor(v);
+    }
+    if (statusEl) {
+      statusEl.textContent = suit.status.toUpperCase();
+      statusEl.style.color = suit.status === 'suitable' ? 'var(--ac-optimal)' :
+                             suit.status === 'qualified' ? 'var(--ac-advisory)' :
+                             suit.status === 'unsuitable' ? 'var(--ac-critical)' : 'var(--text-dim)';
+    }
+    if (trendEl) {
+      const tChar = suit.trend === 'improving' ? '▲ IMPROVING' : suit.trend === 'degrading' ? '▼ DEGRADING' : '● STABLE';
+      const tColor = suit.trend === 'improving' ? 'var(--ac-optimal)' : suit.trend === 'degrading' ? 'var(--ac-caution)' : 'var(--text-dim)';
+      trendEl.textContent = tChar;
+      trendEl.style.color = tColor;
+    }
 
-      // 3D tilt effect
-      tile.addEventListener('mousemove', (e) => this.handleTilt(e, tile));
-      tile.addEventListener('mouseleave', () => {
-        tile.style.transform = 'perspective(600px) rotateX(0) rotateY(0)';
-      });
-      tile.addEventListener('click', () => this.openDetail(feed));
-      grid.appendChild(tile);
+    // Topbar AtmosCore stat
+    const acStat = document.getElementById('stat-atmoscore');
+    if (acStat) {
+      acStat.textContent = suit.status.toUpperCase();
+      acStat.style.color = suit.status === 'suitable' ? 'var(--signal-live)' :
+                           suit.status === 'qualified' ? 'var(--signal-stale)' : 'var(--signal-offline)';
+    }
 
-      requestAnimationFrame(() => this.drawSparkline(sparkId, feed.sparkline, feed.status));
+    const suitStat = document.getElementById('stat-suitability');
+    if (suitStat) {
+      const v = suit.overall;
+      suitStat.textContent = v >= 0 ? `+${v.toFixed(2)}` : v.toFixed(2);
+      suitStat.style.color = AtmosCore.getBandColor(v);
+    }
+
+    // Provenance badge
+    const provEl = document.getElementById('atmoscore-provenance');
+    if (provEl) {
+      provEl.textContent = `${prov.measured + prov.estimated + prov.derived}/${prov.total} nodes active`;
+    }
+
+    // Hard constraint bar
+    const hcBar = document.getElementById('atmoscore-hc-bar');
+    const hcText = document.getElementById('atmoscore-hc-text');
+    const activeHC = Object.entries(AtmosCore.hardConstraints).filter(([, hc]) => hc.active);
+    if (activeHC.length > 0 && hcBar && hcText) {
+      hcBar.style.display = 'flex';
+      hcText.textContent = activeHC.map(([id, hc]) => `${id}: ${hc.reason}`).join(' · ');
+    } else if (hcBar) {
+      hcBar.style.display = 'none';
     }
   },
 
-  // ── 3D Tilt Effect ───────────────────────────────────────────
-  handleTilt(e, tile) {
-    const rect = tile.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width - 0.5;
-    const y = (e.clientY - rect.top) / rect.height - 0.5;
-    tile.style.transform = `perspective(600px) rotateY(${x * 8}deg) rotateX(${-y * 8}deg)`;
+  // ── Render Domain Carousels ──────────────────────────────────
+  renderCarousels() {
+    const container = document.getElementById('feed-carousels');
+    container.innerHTML = '';
+
+    // Group feeds by domain
+    const grouped = {};
+    for (const feed of this.feeds) {
+      const domain = feed.domain || 'Other';
+      if (!grouped[domain]) grouped[domain] = [];
+      grouped[domain].push(feed);
+    }
+
+    // Sort domains by configured order
+    const sortedDomains = Object.keys(grouped).sort((a, b) => {
+      return (this.domains[a]?.order || 99) - (this.domains[b]?.order || 99);
+    });
+
+    for (const domain of sortedDomains) {
+      const feeds = grouped[domain];
+      const domainConf = this.domains[domain] || { color: '#5A7A8A', order: 99 };
+      const carouselId = `carousel-${domain.replace(/\s/g, '-').toLowerCase()}`;
+
+      const section = document.createElement('div');
+      section.className = 'feed-carousel';
+      section.innerHTML = `
+        <div class="feed-carousel__header">
+          <div class="feed-carousel__domain-bar" style="background: ${domainConf.color}"></div>
+          <span class="feed-carousel__domain">${domain.toUpperCase()}</span>
+          <span class="feed-carousel__count">${feeds.length} feeds</span>
+        </div>
+        <div class="feed-carousel__track-wrap">
+          <div class="feed-carousel__track" id="${carouselId}"></div>
+        </div>
+        <div class="feed-carousel__nav">
+          <button class="feed-carousel__arrow feed-carousel__arrow--prev" data-carousel="${carouselId}">&#8249;</button>
+          <div class="feed-carousel__dots" id="${carouselId}-dots"></div>
+          <button class="feed-carousel__arrow feed-carousel__arrow--next" data-carousel="${carouselId}">&#8250;</button>
+        </div>
+      `;
+      container.appendChild(section);
+
+      const track = section.querySelector(`#${carouselId}`);
+      const dots = section.querySelector(`#${carouselId}-dots`);
+
+      for (let i = 0; i < feeds.length; i++) {
+        const feed = feeds[i];
+        const card = this._createFeedCard(feed);
+        track.appendChild(card);
+
+        const dot = document.createElement('div');
+        dot.className = `feed-carousel__dot${i === 0 ? ' feed-carousel__dot--active' : ''}`;
+        dots.appendChild(dot);
+      }
+
+      // Arrow handlers
+      const prevBtn = section.querySelector('.feed-carousel__arrow--prev');
+      const nextBtn = section.querySelector('.feed-carousel__arrow--next');
+      prevBtn.addEventListener('click', () => track.scrollBy({ left: -230, behavior: 'smooth' }));
+      nextBtn.addEventListener('click', () => track.scrollBy({ left: 230, behavior: 'smooth' }));
+
+      // Scroll dot sync
+      track.addEventListener('scroll', () => {
+        const scrollLeft = track.scrollLeft;
+        const cardWidth = 228;
+        const activeIdx = Math.round(scrollLeft / cardWidth);
+        dots.querySelectorAll('.feed-carousel__dot').forEach((d, idx) => {
+          d.classList.toggle('feed-carousel__dot--active', idx === activeIdx);
+        });
+      });
+    }
+
+    // Append footer clone at bottom of feed scroll
+    const footer = document.getElementById('site-footer');
+    if (footer) {
+      const clone = footer.cloneNode(true);
+      clone.removeAttribute('id');
+      container.appendChild(clone);
+    }
   },
 
-  // ── Condition Text (data-driven) ─────────────────────────────
+  _createFeedCard(feed) {
+    const card = document.createElement('div');
+    card.className = `feed-card feed-card--${feed.status}`;
+
+    const ago = this.timeAgo(feed.last);
+    const sparkId = `spark-${feed.id}`;
+    const imgSrc = this.feedImages[feed.id] || 'assets/nexrad.jpg';
+    const condition = this.getConditionText(feed);
+
+    card.innerHTML = `
+      <div class="feed-card__image-wrap">
+        <img class="feed-card__image" src="${imgSrc}" alt="${feed.name}" loading="lazy">
+        <div class="feed-card__image-overlay"></div>
+        <span class="feed-card__badge feed-card__badge--${feed.status}">${feed.status.toUpperCase()}</span>
+        <div class="feed-card__name">${feed.name}</div>
+      </div>
+      <div class="feed-card__content">
+        ${condition ? `<div class="feed-card__condition" style="color: ${condition.color}">${condition.text}</div>` : ''}
+        <canvas class="feed-card__sparkline" id="${sparkId}" width="200" height="24"></canvas>
+        <div class="feed-card__footer">
+          <span>${feed.entries} obs</span>
+          <span>${ago}</span>
+        </div>
+      </div>
+      <button class="feed-card__share" title="Share this feed" data-feed-id="${feed.id}">&#9993;</button>
+    `;
+
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('.feed-card__share')) {
+        e.stopPropagation();
+        this.shareFeed(feed);
+        return;
+      }
+      this.openDetail(feed);
+    });
+
+    requestAnimationFrame(() => this.drawSparkline(sparkId, feed.sparkline, feed.status));
+    return card;
+  },
+
+  // ── Condition Text (all 18 feeds) ───────────────────────────
   getConditionText(feed) {
     if (feed.status === 'offline') return { text: 'NO DATA', color: 'var(--signal-offline)' };
 
     const rate = feed.sparkline ? feed.sparkline[feed.sparkline.length - 1] || 0 : 0;
-    const avg = feed.sparkline ? feed.sparkline.reduce((a, b) => a + b, 0) / feed.sparkline.length : 0;
+    const avg = feed.sparkline ? feed.sparkline.reduce((a, b) => a + b, 0) / (feed.sparkline.length || 1) : 0;
 
-    if (feed.id === 'earthquake') {
-      if (feed.entries > 20) return { text: `${feed.entries} EVENTS — ELEVATED`, color: 'var(--signal-stale)' };
-      return { text: `${feed.entries} events — normal`, color: 'var(--signal-live)' };
+    switch (feed.id) {
+      case 'earthquake':
+        if (feed.entries > 30) return { text: `${feed.entries} EVENTS — ELEVATED`, color: 'var(--signal-offline)' };
+        if (feed.entries > 15) return { text: `${feed.entries} EVENTS — ACTIVE`, color: 'var(--signal-stale)' };
+        return { text: `${feed.entries} events — normal`, color: 'var(--signal-live)' };
+
+      case 'solar':
+        if (rate > avg * 3) return { text: 'MAJOR ACTIVITY', color: 'var(--signal-offline)' };
+        if (rate > avg * 2) return { text: 'ELEVATED ACTIVITY', color: 'var(--signal-stale)' };
+        return { text: 'NOMINAL', color: 'var(--signal-live)' };
+
+      case 'geomag':
+        if (rate > avg * 3) return { text: 'GEOMAGNETIC STORM', color: 'var(--signal-offline)' };
+        if (rate > avg * 2) return { text: 'STORM CONDITIONS', color: 'var(--signal-stale)' };
+        if (rate > avg * 1.3) return { text: 'ACTIVE', color: 'var(--signal-yellow)' };
+        return { text: 'QUIET', color: 'var(--signal-live)' };
+
+      case 'nexrad':
+        if (rate > avg * 2 && avg > 0) return { text: 'SEVERE WEATHER', color: 'var(--signal-offline)' };
+        if (rate > 0) return { text: 'ACTIVE PRECIP', color: 'var(--signal-stale)' };
+        return { text: 'CLEAR', color: 'var(--signal-live)' };
+
+      case 'goes':
+        return { text: 'IMAGING', color: 'var(--signal-cyan)' };
+
+      case 'lightning':
+      case 'blitzortung':
+        if (feed.entries > 50) return { text: 'HIGH DENSITY', color: 'var(--signal-offline)' };
+        if (feed.entries > 10) return { text: 'ACTIVE', color: 'var(--signal-stale)' };
+        if (feed.entries > 0) return { text: 'SPARSE', color: 'var(--signal-yellow)' };
+        return { text: 'CLEAR', color: 'var(--signal-live)' };
+
+      case 'grid':
+        if (rate > avg * 1.5 && avg > 0) return { text: 'DEMAND SURGE', color: 'var(--signal-stale)' };
+        return { text: 'GRID STABLE', color: 'var(--signal-live)' };
+
+      case 'surface':
+        return { text: 'REPORTING', color: 'var(--signal-cyan)' };
+
+      case 'ionosonde':
+        if (rate > avg * 2) return { text: 'TEC ELEVATED', color: 'var(--signal-stale)' };
+        return { text: 'NORMAL TEC', color: 'var(--signal-live)' };
+
+      case 'schumann':
+        if (rate > avg * 2) return { text: 'RESONANCE SPIKE', color: 'var(--signal-stale)' };
+        return { text: 'BASELINE', color: 'var(--signal-live)' };
+
+      case 'aircraft':
+        return { text: `${feed.entries} TRACKED`, color: 'var(--signal-cyan)' };
+
+      case 'notam':
+        if (feed.entries > 20) return { text: 'HIGH ACTIVITY', color: 'var(--signal-stale)' };
+        return { text: `${feed.entries} ACTIVE`, color: 'var(--signal-live)' };
+
+      case 'celltower':
+        return { text: 'MONITORING', color: 'var(--signal-cyan)' };
+
+      case 'heater':
+        if (feed.entries > 0) return { text: 'FACILITY ACTIVE', color: 'var(--signal-stale)' };
+        return { text: 'NO ACTIVITY', color: 'var(--text-dim)' };
+
+      case 'metals':
+        if (rate > avg * 1.5 && avg > 0) return { text: 'ELEVATED TRACE', color: 'var(--signal-stale)' };
+        return { text: 'BASELINE', color: 'var(--signal-live)' };
+
+      case 'ecology':
+        return { text: 'INDEXING', color: 'var(--signal-cyan)' };
+
+      case 'deposition':
+        return { text: 'SAMPLING', color: 'var(--signal-cyan)' };
+
+      default:
+        if (rate > avg * 1.5 && avg > 0) return { text: 'HIGH ACTIVITY', color: 'var(--signal-stale)' };
+        if (rate === 0 && feed.status === 'live') return { text: 'COLLECTING', color: 'var(--text-dim)' };
+        return { text: 'ACTIVE', color: 'var(--signal-live)' };
     }
-    if (feed.id === 'solar') {
-      if (rate > avg * 2) return { text: 'ELEVATED ACTIVITY', color: 'var(--signal-stale)' };
-      return { text: 'NOMINAL', color: 'var(--signal-live)' };
-    }
-    if (feed.id === 'geomag') {
-      if (rate > avg * 2) return { text: 'STORM CONDITIONS', color: 'var(--signal-offline)' };
-      return { text: 'QUIET', color: 'var(--signal-live)' };
-    }
-    if (feed.id === 'grid') {
-      return { text: 'GRID MONITORING', color: 'var(--signal-cyan)' };
-    }
-    if (rate > avg * 1.5 && avg > 0) {
-      return { text: 'HIGH ACTIVITY', color: 'var(--signal-stale)' };
-    }
-    if (rate === 0 && feed.status === 'live') {
-      return { text: 'COLLECTING', color: 'var(--text-dim)' };
-    }
-    return null;
   },
 
   // ── Draw Sparkline ───────────────────────────────────────────
@@ -248,7 +581,6 @@ const Observatory = {
     if (!canvas || !data?.length) return;
 
     const ctx = canvas.getContext('2d');
-    const dpr = window.devicePixelRatio || 1;
     const w = canvas.width;
     const h = canvas.height;
     const max = Math.max(...data, 1);
@@ -320,7 +652,6 @@ const Observatory = {
     const color = status === 'live' ? '0, 255, 136' :
                   status === 'stale' ? '255, 149, 0' : '255, 59, 48';
 
-    // Gradient fill
     const gradient = ctx.createLinearGradient(0, 0, 0, h);
     gradient.addColorStop(0, `rgba(${color}, 0.2)`);
     gradient.addColorStop(1, `rgba(${color}, 0.02)`);
@@ -333,7 +664,6 @@ const Observatory = {
     ctx.fillStyle = gradient;
     ctx.fill();
 
-    // Line
     ctx.beginPath();
     data.forEach((v, i) => {
       const x = i * step;
@@ -344,7 +674,6 @@ const Observatory = {
     ctx.lineWidth = 2;
     ctx.stroke();
 
-    // Dots
     data.forEach((v, i) => {
       const x = i * step;
       const y = h - (v / max) * (h - 4);
@@ -354,7 +683,6 @@ const Observatory = {
       ctx.fill();
     });
 
-    // Hour labels
     ctx.fillStyle = 'rgba(136, 136, 160, 0.5)';
     ctx.font = '9px JetBrains Mono';
     for (let i = 0; i < data.length; i += 6) {
@@ -407,6 +735,9 @@ const Observatory = {
 
     this.drawSparklineLarge(feed.sparkline, feed.status);
 
+    // Store current feed for share button
+    this._currentModalFeed = feed;
+
     try {
       const res = await fetch(`/api/feed/${feed.id}?limit=50`);
       const data = await res.json();
@@ -444,6 +775,46 @@ const Observatory = {
     document.getElementById('modal-overlay').classList.remove('modal-overlay--open');
   },
 
+  // ── Share Feature ───────────────────────────────────────────
+  async shareFeed(feed) {
+    const condition = this.getConditionText(feed);
+    const url = `${window.location.origin}/feed/${feed.id}`;
+    const text = `Truth Observatory — ${feed.name}\nStatus: ${feed.status.toUpperCase()}\nCondition: ${condition?.text || 'Active'}\n${this.timeAgo(feed.last)}\n${url}`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: `Observatory: ${feed.name}`, text, url });
+      } catch (e) {
+        if (e.name !== 'AbortError') this._copyToClipboard(text);
+      }
+    } else {
+      this._copyToClipboard(text);
+    }
+  },
+
+  _copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+      this._showToast('Copied to clipboard');
+    }).catch(() => {
+      // Fallback
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      this._showToast('Copied to clipboard');
+    });
+  },
+
+  _showToast(msg) {
+    const toast = document.createElement('div');
+    toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--bg-raised);border:1px solid var(--signal-cyan);color:var(--signal-cyan);padding:8px 16px;font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.1em;z-index:9000;animation:fadeIn 0.2s ease';
+    toast.textContent = msg;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 2000);
+  },
+
   // ── Render Correlations ──────────────────────────────────────
   renderCorrelations(data) {
     const track = document.getElementById('corr-track');
@@ -451,7 +822,6 @@ const Observatory = {
     const patterns = data.patterns || data.events || [];
 
     document.getElementById('corr-count').textContent = `${patterns.length} patterns`;
-    document.getElementById('stat-corr').textContent = patterns.length > 0 ? `${patterns.length} ACTIVE` : 'MODELING';
 
     if (patterns.length === 0) {
       track.innerHTML = `<div class="corr-card corr-card--empty">
@@ -489,7 +859,6 @@ const Observatory = {
     this.markers.earthquakes = [];
     this.markers.lightning = [];
 
-    // Earthquake markers
     try {
       const res = await fetch('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson');
       const data = await res.json();
@@ -500,10 +869,7 @@ const Observatory = {
           const color = mag >= 5 ? '#ff3b30' : mag >= 4 ? '#ff9500' : mag >= 3 ? '#ffd60a' : '#06b6d4';
           const marker = L.circleMarker([lat, lng], {
             radius: Math.max(4, mag * 3),
-            color: color,
-            fillColor: color,
-            fillOpacity: 0.35,
-            weight: 1.5,
+            color: color, fillColor: color, fillOpacity: 0.35, weight: 1.5,
           }).addTo(this.map);
           marker.bindPopup(`
             <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #e8e8f0; background: #0a0a0e; padding: 8px; border: 1px solid #2a2a38; border-radius: 2px; min-width: 180px;">
@@ -518,6 +884,7 @@ const Observatory = {
     } catch {}
 
     this.updateLayerCount();
+    this.updateDynamicLegend();
   },
 
   // ── Bind Events ──────────────────────────────────────────────
@@ -528,16 +895,19 @@ const Observatory = {
       if (e.target === e.currentTarget) this.closeModal();
     });
 
-    // Domain filters
-    document.getElementById('domain-filters').addEventListener('click', (e) => {
-      const btn = e.target.closest('.filter-btn');
-      if (!btn) return;
-      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('filter-btn--active'));
-      btn.classList.add('filter-btn--active');
-      this.currentFilter = btn.dataset.domain;
-      document.querySelectorAll('.bento-tile').forEach(tile => {
-        tile.dataset.hidden = (this.currentFilter !== 'all' && tile.dataset.domain !== this.currentFilter) ? 'true' : 'false';
-      });
+    // Modal share button
+    document.getElementById('modal-share').addEventListener('click', () => {
+      if (this._currentModalFeed) this.shareFeed(this._currentModalFeed);
+    });
+
+    // Legend info modal close
+    document.getElementById('legend-info-close').addEventListener('click', () => {
+      document.getElementById('legend-info-overlay').classList.remove('legend-info-overlay--open');
+    });
+    document.getElementById('legend-info-overlay').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) {
+        document.getElementById('legend-info-overlay').classList.remove('legend-info-overlay--open');
+      }
     });
 
     // Map layer toggles
@@ -551,6 +921,7 @@ const Observatory = {
         this.map.removeLayer(this.mapLayers[layerName]);
       }
       this.updateLayerCount();
+      this.updateDynamicLegend();
     });
 
     // Correlation carousel
@@ -578,11 +949,26 @@ const Observatory = {
         const view = btn.dataset.view;
         const cockpit = document.getElementById('cockpit');
         cockpit.dataset.view = view;
+
+        // Resize map if switching to map view
+        if (view === 'map' || view === 'cockpit') {
+          setTimeout(() => this.map.invalidateSize(), 100);
+        }
+        // Resize AtmosCore ring if switching to atmoscore view
+        if (view === 'atmoscore') {
+          setTimeout(() => {
+            AtmosCoreViz.resize();
+            AtmosCoreViz.update(AtmosCore);
+          }, 100);
+        }
       });
     });
 
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') this.closeModal();
+      if (e.key === 'Escape') {
+        this.closeModal();
+        document.getElementById('legend-info-overlay').classList.remove('legend-info-overlay--open');
+      }
     });
   },
 

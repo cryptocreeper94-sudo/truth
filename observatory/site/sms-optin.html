@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SMS Alerts Opt-In — Truth Observatory</title>
+  <link rel="stylesheet" href="/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body { overflow: auto; }
+    .optin-page { max-width: 520px; margin: 0 auto; padding: 80px 24px 120px; }
+    .optin-page h1 { font-family: var(--font-mono); font-size: 0.85rem; font-weight: 700; letter-spacing: 0.2em; color: var(--text-primary); margin-bottom: 8px; }
+    .optin-page .optin-sub { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.08em; margin-bottom: 32px; line-height: 1.6; }
+    .optin-page h2 { font-family: var(--font-mono); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.12em; color: var(--text-secondary); margin: 24px 0 8px; }
+    .optin-page p, .optin-page li { font-size: 0.7rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+    .optin-page ul { padding-left: 20px; }
+    .legal-back { position: fixed; top: 12px; left: 12px; font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-dim); text-decoration: none; border: 1px solid var(--border-dim); padding: 6px 12px; letter-spacing: 0.1em; transition: all 0.2s; }
+    .legal-back:hover { color: var(--text-primary); border-color: var(--border-active); }
+    .optin-form { background: var(--bg-tile); border: 1px solid var(--border-dim); padding: 24px; margin-top: 24px; }
+    .optin-field { margin-bottom: 16px; }
+    .optin-label { font-family: var(--font-mono); font-size: 0.55rem; font-weight: 600; letter-spacing: 0.15em; color: var(--text-dim); display: block; margin-bottom: 6px; }
+    .optin-input {
+      width: 100%;
+      padding: 10px 12px;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-mid);
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+      transition: border-color 0.2s;
+    }
+    .optin-input:focus { outline: none; border-color: var(--border-bright); }
+    .optin-input::placeholder { color: var(--text-dim); }
+    .optin-checkbox-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .optin-checkbox-row input[type="checkbox"] {
+      margin-top: 3px;
+      accent-color: var(--signal-cyan);
+      flex-shrink: 0;
+    }
+    .optin-checkbox-row label {
+      font-size: 0.6rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      font-family: var(--font-mono);
+    }
+    .optin-checkbox-row label a { color: var(--text-primary); }
+    .optin-submit {
+      width: 100%;
+      padding: 12px;
+      background: var(--bg-hover);
+      border: 1px solid var(--border-mid);
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .optin-submit:hover { border-color: var(--border-bright); background: var(--bg-active); }
+    .optin-submit:disabled { opacity: 0.4; cursor: not-allowed; }
+    .optin-result { font-family: var(--font-mono); font-size: 0.6rem; margin-top: 12px; padding: 10px; border: 1px solid; display: none; letter-spacing: 0.05em; }
+    .optin-result--ok { color: var(--signal-live); border-color: rgba(0,255,136,0.3); background: rgba(0,255,136,0.05); }
+    .optin-result--err { color: var(--signal-offline); border-color: rgba(255,59,48,0.3); background: rgba(255,59,48,0.05); }
+    .optin-disclosure {
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-dim);
+    }
+    .optin-disclosure p { font-size: 0.55rem; color: var(--text-dim); line-height: 1.6; }
+  </style>
+</head>
+<body>
+  <a href="/" class="legal-back">&larr; OBSERVATORY</a>
+  <div class="optin-page">
+    <h1>SMS WEATHER ALERTS</h1>
+    <div class="optin-sub">Receive atmospheric event notifications directly to your phone. Severe weather, geomagnetic storms, seismic activity, and correlation pattern alerts.</div>
+
+    <h2>WHAT YOU'LL RECEIVE</h2>
+    <ul>
+      <li>Severe weather alerts when Observatory detects radar-confirmed events in your region</li>
+      <li>Geomagnetic storm notifications (G1+ on the NOAA scale)</li>
+      <li>Significant seismic events (M4.5+ within configurable radius)</li>
+      <li>Cross-feed correlation pattern alerts (high-confidence detections)</li>
+      <li>AtmosCore observation suitability changes (if field session is active)</li>
+    </ul>
+
+    <form class="optin-form" id="sms-optin-form">
+      <div class="optin-field">
+        <label class="optin-label" for="optin-phone">PHONE NUMBER</label>
+        <input class="optin-input" type="tel" id="optin-phone" name="phone" placeholder="+1 (555) 123-4567" required>
+      </div>
+      <div class="optin-field">
+        <label class="optin-label" for="optin-email">EMAIL (OPTIONAL)</label>
+        <input class="optin-input" type="email" id="optin-email" name="email" placeholder="you@example.com">
+      </div>
+
+      <div class="optin-checkbox-row">
+        <input type="checkbox" id="optin-consent" name="consent" required>
+        <label for="optin-consent">I consent to receive automated SMS alerts from Truth Observatory (DarkWave Studios LLC). Message frequency varies based on atmospheric conditions. Message and data rates may apply. Reply STOP to unsubscribe at any time. Reply HELP for assistance.</label>
+      </div>
+
+      <div class="optin-checkbox-row">
+        <input type="checkbox" id="optin-terms" name="terms" required>
+        <label for="optin-terms">I have read and agree to the <a href="/terms">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>.</label>
+      </div>
+
+      <button type="submit" class="optin-submit" id="optin-submit" disabled>SUBSCRIBE TO ALERTS</button>
+      <div class="optin-result" id="optin-result"></div>
+    </form>
+
+    <div class="optin-disclosure">
+      <p><strong>Program:</strong> Truth Observatory SMS Alerts</p>
+      <p><strong>Operator:</strong> DarkWave Studios LLC</p>
+      <p><strong>Message frequency:</strong> Varies. Alerts are event-driven and may range from 0 to several per day depending on atmospheric conditions.</p>
+      <p><strong>Opt-out:</strong> Reply STOP to any message to unsubscribe immediately.</p>
+      <p><strong>Help:</strong> Reply HELP to any message or email contact@darkwavestudios.com.</p>
+      <p><strong>Carriers:</strong> T-Mobile, AT&T, Verizon, and all major US carriers are supported.</p>
+      <p><strong>Standard messaging rates apply.</strong> DarkWave Studios LLC does not charge for SMS delivery. Your carrier may apply standard message and data rates.</p>
+    </div>
+  </div>
+
+  <script>
+    // Enable submit only when both checkboxes are checked
+    const consent = document.getElementById('optin-consent');
+    const terms = document.getElementById('optin-terms');
+    const submit = document.getElementById('optin-submit');
+    function checkReady() {
+      submit.disabled = !(consent.checked && terms.checked);
+    }
+    consent.addEventListener('change', checkReady);
+    terms.addEventListener('change', checkReady);
+
+    // Form submission (placeholder — wired to server when Twilio is integrated)
+    document.getElementById('sms-optin-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const result = document.getElementById('optin-result');
+      const phone = document.getElementById('optin-phone').value;
+      const email = document.getElementById('optin-email').value;
+
+      try {
+        const res = await fetch('/api/sms-optin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone, email }),
+        });
+
+        if (res.ok) {
+          result.className = 'optin-result optin-result--ok';
+          result.style.display = 'block';
+          result.textContent = 'You are now subscribed. A confirmation SMS will be sent shortly.';
+          submit.disabled = true;
+          submit.textContent = 'SUBSCRIBED';
+        } else {
+          const data = await res.json().catch(() => ({}));
+          result.className = 'optin-result optin-result--err';
+          result.style.display = 'block';
+          result.textContent = data.error || 'Subscription failed. Please try again or contact support.';
+        }
+      } catch {
+        result.className = 'optin-result optin-result--err';
+        result.style.display = 'block';
+        result.textContent = 'SMS alerts are being set up. Check back soon.';
+      }
+    });
+  </script>
+</body>
+</html>

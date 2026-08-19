@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Truth Observatory — Mission Control</title>
-  <meta name="description" content="18-stream atmospheric, geophysical, and infrastructure monitoring cockpit. Live feeds, cross-feed correlation, SHA-256 integrity. The system watches. The data decides.">
+  <meta name="description" content="18-stream atmospheric, geophysical, and infrastructure monitoring cockpit with AtmosCore 4/42 deterministic state engine. Live feeds, cross-feed correlation, observation suitability governance.">
   <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -17,7 +17,7 @@
     <div class="topbar__left">
       <span class="topbar__logo">&#9673;</span>
       <span class="topbar__title">TRUTH OBSERVATORY</span>
-      <span class="topbar__version">v2.0</span>
+      <span class="topbar__version">v3.0</span>
     </div>
     <div class="topbar__center">
       <div class="topbar__stat">
@@ -25,12 +25,12 @@
         <span class="topbar__stat-value" id="stat-live">&mdash;/18</span>
       </div>
       <div class="topbar__stat">
-        <span class="topbar__stat-label">CORRELATION</span>
-        <span class="topbar__stat-value" id="stat-corr">MODELING</span>
+        <span class="topbar__stat-label">ATMOSCORE</span>
+        <span class="topbar__stat-value" id="stat-atmoscore">INIT</span>
       </div>
       <div class="topbar__stat">
-        <span class="topbar__stat-label">RETENTION</span>
-        <span class="topbar__stat-value" id="stat-retention">4H</span>
+        <span class="topbar__stat-label">SUITABILITY</span>
+        <span class="topbar__stat-value" id="stat-suitability">&mdash;</span>
       </div>
     </div>
     <div class="topbar__right">
@@ -40,7 +40,7 @@
   </header>
 
   <!-- ═══ MAIN COCKPIT ═══ -->
-  <main class="cockpit" id="cockpit">
+  <main class="cockpit" id="cockpit" data-view="cockpit">
 
     <!-- LEFT: MAP PANEL -->
     <section class="cockpit__map" id="map-panel">
@@ -52,56 +52,80 @@
       </div>
       <div class="layer-toggles" id="layer-toggles">
         <label class="layer-toggle"><input type="checkbox" data-layer="radar" checked> RADAR</label>
-        <label class="layer-toggle"><input type="checkbox" data-layer="satellite"> SATELLITE</label>
+        <label class="layer-toggle"><input type="checkbox" data-layer="satellite"> GOES VIS</label>
+        <label class="layer-toggle"><input type="checkbox" data-layer="infrared"> GOES IR</label>
+        <label class="layer-toggle"><input type="checkbox" data-layer="watervapor"> WATER VAPOR</label>
+        <label class="layer-toggle"><input type="checkbox" data-layer="precip"> PRECIP</label>
       </div>
       <div id="map" class="map-container">
-        <!-- Map Legend -->
-        <div class="map-legend" id="map-legend">
-          <div class="map-legend__title">LEGEND</div>
-          <div class="map-legend__section">
-            <div class="map-legend__heading">RADAR REFLECTIVITY</div>
-            <div class="map-legend__bar">
-              <span style="background:#00ff00"></span>
-              <span style="background:#00cc00"></span>
-              <span style="background:#ffff00"></span>
-              <span style="background:#ff9900"></span>
-              <span style="background:#ff0000"></span>
-              <span style="background:#cc0000"></span>
-              <span style="background:#ff00ff"></span>
-            </div>
-            <div class="map-legend__labels">
-              <span>Light</span><span>Mod</span><span>Heavy</span><span>Extreme</span>
-            </div>
-          </div>
-          <div class="map-legend__section">
-            <div class="map-legend__heading">EARTHQUAKES (LAST 24H)</div>
-            <div class="map-legend__sublabel">Circle size = magnitude intensity</div>
-            <div class="map-legend__items">
-              <div class="map-legend__item"><span class="map-legend__dot" style="background:#06b6d4;width:8px;height:8px"></span> Mag 2.5&ndash;2.9 &middot; Minor</div>
-              <div class="map-legend__item"><span class="map-legend__dot" style="background:#ffd60a;width:10px;height:10px"></span> Mag 3.0&ndash;3.9 &middot; Light</div>
-              <div class="map-legend__item"><span class="map-legend__dot" style="background:#ff9500;width:12px;height:12px"></span> Mag 4.0&ndash;4.9 &middot; Moderate</div>
-              <div class="map-legend__item"><span class="map-legend__dot" style="background:#ff3b30;width:14px;height:14px"></span> Mag 5.0+ &middot; Strong</div>
-            </div>
-          </div>
-        </div>
+        <!-- Dynamic Legend -->
+        <div class="map-legend" id="map-legend"></div>
       </div>
     </section>
 
-    <!-- RIGHT: BENTO GRID -->
+    <!-- RIGHT: FEED CAROUSELS -->
     <section class="cockpit__feeds" id="feeds-panel">
       <div class="panel-header">
         <span class="panel-header__icon">&#9635;</span>
         <span class="panel-header__title">DATA STREAMS</span>
-        <div class="panel-header__filters" id="domain-filters">
-          <button class="filter-btn filter-btn--active" data-domain="all">ALL</button>
-          <button class="filter-btn" data-domain="Atmospheric">ATMO</button>
-          <button class="filter-btn" data-domain="Space Weather">SPACE</button>
-          <button class="filter-btn" data-domain="Infrastructure">INFRA</button>
-          <button class="filter-btn" data-domain="Geological">GEO</button>
-          <button class="filter-btn" data-domain="Ecological">ECO</button>
+      </div>
+      <div class="feed-carousels" id="feed-carousels">
+        <!-- Dynamically populated domain carousels -->
+      </div>
+    </section>
+
+    <!-- ATMOSCORE PANEL -->
+    <section class="cockpit__atmoscore" id="atmoscore-panel">
+      <div class="panel-header">
+        <span class="panel-header__icon" style="color: #1E6FA8">&#9673;</span>
+        <span class="panel-header__title">ATMOSCORE 4/42 STATE ENGINE</span>
+        <span class="panel-header__badge" id="atmoscore-provenance"></span>
+      </div>
+      <div class="atmoscore-layout">
+        <div class="atmoscore-ring-wrap">
+          <canvas id="atmoscore-ring"></canvas>
+        </div>
+        <div class="atmoscore-readouts">
+          <div class="atmoscore-primitive" data-primitive="TH">
+            <div class="atmoscore-primitive__bar"></div>
+            <div class="atmoscore-primitive__info">
+              <span class="atmoscore-primitive__label">THERMODYNAMIC</span>
+              <span class="atmoscore-primitive__value" id="prim-TH">0.00</span>
+            </div>
+          </div>
+          <div class="atmoscore-primitive" data-primitive="OP">
+            <div class="atmoscore-primitive__bar"></div>
+            <div class="atmoscore-primitive__info">
+              <span class="atmoscore-primitive__label">OPTICAL PROPAGATION</span>
+              <span class="atmoscore-primitive__value" id="prim-OP">0.00</span>
+            </div>
+          </div>
+          <div class="atmoscore-primitive" data-primitive="DY">
+            <div class="atmoscore-primitive__bar"></div>
+            <div class="atmoscore-primitive__info">
+              <span class="atmoscore-primitive__label">DYNAMIC FLOW</span>
+              <span class="atmoscore-primitive__value" id="prim-DY">0.00</span>
+            </div>
+          </div>
+          <div class="atmoscore-primitive" data-primitive="TS">
+            <div class="atmoscore-primitive__bar"></div>
+            <div class="atmoscore-primitive__info">
+              <span class="atmoscore-primitive__label">TEMPORAL STABILITY</span>
+              <span class="atmoscore-primitive__value" id="prim-TS">0.00</span>
+            </div>
+          </div>
+          <div class="atmoscore-suitability">
+            <div class="atmoscore-suitability__label">OBSERVATION SUITABILITY</div>
+            <div class="atmoscore-suitability__score" id="atmoscore-suit-score">&mdash;</div>
+            <div class="atmoscore-suitability__status" id="atmoscore-suit-status">INITIALIZING</div>
+            <div class="atmoscore-suitability__trend" id="atmoscore-suit-trend"></div>
+          </div>
+          <div class="atmoscore-hc" id="atmoscore-hc-bar" style="display:none">
+            <span class="atmoscore-hc__icon">⚠</span>
+            <span class="atmoscore-hc__text" id="atmoscore-hc-text"></span>
+          </div>
         </div>
       </div>
-      <div class="bento-grid" id="bento-grid"></div>
     </section>
 
     <!-- BOTTOM: CORRELATION BAR -->
@@ -150,9 +174,48 @@
       </div>
       <div class="modal__footer">
         <button class="modal__back-btn" id="modal-back">&larr; BACK TO COCKPIT</button>
+        <button class="modal__share-btn" id="modal-share">&#9993; SHARE</button>
       </div>
     </div>
   </div>
+
+  <!-- ═══ LEGEND INFO MODAL ═══ -->
+  <div class="legend-info-overlay" id="legend-info-overlay">
+    <div class="legend-info-modal" id="legend-info-modal">
+      <div class="legend-info-modal__header">
+        <h3 class="legend-info-modal__title" id="legend-info-title"></h3>
+        <button class="legend-info-modal__close" id="legend-info-close">&#10005;</button>
+      </div>
+      <div class="legend-info-modal__body" id="legend-info-body"></div>
+    </div>
+  </div>
+
+  <!-- ═══ CANONICAL FOOTER ═══ -->
+  <footer class="site-footer" id="site-footer">
+    <div class="site-footer__row">
+      <div class="site-footer__brand">
+        <span class="site-footer__logo">&#9673;</span>
+        <span class="site-footer__name">Truth Observatory</span>
+        <span class="site-footer__copy">&copy; 2026 DarkWave Studios LLC</span>
+      </div>
+      <div class="site-footer__links">
+        <a href="/terms" class="site-footer__link">Terms of Service</a>
+        <a href="/privacy" class="site-footer__link">Privacy Policy</a>
+        <a href="/legal" class="site-footer__link">Legal</a>
+        <a href="/sms-optin" class="site-footer__link">SMS Alerts</a>
+      </div>
+      <div class="site-footer__donate">
+        <span class="site-footer__donate-label">SUPPORT THE PROJECT</span>
+        <div class="site-footer__donate-links">
+          <a href="https://venmo.com/DarkWaveStudios" target="_blank" rel="noopener" class="site-footer__donate-btn">Venmo @DarkWaveStudios</a>
+          <a href="https://cash.app/$darkwavestudios" target="_blank" rel="noopener" class="site-footer__donate-btn">CashApp $darkwavestudios</a>
+        </div>
+      </div>
+    </div>
+    <div class="site-footer__legal-bar">
+      All atmospheric data is sourced from public government APIs (NOAA, USGS, FAA, EPA, EIA, SWPC). Observatory does not generate, modify, or editorialize data. All observations are timestamped, source-attributed, and hash-verified.
+    </div>
+  </footer>
 
   <!-- ═══ BOTTOM NAV ═══ -->
   <nav class="bottomnav" id="bottomnav">
@@ -163,6 +226,10 @@
     <button class="bottomnav__btn" data-view="feeds">
       <span class="bottomnav__icon">&#9635;</span>
       <span class="bottomnav__label">Feeds</span>
+    </button>
+    <button class="bottomnav__btn" data-view="atmoscore">
+      <span class="bottomnav__icon" style="color: #1E6FA8">&#9678;</span>
+      <span class="bottomnav__label">AtmosCore</span>
     </button>
     <button class="bottomnav__btn" data-view="correlations">
       <span class="bottomnav__icon">&#10689;</span>
@@ -175,6 +242,8 @@
   </nav>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="atmoscore.js"></script>
+  <script src="atmoscore-viz.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

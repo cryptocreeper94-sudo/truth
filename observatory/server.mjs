@@ -219,7 +219,14 @@ const server = createServer((req, res) => {
   }
 
   // ── Static File Serving ─────────────────────────────────────────────
-  let filePath = path === '/' ? '/index.html' : path;
+  // Page routes → static HTML files
+  const PAGE_ROUTES = {
+    '/terms': '/terms.html',
+    '/privacy': '/privacy.html',
+    '/legal': '/legal.html',
+    '/sms-optin': '/sms-optin.html',
+  };
+  let filePath = PAGE_ROUTES[path] || (path === '/' ? '/index.html' : path);
   const fullPath = join(SITE_DIR, filePath);
 
   // Security: prevent directory traversal
