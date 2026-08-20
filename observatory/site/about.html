@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Truth Observatory — About</title>
-  <meta name="description" content="Truth Observatory: 18-stream deterministic atmospheric monitoring. How it works, open API, researcher contributions, and investment opportunities.">
+  <meta name="description" content="Truth Observatory: 18-stream deterministic multi-domain observation platform. Electromagnetic, atmospheric, infrastructure, and ecological data — cross-correlated and anchored to the DarkWave Trust Layer.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔭</text></svg>">
@@ -264,9 +264,9 @@
     <div class="hero">
       <span class="hero__icon">🔭</span>
       <h1 class="hero__title">Truth Observatory</h1>
-      <div class="hero__sub">Deterministic Atmospheric Monitoring</div>
+      <div class="hero__sub">Deterministic Multi-Domain Observation</div>
       <p class="hero__desc">
-        18 independent data streams. Zero editorialization. Every observation timestamped, source-attributed, and hash-verified. We don't tell you what to think — we show you what the instruments are reading.
+        18 independent data streams across electromagnetic, atmospheric, infrastructure, and ecological domains. Zero editorialization. Every observation timestamped, source-attributed, hash-verified, and anchored to the DarkWave Trust Layer. We don't tell you what to think — we show you what the instruments are reading.
       </p>
     </div>
 
@@ -275,7 +275,16 @@
       <div class="section__label">01 — The Platform</div>
       <h2 class="section__title">What Observatory Does</h2>
       <p>
-        Truth Observatory is a <strong>real-time atmospheric, geophysical, and infrastructure monitoring platform</strong> that collects data from 18 public government and scientific data sources, models statistical baselines for each stream, detects deviations from normal, and cross-correlates anomalies across feeds.
+        Truth Observatory is a <strong>real-time multi-domain observation platform</strong> that collects data from 18 public government and scientific data sources spanning four domains:
+      </p>
+      <p>
+        <strong>Electromagnetic</strong> — solar flux, geomagnetic indices, ionospheric TEC, Schumann resonance, ionospheric heater schedules.<br>
+        <strong>Atmospheric</strong> — NEXRAD radar, GOES satellite imagery, surface stations, deposition chemistry, precipitation.<br>
+        <strong>Infrastructure</strong> — power grid demand (EIA-930), cell tower registries (FCC ASR), aircraft tracking (ADS-B), NOTAMs.<br>
+        <strong>Ecological</strong> — pollinator observation indices, trace metals in waterways, atmospheric deposition monitoring.
+      </p>
+      <p>
+        The platform models statistical baselines for each stream, detects deviations from normal, and cross-correlates anomalies <strong>across all domains</strong>. Solar flare → geomagnetic spike → ionospheric disturbance → grid demand anomaly — four domains, one observable chain. That's the 10-mile-high view, built from the bottom up.
       </p>
       <p>
         Every piece of data is pulled directly from the source — NOAA, USGS, FAA, EPA, EIA, SWPC, and independent scientific networks. <strong>No data is generated, interpolated, or editorialized.</strong> If a feed goes offline, it's recorded as a gap, not silently skipped.
@@ -338,7 +347,7 @@
           <span class="pipeline__num">07</span>
           <div>
             <div class="pipeline__label">EVENT LEDGER</div>
-            <div class="pipeline__desc">All observations, gaps, deviations, and correlations stream into a unified chronological ledger with 15-minute block numbers and deterministic hashes — like a blockchain for atmospheric data.</div>
+            <div class="pipeline__desc">All observations, gaps, deviations, and correlations stream into a unified chronological ledger with 15-minute block numbers and deterministic hashes. Block Merkle roots are anchored to the DarkWave Trust Layer (DWTL) — a Layer 1 blockchain — making every observation cryptographically verifiable and tamper-proof.</div>
           </div>
         </div>
       </div>
@@ -424,6 +433,31 @@
       <p><strong>No editorialization.</strong> The system shows you what the instruments read. It does not tell you what it means.</p>
       <p><strong>No AI judgment.</strong> Baselines are statistical. Deviations are mathematical. Correlations are temporal. None of this requires or uses machine learning.</p>
       <p><strong>Full provenance.</strong> Every observation is traceable from the UI → API → Event Ledger → manifest → source URL → raw file with SHA-256 hash.</p>
+      <p><strong>On-chain verification.</strong> Ledger block hashes are anchored to the DarkWave Trust Layer (DWTL) — an independent Layer 1 blockchain. Once anchored, observations cannot be retroactively modified, deleted, or reinterpreted. The blockchain is not the product — it is the proof layer.</p>
+    </section>
+
+    <!-- ═══ TRUST LAYER ═══ -->
+    <section class="section">
+      <div class="section__label">05b — Proof Layer</div>
+      <h2 class="section__title">DarkWave Trust Layer (DWTL)</h2>
+      <p>
+        Observatory generates deterministic SHA-256 hashes for every observation. Every 15-minute block's Merkle root is submitted to <strong>DWTL</strong> — the DarkWave ecosystem's Layer 1 blockchain at <a href="https://dwtl.io" style="color: var(--signal-cyan);">dwtl.io</a>.
+      </p>
+      <p>
+        This anchoring provides four guarantees:
+      </p>
+      <p>
+        <strong>1. Tamper-proof observations.</strong> Once a block hash is on-chain, the raw data that produced it cannot be retroactively altered without breaking the Merkle proof.
+      </p>
+      <p>
+        <strong>2. Safe pruning.</strong> Raw observation files are pruned at 30 days, but the on-chain proof of their existence is permanent. Anyone can verify an observation existed by checking its hash against the block's Merkle root.
+      </p>
+      <p>
+        <strong>3. Immutable verdicts.</strong> The skeptic engine's correlation verdicts are recorded with the block hash. A "COINCIDENCE" verdict cannot be retroactively changed to "CONFIRMED" — the original judgment is on-chain.
+      </p>
+      <p>
+        <strong>4. Independent verification.</strong> Any third party can reconstruct the Merkle tree from raw manifests and verify it matches the on-chain root. No trust in DarkWave Studios is required — the math is the proof.
+      </p>
     </section>
 
     <!-- ═══ FOR RESEARCHERS ═══ -->
@@ -529,7 +563,10 @@
         <strong>Manifest metadata</strong> — including timestamps, source attribution, SHA-256 hashes, and observation summaries — is retained <strong>permanently</strong>. This means every observation that ever passed through the system can be verified by its hash, even after the raw file is pruned.
       </p>
       <p>
-        <strong>Event Ledger blocks</strong> and their hashes are permanent. The full ledger history is accessible via <code style="background: rgba(0,210,255,0.1); color: var(--signal-cyan); padding: 1px 4px; border-radius: 2px; font-size: 0.8rem;">/api/ledger</code>.
+        <strong>On-chain anchoring</strong> — 15-minute block Merkle roots are submitted to DWTL. Even if this server is destroyed, the cryptographic proof of every observation's existence is permanent on Layer 1.
+      </p>
+      <p>
+        <strong>Event Ledger blocks</strong> and their hashes are permanent. The full ledger history is accessible via <code style="background: rgba(0,210,255,0.1); color: var(--signal-cyan); padding: 1px 4px; border-radius: 2px; font-size: 0.8rem;">/api/ledger</code> and searchable via the <a href="/explorer" style="color: var(--signal-cyan);">Event Explorer</a>.
       </p>
       <p>
         <strong>Correlation patterns</strong> are recomputed every 5 minutes from the rolling 7-day window. Historical patterns are preserved in the Event Ledger.
@@ -541,6 +578,8 @@
       <div class="about-footer__text">© 2026 DARKWAVE STUDIOS LLC — TRUTH OBSERVATORY v3.0</div>
       <div class="about-footer__links">
         <a href="/" class="about-footer__link">Cockpit</a>
+        <a href="/explorer" class="about-footer__link">Explorer</a>
+        <a href="https://dwtl.io" class="about-footer__link">Trust Layer</a>
         <a href="/terms" class="about-footer__link">Terms</a>
         <a href="/privacy" class="about-footer__link">Privacy</a>
         <a href="/legal" class="about-footer__link">Legal</a>
