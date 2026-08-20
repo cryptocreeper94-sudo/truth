@@ -1414,8 +1414,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
       const time = new Date(ev.at);
       const timeStr = time.toISOString().slice(11, 16) + ' UTC';
       const kindClass = `ledger-event--${ev.kind}`;
-      const isCorr = ev.kind === 'correlation';
-      const clickAttr = isCorr ? `onclick="Observatory.openCorrelationDetail(${data.events.indexOf(ev)})"` : '';
+      const clickAttr = `onclick="Observatory.openEventDetail(${data.events.indexOf(ev)})"`;
 
       let feedLabel = ev.feedName;
       let detailHtml = ev.detail || '';
@@ -1429,7 +1428,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
       }
 
       html += `
-        <div class="ledger-event ${kindClass}" ${clickAttr}>
+        <div class="ledger-event ${kindClass}" ${clickAttr} style="cursor:pointer">
           <span class="ledger-event__time">${timeStr}</span>
           <span class="ledger-event__icon">${ev.icon || '·'}</span>
           <div class="ledger-event__content">
@@ -1443,7 +1442,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
     stream.innerHTML = html;
   },
 
-  openCorrelationDetail(index) {
+  openEventDetail(index) {
     if (!this.ledgerData || !this.ledgerData.events[index]) return;
     const ev = this.ledgerData.events[index];
 
@@ -1453,19 +1452,54 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
     const verdict = document.getElementById('corr-detail-verdict');
     const skeptic = document.getElementById('corr-detail-skeptic');
 
-    title.textContent = ev.feedName || 'CORRELATION';
-    body.innerHTML = `
-      <p><strong>Domains:</strong> ${ev.domain || '—'}</p>
-      <p><strong>Occurrences:</strong> ${ev.occurrences || '—'} coincident deviations in past 7 days</p>
-      <p><strong>Average Lag:</strong> ${ev.avgLagMinutes != null ? (ev.avgLagMinutes === 0 ? 'Simultaneous' : Math.abs(ev.avgLagMinutes) + ' minutes') : '—'}</p>
-      <p><strong>Confidence:</strong> ${ev.confidence || '—'}</p>
-      <p><strong>Detail:</strong> ${ev.detail || '—'}</p>
-      <p><strong>Feeds Involved:</strong> ${(ev.feeds || []).join(', ')}</p>
-      <p><strong>Last Detected:</strong> ${ev.at || '—'}</p>
-      <p><strong>Block:</strong> #${ev.block} &nbsp; <strong>Hash:</strong> ${ev.hash || '—'}</p>
-    `;
-    verdict.textContent = ev.verdict || 'CORRELATION OBSERVED — NOT CAUSATION';
-    skeptic.textContent = ev.skepticNote || 'No skeptic analysis available.';
+    const kindLabels = { observation: 'OBSERVATION', gap: 'DATA GAP', deviation: 'DEVIATION', correlation: 'CORRELATION' };
+    title.textContent = `${kindLabels[ev.kind] || ev.kind.toUpperCase()} — ${ev.feedName || 'Unknown'}`;
+
+    let bodyHtml = '';
+
+    // Common fields
+    bodyHtml += `<p><strong>Type:</strong> ${ev.type || ev.kind}</p>`;
+    bodyHtml += `<p><strong>Feed:</strong> ${ev.feedName || '—'}</p>`;
+    bodyHtml += `<p><strong>Domain:</strong> ${ev.domain || '—'}</p>`;
+    bodyHtml += `<p><strong>Timestamp:</strong> ${ev.at || '—'}</p>`;
+
+    if (ev.kind === 'observation') {
+      if (ev.source) bodyHtml += `<p><strong>Source:</strong> ${ev.source}</p>`;
+      if (ev.bytes) bodyHtml += `<p><strong>Payload:</strong> ${(ev.bytes / 1024).toFixed(1)}KB</p>`;
+      if (ev.sha256) bodyHtml += `<p><strong>SHA-256:</strong> <span style="font-size:0.6rem;word-break:break-all">${ev.sha256}</span></p>`;
+    } else if (ev.kind === 'gap') {
+      if (ev.reason) bodyHtml += `<p><strong>Reason:</strong> ${ev.reason}</p>`;
+      bodyHtml += `<p><strong>Status:</strong> Feed did not return data at this collection interval.</p>`;
+    } else if (ev.kind === 'deviation') {
+      if (ev.zScore) bodyHtml += `<p><strong>Z-Score:</strong> ${ev.zScore}σ ${ev.direction || ''}</p>`;
+      if (ev.metric) bodyHtml += `<p><strong>Metric:</strong> ${ev.metric}</p>`;
+      if (ev.value != null) bodyHtml += `<p><strong>Observed Value:</strong> ${ev.value}</p>`;
+      if (ev.baseline != null) bodyHtml += `<p><strong>Baseline:</strong> ${ev.baseline}</p>`;
+    } else if (ev.kind === 'correlation') {
+      if (ev.feeds) bodyHtml += `<p><strong>Feeds Involved:</strong> ${ev.feeds.join(', ')}</p>`;
+      if (ev.occurrences) bodyHtml += `<p><strong>Occurrences:</strong> ${ev.occurrences} coincident deviations</p>`;
+      if (ev.avgLagMinutes != null) bodyHtml += `<p><strong>Average Lag:</strong> ${ev.avgLagMinutes === 0 ? 'Simultaneous' : Math.abs(ev.avgLagMinutes) + ' minutes'}</p>`;
+      if (ev.confidence) bodyHtml += `<p><strong>Confidence:</strong> ${ev.confidence}</p>`;
+    }
+
+    if (ev.detail) bodyHtml += `<p><strong>Detail:</strong> ${ev.detail}</p>`;
+    bodyHtml += `<p><strong>Block:</strong> #${ev.block} &nbsp; <strong>Hash:</strong> ${ev.hash || '—'}</p>`;
+
+    body.innerHTML = bodyHtml;
+
+    if (ev.kind === 'correlation') {
+      verdict.textContent = ev.verdict || 'CORRELATION OBSERVED — NOT CAUSATION';
+      skeptic.textContent = ev.skepticNote || 'Temporal proximity does not imply causal relationship.';
+    } else if (ev.kind === 'deviation') {
+      verdict.textContent = 'STATISTICAL DEVIATION FROM BASELINE';
+      skeptic.textContent = 'Deviations exceeding 2σ are flagged automatically. This is a statistical observation, not an alert.';
+    } else if (ev.kind === 'gap') {
+      verdict.textContent = 'DATA GAP RECORDED';
+      skeptic.textContent = 'Source did not respond or returned an error. Gap is logged for integrity — no data was interpolated.';
+    } else {
+      verdict.textContent = 'OBSERVATION RECORDED';
+      skeptic.textContent = 'Raw data collected from public source. No modification, no editorialization.';
+    }
 
     overlay.classList.add('corr-detail-overlay--open');
   },

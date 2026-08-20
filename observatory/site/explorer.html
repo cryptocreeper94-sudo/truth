@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Truth Observatory — Event Explorer</title>
+  <meta name="description" content="Search, filter, and explore the full event ledger — observations, deviations, correlations, and data gaps across all 18 atmospheric feeds.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔭</text></svg>">
+  <style>
+    :root {
+      --bg-primary: #0a0e14;
+      --bg-secondary: #111820;
+      --bg-tertiary: #1a2230;
+      --text-primary: #d4dae3;
+      --text-secondary: #8b95a5;
+      --text-dim: #4a5568;
+      --signal-cyan: #00d2ff;
+      --signal-live: #00e676;
+      --signal-stale: #ffa726;
+      --signal-warn: #ff6b35;
+      --signal-dead: #ff3b30;
+      --border-dim: rgba(255,255,255,0.06);
+      --font-mono: 'JetBrains Mono', monospace;
+      --font-sans: 'Inter', sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg-primary); color: var(--text-primary);
+      font-family: var(--font-sans); -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Top Bar ──────────────────────────────────── */
+    .explorer-bar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(10, 14, 20, 0.95); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-dim);
+      padding: 10px 20px; display: flex; align-items: center; gap: 16px;
+    }
+    .explorer-bar__back {
+      background: none; border: 1px solid var(--border-dim);
+      color: var(--signal-cyan); font-family: var(--font-mono);
+      font-size: 0.65rem; padding: 5px 12px; border-radius: 3px;
+      cursor: pointer; text-decoration: none; letter-spacing: 0.05em;
+      transition: all 0.2s;
+    }
+    .explorer-bar__back:hover { background: var(--signal-cyan); color: var(--bg-primary); }
+    .explorer-bar__title {
+      font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+    }
+    .explorer-bar__stats {
+      margin-left: auto; display: flex; gap: 16px;
+      font-family: var(--font-mono); font-size: 0.6rem;
+    }
+    .explorer-bar__stat-label { color: var(--text-dim); margin-right: 4px; }
+    .explorer-bar__stat-value { color: var(--signal-cyan); font-weight: 600; }
+
+    /* ── Layout ───────────────────────────────────── */
+    .explorer { padding: 60px 20px 40px; max-width: 1200px; margin: 0 auto; }
+
+    /* ── Filters ──────────────────────────────────── */
+    .filters {
+      display: flex; flex-wrap: wrap; gap: 10px; padding: 16px 0;
+      border-bottom: 1px solid var(--border-dim); margin-bottom: 12px;
+    }
+    .filter-group { display: flex; flex-direction: column; gap: 4px; }
+    .filter-group__label {
+      font-family: var(--font-mono); font-size: 0.55rem;
+      color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase;
+    }
+    .filter-input, .filter-select {
+      background: var(--bg-secondary); border: 1px solid var(--border-dim);
+      color: var(--text-primary); font-family: var(--font-mono);
+      font-size: 0.7rem; padding: 6px 10px; border-radius: 3px;
+      outline: none; transition: border-color 0.2s;
+    }
+    .filter-input:focus, .filter-select:focus { border-color: var(--signal-cyan); }
+    .filter-input { min-width: 200px; }
+    .filter-select { min-width: 140px; cursor: pointer; }
+    .filter-select option { background: var(--bg-secondary); }
+
+    .filter-chips {
+      display: flex; gap: 6px; align-items: flex-end; flex-wrap: wrap;
+    }
+    .filter-chip {
+      background: none; border: 1px solid var(--border-dim);
+      color: var(--text-secondary); font-family: var(--font-mono);
+      font-size: 0.6rem; padding: 5px 10px; border-radius: 3px;
+      cursor: pointer; transition: all 0.2s; letter-spacing: 0.05em;
+    }
+    .filter-chip:hover { border-color: var(--signal-cyan); color: var(--signal-cyan); }
+    .filter-chip--active {
+      background: rgba(0, 210, 255, 0.12); border-color: var(--signal-cyan);
+      color: var(--signal-cyan); font-weight: 600;
+    }
+    .filter-chip--obs.filter-chip--active { background: rgba(0,230,118,0.12); border-color: var(--signal-live); color: var(--signal-live); }
+    .filter-chip--gap.filter-chip--active { background: rgba(255,167,38,0.12); border-color: var(--signal-stale); color: var(--signal-stale); }
+    .filter-chip--dev.filter-chip--active { background: rgba(255,107,53,0.12); border-color: var(--signal-warn); color: var(--signal-warn); }
+    .filter-chip--corr.filter-chip--active { background: rgba(0,210,255,0.12); border-color: var(--signal-cyan); color: var(--signal-cyan); }
+
+    .filter-actions { display: flex; gap: 8px; align-items: flex-end; margin-left: auto; }
+    .filter-btn {
+      background: var(--signal-cyan); border: none; color: var(--bg-primary);
+      font-family: var(--font-mono); font-size: 0.6rem; font-weight: 700;
+      padding: 6px 14px; border-radius: 3px; cursor: pointer;
+      letter-spacing: 0.05em; transition: opacity 0.2s;
+    }
+    .filter-btn:hover { opacity: 0.85; }
+    .filter-btn--reset {
+      background: none; border: 1px solid var(--border-dim);
+      color: var(--text-dim);
+    }
+
+    /* ── Results Summary ──────────────────────────── */
+    .results-bar {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 0; font-family: var(--font-mono); font-size: 0.6rem;
+    }
+    .results-bar__count { color: var(--text-dim); }
+    .results-bar__count strong { color: var(--signal-cyan); }
+    .results-bar__pagination { display: flex; gap: 6px; }
+    .page-btn {
+      background: var(--bg-secondary); border: 1px solid var(--border-dim);
+      color: var(--text-secondary); font-family: var(--font-mono);
+      font-size: 0.6rem; padding: 4px 10px; border-radius: 3px;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .page-btn:hover { border-color: var(--signal-cyan); color: var(--signal-cyan); }
+    .page-btn:disabled { opacity: 0.3; cursor: default; }
+
+    /* ── Event Table ──────────────────────────────── */
+    .event-table { width: 100%; border-collapse: collapse; }
+    .event-table th {
+      text-align: left; font-family: var(--font-mono); font-size: 0.55rem;
+      color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 8px 10px; border-bottom: 1px solid var(--border-dim);
+      position: sticky; top: 0; background: var(--bg-primary); z-index: 1;
+    }
+    .event-table td {
+      font-family: var(--font-mono); font-size: 0.65rem;
+      padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.03);
+      color: var(--text-secondary); vertical-align: top;
+    }
+    .event-table tr { transition: background 0.15s; cursor: pointer; }
+    .event-table tr:hover { background: rgba(255,255,255,0.03); }
+    .event-table tr.row--observation { border-left: 3px solid var(--signal-live); }
+    .event-table tr.row--gap { border-left: 3px solid var(--signal-stale); }
+    .event-table tr.row--deviation { border-left: 3px solid var(--signal-warn); background: rgba(255,107,53,0.03); }
+    .event-table tr.row--correlation { border-left: 3px solid var(--signal-cyan); background: rgba(0,210,255,0.04); }
+
+    .cell-kind {
+      display: inline-block; padding: 2px 6px; border-radius: 3px;
+      font-size: 0.55rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .cell-kind--observation { background: rgba(0,230,118,0.12); color: var(--signal-live); }
+    .cell-kind--gap { background: rgba(255,167,38,0.12); color: var(--signal-stale); }
+    .cell-kind--deviation { background: rgba(255,107,53,0.15); color: var(--signal-warn); }
+    .cell-kind--correlation { background: rgba(0,210,255,0.12); color: var(--signal-cyan); }
+
+    .cell-hash {
+      font-size: 0.55rem; color: var(--text-dim); opacity: 0.6;
+      max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .cell-detail {
+      max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+
+    /* ── Detail Panel ─────────────────────────────── */
+    .detail-overlay {
+      position: fixed; inset: 0; z-index: 9000;
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+      display: none; align-items: center; justify-content: center;
+    }
+    .detail-overlay--open { display: flex; }
+    .detail-panel {
+      background: var(--bg-secondary); border: 1px solid var(--border-dim);
+      border-radius: 6px; max-width: 600px; width: 92%; max-height: 85vh;
+      overflow-y: auto; font-family: var(--font-mono);
+    }
+    .detail-panel__header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 14px 18px; border-bottom: 1px solid var(--border-dim);
+    }
+    .detail-panel__title {
+      font-size: 0.75rem; color: var(--signal-cyan); font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+    }
+    .detail-panel__close {
+      background: none; border: none; color: var(--text-dim);
+      cursor: pointer; font-size: 1.1rem; padding: 4px;
+    }
+    .detail-panel__body { padding: 18px; }
+    .detail-panel__row {
+      display: flex; gap: 12px; padding: 6px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+    }
+    .detail-panel__label {
+      font-size: 0.6rem; color: var(--text-dim); min-width: 100px;
+      text-transform: uppercase; letter-spacing: 0.08em;
+    }
+    .detail-panel__value { font-size: 0.7rem; color: var(--text-primary); word-break: break-all; }
+    .detail-panel__footer {
+      padding: 14px 18px; border-top: 1px solid var(--border-dim);
+    }
+    .detail-panel__verdict {
+      font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; margin-bottom: 6px;
+    }
+    .detail-panel__verdict--obs { color: var(--signal-live); }
+    .detail-panel__verdict--gap { color: var(--signal-stale); }
+    .detail-panel__verdict--dev { color: var(--signal-warn); }
+    .detail-panel__verdict--corr { color: var(--signal-cyan); }
+    .detail-panel__skeptic {
+      font-size: 0.6rem; color: var(--text-dim); font-style: italic; line-height: 1.5;
+    }
+
+    /* ── Empty State ──────────────────────────────── */
+    .empty-state {
+      text-align: center; padding: 60px 20px;
+      font-family: var(--font-mono); color: var(--text-dim);
+    }
+    .empty-state__icon { font-size: 2rem; margin-bottom: 12px; }
+    .empty-state__text { font-size: 0.75rem; }
+
+    /* ── Loading ──────────────────────────────────── */
+    .loading-bar {
+      text-align: center; padding: 40px;
+      font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim);
+    }
+
+    /* ── Responsive ───────────────────────────────── */
+    @media (max-width: 768px) {
+      .filters { flex-direction: column; }
+      .filter-actions { margin-left: 0; }
+      .filter-input { min-width: 100%; }
+      .explorer-bar__stats { display: none; }
+      .event-table th:nth-child(6), .event-table td:nth-child(6) { display: none; }
+      .cell-detail { max-width: 160px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="explorer-bar">
+    <a href="/" class="explorer-bar__back">&larr; COCKPIT</a>
+    <span class="explorer-bar__title">Event Explorer</span>
+    <div class="explorer-bar__stats">
+      <span><span class="explorer-bar__stat-label">EVENTS</span><span class="explorer-bar__stat-value" id="stat-total">—</span></span>
+      <span><span class="explorer-bar__stat-label">BLOCK</span><span class="explorer-bar__stat-value" id="stat-block">—</span></span>
+      <span><span class="explorer-bar__stat-label">FEEDS</span><span class="explorer-bar__stat-value" id="stat-feeds">18</span></span>
+    </div>
+  </nav>
+
+  <div class="explorer">
+
+    <!-- ═══ FILTERS ═══ -->
+    <div class="filters" id="filters">
+      <div class="filter-group">
+        <span class="filter-group__label">Search</span>
+        <input class="filter-input" type="text" id="search-input" placeholder="Feed name, source, hash...">
+      </div>
+      <div class="filter-group">
+        <span class="filter-group__label">Feed</span>
+        <select class="filter-select" id="feed-filter">
+          <option value="">All Feeds</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <span class="filter-group__label">Event Type</span>
+        <div class="filter-chips" id="type-chips">
+          <button class="filter-chip filter-chip--obs filter-chip--active" data-type="observation">Observations</button>
+          <button class="filter-chip filter-chip--gap filter-chip--active" data-type="gap">Gaps</button>
+          <button class="filter-chip filter-chip--dev filter-chip--active" data-type="deviation">Deviations</button>
+          <button class="filter-chip filter-chip--corr filter-chip--active" data-type="correlation">Correlations</button>
+        </div>
+      </div>
+      <div class="filter-actions">
+        <button class="filter-btn filter-btn--reset" id="reset-btn">RESET</button>
+        <button class="filter-btn" id="search-btn">SEARCH</button>
+      </div>
+    </div>
+
+    <!-- ═══ RESULTS ═══ -->
+    <div class="results-bar" id="results-bar">
+      <span class="results-bar__count" id="results-count">Loading...</span>
+      <div class="results-bar__pagination" id="pagination"></div>
+    </div>
+
+    <div id="table-container">
+      <div class="loading-bar" id="loading">Loading event ledger...</div>
+    </div>
+  </div>
+
+  <!-- ═══ DETAIL PANEL ═══ -->
+  <div class="detail-overlay" id="detail-overlay">
+    <div class="detail-panel" id="detail-panel">
+      <div class="detail-panel__header">
+        <span class="detail-panel__title" id="detail-title">EVENT</span>
+        <button class="detail-panel__close" id="detail-close">&#10005;</button>
+      </div>
+      <div class="detail-panel__body" id="detail-body"></div>
+      <div class="detail-panel__footer">
+        <div class="detail-panel__verdict" id="detail-verdict"></div>
+        <div class="detail-panel__skeptic" id="detail-skeptic"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  const Explorer = {
+    allEvents: [],
+    filtered: [],
+    page: 0,
+    perPage: 50,
+    feeds: new Set(),
+    activeTypes: new Set(['observation', 'gap', 'deviation', 'correlation']),
+
+    async init() {
+      this.bindEvents();
+      await this.fetchAll();
+    },
+
+    bindEvents() {
+      document.getElementById('search-btn').addEventListener('click', () => this.applyFilters());
+      document.getElementById('reset-btn').addEventListener('click', () => this.resetFilters());
+      document.getElementById('search-input').addEventListener('keyup', (e) => {
+        if (e.key === 'Enter') this.applyFilters();
+      });
+      document.getElementById('feed-filter').addEventListener('change', () => this.applyFilters());
+
+      // Type chips
+      document.querySelectorAll('.filter-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          chip.classList.toggle('filter-chip--active');
+          const type = chip.dataset.type;
+          if (this.activeTypes.has(type)) this.activeTypes.delete(type);
+          else this.activeTypes.add(type);
+          this.applyFilters();
+        });
+      });
+
+      // Detail modal
+      document.getElementById('detail-close').addEventListener('click', () => {
+        document.getElementById('detail-overlay').classList.remove('detail-overlay--open');
+      });
+      document.getElementById('detail-overlay').addEventListener('click', (e) => {
+        if (e.target.id === 'detail-overlay') e.target.classList.remove('detail-overlay--open');
+      });
+    },
+
+    async fetchAll() {
+      try {
+        const res = await fetch('/api/ledger?limit=500');
+        const data = await res.json();
+        this.allEvents = data.events || [];
+        this.totalEvents = data.totalEvents || this.allEvents.length;
+        this.currentBlock = data.currentBlock || '—';
+
+        // Populate stats
+        document.getElementById('stat-total').textContent = this.totalEvents.toLocaleString();
+        document.getElementById('stat-block').textContent = '#' + this.currentBlock;
+
+        // Populate feed dropdown
+        this.feeds.clear();
+        this.allEvents.forEach(ev => { if (ev.feedName) this.feeds.add(ev.feedName); });
+        const select = document.getElementById('feed-filter');
+        const sorted = [...this.feeds].sort();
+        sorted.forEach(f => {
+          const opt = document.createElement('option');
+          opt.value = f; opt.textContent = f;
+          select.appendChild(opt);
+        });
+        document.getElementById('stat-feeds').textContent = sorted.length;
+
+        this.applyFilters();
+      } catch (e) {
+        document.getElementById('loading').textContent = 'Failed to load: ' + e.message;
+      }
+    },
+
+    applyFilters() {
+      const search = document.getElementById('search-input').value.toLowerCase().trim();
+      const feedFilter = document.getElementById('feed-filter').value;
+
+      this.filtered = this.allEvents.filter(ev => {
+        if (!this.activeTypes.has(ev.kind)) return false;
+        if (feedFilter && ev.feedName !== feedFilter) return false;
+        if (search) {
+          const searchable = [
+            ev.feedName, ev.feedId, ev.source, ev.detail,
+            ev.hash, ev.domain, ev.type, ev.kind, ev.reason
+          ].filter(Boolean).join(' ').toLowerCase();
+          if (!searchable.includes(search)) return false;
+        }
+        return true;
+      });
+
+      this.page = 0;
+      this.renderTable();
+      this.renderPagination();
+      this.updateResultsCount();
+    },
+
+    resetFilters() {
+      document.getElementById('search-input').value = '';
+      document.getElementById('feed-filter').value = '';
+      this.activeTypes = new Set(['observation', 'gap', 'deviation', 'correlation']);
+      document.querySelectorAll('.filter-chip').forEach(c => c.classList.add('filter-chip--active'));
+      this.applyFilters();
+    },
+
+    renderTable() {
+      const container = document.getElementById('table-container');
+      const start = this.page * this.perPage;
+      const slice = this.filtered.slice(start, start + this.perPage);
+
+      if (slice.length === 0) {
+        container.innerHTML = `<div class="empty-state">
+          <div class="empty-state__icon">◌</div>
+          <div class="empty-state__text">No events match your filters.</div>
+        </div>`;
+        return;
+      }
+
+      let html = `<table class="event-table">
+        <thead><tr>
+          <th>TIME</th><th>TYPE</th><th>FEED</th><th>BLOCK</th><th>DETAIL</th><th>HASH</th>
+        </tr></thead><tbody>`;
+
+      slice.forEach((ev, i) => {
+        const idx = start + i;
+        const time = ev.at ? new Date(ev.at).toISOString().replace('T', ' ').slice(0, 19) + ' UTC' : '—';
+        html += `<tr class="row--${ev.kind}" onclick="Explorer.openDetail(${idx})">
+          <td style="white-space:nowrap;font-size:0.6rem">${time}</td>
+          <td><span class="cell-kind cell-kind--${ev.kind}">${ev.kind}</span></td>
+          <td>${ev.feedName || '—'}</td>
+          <td>#${ev.block || '—'}</td>
+          <td class="cell-detail">${ev.detail || ev.source || ev.reason || '—'}</td>
+          <td class="cell-hash">${ev.hash || '—'}</td>
+        </tr>`;
+      });
+
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    },
+
+    renderPagination() {
+      const total = Math.ceil(this.filtered.length / this.perPage);
+      const pag = document.getElementById('pagination');
+      if (total <= 1) { pag.innerHTML = ''; return; }
+
+      let html = '';
+      html += `<button class="page-btn" onclick="Explorer.goPage(${this.page - 1})" ${this.page === 0 ? 'disabled' : ''}>&laquo; Prev</button>`;
+      
+      // Show page numbers
+      const maxShow = 7;
+      let startP = Math.max(0, this.page - 3);
+      let endP = Math.min(total, startP + maxShow);
+      if (endP - startP < maxShow) startP = Math.max(0, endP - maxShow);
+      
+      for (let i = startP; i < endP; i++) {
+        const active = i === this.page ? 'border-color:var(--signal-cyan);color:var(--signal-cyan)' : '';
+        html += `<button class="page-btn" onclick="Explorer.goPage(${i})" style="${active}">${i + 1}</button>`;
+      }
+      
+      html += `<button class="page-btn" onclick="Explorer.goPage(${this.page + 1})" ${this.page >= total - 1 ? 'disabled' : ''}>Next &raquo;</button>`;
+      pag.innerHTML = html;
+    },
+
+    goPage(p) {
+      const total = Math.ceil(this.filtered.length / this.perPage);
+      if (p < 0 || p >= total) return;
+      this.page = p;
+      this.renderTable();
+      this.renderPagination();
+      this.updateResultsCount();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
+
+    updateResultsCount() {
+      const start = this.page * this.perPage + 1;
+      const end = Math.min((this.page + 1) * this.perPage, this.filtered.length);
+      document.getElementById('results-count').innerHTML =
+        `Showing <strong>${start}-${end}</strong> of <strong>${this.filtered.length}</strong> events (${this.totalEvents} total in ledger)`;
+    },
+
+    openDetail(index) {
+      const ev = this.filtered[index];
+      if (!ev) return;
+
+      const overlay = document.getElementById('detail-overlay');
+      const title = document.getElementById('detail-title');
+      const body = document.getElementById('detail-body');
+      const verdict = document.getElementById('detail-verdict');
+      const skeptic = document.getElementById('detail-skeptic');
+
+      const kindLabels = { observation: 'OBSERVATION', gap: 'DATA GAP', deviation: 'DEVIATION', correlation: 'CORRELATION' };
+      title.textContent = `${kindLabels[ev.kind] || ev.kind} — ${ev.feedName || 'Unknown'}`;
+
+      // Build rows
+      const rows = [];
+      rows.push(['Type', ev.type || ev.kind]);
+      rows.push(['Feed', ev.feedName || '—']);
+      rows.push(['Domain', ev.domain || '—']);
+      rows.push(['Timestamp', ev.at || '—']);
+      rows.push(['Block', '#' + (ev.block || '—')]);
+
+      if (ev.kind === 'observation') {
+        if (ev.source) rows.push(['Source', ev.source]);
+        if (ev.bytes) rows.push(['Payload', (ev.bytes / 1024).toFixed(1) + ' KB']);
+        if (ev.sha256) rows.push(['SHA-256', ev.sha256]);
+      } else if (ev.kind === 'gap') {
+        if (ev.reason) rows.push(['Reason', ev.reason]);
+      } else if (ev.kind === 'deviation') {
+        if (ev.zScore) rows.push(['Z-Score', ev.zScore + 'σ ' + (ev.direction || '')]);
+        if (ev.metric) rows.push(['Metric', ev.metric]);
+        if (ev.value != null) rows.push(['Observed', String(ev.value)]);
+        if (ev.baseline != null) rows.push(['Baseline', String(ev.baseline)]);
+      } else if (ev.kind === 'correlation') {
+        if (ev.feeds) rows.push(['Feeds', ev.feeds.join(', ')]);
+        if (ev.occurrences) rows.push(['Occurrences', ev.occurrences + ' coincident deviations']);
+        if (ev.avgLagMinutes != null) rows.push(['Avg Lag', ev.avgLagMinutes === 0 ? 'Simultaneous' : Math.abs(ev.avgLagMinutes) + ' min']);
+        if (ev.confidence) rows.push(['Confidence', ev.confidence]);
+      }
+
+      if (ev.detail) rows.push(['Detail', ev.detail]);
+      if (ev.hash) rows.push(['Hash', ev.hash]);
+      if (ev.icon) rows.push(['Icon', ev.icon]);
+
+      body.innerHTML = rows.map(([label, value]) =>
+        `<div class="detail-panel__row"><span class="detail-panel__label">${label}</span><span class="detail-panel__value">${value}</span></div>`
+      ).join('');
+
+      // Verdict + skeptic
+      verdict.className = 'detail-panel__verdict detail-panel__verdict--' + (ev.kind === 'observation' ? 'obs' : ev.kind === 'gap' ? 'gap' : ev.kind === 'deviation' ? 'dev' : 'corr');
+      
+      if (ev.kind === 'correlation') {
+        verdict.textContent = ev.verdict || 'CORRELATION OBSERVED — NOT CAUSATION';
+        skeptic.textContent = ev.skepticNote || 'Temporal proximity does not imply causal relationship. The null hypothesis (coincidence) is the default.';
+      } else if (ev.kind === 'deviation') {
+        verdict.textContent = 'STATISTICAL DEVIATION FROM BASELINE';
+        skeptic.textContent = 'Observations exceeding 2σ are flagged automatically. This is pure statistics — no AI judgment, no editorial interpretation.';
+      } else if (ev.kind === 'gap') {
+        verdict.textContent = 'DATA GAP — INTEGRITY PRESERVED';
+        skeptic.textContent = 'Source did not respond or returned an error. Gap is logged for completeness — no data was interpolated or fabricated.';
+      } else {
+        verdict.textContent = 'OBSERVATION RECORDED';
+        skeptic.textContent = 'Raw data collected from public government API. Stored as-is with SHA-256 integrity hash. No modification.';
+      }
+
+      overlay.classList.add('detail-overlay--open');
+    },
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => Explorer.init());
+  } else {
+    Explorer.init();
+  }
+  </script>
+</body>
+</html>

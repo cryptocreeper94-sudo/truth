@@ -153,8 +153,10 @@ body::after {
   grid-column: 1 / -1;
   grid-row: 2;
   background: var(--bg-primary);
-  min-height: 100px;
-  max-height: 160px;
+  min-height: 140px;
+  max-height: 280px;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ── View Switching ──────────────────────────────────────────── */
@@ -173,7 +175,7 @@ body::after {
 .cockpit[data-view="atmoscore"] .cockpit__feeds { display: none; }
 .cockpit[data-view="atmoscore"] .cockpit__corr { display: none; }
 
-.cockpit[data-view="correlations"] .cockpit__corr { display: flex; grid-column: 1 / -1; grid-row: 1; max-height: none; min-height: 0; }
+.cockpit[data-view="correlations"] .cockpit__corr { display: flex; grid-column: 1 / -1; grid-row: 1; max-height: none; min-height: 0; flex: 1; overflow: hidden; }
 .cockpit[data-view="correlations"] .cockpit__map { display: none; }
 .cockpit[data-view="correlations"] .cockpit__feeds { display: none; }
 .cockpit[data-view="correlations"] .cockpit__atmoscore { display: none; }
@@ -1382,7 +1384,7 @@ body::after {
 
 .ledger-stream {
   display: flex; flex-direction: column; gap: 2px;
-  max-height: 320px; overflow-y: auto; overflow-x: hidden;
+  flex: 1; overflow-y: auto; overflow-x: hidden;
   padding: 4px 8px 8px;
   scrollbar-width: thin; scrollbar-color: var(--border-dim) transparent;
 }
