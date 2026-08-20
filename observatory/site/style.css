@@ -116,7 +116,7 @@ body::after {
   bottom: var(--bottomnav-h);
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr auto auto;
+  grid-template-rows: 1fr auto minmax(80px, 200px);
   gap: 1px;
   background: var(--border-dim);
   overflow: hidden;
@@ -154,6 +154,7 @@ body::after {
   grid-row: 3;
   background: var(--bg-primary);
   min-height: 80px;
+  max-height: 300px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -201,7 +202,7 @@ body::after {
 .cockpit[data-view="feeds"] .cockpit__corr { display: none; }
 .cockpit[data-view="feeds"] .cockpit__resize-handle { display: none; }
 
-.cockpit[data-view="atmoscore"] .cockpit__atmoscore { display: flex; }
+.cockpit[data-view="atmoscore"] .cockpit__atmoscore { display: flex; grid-column: 1 / -1; grid-row: 1 / -1; }
 .cockpit[data-view="atmoscore"] .cockpit__map { display: none; }
 .cockpit[data-view="atmoscore"] .cockpit__feeds { display: none; }
 .cockpit[data-view="atmoscore"] .cockpit__corr { display: none; }

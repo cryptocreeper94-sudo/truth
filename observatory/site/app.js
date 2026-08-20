@@ -967,6 +967,9 @@ const Observatory = {
         btn.classList.add('bottomnav__btn--active');
         const view = btn.dataset.view;
         const cockpit = document.getElementById('cockpit');
+
+        // Reset inline grid override from drag handle
+        cockpit.style.gridTemplateRows = '';
         cockpit.dataset.view = view;
 
         // Resize map if switching to map view
@@ -978,7 +981,7 @@ const Observatory = {
           setTimeout(() => {
             AtmosCoreViz.resize();
             AtmosCoreViz.update(AtmosCore);
-          }, 100);
+          }, 150);
         }
       });
     });
