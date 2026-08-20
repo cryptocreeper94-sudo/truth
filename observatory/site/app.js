@@ -821,41 +821,11 @@ const Observatory = {
     setTimeout(() => toast.remove(), 2000);
   },
 
-  // ── Render Correlations ──────────────────────────────────────
+  // ── Render Correlations (legacy — now served via Event Ledger) ──
   renderCorrelations(data) {
-    const track = document.getElementById('corr-track');
-    const dots = document.getElementById('corr-dots');
-    const patterns = data.patterns || data.events || [];
-
-    document.getElementById('corr-count').textContent = `${patterns.length} patterns`;
-
-    if (patterns.length === 0) {
-      track.innerHTML = `<div class="corr-card corr-card--empty">
-        <p class="corr-card__msg">${data.message || 'Correlation engine is modeling baselines. Patterns appear as deviations are identified.'}</p>
-      </div>`;
-      dots.innerHTML = '';
-      return;
-    }
-
-    track.innerHTML = '';
-    dots.innerHTML = '';
-
-    patterns.forEach((p, i) => {
-      const card = document.createElement('div');
-      card.className = 'corr-card';
-      const confColor = p.confidence > 0.7 ? 'var(--signal-live)' : p.confidence > 0.4 ? 'var(--signal-stale)' : 'var(--text-dim)';
-      card.innerHTML = `
-        <div class="corr-card__title">${p.title || 'Pattern Detected'}</div>
-        <div class="corr-card__confidence" style="color: ${confColor}">CONFIDENCE: ${((p.confidence || 0) * 100).toFixed(1)}% · ${p.verdict || 'ANALYZING'}</div>
-        <div class="corr-card__summary">${p.summary || ''}</div>
-        ${p.skepticNote ? `<div class="corr-card__skeptic">${p.skepticNote}</div>` : ''}
-      `;
-      track.appendChild(card);
-
-      const dot = document.createElement('div');
-      dot.className = `corr-dot${i === 0 ? ' corr-dot--active' : ''}`;
-      dots.appendChild(dot);
-    });
+    // Legacy correlation carousel removed. Data now flows through Event Ledger.
+    // This method is kept as a no-op for backward compatibility with fetchAll.
+    return;
   },
 
   // ── Map Overlays ─────────────────────────────────────────────
@@ -930,10 +900,7 @@ const Observatory = {
       this.updateDynamicLegend();
     });
 
-    // Correlation carousel
-    const track = document.getElementById('corr-track');
-    document.getElementById('corr-prev').addEventListener('click', () => track.scrollBy({ left: -320, behavior: 'smooth' }));
-    document.getElementById('corr-next').addEventListener('click', () => track.scrollBy({ left: 320, behavior: 'smooth' }));
+    // (Correlation carousel removed — replaced by Event Ledger)
 
     // Refresh button
     const refreshBtn = document.getElementById('refresh-map');
