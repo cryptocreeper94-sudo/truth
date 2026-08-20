@@ -44,10 +44,12 @@ const IDENTITY = Object.freeze({
 const FACILITIES = [
   { id: 'haarp', name: 'HAARP', url: 'https://haarp.gi.alaska.edu/', location: 'Gakona, Alaska', lat: 62.39, lon: -145.15 },
   { id: 'haarp-schedule', name: 'HAARP Schedule', url: 'https://haarp.gi.alaska.edu/experiments', location: 'Gakona, Alaska', lat: 62.39, lon: -145.15 },
-  { id: 'eiscat', name: 'EISCAT', url: 'https://www.eiscat.se/schedule/', location: 'Tromsø, Norway', lat: 69.58, lon: 19.23 },
-  { id: 'eiscat-3d', name: 'EISCAT_3D', url: 'https://www.eiscat.se/eiscat3d/', location: 'Skibotn, Norway', lat: 69.34, lon: 20.31 },
+  { id: 'eiscat', name: 'EISCAT', url: 'https://portal.eiscat.se/schedule/', location: 'Tromsø, Norway', lat: 69.58, lon: 19.23 },
+  { id: 'eiscat-3d', name: 'EISCAT_3D', url: 'https://portal.eiscat.se/eiscat3d/', location: 'Skibotn, Norway', lat: 69.34, lon: 20.31 },
   { id: 'jicamarca', name: 'Jicamarca', url: 'https://jro.igp.gob.pe/', location: 'Lima, Peru', lat: -11.95, lon: -76.87 },
-  { id: 'arecibo', name: 'Arecibo (archive)', url: 'https://www.naic.edu/', location: 'Arecibo, Puerto Rico', lat: 18.34, lon: -66.75 },
+  // Arecibo Observatory collapsed December 1, 2020. NSF declined to rebuild.
+  // Retained for historical completeness. Collector will log DATA-GAP entries.
+  { id: 'arecibo', name: 'Arecibo (decommissioned)', url: null, location: 'Arecibo, Puerto Rico', lat: 18.34, lon: -66.75, decommissioned: true },
 ];
 
 const CONFIG = Object.freeze({
@@ -92,6 +94,12 @@ async function runCycle() {
 
   let successes = 0;
   for (const facility of FACILITIES) {
+    // Skip decommissioned facilities — log gap with reason
+    if (facility.decommissioned || !facility.url) {
+      appendManifest({ type: 'DATA-GAP', source: facility.name, facility: facility.id, domain: IDENTITY.domain, retrievedAt: now.toISOString(), reason: 'Facility decommissioned' });
+      console.log(`  [${facility.id.toUpperCase()}] Decommissioned — gap logged`);
+      continue;
+    }
     const result = await safeFetch(facility.url);
     if (result.ok) {
       const filename = `${facility.id}_${now.toISOString().replace(/[:.]/g, '-')}.html`;

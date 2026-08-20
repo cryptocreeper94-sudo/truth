@@ -45,9 +45,9 @@ const IDENTITY = Object.freeze({
 });
 
 const CONFIG = Object.freeze({
-  // Blitzortung publishes recent stroke data in 10-minute bins
-  // We fetch the GeoJSON summary endpoint for the Americas region
-  apiUrl: 'https://map.blitzortung.org/GEOjson/GEOjson.php?c=America/New_York',
+  // Blitzortung publishes recent stroke data in regional GeoJSON
+  // Use the main map data endpoint which returns recent strokes
+  apiUrl: 'https://map.blitzortung.org/MapCall/',
   intervalMs: parseInt(process.env.BLITZ_INTERVAL_MS || '600000', 10), // 10 min
   maxRetries: 3,
   retryDelayMs: 3000,

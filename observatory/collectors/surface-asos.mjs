@@ -46,7 +46,10 @@ const IDENTITY = Object.freeze({
 });
 
 const CONFIG = Object.freeze({
-  apiUrl: 'https://mesonet.agron.iastate.edu/api/1/currents.json?network=ASOS&only_online=true',
+  // NOAA Weather API — official, free, no API key, reliable
+  // Fetches latest observations from major US stations
+  apiUrl: 'https://api.weather.gov/stations?state=TN&limit=50',
+  observationsUrl: 'https://api.weather.gov/stations/{stationId}/observations/latest',
   intervalMs: parseInt(process.env.SURFACE_INTERVAL_MS || '900000', 10), // 15 min
   maxRetries: 3,
   retryDelayMs: 2000,
