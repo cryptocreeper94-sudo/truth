@@ -20,24 +20,70 @@
       <span class="topbar__version">v3.0</span>
     </div>
     <div class="topbar__center">
-      <div class="topbar__stat">
-        <span class="topbar__stat-label">FEEDS</span>
+      <div class="topbar__stat" data-info="stat-feeds">
+        <span class="topbar__stat-label">FEEDS <span class="topbar__info-icon">ⓘ</span></span>
         <span class="topbar__stat-value" id="stat-live">&mdash;/18</span>
       </div>
-      <div class="topbar__stat">
-        <span class="topbar__stat-label">ATMOSCORE</span>
+      <div class="topbar__stat" data-info="stat-atmoscore">
+        <span class="topbar__stat-label">ATMOSCORE <span class="topbar__info-icon">ⓘ</span></span>
         <span class="topbar__stat-value" id="stat-atmoscore">INIT</span>
       </div>
-      <div class="topbar__stat">
-        <span class="topbar__stat-label">SUITABILITY</span>
+      <div class="topbar__stat" data-info="stat-suitability">
+        <span class="topbar__stat-label">SUITABILITY <span class="topbar__info-icon">ⓘ</span></span>
         <span class="topbar__stat-value" id="stat-suitability">&mdash;</span>
       </div>
     </div>
     <div class="topbar__right">
       <span class="topbar__clock" id="utc-clock">00:00:00 UTC</span>
-      <span class="topbar__pulse" id="global-pulse"></span>
+      <span class="topbar__pulse" id="global-pulse" data-info="stat-pulse" title="Data connection status"></span>
     </div>
   </header>
+
+  <!-- ═══ STAT INFO TOOLTIP ═══ -->
+  <div class="stat-tooltip" id="stat-tooltip">
+    <div class="stat-tooltip__header">
+      <span class="stat-tooltip__title" id="stat-tooltip-title"></span>
+      <button class="stat-tooltip__close" id="stat-tooltip-close">&#10005;</button>
+    </div>
+    <div class="stat-tooltip__body" id="stat-tooltip-body"></div>
+  </div>
+
+  <!-- ═══ MOBILE MAP PREVIEW ═══ -->
+  <div class="map-preview" id="map-preview">
+    <div class="map-preview__map" id="map-preview-container"></div>
+    <div class="map-preview__overlay">
+      <span class="map-preview__label">TAP FOR FULL MAP</span>
+    </div>
+  </div>
+
+  <!-- ═══ LOCATION BAR (mobile) ═══ -->
+  <div class="location-bar" id="location-bar">
+    <button class="location-bar__geo" id="geo-btn" title="Use my location">&#9673;</button>
+    <input class="location-bar__input" id="zip-input" type="text" placeholder="ZIP CODE" maxlength="5" inputmode="numeric">
+    <button class="location-bar__set" id="zip-set">SET</button>
+    <span class="location-bar__status" id="location-status"></span>
+  </div>
+
+  <!-- ═══ FULLSCREEN MAP OVERLAY ═══ -->
+  <div class="map-fullscreen" id="map-fullscreen">
+    <div class="map-fullscreen__toolbar">
+      <button class="map-fullscreen__close" id="map-fullscreen-close">&#10005; CLOSE</button>
+      <div class="map-fullscreen__toggles" id="fullscreen-layer-toggles">
+        <label class="layer-toggle"><input type="checkbox" data-fslayer="radar" checked> RADAR</label>
+        <label class="layer-toggle"><input type="checkbox" data-fslayer="satellite"> VIS</label>
+        <label class="layer-toggle"><input type="checkbox" data-fslayer="infrared"> IR</label>
+        <label class="layer-toggle"><input type="checkbox" data-fslayer="watervapor"> WV</label>
+        <label class="layer-toggle"><input type="checkbox" data-fslayer="precip"> PRECIP</label>
+      </div>
+      <button class="map-fullscreen__anim-btn" id="anim-toggle" title="Toggle animation loop">▶ LOOP</button>
+    </div>
+    <div class="map-fullscreen__map" id="map-fullscreen-container"></div>
+    <div class="map-fullscreen__legend" id="map-fullscreen-legend"></div>
+    <div class="map-fullscreen__anim-bar" id="anim-bar">
+      <span class="anim-bar__label" id="anim-label">LIVE</span>
+      <div class="anim-bar__track" id="anim-track"></div>
+    </div>
+  </div>
 
   <!-- ═══ MAIN COCKPIT ═══ -->
   <main class="cockpit" id="cockpit" data-view="cockpit">

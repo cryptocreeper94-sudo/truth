@@ -88,6 +88,9 @@ const Observatory = {
     this.startClock();
     this.initMap();
     this.bindEvents();
+    this.initStatTooltips();
+    this.initMobileMapPreview();
+    this.initLocation();
 
     // Initialize AtmosCore engine
     AtmosCore.init();
@@ -967,12 +970,13 @@ const Observatory = {
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         this.closeModal();
+        this.closeFullscreenMap();
         document.getElementById('legend-info-overlay').classList.remove('legend-info-overlay--open');
+        document.getElementById('stat-tooltip').classList.remove('stat-tooltip--open');
       }
     });
   },
 
-  // ── Utilities ────────────────────────────────────────────────
   timeAgo(isoStr) {
     if (!isoStr) return '—';
     const ms = Date.now() - new Date(isoStr).getTime();
@@ -980,6 +984,397 @@ const Observatory = {
     if (ms < 3600000) return `${Math.floor(ms / 60000)}m ago`;
     if (ms < 86400000) return `${Math.floor(ms / 3600000)}h ago`;
     return `${Math.floor(ms / 86400000)}d ago`;
+  },
+
+  // ═══════════════════════════════════════════════════════════════
+  // STAT INFO TOOLTIPS — explain every number in the topbar
+  // ═══════════════════════════════════════════════════════════════
+  statInfoContent: {
+    'stat-feeds': {
+      title: 'LIVE FEEDS',
+      body: `<strong>What this shows:</strong> The number of data feeds currently receiving fresh data, out of 18 total feeds monitored.<br><br>
+<strong>LIVE</strong> = received data within expected interval.<br>
+<strong>STALE</strong> = data is older than 3× the expected refresh interval.<br>
+<strong>OFFLINE</strong> = no data received.<br><br>
+Feeds include NEXRAD radar, GOES satellite, solar/SWPC, USGS seismic, lightning, power grid, geomagnetic, ionospheric, Schumann resonance, surface stations, Blitzortung, ADS-B aircraft, NOTAMs, cell towers, and more.`,
+    },
+    'stat-atmoscore': {
+      title: 'ATMOSCORE 4/42',
+      body: `<strong>What this shows:</strong> The composite atmospheric state score computed by the AtmosCore 4/42 Deterministic Flow Organism.<br><br>
+AtmosCore combines 4 physical primitives — <strong>Thermodynamic</strong>, <strong>Optical Propagation</strong>, <strong>Dynamic Stability</strong>, and <strong>Temporal Coherence</strong> — into a single-number assessment of current atmospheric conditions.<br><br>
+Score ranges from <strong>0.00</strong> (all feeds offline) to <strong>1.00</strong> (optimal observation conditions). The score updates every 60 seconds from live feed data.`,
+    },
+    'stat-suitability': {
+      title: 'OBSERVATION SUITABILITY',
+      body: `<strong>What this shows:</strong> Whether current conditions are suitable for reliable atmospheric observation and data collection.<br><br>
+<strong>OPTIMAL</strong> = all primitives favorable, high confidence in data quality.<br>
+<strong>ADVISORY</strong> = some conditions degraded, observations possible but less reliable.<br>
+<strong>CAUTION</strong> = significant atmospheric disruption detected, use data with awareness.<br>
+<strong>CRITICAL</strong> = hard constraint triggered (e.g. geomagnetic storm, extreme convection). Data may be unreliable.<br><br>
+This is NOT a weather forecast. It indicates how trustworthy the current sensor data is.`,
+    },
+    'stat-pulse': {
+      title: 'CONNECTION STATUS',
+      body: `<strong>What this shows:</strong> The green pulsing dot indicates Observatory is actively connected to its data feeds and refreshing every 60 seconds.<br><br>
+If this dot turns <strong>red</strong> or stops pulsing, the connection to the data server may be interrupted.`,
+    },
+  },
+
+  initStatTooltips() {
+    const tooltip = document.getElementById('stat-tooltip');
+    const title = document.getElementById('stat-tooltip-title');
+    const body = document.getElementById('stat-tooltip-body');
+    const closeBtn = document.getElementById('stat-tooltip-close');
+
+    document.querySelectorAll('[data-info]').forEach(el => {
+      el.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const key = el.dataset.info;
+        const info = this.statInfoContent[key];
+        if (!info) return;
+        title.textContent = info.title;
+        body.innerHTML = info.body;
+        tooltip.classList.add('stat-tooltip--open');
+      });
+    });
+
+    closeBtn.addEventListener('click', () => tooltip.classList.remove('stat-tooltip--open'));
+    document.addEventListener('click', (e) => {
+      if (!tooltip.contains(e.target) && !e.target.closest('[data-info]')) {
+        tooltip.classList.remove('stat-tooltip--open');
+      }
+    });
+  },
+
+  // ═══════════════════════════════════════════════════════════════
+  // MOBILE MAP PREVIEW — compact visual-only map at top of page
+  // ═══════════════════════════════════════════════════════════════
+  previewMap: null,
+
+  initMobileMapPreview() {
+    const container = document.getElementById('map-preview-container');
+    const preview = document.getElementById('map-preview');
+    if (!container || !preview) return;
+
+    // Only init on mobile
+    if (window.innerWidth > 768) return;
+
+    const savedLoc = this._getSavedLocation();
+    const center = savedLoc ? [savedLoc.lat, savedLoc.lng] : [39.0, -95.0];
+    const zoom = savedLoc ? 8 : 4;
+
+    this.previewMap = L.map(container, {
+      center, zoom,
+      zoomControl: false,
+      attributionControl: false,
+      dragging: false,
+      scrollWheelZoom: false,
+      doubleClickZoom: false,
+      touchZoom: false,
+      keyboard: false,
+    });
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      maxZoom: 19,
+    }).addTo(this.previewMap);
+
+    // Add radar overlay to preview
+    this.previewRadar = L.tileLayer('https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913/{z}/{x}/{y}.png', {
+      opacity: 0.5, maxZoom: 8,
+    }).addTo(this.previewMap);
+
+    // Tap to open fullscreen
+    preview.addEventListener('click', () => this.openFullscreenMap());
+  },
+
+  // ═══════════════════════════════════════════════════════════════
+  // FULLSCREEN MAP — interactive with animation loop
+  // ═══════════════════════════════════════════════════════════════
+  fullscreenMap: null,
+  fsMapLayers: {},
+  animFrames: [],
+  animLayers: [],
+  animIndex: 0,
+  animInterval: null,
+  animActive: false,
+
+  openFullscreenMap() {
+    const overlay = document.getElementById('map-fullscreen');
+    overlay.classList.add('map-fullscreen--open');
+
+    if (!this.fullscreenMap) {
+      this._initFullscreenMap();
+    } else {
+      this.fullscreenMap.invalidateSize();
+    }
+
+    // Try to lock landscape
+    try {
+      if (screen.orientation && screen.orientation.lock) {
+        screen.orientation.lock('landscape').catch(() => {});
+      }
+    } catch (e) {}
+  },
+
+  closeFullscreenMap() {
+    document.getElementById('map-fullscreen').classList.remove('map-fullscreen--open');
+    this.stopAnimation();
+
+    // Unlock orientation
+    try {
+      if (screen.orientation && screen.orientation.unlock) {
+        screen.orientation.unlock();
+      }
+    } catch (e) {}
+  },
+
+  _initFullscreenMap() {
+    const container = document.getElementById('map-fullscreen-container');
+    const savedLoc = this._getSavedLocation();
+    const center = savedLoc ? [savedLoc.lat, savedLoc.lng] : [39.0, -95.0];
+    const zoom = savedLoc ? 7 : 4;
+
+    this.fullscreenMap = L.map(container, {
+      center, zoom,
+      zoomControl: true,
+    });
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      maxZoom: 19,
+    }).addTo(this.fullscreenMap);
+
+    // Build FS layers
+    this.fsMapLayers.radar = L.tileLayer('https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913/{z}/{x}/{y}.png', {
+      opacity: 0.5, maxZoom: 8,
+    });
+    this.fsMapLayers.satellite = L.tileLayer('https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/goes-east-vis-1km-900913/{z}/{x}/{y}.png', {
+      opacity: 0.5, maxZoom: 8,
+    });
+    this.fsMapLayers.infrared = L.tileLayer('https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/goes-east-ir-4km-900913/{z}/{x}/{y}.png', {
+      opacity: 0.5, maxZoom: 8,
+    });
+    this.fsMapLayers.watervapor = L.tileLayer('https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/goes-east-wv-4km-900913/{z}/{x}/{y}.png', {
+      opacity: 0.5, maxZoom: 8,
+    });
+    this.fsMapLayers.precip = L.tileLayer('', { opacity: 0.5, maxZoom: 18 });
+
+    // Default radar
+    this.fsMapLayers.radar.addTo(this.fullscreenMap);
+
+    // Wire FS layer toggles
+    document.querySelectorAll('[data-fslayer]').forEach(cb => {
+      cb.addEventListener('change', () => {
+        const layer = this.fsMapLayers[cb.dataset.fslayer];
+        if (!layer) return;
+        if (cb.checked) layer.addTo(this.fullscreenMap);
+        else this.fullscreenMap.removeLayer(layer);
+      });
+    });
+
+    // Close button
+    document.getElementById('map-fullscreen-close').addEventListener('click', () => this.closeFullscreenMap());
+
+    // Animation toggle
+    document.getElementById('anim-toggle').addEventListener('click', () => {
+      if (this.animActive) this.stopAnimation();
+      else this.startAnimation();
+    });
+
+    // Load RainViewer frames for animation
+    this._loadAnimationFrames();
+
+    setTimeout(() => this.fullscreenMap.invalidateSize(), 200);
+  },
+
+  async _loadAnimationFrames() {
+    try {
+      const res = await fetch('https://api.rainviewer.com/public/weather-maps.json');
+      const data = await res.json();
+      this.animFrames = data.radar.past.map(f => ({
+        path: f.path,
+        time: new Date(f.time * 1000),
+        url: `https://tilecache.rainviewer.com${f.path}/512/{z}/{x}/{y}/2/1_1.png`,
+      }));
+      // Also update the precip layer for FS map
+      if (this.animFrames.length > 0) {
+        const latest = this.animFrames[this.animFrames.length - 1];
+        this.fsMapLayers.precip = L.tileLayer(latest.url, { opacity: 0.5, maxZoom: 18 });
+      }
+      // Build animation dots
+      const track = document.getElementById('anim-track');
+      track.innerHTML = '';
+      this.animFrames.forEach((_, i) => {
+        const dot = document.createElement('span');
+        dot.className = 'anim-bar__dot' + (i === this.animFrames.length - 1 ? ' anim-bar__dot--active' : '');
+        track.appendChild(dot);
+      });
+    } catch (e) {
+      console.warn('[Observatory] RainViewer animation load failed:', e.message);
+    }
+  },
+
+  startAnimation() {
+    if (this.animFrames.length === 0) return;
+    this.animActive = true;
+    this.animIndex = 0;
+
+    const btn = document.getElementById('anim-toggle');
+    btn.classList.add('map-fullscreen__anim-btn--active');
+    btn.textContent = '⏸ LOOP';
+
+    // Remove static radar, add animated radar
+    if (this.fullscreenMap.hasLayer(this.fsMapLayers.radar)) {
+      this.fullscreenMap.removeLayer(this.fsMapLayers.radar);
+    }
+
+    // Pre-create all animation layers
+    this.animLayers = this.animFrames.map(f =>
+      L.tileLayer(f.url, { opacity: 0.5, maxZoom: 18 })
+    );
+
+    // Show first frame
+    this.animLayers[0].addTo(this.fullscreenMap);
+
+    this.animInterval = setInterval(() => {
+      // Remove current
+      if (this.animLayers[this.animIndex]) {
+        this.fullscreenMap.removeLayer(this.animLayers[this.animIndex]);
+      }
+      // Advance
+      this.animIndex = (this.animIndex + 1) % this.animFrames.length;
+      // Add next
+      this.animLayers[this.animIndex].addTo(this.fullscreenMap);
+
+      // Update label
+      const frame = this.animFrames[this.animIndex];
+      const label = document.getElementById('anim-label');
+      const mins = Math.round((Date.now() - frame.time.getTime()) / 60000);
+      label.textContent = mins <= 0 ? 'LIVE' : `-${mins}m`;
+      label.style.color = this.animIndex === this.animFrames.length - 1 ? 'var(--signal-live)' : 'var(--signal-cyan)';
+
+      // Update dots
+      document.querySelectorAll('.anim-bar__dot').forEach((d, i) => {
+        d.classList.toggle('anim-bar__dot--active', i === this.animIndex);
+      });
+    }, 700);
+  },
+
+  stopAnimation() {
+    this.animActive = false;
+    clearInterval(this.animInterval);
+
+    const btn = document.getElementById('anim-toggle');
+    if (btn) {
+      btn.classList.remove('map-fullscreen__anim-btn--active');
+      btn.textContent = '▶ LOOP';
+    }
+
+    // Remove all anim layers
+    this.animLayers.forEach(l => {
+      if (this.fullscreenMap && this.fullscreenMap.hasLayer(l)) {
+        this.fullscreenMap.removeLayer(l);
+      }
+    });
+    this.animLayers = [];
+
+    // Re-add static radar
+    if (this.fullscreenMap && !this.fullscreenMap.hasLayer(this.fsMapLayers.radar)) {
+      this.fsMapLayers.radar.addTo(this.fullscreenMap);
+    }
+
+    // Reset label
+    const label = document.getElementById('anim-label');
+    if (label) { label.textContent = 'LIVE'; label.style.color = 'var(--signal-live)'; }
+
+    // Reset dots
+    const dots = document.querySelectorAll('.anim-bar__dot');
+    dots.forEach((d, i) => d.classList.toggle('anim-bar__dot--active', i === dots.length - 1));
+  },
+
+  // ═══════════════════════════════════════════════════════════════
+  // LOCATION / ZIP CODE — local conditions
+  // ═══════════════════════════════════════════════════════════════
+  userLocation: null,
+
+  initLocation() {
+    const geoBtn = document.getElementById('geo-btn');
+    const zipInput = document.getElementById('zip-input');
+    const zipSet = document.getElementById('zip-set');
+    const status = document.getElementById('location-status');
+
+    if (!geoBtn) return;
+
+    // Restore saved
+    const saved = this._getSavedLocation();
+    if (saved) {
+      this.userLocation = saved;
+      if (saved.zip) zipInput.value = saved.zip;
+      status.textContent = saved.label || `${saved.lat.toFixed(2)}, ${saved.lng.toFixed(2)}`;
+      geoBtn.classList.add('location-bar__geo--active');
+    }
+
+    // Geolocation button
+    geoBtn.addEventListener('click', () => {
+      status.textContent = 'LOCATING...';
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          this.userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude, label: 'GPS' };
+          this._saveLocation(this.userLocation);
+          this._applyLocation();
+          status.textContent = `GPS: ${this.userLocation.lat.toFixed(2)}, ${this.userLocation.lng.toFixed(2)}`;
+          geoBtn.classList.add('location-bar__geo--active');
+        },
+        () => { status.textContent = 'LOCATION DENIED'; },
+        { enableHighAccuracy: false, timeout: 10000 }
+      );
+    });
+
+    // Zip code
+    const setZip = () => {
+      const zip = zipInput.value.trim();
+      if (!/^\d{5}$/.test(zip)) { status.textContent = 'INVALID ZIP'; return; }
+      status.textContent = 'LOOKING UP...';
+      // Use a free geocoding approach: Nominatim (OpenStreetMap)
+      fetch(`https://nominatim.openstreetmap.org/search?postalcode=${zip}&country=US&format=json&limit=1`)
+        .then(r => r.json())
+        .then(data => {
+          if (data.length === 0) { status.textContent = 'ZIP NOT FOUND'; return; }
+          this.userLocation = { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon), zip, label: zip };
+          this._saveLocation(this.userLocation);
+          this._applyLocation();
+          status.textContent = `ZIP ${zip}: ${data[0].display_name.split(',').slice(0, 2).join(',')}`;
+          geoBtn.classList.add('location-bar__geo--active');
+        })
+        .catch(() => { status.textContent = 'LOOKUP FAILED'; });
+    };
+
+    zipSet.addEventListener('click', setZip);
+    zipInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') setZip(); });
+  },
+
+  _applyLocation() {
+    if (!this.userLocation) return;
+    const { lat, lng } = this.userLocation;
+
+    // Center preview map
+    if (this.previewMap) this.previewMap.setView([lat, lng], 8);
+
+    // Center fullscreen map
+    if (this.fullscreenMap) this.fullscreenMap.setView([lat, lng], 7);
+
+    // Center desktop map
+    if (this.map) this.map.setView([lat, lng], 7);
+  },
+
+  _getSavedLocation() {
+    try {
+      const raw = localStorage.getItem('observatory_location');
+      return raw ? JSON.parse(raw) : null;
+    } catch { return null; }
+  },
+
+  _saveLocation(loc) {
+    try { localStorage.setItem('observatory_location', JSON.stringify(loc)); } catch {}
   },
 };
 
