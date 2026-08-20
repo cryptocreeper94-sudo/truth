@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Truth Observatory — About</title>
+  <meta name="description" content="Truth Observatory: 18-stream deterministic atmospheric monitoring. How it works, open API, researcher contributions, and investment opportunities.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔭</text></svg>">
+  <style>
+    :root {
+      --bg-primary: #0a0e14;
+      --bg-secondary: #111820;
+      --bg-tertiary: #1a2230;
+      --text-primary: #d4dae3;
+      --text-secondary: #8b95a5;
+      --text-dim: #4a5568;
+      --signal-cyan: #00d2ff;
+      --signal-live: #00e676;
+      --signal-warn: #ff6b35;
+      --border-dim: rgba(255,255,255,0.06);
+      --font-mono: 'JetBrains Mono', monospace;
+      --font-sans: 'Inter', sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Back Nav ──────────────────────────────────────────── */
+    .back-nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(10, 14, 20, 0.92); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-dim);
+      padding: 12px 24px;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .back-nav__btn {
+      background: none; border: 1px solid var(--border-dim);
+      color: var(--signal-cyan); font-family: var(--font-mono);
+      font-size: 0.7rem; padding: 6px 14px; border-radius: 3px;
+      cursor: pointer; text-decoration: none; letter-spacing: 0.05em;
+      transition: all 0.2s;
+    }
+    .back-nav__btn:hover { background: var(--signal-cyan); color: var(--bg-primary); }
+    .back-nav__title {
+      font-family: var(--font-mono); font-size: 0.65rem;
+      color: var(--text-dim); letter-spacing: 0.15em; text-transform: uppercase;
+    }
+
+    /* ── Layout ────────────────────────────────────────────── */
+    .page { max-width: 780px; margin: 0 auto; padding: 80px 24px 60px; }
+
+    .hero {
+      text-align: center; padding: 40px 0 48px;
+      border-bottom: 1px solid var(--border-dim);
+    }
+    .hero__icon { font-size: 2.5rem; margin-bottom: 12px; display: block; }
+    .hero__title {
+      font-family: var(--font-mono); font-size: 1.6rem; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px;
+    }
+    .hero__sub {
+      font-family: var(--font-mono); font-size: 0.75rem;
+      color: var(--signal-cyan); letter-spacing: 0.12em; text-transform: uppercase;
+    }
+    .hero__desc {
+      margin-top: 20px; font-size: 0.9rem; color: var(--text-secondary);
+      max-width: 600px; margin-left: auto; margin-right: auto;
+    }
+
+    /* ── Sections ──────────────────────────────────────────── */
+    .section {
+      padding: 40px 0; border-bottom: 1px solid var(--border-dim);
+    }
+    .section:last-child { border-bottom: none; }
+
+    .section__label {
+      font-family: var(--font-mono); font-size: 0.6rem;
+      color: var(--signal-cyan); letter-spacing: 0.2em;
+      text-transform: uppercase; margin-bottom: 8px;
+    }
+    .section__title {
+      font-family: var(--font-mono); font-size: 1.1rem; font-weight: 700;
+      letter-spacing: 0.05em; margin-bottom: 16px;
+    }
+    .section p {
+      font-size: 0.85rem; color: var(--text-secondary);
+      margin-bottom: 14px;
+    }
+    .section strong { color: var(--text-primary); }
+
+    /* ── Pipeline ──────────────────────────────────────────── */
+    .pipeline {
+      display: flex; flex-direction: column; gap: 0;
+      margin: 20px 0;
+    }
+    .pipeline__step {
+      display: grid; grid-template-columns: 40px 1fr; gap: 12px;
+      padding: 14px 0;
+      border-left: 2px solid var(--border-dim);
+      padding-left: 16px;
+      position: relative;
+    }
+    .pipeline__step::before {
+      content: ''; position: absolute; left: -5px; top: 18px;
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--signal-cyan); border: 2px solid var(--bg-primary);
+    }
+    .pipeline__num {
+      font-family: var(--font-mono); font-size: 0.7rem;
+      color: var(--text-dim); font-weight: 700;
+    }
+    .pipeline__label {
+      font-family: var(--font-mono); font-size: 0.75rem;
+      color: var(--text-primary); font-weight: 600;
+    }
+    .pipeline__desc {
+      font-size: 0.75rem; color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    /* ── Feed Grid ─────────────────────────────────────────── */
+    .feed-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 8px; margin: 16px 0;
+    }
+    .feed-item {
+      background: var(--bg-secondary); border: 1px solid var(--border-dim);
+      padding: 10px 12px; border-radius: 4px;
+      font-family: var(--font-mono); font-size: 0.65rem;
+      display: flex; gap: 8px; align-items: center;
+    }
+    .feed-item__icon { font-size: 1rem; }
+    .feed-item__name { color: var(--text-primary); font-weight: 600; }
+    .feed-item__source { color: var(--text-dim); font-size: 0.58rem; }
+
+    /* ── Primitives ────────────────────────────────────────── */
+    .primitives {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+      margin: 16px 0;
+    }
+    .primitive-card {
+      background: var(--bg-secondary); border: 1px solid var(--border-dim);
+      border-radius: 4px; padding: 16px;
+    }
+    .primitive-card__label {
+      font-family: var(--font-mono); font-size: 0.6rem;
+      color: var(--signal-cyan); letter-spacing: 0.1em;
+      text-transform: uppercase; margin-bottom: 6px;
+    }
+    .primitive-card__name {
+      font-family: var(--font-mono); font-size: 0.8rem;
+      color: var(--text-primary); font-weight: 700; margin-bottom: 6px;
+    }
+    .primitive-card__desc {
+      font-size: 0.7rem; color: var(--text-secondary); line-height: 1.5;
+    }
+
+    /* ── API Block ─────────────────────────────────────────── */
+    .api-block {
+      background: var(--bg-secondary); border: 1px solid var(--border-dim);
+      border-radius: 4px; padding: 16px; margin: 12px 0;
+      font-family: var(--font-mono);
+    }
+    .api-block__method {
+      font-size: 0.6rem; color: var(--signal-live); font-weight: 700;
+      margin-right: 8px;
+    }
+    .api-block__url {
+      font-size: 0.7rem; color: var(--signal-cyan);
+    }
+    .api-block__desc {
+      font-size: 0.65rem; color: var(--text-dim); margin-top: 6px;
+    }
+
+    /* ── CTA ───────────────────────────────────────────────── */
+    .cta-block {
+      background: var(--bg-tertiary); border: 1px solid rgba(0,210,255,0.15);
+      border-radius: 6px; padding: 28px; margin: 20px 0; text-align: center;
+    }
+    .cta-block__title {
+      font-family: var(--font-mono); font-size: 0.85rem; font-weight: 700;
+      color: var(--text-primary); margin-bottom: 10px;
+      text-transform: uppercase; letter-spacing: 0.08em;
+    }
+    .cta-block__text {
+      font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 16px;
+      max-width: 500px; margin-left: auto; margin-right: auto;
+    }
+    .cta-block__contact {
+      font-family: var(--font-mono); font-size: 0.75rem;
+      color: var(--signal-cyan); text-decoration: none;
+      border: 1px solid var(--signal-cyan); padding: 8px 20px;
+      border-radius: 3px; display: inline-block;
+      transition: all 0.2s;
+    }
+    .cta-block__contact:hover {
+      background: var(--signal-cyan); color: var(--bg-primary);
+    }
+
+    /* ── Guarantee Box ─────────────────────────────────────── */
+    .guarantee {
+      border: 1px solid var(--signal-warn);
+      background: rgba(255, 107, 53, 0.05);
+      border-radius: 4px; padding: 20px; margin: 20px 0;
+    }
+    .guarantee__title {
+      font-family: var(--font-mono); font-size: 0.7rem;
+      color: var(--signal-warn); font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px;
+    }
+    .guarantee__text {
+      font-size: 0.75rem; color: var(--text-secondary); line-height: 1.6;
+    }
+
+    /* ── Footer ────────────────────────────────────────────── */
+    .about-footer {
+      text-align: center; padding: 40px 0 20px;
+      border-top: 1px solid var(--border-dim);
+      margin-top: 20px;
+    }
+    .about-footer__text {
+      font-family: var(--font-mono); font-size: 0.6rem;
+      color: var(--text-dim); letter-spacing: 0.1em;
+    }
+    .about-footer__links {
+      margin-top: 12px; display: flex; gap: 16px;
+      justify-content: center; flex-wrap: wrap;
+    }
+    .about-footer__link {
+      font-family: var(--font-mono); font-size: 0.6rem;
+      color: var(--text-dim); text-decoration: none;
+      transition: color 0.2s;
+    }
+    .about-footer__link:hover { color: var(--signal-cyan); }
+
+    /* ── Responsive ────────────────────────────────────────── */
+    @media (max-width: 640px) {
+      .hero__title { font-size: 1.2rem; }
+      .primitives { grid-template-columns: 1fr; }
+      .feed-grid { grid-template-columns: 1fr 1fr; }
+      .section__title { font-size: 0.95rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="back-nav">
+    <a href="/" class="back-nav__btn">&larr; COCKPIT</a>
+    <span class="back-nav__title">Truth Observatory — Executive Summary</span>
+  </nav>
+
+  <div class="page">
+
+    <!-- ═══ HERO ═══ -->
+    <div class="hero">
+      <span class="hero__icon">🔭</span>
+      <h1 class="hero__title">Truth Observatory</h1>
+      <div class="hero__sub">Deterministic Atmospheric Monitoring</div>
+      <p class="hero__desc">
+        18 independent data streams. Zero editorialization. Every observation timestamped, source-attributed, and hash-verified. We don't tell you what to think — we show you what the instruments are reading.
+      </p>
+    </div>
+
+    <!-- ═══ WHAT IT IS ═══ -->
+    <section class="section">
+      <div class="section__label">01 — The Platform</div>
+      <h2 class="section__title">What Observatory Does</h2>
+      <p>
+        Truth Observatory is a <strong>real-time atmospheric, geophysical, and infrastructure monitoring platform</strong> that collects data from 18 public government and scientific data sources, models statistical baselines for each stream, detects deviations from normal, and cross-correlates anomalies across feeds.
+      </p>
+      <p>
+        Every piece of data is pulled directly from the source — NOAA, USGS, FAA, EPA, EIA, SWPC, and independent scientific networks. <strong>No data is generated, interpolated, or editorialized.</strong> If a feed goes offline, it's recorded as a gap, not silently skipped.
+      </p>
+      <p>
+        The platform runs on a single Hetzner VPS in Finland for approximately <strong>$8/month</strong>. All data sources are free, public APIs. The entire system is designed to be reproducible — same input data always produces the same output.
+      </p>
+    </section>
+
+    <!-- ═══ HOW IT WORKS ═══ -->
+    <section class="section">
+      <div class="section__label">02 — Architecture</div>
+      <h2 class="section__title">How It Works</h2>
+      <p>The Observatory pipeline is deterministic. Every stage is auditable and every output is traceable to its source manifest.</p>
+
+      <div class="pipeline">
+        <div class="pipeline__step">
+          <span class="pipeline__num">01</span>
+          <div>
+            <div class="pipeline__label">COLLECTORS</div>
+            <div class="pipeline__desc">18 independent Node.js processes pull data from public APIs on continuous loops. Each collector writes an append-only NDJSON manifest with SHA-256 hashes, timestamps, and source attribution.</div>
+          </div>
+        </div>
+        <div class="pipeline__step">
+          <span class="pipeline__num">02</span>
+          <div>
+            <div class="pipeline__label">MANIFESTS</div>
+            <div class="pipeline__desc">Every observation and every data gap is recorded. Raw files are stored with integrity hashes. Nothing is modified after collection. Pruned after 30 days; hashes and metadata retained permanently.</div>
+          </div>
+        </div>
+        <div class="pipeline__step">
+          <span class="pipeline__num">03</span>
+          <div>
+            <div class="pipeline__label">BASELINE ENGINE</div>
+            <div class="pipeline__desc">Statistical baselines are computed per-feed with hourly cyclical modeling. The engine knows what "normal" looks like for each data stream at each hour of the day.</div>
+          </div>
+        </div>
+        <div class="pipeline__step">
+          <span class="pipeline__num">04</span>
+          <div>
+            <div class="pipeline__label">DEVIATION DETECTOR</div>
+            <div class="pipeline__desc">Observations exceeding 2σ from the hourly baseline are flagged as deviations. This is pure statistics — no AI judgment, no editorial interpretation.</div>
+          </div>
+        </div>
+        <div class="pipeline__step">
+          <span class="pipeline__num">05</span>
+          <div>
+            <div class="pipeline__label">CROSS-CORRELATOR</div>
+            <div class="pipeline__desc">Deviations across different feeds are tested for temporal proximity (within 1 hour) and lagged relationships (up to 6 hours). Coincident deviations are flagged as potential correlations.</div>
+          </div>
+        </div>
+        <div class="pipeline__step">
+          <span class="pipeline__num">06</span>
+          <div>
+            <div class="pipeline__label">SKEPTIC ENGINE</div>
+            <div class="pipeline__desc">Every detected correlation receives a skeptic explanation scored HIGHER than the anomalous interpretation. This is architecturally enforced — the mundane explanation cannot be overridden by the system.</div>
+          </div>
+        </div>
+        <div class="pipeline__step">
+          <span class="pipeline__num">07</span>
+          <div>
+            <div class="pipeline__label">EVENT LEDGER</div>
+            <div class="pipeline__desc">All observations, gaps, deviations, and correlations stream into a unified chronological ledger with 15-minute block numbers and deterministic hashes — like a blockchain for atmospheric data.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ DATA SOURCES ═══ -->
+    <section class="section">
+      <div class="section__label">03 — Data Sources</div>
+      <h2 class="section__title">18 Independent Feeds</h2>
+      <p>Every feed pulls from a public, freely accessible source. No API keys, no paywalls, no proprietary data.</p>
+
+      <div class="feed-grid">
+        <div class="feed-item"><span class="feed-item__icon">◉</span><div><div class="feed-item__name">NEXRAD Radar</div><div class="feed-item__source">NOAA S3 Archive</div></div></div>
+        <div class="feed-item"><span class="feed-item__icon">◎</span><div><div class="feed-item__name">GOES Satellite</div><div class="feed-item__source">NOAA AWS</div></div></div>
+        <div class="feed-item"><span class="feed-item__icon">☀</span><div><div class="feed-item__name">Solar / SWPC</div><div class="feed-item__source">NOAA SWPC</div></div></div>
+        <div class="feed-item"><span class="feed-item__icon">▲</span><div><div class="feed-item__name">USGS Seismic</div><div class="feed-item__source">USGS Earthquake API</div></div></div>
+        <div class="feed-item"><span class="feed-item__icon">⚡</span><div><div class="feed-item__name">GLM Lightning</div><div class="feed-item__source">NOAA GOES GLM</div></div></div>
+        <div class="feed-item"><span class="feed-item__icon">⏚</span><div><div class="feed-item__name">EIA Power Grid</div><div class="feed-item__source">EIA-930</div></div></div>
+        <div class="feed-item"><span class="feed-item__icon">◈</span><div><div class="feed-item__name">Geomagnetic</div><div class="feed-item__source">INTERMAGNET</div></div></div>
+        <div class="feed-item"><span class="feed-item__icon">◇</span><div><div class="feed-item__name">Ionospheric TEC</div><div class="feed-item__source">GIRO/DIDBase</div></div></div>
+        <div class="feed-item"><span class="feed-item__icon">∿</span><div><div class="feed-item__name">Schumann Resonance</div><div class="feed-item__source">Independent Stations</div></div></div>
+        <div class="feed-item"><span class="feed-item__icon">◫</span><div><div class="feed-item__name">Surface Stations</div><div class="feed-item__source">NOAA Weather API</div></div></div>
+        <div class="feed-item"><span class="feed-item__icon">↯</span><div><div class="feed-item__name">Blitzortung</div><div class="feed-item__source">Community Network</div></div></div>
+        <div class="feed-item"><span class="feed-item__icon">✈</span><div><div class="feed-item__name">ADS-B Aircraft</div><div class="feed-item__source">ADS-B Exchange</div></div></div>
+        <div class="feed-item"><span class="feed-item__icon">⚐</span><div><div class="feed-item__name">NOTAMs</div><div class="feed-item__source">FAA / State Agencies</div></div></div>
+        <div class="feed-item"><span class="feed-item__icon">⌁</span><div><div class="feed-item__name">Cell Towers</div><div class="feed-item__source">FCC ASR</div></div></div>
+        <div class="feed-item"><span class="feed-item__icon">⏛</span><div><div class="feed-item__name">Iono. Heaters</div><div class="feed-item__source">HAARP / EISCAT</div></div></div>
+        <div class="feed-item"><span class="feed-item__icon">⬡</span><div><div class="feed-item__name">Trace Metals</div><div class="feed-item__source">USGS NWIS</div></div></div>
+        <div class="feed-item"><span class="feed-item__icon">❀</span><div><div class="feed-item__name">Pollinator Index</div><div class="feed-item__source">iNaturalist</div></div></div>
+        <div class="feed-item"><span class="feed-item__icon">◌</span><div><div class="feed-item__name">Atmo. Deposition</div><div class="feed-item__source">NADP / CoCoRaHS</div></div></div>
+      </div>
+    </section>
+
+    <!-- ═══ ATMOSCORE ═══ -->
+    <section class="section">
+      <div class="section__label">04 — The Model</div>
+      <h2 class="section__title">AtmosCore 4/42</h2>
+      <p>
+        AtmosCore is the composite state engine that distills all 18 feeds into a single observation suitability score. It computes four physical primitives, each derived from a subset of feeds:
+      </p>
+
+      <div class="primitives">
+        <div class="primitive-card">
+          <div class="primitive-card__label">Primitive 1</div>
+          <div class="primitive-card__name">Thermodynamic State</div>
+          <div class="primitive-card__desc">Surface temperature, pressure, humidity, and convective potential. How much energy is in the atmosphere right now.</div>
+        </div>
+        <div class="primitive-card">
+          <div class="primitive-card__label">Primitive 2</div>
+          <div class="primitive-card__name">Optical Propagation</div>
+          <div class="primitive-card__desc">Cloud cover, aerosol loading, radar reflectivity. How clearly can instruments see through the atmosphere.</div>
+        </div>
+        <div class="primitive-card">
+          <div class="primitive-card__label">Primitive 3</div>
+          <div class="primitive-card__name">Dynamic Stability</div>
+          <div class="primitive-card__desc">Geomagnetic indices, ionospheric variability, solar flux. How stable is the electromagnetic environment.</div>
+        </div>
+        <div class="primitive-card">
+          <div class="primitive-card__label">Primitive 4</div>
+          <div class="primitive-card__name">Temporal Coherence</div>
+          <div class="primitive-card__desc">Feed freshness, data gap frequency, baseline consistency. How trustworthy is the data we're seeing right now.</div>
+        </div>
+      </div>
+
+      <p>
+        The 4/42 designation refers to the four physical primitives grounded in the <strong>42-Doctrine Deterministic Dissolution Ladder</strong> — the architectural framework that guarantees deterministic outputs across the entire system.
+      </p>
+    </section>
+
+    <!-- ═══ ARCHITECTURAL GUARANTEE ═══ -->
+    <section class="section">
+      <div class="section__label">05 — Integrity</div>
+      <h2 class="section__title">Architectural Guarantees</h2>
+
+      <div class="guarantee">
+        <div class="guarantee__title">⚠ Correlation ≠ Causation</div>
+        <div class="guarantee__text">
+          This principle is not a disclaimer — it is architecturally enforced. Every detected correlation carries a skeptic explanation scored higher than the anomalous interpretation by default. The system cannot override this. Temporal proximity of events across independent data streams is statistically expected. The null hypothesis (coincidence) is the default verdict until independently verified through controlled study.
+        </div>
+      </div>
+
+      <p><strong>No interpolation.</strong> If data is missing, it's recorded as a gap. We never fill holes with estimates.</p>
+      <p><strong>No editorialization.</strong> The system shows you what the instruments read. It does not tell you what it means.</p>
+      <p><strong>No AI judgment.</strong> Baselines are statistical. Deviations are mathematical. Correlations are temporal. None of this requires or uses machine learning.</p>
+      <p><strong>Full provenance.</strong> Every observation is traceable from the UI → API → Event Ledger → manifest → source URL → raw file with SHA-256 hash.</p>
+    </section>
+
+    <!-- ═══ FOR RESEARCHERS ═══ -->
+    <section class="section">
+      <div class="section__label">06 — Open Contribution</div>
+      <h2 class="section__title">For Researchers & Independents</h2>
+      <p>
+        Observatory is designed to grow. If you operate a sensor network, maintain a public data feed, or have access to a scientific data source we don't yet cover — <strong>you can propose it for inclusion.</strong>
+      </p>
+      <p>
+        The contribution model is straightforward:
+      </p>
+      <p>
+        <strong>1. Propose a feed.</strong> Describe your data source, its update frequency, what it measures, and how to access it (must be freely accessible — no API keys, no paywalls).
+      </p>
+      <p>
+        <strong>2. Define a manifest schema.</strong> Specify the fields your collector will write to its NDJSON manifest. At minimum: <code style="background: rgba(0,210,255,0.1); color: var(--signal-cyan); padding: 1px 4px; border-radius: 2px; font-size: 0.8rem;">type</code>, <code style="background: rgba(0,210,255,0.1); color: var(--signal-cyan); padding: 1px 4px; border-radius: 2px; font-size: 0.8rem;">source</code>, <code style="background: rgba(0,210,255,0.1); color: var(--signal-cyan); padding: 1px 4px; border-radius: 2px; font-size: 0.8rem;">retrievedAt</code>, <code style="background: rgba(0,210,255,0.1); color: var(--signal-cyan); padding: 1px 4px; border-radius: 2px; font-size: 0.8rem;">sha256</code>.
+      </p>
+      <p>
+        <strong>3. We validate and integrate.</strong> Your collector is added to the supervisor fleet. Your data enters the baseline engine, the deviation detector, the cross-correlator, and the Event Ledger. You get full access to the correlation output across all feeds, including yours.
+      </p>
+      <p>
+        The more feeds, the richer the correlation model. Independent sensor networks — air quality, electromagnetic field measurements, acoustic monitoring, water quality — all contribute to a more complete picture of what the atmosphere is actually doing.
+      </p>
+    </section>
+
+    <!-- ═══ OPEN API ═══ -->
+    <section class="section">
+      <div class="section__label">07 — API Access</div>
+      <h2 class="section__title">Open REST API</h2>
+      <p>All Observatory data is freely accessible via REST API. No authentication required.</p>
+
+      <div class="api-block">
+        <span class="api-block__method">GET</span>
+        <span class="api-block__url">/api/feeds</span>
+        <div class="api-block__desc">All 18 feeds with live/stale/offline status, entry counts, last update timestamps, and 24-hour sparkline data.</div>
+      </div>
+      <div class="api-block">
+        <span class="api-block__method">GET</span>
+        <span class="api-block__url">/api/feed/{id}</span>
+        <div class="api-block__desc">Detailed status and recent manifest entries for a specific feed.</div>
+      </div>
+      <div class="api-block">
+        <span class="api-block__method">GET</span>
+        <span class="api-block__url">/api/ledger?limit=40</span>
+        <div class="api-block__desc">Unified event stream: observations, gaps, deviations, and correlations with block numbers and hashes.</div>
+      </div>
+      <div class="api-block">
+        <span class="api-block__method">GET</span>
+        <span class="api-block__url">/api/correlations</span>
+        <div class="api-block__desc">Full correlation engine output: per-feed baselines, deviations, patterns, skeptic notes, and analysis metadata.</div>
+      </div>
+      <div class="api-block">
+        <span class="api-block__method">GET</span>
+        <span class="api-block__url">/api/health</span>
+        <div class="api-block__desc">System health check — returns status, timestamp, and feed count.</div>
+      </div>
+    </section>
+
+    <!-- ═══ FOR INVESTORS ═══ -->
+    <section class="section">
+      <div class="section__label">08 — Investment</div>
+      <h2 class="section__title">For Partners & Investors</h2>
+      <p>
+        Observatory currently runs on a <strong>$8/month</strong> Hetzner VPS. The entire platform — 18 collectors, the correlation engine, the API server, and the dashboard — operates within this budget using exclusively free public data sources.
+      </p>
+      <p>
+        <strong>What funding enables:</strong>
+      </p>
+      <p>
+        <strong>More feeds.</strong> Weather balloon radiosonde data, ocean buoy networks (NDBC), volcanic gas emissions (USGS), aurora cameras, magnetometer networks, and space weather beyond SWPC (DSCOVR, ACE real-time solar wind).
+      </p>
+      <p>
+        <strong>Longer retention.</strong> Currently raw data is pruned at 30 days. With additional storage, we can retain 1 year+ of raw observations for long-term trend analysis and seasonal correlation patterns.
+      </p>
+      <p>
+        <strong>Real-time alerting.</strong> SMS/email/webhook notifications when deviations exceed configurable thresholds or when new cross-feed correlations are detected.
+      </p>
+      <p>
+        <strong>Regional coverage.</strong> Per-zip-code local condition dashboards, station-level data overlays, and location-aware deviation alerts.
+      </p>
+      <p>
+        <strong>Mobile app.</strong> Native iOS/Android application for field researchers and independent observers.
+      </p>
+
+      <div class="cta-block">
+        <div class="cta-block__title">Interested in Contributing?</div>
+        <div class="cta-block__text">
+          Whether you're a researcher with data to contribute, an independent observer with a sensor network, or an investor who believes in transparent atmospheric monitoring — we want to hear from you.
+        </div>
+        <a href="mailto:info@darkwavestudios.io" class="cta-block__contact">info@darkwavestudios.io</a>
+      </div>
+    </section>
+
+    <!-- ═══ DATA RETENTION ═══ -->
+    <section class="section">
+      <div class="section__label">09 — Retention Policy</div>
+      <h2 class="section__title">Data Retention & Pruning</h2>
+      <p>
+        <strong>Raw observation files</strong> are pruned after <strong>30 days</strong> to manage storage on the current infrastructure.
+      </p>
+      <p>
+        <strong>Manifest metadata</strong> — including timestamps, source attribution, SHA-256 hashes, and observation summaries — is retained <strong>permanently</strong>. This means every observation that ever passed through the system can be verified by its hash, even after the raw file is pruned.
+      </p>
+      <p>
+        <strong>Event Ledger blocks</strong> and their hashes are permanent. The full ledger history is accessible via <code style="background: rgba(0,210,255,0.1); color: var(--signal-cyan); padding: 1px 4px; border-radius: 2px; font-size: 0.8rem;">/api/ledger</code>.
+      </p>
+      <p>
+        <strong>Correlation patterns</strong> are recomputed every 5 minutes from the rolling 7-day window. Historical patterns are preserved in the Event Ledger.
+      </p>
+    </section>
+
+    <!-- ═══ FOOTER ═══ -->
+    <div class="about-footer">
+      <div class="about-footer__text">© 2026 DARKWAVE STUDIOS LLC — TRUTH OBSERVATORY v3.0</div>
+      <div class="about-footer__links">
+        <a href="/" class="about-footer__link">Cockpit</a>
+        <a href="/terms" class="about-footer__link">Terms</a>
+        <a href="/privacy" class="about-footer__link">Privacy</a>
+        <a href="/legal" class="about-footer__link">Legal</a>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

@@ -393,6 +393,7 @@ const server = createServer((req, res) => {
     '/privacy': '/privacy.html',
     '/legal': '/legal.html',
     '/sms-optin': '/sms-optin.html',
+    '/about': '/about.html',
   };
   let filePath = PAGE_ROUTES[path] || (path === '/' ? '/index.html' : path);
   const fullPath = join(SITE_DIR, filePath);
