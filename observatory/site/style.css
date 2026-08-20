@@ -1334,7 +1334,7 @@ body::after {
 
 /* ═══ MOBILE RESPONSIVE ═══════════════════════════════════════ */
 @media (max-width: 768px) {
-  /* Show topbar stats on mobile too but compact */
+  /* ── Topbar compact ─────────────────────────────── */
   .topbar__center { display: flex; gap: var(--space-md); }
   .topbar__stat-label { font-size: 0.4rem; }
   .topbar__stat-value { font-size: 0.55rem; }
@@ -1342,11 +1342,11 @@ body::after {
   .topbar__version { display: none; }
   .topbar__clock { font-size: 0.55rem; }
 
-  /* Show mobile-only elements */
+  /* ── Mobile-only elements ───────────────────────── */
   .map-preview { display: block; }
   .location-bar { display: flex; }
 
-  /* Cockpit becomes a scroll column below the map preview */
+  /* ── Cockpit = scrollable column ─────────────────── */
   .cockpit {
     position: relative;
     top: auto; left: auto; right: auto; bottom: auto;
@@ -1358,38 +1358,80 @@ body::after {
     height: auto;
     min-height: calc(100vh - var(--topbar-h) - var(--bottomnav-h));
     background: var(--bg-primary);
+    gap: 0;
   }
 
-  /* Hide the desktop map panel on mobile (we use map-preview instead) */
+  /* Hide desktop map + resize handle on mobile */
   .cockpit__map { display: none !important; }
-  .cockpit__feeds { display: flex; flex-direction: column; overflow: visible; }
-  .cockpit__corr { display: none; }
-  .cockpit__atmoscore { display: none; }
+  .cockpit__resize-handle { display: none !important; }
 
+  /* Feeds: full width column */
+  .cockpit__feeds {
+    display: flex; flex-direction: column;
+    overflow: visible; width: 100%;
+  }
+
+  /* Ledger: full width, no height constraint */
+  .cockpit__corr {
+    display: none; width: 100%;
+    max-height: none; min-height: 0;
+    overflow: visible;
+  }
+
+  /* AtmosCore: hidden by default */
+  .cockpit__atmoscore { display: none; width: 100%; }
+
+  /* ── View: Cockpit (feeds + ledger) ─────────────── */
   .cockpit[data-view="cockpit"] .cockpit__feeds { display: flex; }
+  .cockpit[data-view="cockpit"] .cockpit__corr { display: flex; }
 
+  /* ── View: Feeds only ───────────────────────────── */
   .cockpit[data-view="feeds"] .cockpit__feeds { display: flex; }
+  .cockpit[data-view="feeds"] .cockpit__corr { display: none; }
 
-  .cockpit[data-view="atmoscore"] .cockpit__atmoscore { display: flex; overflow: visible; }
+  /* ── View: AtmosCore ────────────────────────────── */
+  .cockpit[data-view="atmoscore"] .cockpit__atmoscore {
+    display: flex; overflow: visible;
+  }
   .cockpit[data-view="atmoscore"] .cockpit__feeds { display: none; }
+  .cockpit[data-view="atmoscore"] .cockpit__corr { display: none; }
 
-  .cockpit[data-view="correlations"] .cockpit__corr { display: flex; max-height: none; overflow: visible; }
+  /* ── View: Ledger only ──────────────────────────── */
+  .cockpit[data-view="correlations"] .cockpit__corr {
+    display: flex; max-height: none; overflow: visible;
+  }
   .cockpit[data-view="correlations"] .cockpit__feeds { display: none; }
 
-  /* Hide map bottom-nav button on mobile (map is always visible as preview) */
+  /* ── View: Map ──────────────────────────────────── */
   .cockpit[data-view="map"] .cockpit__feeds { display: none; }
+  .cockpit[data-view="map"] .cockpit__corr { display: none; }
   .cockpit[data-view="map"] .cockpit__map { display: none !important; }
 
+  /* ── AtmosCore single column ────────────────────── */
   .atmoscore-layout {
     grid-template-columns: 1fr;
     grid-template-rows: auto 1fr;
   }
+  .atmoscore-ring-wrap { padding: var(--space-md); min-height: 250px; }
 
+  /* ── Feed cards ─────────────────────────────────── */
   .feed-card { width: 180px; min-height: 160px; }
   .feed-card__image-wrap { height: 65px; }
 
-  .corr-card { width: 260px; }
+  /* ── Domain carousel ────────────────────────────── */
+  .domain-carousel__track {
+    padding: 0 var(--space-sm);
+    -webkit-overflow-scrolling: touch;
+  }
 
+  /* ── Ledger mobile ──────────────────────────────── */
+  .ledger-stream { max-height: none; overflow-y: visible; }
+
+  /* ── Panel headers compact ──────────────────────── */
+  .panel-header__title { font-size: 0.6rem; }
+  .panel-header__badge { font-size: 0.5rem; }
+
+  /* ── Bottom nav compact ─────────────────────────── */
   .bottomnav__label { font-size: 0.45rem; }
 }
 
@@ -1404,6 +1446,20 @@ body::after {
   .feed-card__condition { font-size: 0.5rem; }
 
   .map-preview { height: 32vh; }
+
+  /* Ledger events compact */
+  .ledger-event { font-size: 0.55rem; padding: 4px 6px; }
+  .ledger-event__feed { font-size: 0.55rem; }
+  .ledger-event__detail { font-size: 0.5rem; }
+  .ledger-event__time { font-size: 0.5rem; }
+
+  /* AtmosCore primitives compact */
+  .atmoscore-primitive__label { font-size: 0.5rem; }
+  .atmoscore-primitive__value { font-size: 0.7rem; }
+  .atmoscore-suitability__score { font-size: 1.4rem; }
+
+  /* Modals full width on small screens */
+  .corr-detail-modal, .ledger-info-modal { width: 95%; max-height: 85vh; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
