@@ -116,7 +116,7 @@ body::after {
   bottom: var(--bottomnav-h);
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr auto;
+  grid-template-rows: 1fr auto auto;
   gap: 1px;
   background: var(--border-dim);
   overflow: hidden;
@@ -151,38 +151,72 @@ body::after {
 
 .cockpit__corr {
   grid-column: 1 / -1;
-  grid-row: 2;
+  grid-row: 3;
   background: var(--bg-primary);
-  min-height: 140px;
-  max-height: 280px;
+  min-height: 80px;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── Resize Handle ──────────────────────────────────────────── */
+.cockpit__resize-handle {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  height: 8px;
+  cursor: ns-resize;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-primary);
+  border-top: 1px solid var(--border-dim);
+  border-bottom: 1px solid var(--border-dim);
+  z-index: 10;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+.cockpit__resize-grip {
+  width: 40px; height: 3px;
+  background: var(--text-dim);
+  border-radius: 2px;
+  opacity: 0.5;
+  transition: opacity 0.2s, background 0.2s;
+}
+.cockpit__resize-handle:hover .cockpit__resize-grip,
+.cockpit__resize-handle:active .cockpit__resize-grip {
+  opacity: 1; background: var(--signal-cyan);
 }
 
 /* ── View Switching ──────────────────────────────────────────── */
 .cockpit[data-view="cockpit"] .cockpit__map,
 .cockpit[data-view="cockpit"] .cockpit__feeds,
 .cockpit[data-view="cockpit"] .cockpit__corr { display: flex; }
+.cockpit[data-view="cockpit"] .cockpit__resize-handle { display: flex; }
 .cockpit[data-view="cockpit"] .cockpit__atmoscore { display: none; }
 
 .cockpit[data-view="feeds"] .cockpit__feeds { display: flex; grid-column: 1 / -1; }
 .cockpit[data-view="feeds"] .cockpit__map { display: none; }
 .cockpit[data-view="feeds"] .cockpit__atmoscore { display: none; }
 .cockpit[data-view="feeds"] .cockpit__corr { display: none; }
+.cockpit[data-view="feeds"] .cockpit__resize-handle { display: none; }
 
 .cockpit[data-view="atmoscore"] .cockpit__atmoscore { display: flex; }
 .cockpit[data-view="atmoscore"] .cockpit__map { display: none; }
 .cockpit[data-view="atmoscore"] .cockpit__feeds { display: none; }
 .cockpit[data-view="atmoscore"] .cockpit__corr { display: none; }
+.cockpit[data-view="atmoscore"] .cockpit__resize-handle { display: none; }
 
 .cockpit[data-view="correlations"] .cockpit__corr { display: flex; grid-column: 1 / -1; grid-row: 1; max-height: none; min-height: 0; flex: 1; overflow: hidden; }
 .cockpit[data-view="correlations"] .cockpit__map { display: none; }
 .cockpit[data-view="correlations"] .cockpit__feeds { display: none; }
 .cockpit[data-view="correlations"] .cockpit__atmoscore { display: none; }
+.cockpit[data-view="correlations"] .cockpit__resize-handle { display: none; }
 
 .cockpit[data-view="map"] .cockpit__map { display: flex; grid-column: 1 / -1; }
 .cockpit[data-view="map"] .cockpit__feeds { display: none; }
 .cockpit[data-view="map"] .cockpit__corr { display: none; }
+.cockpit[data-view="map"] .cockpit__resize-handle { display: none; }
 .cockpit[data-view="map"] .cockpit__atmoscore { display: none; }
 
 /* ═══ PANEL HEADER ═══════════════════════════════════════════ */

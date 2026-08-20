@@ -900,7 +900,53 @@ const Observatory = {
       this.updateDynamicLegend();
     });
 
-    // (Correlation carousel removed — replaced by Event Ledger)
+    // ── Cockpit resize handle (drag to resize map/ledger split) ──
+    const resizeHandle = document.getElementById('cockpit-resize-handle');
+    if (resizeHandle) {
+      let dragging = false;
+      let startY = 0;
+      let startTopHeight = 0;
+      const cockpit = document.querySelector('.cockpit');
+
+      const onStart = (e) => {
+        dragging = true;
+        startY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+        startTopHeight = cockpit.querySelector('.cockpit__map').getBoundingClientRect().height;
+        document.body.style.cursor = 'ns-resize';
+        document.body.style.userSelect = 'none';
+        e.preventDefault();
+      };
+
+      const onMove = (e) => {
+        if (!dragging) return;
+        const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+        const delta = clientY - startY;
+        const cockpitRect = cockpit.getBoundingClientRect();
+        const newTopHeight = startTopHeight + delta;
+        const minTop = 120;
+        const minBottom = 80;
+        const maxTop = cockpitRect.height - minBottom - 8; // 8px handle
+        const clamped = Math.max(minTop, Math.min(maxTop, newTopHeight));
+        cockpit.style.gridTemplateRows = `${clamped}px auto 1fr`;
+        // Invalidate map size so tiles render correctly
+        if (this.map) this.map.invalidateSize();
+      };
+
+      const onEnd = () => {
+        if (!dragging) return;
+        dragging = false;
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+        if (this.map) this.map.invalidateSize();
+      };
+
+      resizeHandle.addEventListener('mousedown', onStart);
+      resizeHandle.addEventListener('touchstart', onStart, { passive: false });
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('touchmove', onMove, { passive: false });
+      document.addEventListener('mouseup', onEnd);
+      document.addEventListener('touchend', onEnd);
+    }
 
     // Refresh button
     const refreshBtn = document.getElementById('refresh-map');
