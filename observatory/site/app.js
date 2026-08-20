@@ -91,13 +91,16 @@ const Observatory = {
     this.initStatTooltips();
     this.initMobileMapPreview();
     this.initLocation();
+    this.initLedger();
 
     // Initialize AtmosCore engine
     AtmosCore.init();
     AtmosCoreViz.init('atmoscore-ring');
 
     await this.fetchAll();
+    this.fetchLedger();
     setInterval(() => this.fetchAll(), this.refreshInterval);
+    setInterval(() => this.fetchLedger(), 60000); // Refresh ledger every 60s
   },
 
   // ── UTC Clock ────────────────────────────────────────────────
@@ -1375,6 +1378,129 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
 
   _saveLocation(loc) {
     try { localStorage.setItem('observatory_location', JSON.stringify(loc)); } catch {}
+  },
+
+  // ═══════════════════════════════════════════════════════════════
+  // EVENT LEDGER — blockchain-style event stream
+  // ═══════════════════════════════════════════════════════════════
+  ledgerData: null,
+
+  initLedger() {
+    // Info button
+    const infoBtn = document.getElementById('ledger-info-btn');
+    const infoOverlay = document.getElementById('ledger-info-overlay');
+    const infoClose = document.getElementById('ledger-info-close');
+    if (infoBtn && infoOverlay) {
+      infoBtn.addEventListener('click', () => infoOverlay.classList.add('ledger-info-overlay--open'));
+      infoClose.addEventListener('click', () => infoOverlay.classList.remove('ledger-info-overlay--open'));
+      infoOverlay.addEventListener('click', (e) => {
+        if (e.target === infoOverlay) infoOverlay.classList.remove('ledger-info-overlay--open');
+      });
+    }
+
+    // Correlation detail modal
+    const corrOverlay = document.getElementById('corr-detail-overlay');
+    const corrClose = document.getElementById('corr-detail-close');
+    if (corrOverlay) {
+      corrClose.addEventListener('click', () => corrOverlay.classList.remove('corr-detail-overlay--open'));
+      corrOverlay.addEventListener('click', (e) => {
+        if (e.target === corrOverlay) corrOverlay.classList.remove('corr-detail-overlay--open');
+      });
+    }
+  },
+
+  async fetchLedger() {
+    try {
+      const res = await fetch('/api/ledger?limit=40');
+      const data = await res.json();
+      this.ledgerData = data;
+      this.renderLedger(data);
+    } catch (e) {
+      console.warn('[Ledger] Fetch failed:', e.message);
+    }
+  },
+
+  renderLedger(data) {
+    const stream = document.getElementById('ledger-stream');
+    const badge = document.getElementById('ledger-count');
+    if (!stream || !data) return;
+
+    badge.textContent = `${data.totalEvents} events`;
+
+    if (!data.events || data.events.length === 0) {
+      stream.innerHTML = '<div class="ledger-loading">No events in the last 24 hours. Collectors are gathering data.</div>';
+      return;
+    }
+
+    let html = '';
+    let lastBlock = null;
+
+    for (const ev of data.events) {
+      // Block separator
+      if (ev.block !== lastBlock) {
+        if (lastBlock !== null) {
+          html += `<div class="ledger-block-sep">BLOCK #${ev.block}</div>`;
+        }
+        lastBlock = ev.block;
+      }
+
+      const time = new Date(ev.at);
+      const timeStr = time.toISOString().slice(11, 16) + ' UTC';
+      const kindClass = `ledger-event--${ev.kind}`;
+      const isCorr = ev.kind === 'correlation';
+      const clickAttr = isCorr ? `onclick="Observatory.openCorrelationDetail(${data.events.indexOf(ev)})"` : '';
+
+      let feedLabel = ev.feedName;
+      let detailHtml = ev.detail || '';
+      let badgeHtml = '';
+
+      if (ev.kind === 'correlation') {
+        const confClass = ev.confidence === 'HIGH' ? ' ledger-event__corr-badge--high' : '';
+        badgeHtml = `<span class="ledger-event__corr-badge${confClass}">${ev.confidence} CORR</span>`;
+      } else if (ev.kind === 'deviation') {
+        badgeHtml = `<span class="ledger-event__dev-badge">${ev.direction === 'above' ? '↑' : '↓'}${Math.abs(ev.zScore)}σ</span>`;
+      }
+
+      html += `
+        <div class="ledger-event ${kindClass}" ${clickAttr}>
+          <span class="ledger-event__time">${timeStr}</span>
+          <span class="ledger-event__icon">${ev.icon || '·'}</span>
+          <div class="ledger-event__content">
+            <span class="ledger-event__feed">${feedLabel}${badgeHtml}</span>
+            <span class="ledger-event__detail">${detailHtml}</span>
+          </div>
+          <span class="ledger-event__hash">${ev.hash || ''}</span>
+        </div>`;
+    }
+
+    stream.innerHTML = html;
+  },
+
+  openCorrelationDetail(index) {
+    if (!this.ledgerData || !this.ledgerData.events[index]) return;
+    const ev = this.ledgerData.events[index];
+
+    const overlay = document.getElementById('corr-detail-overlay');
+    const title = document.getElementById('corr-detail-title');
+    const body = document.getElementById('corr-detail-body');
+    const verdict = document.getElementById('corr-detail-verdict');
+    const skeptic = document.getElementById('corr-detail-skeptic');
+
+    title.textContent = ev.feedName || 'CORRELATION';
+    body.innerHTML = `
+      <p><strong>Domains:</strong> ${ev.domain || '—'}</p>
+      <p><strong>Occurrences:</strong> ${ev.occurrences || '—'} coincident deviations in past 7 days</p>
+      <p><strong>Average Lag:</strong> ${ev.avgLagMinutes != null ? (ev.avgLagMinutes === 0 ? 'Simultaneous' : Math.abs(ev.avgLagMinutes) + ' minutes') : '—'}</p>
+      <p><strong>Confidence:</strong> ${ev.confidence || '—'}</p>
+      <p><strong>Detail:</strong> ${ev.detail || '—'}</p>
+      <p><strong>Feeds Involved:</strong> ${(ev.feeds || []).join(', ')}</p>
+      <p><strong>Last Detected:</strong> ${ev.at || '—'}</p>
+      <p><strong>Block:</strong> #${ev.block} &nbsp; <strong>Hash:</strong> ${ev.hash || '—'}</p>
+    `;
+    verdict.textContent = ev.verdict || 'CORRELATION OBSERVED — NOT CAUSATION';
+    skeptic.textContent = ev.skepticNote || 'No skeptic analysis available.';
+
+    overlay.classList.add('corr-detail-overlay--open');
   },
 };
 

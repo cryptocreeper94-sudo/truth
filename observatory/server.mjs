@@ -127,6 +127,166 @@ function getFeedStatus(feed) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// Event Ledger — builds a unified stream of events + correlations
+// ═══════════════════════════════════════════════════════════════════════════
+function buildEventLedger(limit = 40) {
+  const allEvents = [];
+  const now = Date.now();
+  const maxAge = 24 * 60 * 60 * 1000; // 24 hours of events
+
+  // 1. Collect recent events from all manifests
+  for (const feed of FEEDS) {
+    const entries = readManifest(feed.manifest, 50);
+    for (const entry of entries) {
+      const ts = entry.retrievedAt || entry.writtenAt || entry.timestamp;
+      if (!ts) continue;
+      const t = new Date(ts).getTime();
+      if (isNaN(t) || now - t > maxAge) continue;
+
+      // Skip prune entries — not interesting to the user
+      if (entry.type === 'RETENTION-PRUNE') continue;
+
+      const isGap = entry.type === 'DATA-GAP';
+      allEvents.push({
+        kind: isGap ? 'gap' : 'observation',
+        feedId: feed.id,
+        feedName: feed.name,
+        domain: feed.domain,
+        icon: feed.icon,
+        type: entry.type,
+        at: ts,
+        t,
+        source: entry.source || feed.name,
+        detail: buildEventDetail(entry, feed),
+        isCorrelation: false,
+      });
+    }
+  }
+
+  // 2. Load correlation patterns and deviations
+  const corrFile = join(STATE_DIR, 'correlations.json');
+  let patterns = [];
+  let recentDeviations = [];
+  let corrMeta = {};
+
+  if (existsSync(corrFile)) {
+    try {
+      const data = JSON.parse(readFileSync(corrFile, 'utf-8'));
+      patterns = data.patterns || [];
+      recentDeviations = data.recentDeviations || [];
+      corrMeta = {
+        totalObservations: data.totalObservations,
+        totalDeviations: data.totalDeviations,
+        totalCorrelations: data.totalCorrelations,
+        generatedAt: data.generatedAt,
+      };
+
+      // Add deviation events
+      for (const dev of recentDeviations) {
+        const t = new Date(dev.at).getTime();
+        if (now - t > maxAge) continue;
+        allEvents.push({
+          kind: 'deviation',
+          feedId: dev.feedId,
+          feedName: FEEDS.find(f => f.id === dev.feedId)?.name || dev.feedId,
+          domain: dev.domain,
+          icon: FEEDS.find(f => f.id === dev.feedId)?.icon || '!',
+          type: 'DEVIATION',
+          at: dev.at,
+          t,
+          source: dev.source,
+          detail: `${dev.direction === 'above' ? '\u2191' : '\u2193'}${Math.abs(dev.zScore)}\u03C3 from baseline (value: ${typeof dev.value === 'number' ? dev.value.toLocaleString() : dev.value}, expected: ${typeof dev.expected === 'number' ? Math.round(dev.expected).toLocaleString() : dev.expected})`,
+          zScore: dev.zScore,
+          direction: dev.direction,
+          isCorrelation: false,
+        });
+      }
+
+      // Add correlation pattern events (most recent occurrence)
+      for (const pat of patterns) {
+        if (!pat.latestEvent) continue;
+        const t = new Date(pat.latestEvent).getTime();
+        if (now - t > maxAge) continue;
+        allEvents.push({
+          kind: 'correlation',
+          feedId: pat.feeds.join('+'),
+          feedName: pat.title,
+          domain: pat.domains.join(' \u2194 '),
+          icon: '\u2194',
+          type: 'CORRELATION',
+          at: pat.latestEvent,
+          t,
+          source: 'Correlation Engine',
+          detail: pat.summary,
+          confidence: pat.confidence,
+          skepticNote: pat.skepticNote,
+          verdict: pat.verdict,
+          feeds: pat.feeds,
+          domains: pat.domains,
+          occurrences: pat.occurrences,
+          avgLagMinutes: pat.avgLagMinutes,
+          isCorrelation: true,
+        });
+      }
+    } catch {}
+  }
+
+  // 3. Sort by time (newest first) and limit
+  allEvents.sort((a, b) => b.t - a.t);
+  const events = allEvents.slice(0, limit);
+
+  // 4. Assign block numbers (descending from current block)
+  const baseBlock = Math.floor(now / (15 * 60 * 1000)); // 15-min blocks
+  events.forEach((ev, i) => {
+    ev.block = Math.floor(ev.t / (15 * 60 * 1000));
+    ev.blockLabel = `#${ev.block}`;
+    // Simple hash: feed + type + timestamp
+    ev.hash = simpleHash(`${ev.feedId}:${ev.type}:${ev.at}`).slice(0, 12);
+  });
+
+  return {
+    timestamp: new Date().toISOString(),
+    currentBlock: baseBlock,
+    totalEvents: allEvents.length,
+    events,
+    correlationMeta: corrMeta,
+    retention: {
+      rawDataDays: 30,
+      metadataRetention: 'permanent',
+      note: 'Raw observation data is pruned after 30 days. Block hashes and metadata summaries are retained permanently.',
+    },
+  };
+}
+
+function buildEventDetail(entry, feed) {
+  // Extract meaningful details from manifest entries
+  if (entry.type === 'DATA-GAP') return `Source offline: ${entry.reason || 'unknown'}`;
+  if (entry.type === 'GOES-SCAN') return `${entry.satellite || 'GOES'} ${entry.product || ''} ${entry.region || ''}`.trim();
+  if (entry.type === 'GRID-DATA') return `${entry.datasetName || 'Grid data'} (${entry.entries || entry.rows || '?'} entries)`;
+  if (entry.type === 'SCHUMANN-DATA') return `${entry.stationName || 'Station'} (${entry.country || '?'})`;
+  if (entry.type === 'OBSERVATION') {
+    const parts = [];
+    if (entry.source) parts.push(entry.source);
+    if (entry.bytes) parts.push(`${(entry.bytes / 1024).toFixed(1)}KB`);
+    if (entry.stations) parts.push(`${entry.stations} stations`);
+    if (entry.aircraft) parts.push(`${entry.aircraft} aircraft`);
+    if (entry.totalResults) parts.push(`${entry.totalResults.toLocaleString()} results`);
+    return parts.join(' \u2014 ') || feed.name;
+  }
+  return entry.source || entry.type || feed.name;
+}
+
+function simpleHash(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const chr = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + chr;
+    hash |= 0;
+  }
+  return Math.abs(hash).toString(16).padStart(8, '0');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // HTTP Server
 // ═══════════════════════════════════════════════════════════════════════════
 const server = createServer((req, res) => {
@@ -203,6 +363,14 @@ const server = createServer((req, res) => {
       events: [],
       message: 'Correlation engine is modeling baselines. Patterns will appear as deviations are identified.',
     }));
+  }
+
+  // ── Event Ledger — unified stream of events + correlations ──────────
+  if (path === '/api/ledger') {
+    const limit = Math.min(parseInt(url.searchParams.get('limit') || '40', 10), 100);
+    const ledger = buildEventLedger(limit);
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    return res.end(JSON.stringify(ledger));
   }
 
   if (path === '/api/digests') {

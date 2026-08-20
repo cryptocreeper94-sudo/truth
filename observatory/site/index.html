@@ -174,24 +174,16 @@
       </div>
     </section>
 
-    <!-- BOTTOM: CORRELATION BAR -->
-    <section class="cockpit__corr" id="corr-panel">
+    <!-- BOTTOM: EVENT LEDGER -->
+    <section class="cockpit__corr" id="ledger-panel">
       <div class="panel-header">
-        <span class="panel-header__icon">&#10689;</span>
-        <span class="panel-header__title">CORRELATION ENGINE</span>
-        <span class="panel-header__badge" id="corr-count">0 patterns</span>
+        <span class="panel-header__icon">&#9638;</span>
+        <span class="panel-header__title">EVENT LEDGER</span>
+        <button class="panel-header__info-btn" id="ledger-info-btn" title="About the Event Ledger">ⓘ</button>
+        <span class="panel-header__badge" id="ledger-count">loading...</span>
       </div>
-      <div class="corr-carousel" id="corr-carousel">
-        <div class="corr-carousel__track" id="corr-track">
-          <div class="corr-card corr-card--empty">
-            <p class="corr-card__msg">Correlation engine is modeling baselines. Patterns appear as deviations are identified.</p>
-          </div>
-        </div>
-        <div class="corr-carousel__nav">
-          <button class="corr-nav-btn" id="corr-prev">&#8249;</button>
-          <div class="corr-carousel__dots" id="corr-dots"></div>
-          <button class="corr-nav-btn" id="corr-next">&#8250;</button>
-        </div>
+      <div class="ledger-stream" id="ledger-stream">
+        <div class="ledger-loading">Loading event stream...</div>
       </div>
     </section>
   </main>
@@ -233,6 +225,38 @@
         <button class="legend-info-modal__close" id="legend-info-close">&#10005;</button>
       </div>
       <div class="legend-info-modal__body" id="legend-info-body"></div>
+    </div>
+  </div>
+
+  <!-- ═══ CORRELATION DETAIL MODAL ═══ -->
+  <div class="corr-detail-overlay" id="corr-detail-overlay">
+    <div class="corr-detail-modal" id="corr-detail-modal">
+      <div class="corr-detail-modal__header">
+        <h3 class="corr-detail-modal__title" id="corr-detail-title">CORRELATION</h3>
+        <button class="corr-detail-modal__close" id="corr-detail-close">&#10005;</button>
+      </div>
+      <div class="corr-detail-modal__body" id="corr-detail-body"></div>
+      <div class="corr-detail-modal__footer">
+        <div class="corr-detail-modal__verdict" id="corr-detail-verdict"></div>
+        <div class="corr-detail-modal__skeptic" id="corr-detail-skeptic"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ LEDGER INFO MODAL ═══ -->
+  <div class="ledger-info-overlay" id="ledger-info-overlay">
+    <div class="ledger-info-modal">
+      <div class="ledger-info-modal__header">
+        <h3>EVENT LEDGER — DATA RETENTION</h3>
+        <button class="ledger-info-modal__close" id="ledger-info-close">&#10005;</button>
+      </div>
+      <div class="ledger-info-modal__body">
+        <p><strong>What is this?</strong> The Event Ledger is a chronological stream of every observation, data gap, deviation, and correlation detected across all 18 feeds.</p>
+        <p><strong>Block Numbers:</strong> Events are grouped into 15-minute blocks. Each event carries a deterministic hash for integrity verification.</p>
+        <p><strong>Correlations:</strong> When deviations in multiple feeds coincide within a 1-hour window, they are highlighted as a potential correlation. All correlations carry a <em>skeptic note</em> — the mundane explanation is always scored higher than the anomalous one.</p>
+        <p><strong>Data Retention:</strong> Raw observation data is pruned after <strong>30 days</strong>. Block hashes and metadata summaries are retained <strong>permanently</strong>. Full manifests are accessible via <code>/api/ledger</code>.</p>
+        <p><strong>Architectural Guarantee:</strong> CORRELATION ≠ CAUSATION. This is architecturally enforced — the skeptic explanation cannot be overridden.</p>
+      </div>
     </div>
   </div>
 
@@ -278,8 +302,8 @@
       <span class="bottomnav__label">AtmosCore</span>
     </button>
     <button class="bottomnav__btn" data-view="correlations">
-      <span class="bottomnav__icon">&#10689;</span>
-      <span class="bottomnav__label">Correlations</span>
+      <span class="bottomnav__icon">&#9638;</span>
+      <span class="bottomnav__label">Ledger</span>
     </button>
     <button class="bottomnav__btn" data-view="map">
       <span class="bottomnav__icon">&#9678;</span>
