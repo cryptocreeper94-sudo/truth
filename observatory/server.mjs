@@ -92,8 +92,9 @@ function getFeedStatus(feed) {
   const total = entries.length;
   if (total === 0) return { ...feed, status: 'offline', entries: 0, last: null, sparkline: [] };
 
-  const last = entries[entries.length - 1];
-  const lastTs = last.timestamp || last.retrievedAt || last.fetchedAt || last.collected_at || null;
+  const dataEntries = entries.filter(e => e.type !== "RETENTION-PRUNE");
+  const last = dataEntries.length > 0 ? dataEntries[dataEntries.length - 1] : entries[entries.length - 1];
+  const lastTs = last.timestamp || last.retrievedAt || last.fetchedAt || last.collected_at || last.at || last.writtenAt || null;
   const lastTime = lastTs ? new Date(lastTs).getTime() : 0;
   const age = Date.now() - lastTime;
 
@@ -107,7 +108,7 @@ function getFeedStatus(feed) {
     const start = now - (h + 1) * 3600000;
     const end = now - h * 3600000;
     const count = entries.filter(e => {
-      const ts = new Date(e.timestamp || e.retrievedAt || e.fetchedAt || e.collected_at || 0).getTime();
+      const ts = new Date(e.timestamp || e.retrievedAt || e.fetchedAt || e.collected_at || e.at || e.writtenAt || 0).getTime();
       return ts >= start && ts < end;
     }).length;
     sparkline.push(count);
