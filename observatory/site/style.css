@@ -59,6 +59,7 @@
 
   --topbar-h: 48px;
   --bottomnav-h: 56px;
+  --footer-h: 72px;
 }
 
 html, body {
@@ -113,7 +114,7 @@ body::after {
   position: fixed;
   top: var(--topbar-h);
   left: 0; right: 0;
-  bottom: var(--bottomnav-h);
+  bottom: calc(var(--bottomnav-h) + var(--footer-h));
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr auto minmax(80px, 200px);
@@ -196,7 +197,7 @@ body::after {
 .cockpit[data-view="cockpit"] .cockpit__resize-handle { display: flex; }
 .cockpit[data-view="cockpit"] .cockpit__atmoscore { display: none; }
 
-.cockpit[data-view="feeds"] .cockpit__feeds { display: flex; grid-column: 1 / -1; }
+.cockpit[data-view="feeds"] .cockpit__feeds { display: flex; grid-column: 1 / -1; grid-row: 1 / -1; }
 .cockpit[data-view="feeds"] .cockpit__map { display: none; }
 .cockpit[data-view="feeds"] .cockpit__atmoscore { display: none; }
 .cockpit[data-view="feeds"] .cockpit__corr { display: none; }
@@ -954,11 +955,19 @@ body::after {
 
 /* ═══ CANONICAL FOOTER ═══════════════════════════════════════ */
 .site-footer {
+  position: fixed;
+  left: 0; right: 0;
+  bottom: var(--bottomnav-h);
+  z-index: 50;
   background: var(--bg-primary);
   border-top: 1px solid var(--border-dim);
-  padding: var(--space-lg) var(--space-xl);
+  padding: var(--space-sm) var(--space-xl);
   font-family: var(--font-mono);
   flex-shrink: 0;
+}
+.site-footer--visible {
+  transform: translateY(0);
+  pointer-events: auto;
 }
 
 .site-footer__row {
