@@ -1356,14 +1356,22 @@ body::after {
   .location-bar { display: flex; }
 
   /* ── Cockpit = scrollable column ─────────────────── */
+  html, body {
+    overflow: auto;
+    overflow-x: hidden;
+    height: auto;
+    min-height: 100%;
+  }
+
   .cockpit {
     position: relative;
     top: auto; left: auto; right: auto; bottom: auto;
     margin-top: var(--topbar-h);
-    margin-bottom: var(--bottomnav-h);
+    margin-bottom: calc(var(--bottomnav-h) + var(--footer-h));
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
+    overflow-y: visible;
+    overflow-x: hidden;
     height: auto;
     min-height: calc(100vh - var(--topbar-h) - var(--bottomnav-h) - var(--footer-h));
     background: var(--bg-primary);
