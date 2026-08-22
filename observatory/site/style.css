@@ -1365,7 +1365,7 @@ body::after {
     flex-direction: column;
     overflow-y: auto;
     height: auto;
-    min-height: calc(100vh - var(--topbar-h) - var(--bottomnav-h));
+    min-height: calc(100vh - var(--topbar-h) - var(--bottomnav-h) - var(--footer-h));
     background: var(--bg-primary);
     gap: 0;
   }
@@ -1395,7 +1395,7 @@ body::after {
   .cockpit[data-view="cockpit"] .cockpit__corr { display: flex; }
 
   /* ── View: Feeds only ───────────────────────────── */
-  .cockpit[data-view="feeds"] .cockpit__feeds { display: flex; }
+  .cockpit[data-view="feeds"] .cockpit__feeds { display: flex; flex: 1; }
   .cockpit[data-view="feeds"] .cockpit__corr { display: none; }
 
   /* ── View: AtmosCore ────────────────────────────── */
