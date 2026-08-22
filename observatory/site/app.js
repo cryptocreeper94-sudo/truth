@@ -1151,6 +1151,8 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
   fsMapLayers: {},
   animFrames: [],
   animLayers: [],
+  animNexradLayers: [],
+  animTimestamps: [],
   animIndex: 0,
   animInterval: null,
   animActive: false,
@@ -1260,6 +1262,19 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
 
   async _loadAnimationFrames() {
     try {
+      // ── Generate shared timeline: 24 frames at 5-min intervals (2 hours) ──
+      const now = new Date();
+      const frameCount = 24;
+      const intervalMs = 5 * 60 * 1000; // 5 minutes
+      this.animTimestamps = [];
+      for (let i = frameCount - 1; i >= 0; i--) {
+        const t = new Date(now.getTime() - i * intervalMs);
+        // Round down to nearest 5 min
+        t.setMinutes(Math.floor(t.getMinutes() / 5) * 5, 0, 0);
+        this.animTimestamps.push(t);
+      }
+
+      // ── RainViewer frames (precip) ──
       const res = await fetch('https://api.rainviewer.com/public/weather-maps.json');
       const data = await res.json();
       this.animFrames = data.radar.past.map(f => ({
@@ -1267,12 +1282,14 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
         time: new Date(f.time * 1000),
         url: `https://tilecache.rainviewer.com${f.path}/512/{z}/{x}/{y}/2/1_1.png`,
       }));
+
       // Also update the precip layer for FS map
       if (this.animFrames.length > 0) {
         const latest = this.animFrames[this.animFrames.length - 1];
         this.fsMapLayers.precip = L.tileLayer(latest.url, { opacity: 0.5, maxZoom: 18 });
       }
-      // Build animation dots
+
+      // ── Build animation dots (use RainViewer frame count as reference) ──
       const track = document.getElementById('anim-track');
       track.innerHTML = '';
       this.animFrames.forEach((_, i) => {
@@ -1281,8 +1298,20 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
         track.appendChild(dot);
       });
     } catch (e) {
-      console.warn('[Observatory] RainViewer animation load failed:', e.message);
+      console.warn('[Observatory] Animation frame load failed:', e.message);
     }
+  },
+
+  // ── Build a NEXRAD WMS-T layer for a given timestamp ──────────
+  _nexradFrameForTime(timestamp) {
+    const iso = timestamp.toISOString().replace('.000Z', 'Z');
+    return L.tileLayer.wms('https://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0q-t.cgi', {
+      layers: 'nexrad-n0q-wmst',
+      format: 'image/png',
+      transparent: true,
+      opacity: 0.6,
+      time: iso,
+    });
   },
 
   startAnimation() {
@@ -1294,41 +1323,67 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
     btn.classList.add('map-fullscreen__anim-btn--active');
     btn.textContent = '⏸ LOOP';
 
-    // Remove static radar, add animated radar
-    if (this.fullscreenMap.hasLayer(this.fsMapLayers.radar)) {
-      this.fullscreenMap.removeLayer(this.fsMapLayers.radar);
-    }
+    // ── Determine which layers to animate ──
+    // Check which FS layers are currently active
+    const hasRadar = this.fullscreenMap.hasLayer(this.fsMapLayers.radar);
+    const hasSatellite = this.fullscreenMap.hasLayer(this.fsMapLayers.satellite);
+    const hasInfrared = this.fullscreenMap.hasLayer(this.fsMapLayers.infrared);
+    const hasWV = this.fullscreenMap.hasLayer(this.fsMapLayers.watervapor);
+    const hasPrecip = this.fullscreenMap.hasLayer(this.fsMapLayers.precip);
 
-    // Pre-create all animation layers
+    // Remove static layers that will be animated
+    if (hasRadar) this.fullscreenMap.removeLayer(this.fsMapLayers.radar);
+
+    // ── Build animation layer stacks ──
+    // Precip: use RainViewer frames (already loaded)
     this.animLayers = this.animFrames.map(f =>
       L.tileLayer(f.url, { opacity: 0.5, maxZoom: 18 })
     );
 
-    // Show first frame
+    // NEXRAD: use WMS-T frames synced to RainViewer timestamps
+    this.animNexradLayers = [];
+    if (hasRadar) {
+      this.animNexradLayers = this.animFrames.map(f =>
+        this._nexradFrameForTime(f.time)
+      );
+    }
+
+    // Show first frame of each active animated layer
     this.animLayers[0].addTo(this.fullscreenMap);
+    if (this.animNexradLayers.length > 0) {
+      this.animNexradLayers[0].addTo(this.fullscreenMap);
+    }
 
     this.animInterval = setInterval(() => {
-      // Remove current
+      // Remove current frame layers
       if (this.animLayers[this.animIndex]) {
         this.fullscreenMap.removeLayer(this.animLayers[this.animIndex]);
       }
+      if (this.animNexradLayers[this.animIndex]) {
+        this.fullscreenMap.removeLayer(this.animNexradLayers[this.animIndex]);
+      }
+
       // Advance
       this.animIndex = (this.animIndex + 1) % this.animFrames.length;
-      // Add next
+
+      // Add next frame layers
       this.animLayers[this.animIndex].addTo(this.fullscreenMap);
+      if (this.animNexradLayers[this.animIndex]) {
+        this.animNexradLayers[this.animIndex].addTo(this.fullscreenMap);
+      }
 
       // Update label
       const frame = this.animFrames[this.animIndex];
       const label = document.getElementById('anim-label');
       const mins = Math.round((Date.now() - frame.time.getTime()) / 60000);
       label.textContent = mins <= 0 ? 'LIVE' : `-${mins}m`;
-      label.style.color = this.animIndex === this.animFrames.length - 1 ? 'var(--signal-live)' : 'var(--signal-cyan)';
+      label.style.color = this.animIndex === this.animFrames.length - 1 ? 'var(--signal-live)' : 'var(--brass)';
 
       // Update dots
       document.querySelectorAll('.anim-bar__dot').forEach((d, i) => {
         d.classList.toggle('anim-bar__dot--active', i === this.animIndex);
       });
-    }, 700);
+    }, 800);
   },
 
   stopAnimation() {
@@ -1341,7 +1396,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
       btn.textContent = '▶ LOOP';
     }
 
-    // Remove all anim layers
+    // Remove all precip anim layers
     this.animLayers.forEach(l => {
       if (this.fullscreenMap && this.fullscreenMap.hasLayer(l)) {
         this.fullscreenMap.removeLayer(l);
@@ -1349,7 +1404,17 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
     });
     this.animLayers = [];
 
-    // Re-add static radar
+    // Remove all NEXRAD anim layers
+    if (this.animNexradLayers) {
+      this.animNexradLayers.forEach(l => {
+        if (this.fullscreenMap && this.fullscreenMap.hasLayer(l)) {
+          this.fullscreenMap.removeLayer(l);
+        }
+      });
+      this.animNexradLayers = [];
+    }
+
+    // Re-add static layers
     if (this.fullscreenMap && !this.fullscreenMap.hasLayer(this.fsMapLayers.radar)) {
       this.fsMapLayers.radar.addTo(this.fullscreenMap);
     }
