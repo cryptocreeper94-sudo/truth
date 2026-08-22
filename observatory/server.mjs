@@ -390,6 +390,7 @@ const server = createServer((req, res) => {
   // ── Static File Serving ─────────────────────────────────────────────
   // Page routes → static HTML files
   const PAGE_ROUTES = {
+    '/cockpit': '/cockpit.html',
     '/terms': '/terms.html',
     '/privacy': '/privacy.html',
     '/legal': '/legal.html',

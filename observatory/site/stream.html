@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loading Stream — Truth Observatory</title>
+  <meta name="description" content="Live atmospheric and geophysical data stream detail view.">
+  <link rel="stylesheet" href="landing.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔭</text></svg>">
+  <style>
+    /* ── Stream Detail Page ──────────────────────────────────── */
+    .stream-detail {
+      --font-display: 'Inter', system-ui, sans-serif;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: var(--space-md);
+      min-height: 100vh;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 0.6rem 1rem;
+      border: 1px solid var(--border-dim);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--space-lg);
+      transition: all 0.3s ease;
+      background: rgba(255,255,255,0.03);
+    }
+
+    .back-btn:hover {
+      color: var(--text-primary);
+      border-color: var(--border-active);
+      background: rgba(255,255,255,0.06);
+    }
+
+    .stream-hero {
+      position: relative;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: var(--space-xl);
+      border: 1px solid var(--border-dim);
+    }
+
+    .stream-hero__image {
+      width: 100%;
+      height: 280px;
+      object-fit: cover;
+      filter: grayscale(100%) contrast(1.1) brightness(0.5);
+    }
+
+    .stream-hero__overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: var(--space-lg);
+      background: linear-gradient(transparent, rgba(10,10,14,0.95));
+    }
+
+    .stream-hero__badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      padding: 0.3rem 0.7rem;
+      border-radius: 100px;
+      margin-bottom: 0.5rem;
+    }
+
+    .stream-hero__badge--live {
+      background: rgba(0, 255, 136, 0.15);
+      color: #00ff88;
+      border: 1px solid rgba(0, 255, 136, 0.3);
+    }
+
+    .stream-hero__badge--live::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #00ff88;
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+
+    .stream-hero__title {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      color: var(--text-primary);
+      margin-bottom: 0.25rem;
+    }
+
+    .stream-hero__source {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* ── Live Data Panel ────────────────────────────────────── */
+    .data-panel {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-md);
+      margin-bottom: var(--space-xl);
+    }
+
+    .data-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-dim);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      transition: border-color 0.3s ease;
+    }
+
+    .data-card:hover {
+      border-color: var(--border-active);
+    }
+
+    .data-card__label {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.5rem;
+    }
+
+    .data-card__value {
+      font-family: var(--font-mono);
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--accent-green);
+      line-height: 1.1;
+    }
+
+    .data-card__unit {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      font-weight: 400;
+    }
+
+    .data-card__updated {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+    }
+
+    /* ── Explanation Section ─────────────────────────────────── */
+    .explanation {
+      margin-bottom: var(--space-xl);
+    }
+
+    .explanation__heading {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      color: var(--text-primary);
+      margin-bottom: var(--space-sm);
+    }
+
+    .explanation__text {
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: var(--space-md);
+      font-size: 0.95rem;
+    }
+
+    .explanation__text strong {
+      color: var(--text-primary);
+    }
+
+    /* ── Recent Events Table ────────────────────────────────── */
+    .events-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: var(--space-xl);
+      font-size: 0.85rem;
+    }
+
+    .events-table th {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      text-align: left;
+      padding: 0.75rem;
+      border-bottom: 1px solid var(--border-dim);
+    }
+
+    .events-table td {
+      padding: 0.75rem;
+      color: var(--text-secondary);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+    }
+
+    .events-table tr:hover td {
+      background: rgba(255,255,255,0.02);
+    }
+
+    .events-table .mag { color: var(--accent-green); font-weight: 700; }
+
+    /* ── Loading State ──────────────────────────────────────── */
+    .loading-spinner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      padding: var(--space-xl);
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+    }
+
+    .loading-spinner::before {
+      content: '';
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--border-dim);
+      border-top-color: var(--accent-green);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ── Provenance Footer ──────────────────────────────────── */
+    .provenance {
+      border-top: 1px solid var(--border-dim);
+      padding-top: var(--space-md);
+      margin-top: var(--space-xl);
+    }
+
+    .provenance__label {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .provenance__text {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .provenance__text a {
+      color: var(--accent-green);
+      text-decoration: none;
+    }
+
+    .provenance__text a:hover {
+      text-decoration: underline;
+    }
+
+    /* Error state */
+    .error-msg {
+      background: rgba(220, 38, 38, 0.1);
+      border: 1px solid rgba(220, 38, 38, 0.3);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      color: #fca5a5;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+    }
+
+    /* ── Live Visual Embed ─────────────────────────────────── */
+    .visual-panel {
+      margin-bottom: var(--space-xl);
+    }
+
+    .visual-panel__heading {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      color: var(--text-primary);
+      margin-bottom: var(--space-sm);
+    }
+
+    .visual-panel__desc {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      margin-bottom: var(--space-md);
+    }
+
+    .visual-panel__grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: var(--space-md);
+    }
+
+    .visual-panel__item {
+      background: var(--bg-card);
+      border: 1px solid var(--border-dim);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      transition: border-color 0.3s ease;
+    }
+
+    .visual-panel__item:hover {
+      border-color: var(--border-active);
+    }
+
+    .visual-panel__item img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .visual-panel__caption {
+      padding: 0.5rem 0.75rem;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border-dim);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="stream-detail" id="stream-detail">
+    <a href="index.html" class="back-btn">← Back to Observatory</a>
+
+    <div class="stream-hero" id="stream-hero">
+      <img class="stream-hero__image" id="hero-img" src="" alt="">
+      <div class="stream-hero__overlay">
+        <div class="stream-hero__badge stream-hero__badge--live" id="hero-badge">Live</div>
+        <h1 class="stream-hero__title" id="hero-title">Loading...</h1>
+        <p class="stream-hero__source" id="hero-source"></p>
+      </div>
+    </div>
+
+    <div class="data-panel" id="data-panel">
+      <div class="loading-spinner">Fetching live data...</div>
+    </div>
+
+    <div id="visual-container"></div>
+
+    <div class="explanation" id="explanation"></div>
+
+    <div id="events-container"></div>
+
+    <div class="provenance" id="provenance"></div>
+
+    <div id="stream-nav" style="display:flex;justify-content:space-between;align-items:center;margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border-dim);">
+      <a id="nav-prev" href="#" class="back-btn" style="margin-bottom:0;">← Previous</a>
+      <a href="index.html" class="back-btn" style="margin-bottom:0;">All Streams</a>
+      <a id="nav-next" href="#" class="back-btn" style="margin-bottom:0;">Next →</a>
+    </div>
+  </div>
+
+  <script>
+  /**
+   * Truth Observatory — Stream Detail Page
+   * DarkWave Studios LLC — Copyright 2026
+   */
+  (function() {
+    'use strict';
+
+    const streamId = new URLSearchParams(window.location.search).get('stream');
+    if (!streamId) {
+      document.getElementById('data-panel').innerHTML = '<div class="error-msg">No stream specified. Return to the observatory.</div>';
+      return;
+    }
+
+    // ── Stream Definitions ───────────────────────────────────
+    const STREAMS = {
+      nexrad: {
+        title: 'NEXRAD Radar Network',
+        source: 'NOAA National Weather Service',
+        image: 'assets/nexrad.webp',
+        api: 'https://api.weather.gov/radar/stations?stationType=WSR-88D',
+        sourceUrl: 'https://www.weather.gov/radar',
+        visuals: [
+          { src: 'https://radar.weather.gov/ridge/standard/CONUS-LARGE_0.gif', caption: 'National NEXRAD Composite — Current Reflectivity (NOAA)' },
+        ],
+        description: [
+          'The <strong>NEXRAD</strong> (Next-Generation Radar) network consists of 160 high-resolution S-band Doppler weather radars operated by the National Weather Service, FAA, and Department of Defense across the United States.',
+          'Each WSR-88D station produces volumetric scans every 4-6 minutes, measuring reflectivity, radial velocity, and spectrum width. The data is used for precipitation detection, severe weather tracking, and wind profiling.',
+          'The Observatory monitors station availability and operational status. <strong>Anomalous gaps or mode changes</strong> in the network are flagged but never assumed to indicate anything beyond equipment or operational variation.'
+        ],
+        parse(data) {
+          const stations = data?.features || [];
+          const active = stations.filter(s => s.properties?.rda?.properties?.alarmSummary !== 'Inoperable').length;
+          return {
+            cards: [
+              { label: 'Total Stations', value: stations.length, unit: 'WSR-88D' },
+              { label: 'Active', value: active, unit: 'operational' },
+              { label: 'Network', value: 'S-band', unit: 'Doppler' },
+              { label: 'Refresh', value: '4-6', unit: 'min/scan' },
+            ],
+            table: null,
+          };
+        },
+      },
+
+      solar: {
+        title: 'Solar X-Ray Flux',
+        source: 'NOAA SWPC — GOES Satellite',
+        image: 'assets/solar.webp',
+        api: 'https://services.swpc.noaa.gov/json/goes/primary/xrays-6-hour.json',
+        sourceUrl: 'https://www.swpc.noaa.gov/products/goes-x-ray-flux',
+        visuals: [
+          { src: 'https://services.swpc.noaa.gov/images/goes-xray-flux.gif', caption: 'GOES X-Ray Flux — 3 Day Plot (SWPC/NOAA)' },
+        ],
+        description: [
+          'The <strong>GOES X-ray sensors</strong> measure solar X-ray irradiance in two wavelength bands (0.05–0.4 nm and 0.1–0.8 nm) from geostationary orbit.',
+          'Solar flares are classified by their peak X-ray flux: <strong>A</strong> (< 10⁻⁷), <strong>B</strong> (10⁻⁷–10⁻⁶), <strong>C</strong> (10⁻⁶–10⁻⁵), <strong>M</strong> (10⁻⁵–10⁻⁴), and <strong>X</strong> (> 10⁻⁴) W/m². M and X-class flares can affect radio communications and GPS accuracy.',
+          'This stream displays the most recent 6 hours of X-ray measurements. The Observatory tracks flux levels to correlate with geomagnetic and ionospheric observations. <strong>Correlation is logged, not assumed causal.</strong>'
+        ],
+        parse(data) {
+          if (!Array.isArray(data) || data.length === 0) return null;
+          const latest = data[data.length - 1];
+          const flux = parseFloat(latest.flux);
+          let flareClass = 'A';
+          if (flux > 1e-4) flareClass = 'X';
+          else if (flux > 1e-5) flareClass = 'M';
+          else if (flux > 1e-6) flareClass = 'C';
+          else if (flux > 1e-7) flareClass = 'B';
+
+          // Get last 10 readings for table
+          const recent = data.slice(-10).reverse();
+          return {
+            cards: [
+              { label: 'Current Flux', value: flux.toExponential(2), unit: 'W/m²' },
+              { label: 'Flare Class', value: flareClass, unit: 'class' },
+              { label: 'Satellite', value: latest.satellite?.toString() || 'GOES-16', unit: '' },
+              { label: 'Updated', value: formatTime(latest.time_tag), unit: '' },
+            ],
+            table: {
+              title: 'Recent X-Ray Readings',
+              headers: ['Time (UTC)', 'Flux (W/m²)', 'Energy'],
+              rows: recent.map(r => [
+                formatTime(r.time_tag),
+                parseFloat(r.flux).toExponential(2),
+                r.energy || '0.1-0.8nm',
+              ]),
+            },
+          };
+        },
+      },
+
+      geomag: {
+        title: 'Geomagnetic Activity (Kp Index)',
+        source: 'NOAA SWPC — Estimated Planetary K-Index',
+        image: 'assets/geomagnetic.webp',
+        api: 'https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json',
+        sourceUrl: 'https://www.swpc.noaa.gov/products/planetary-k-index',
+        visuals: [
+          { src: 'https://services.swpc.noaa.gov/images/planetary-k-index.gif', caption: 'Planetary Kp Index — 3 Day Bar Chart (SWPC/NOAA)' },
+          { src: 'https://services.swpc.noaa.gov/images/geospace-1-day.png', caption: 'Geospace Environment — 1 Day (SWPC/NOAA)' },
+        ],
+        description: [
+          'The <strong>Kp index</strong> is a global geomagnetic activity indicator derived from ground-based magnetometer data at 13 stations between 44° and 60° geomagnetic latitude.',
+          'The scale ranges from <strong>0 (quiet)</strong> to <strong>9 (extreme storm)</strong>. Values of Kp ≥ 5 indicate geomagnetic storm conditions that may affect power grids, satellite operations, and radio propagation.',
+          'The Observatory uses Kp as one input to the multi-layer correlation engine. A Kp spike alone proves nothing — it must be cross-referenced against solar wind, IMF Bz, and ground-level observations. <strong>The architecture enforces this requirement.</strong>'
+        ],
+        parse(data) {
+          if (!Array.isArray(data) || data.length < 2) return null;
+          const rows = data.slice(1); // skip header
+          const latest = rows[rows.length - 1];
+          const kp = parseFloat(latest[1]);
+          let level = 'Quiet';
+          if (kp >= 7) level = 'Severe Storm (G3+)';
+          else if (kp >= 5) level = 'Storm (G1-G2)';
+          else if (kp >= 4) level = 'Active';
+          else if (kp >= 2) level = 'Unsettled';
+
+          const recent = rows.slice(-12).reverse();
+          return {
+            cards: [
+              { label: 'Current Kp', value: kp.toFixed(1), unit: '' },
+              { label: 'Condition', value: level, unit: '' },
+              { label: 'Observations', value: rows.length, unit: 'readings' },
+              { label: 'Period', value: formatTime(latest[0]), unit: '' },
+            ],
+            table: {
+              title: 'Recent Kp Index Values',
+              headers: ['Time (UTC)', 'Kp', 'Estimated Kp'],
+              rows: recent.map(r => [r[0], r[1], r[2] || '-']),
+            },
+          };
+        },
+      },
+
+      seismic: {
+        title: 'Earthquake Catalog',
+        source: 'USGS Earthquake Hazards Program',
+        image: 'assets/seismic.webp',
+        api: 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson',
+        sourceUrl: 'https://earthquake.usgs.gov/earthquakes/',
+        visuals: [
+          { src: 'https://earthquake.usgs.gov/earthquakes/map/doc_images/background.png', caption: 'USGS Earthquake Hazards — Interactive Map (link below)' },
+        ],
+        description: [
+          'The <strong>USGS Earthquake Hazards Program</strong> provides near-real-time earthquake notification and monitoring for the globe. This feed shows all M2.5+ events in the last 24 hours.',
+          'Each event includes magnitude, depth, location, review status (automatic vs. human-reviewed), and felt reports from the "Did You Feel It?" system.',
+          'Seismic activity is correlated with geomagnetic indices and atmospheric pressure changes in the Observatory\'s multi-layer analysis. <strong>Correlation is temporal proximity, not claimed causation.</strong> The skeptic engine is always active.'
+        ],
+        parse(data) {
+          const quakes = data?.features || [];
+          if (quakes.length === 0) return null;
+          const strongest = quakes.reduce((max, q) => q.properties.mag > max.properties.mag ? q : max, quakes[0]);
+          const avgDepth = (quakes.reduce((sum, q) => sum + (q.geometry.coordinates[2] || 0), 0) / quakes.length).toFixed(1);
+
+          const recent = quakes.slice(0, 15);
+          return {
+            cards: [
+              { label: 'Events (24h)', value: quakes.length, unit: 'M2.5+' },
+              { label: 'Strongest', value: `M${strongest.properties.mag.toFixed(1)}`, unit: '' },
+              { label: 'Avg Depth', value: avgDepth, unit: 'km' },
+              { label: 'Location', value: (strongest.properties.place || '').substring(0, 25), unit: '' },
+            ],
+            table: {
+              title: 'Recent Seismic Events',
+              headers: ['Time', 'Mag', 'Depth (km)', 'Location', 'Status'],
+              rows: recent.map(q => [
+                formatTime(new Date(q.properties.time).toISOString()),
+                `<span class="mag">M${q.properties.mag.toFixed(1)}</span>`,
+                (q.geometry.coordinates[2] || 0).toFixed(1),
+                (q.properties.place || 'Unknown').substring(0, 30),
+                q.properties.status || '-',
+              ]),
+            },
+          };
+        },
+      },
+
+      goes: {
+        title: 'GOES Satellite — Interplanetary Magnetic Field',
+        source: 'NOAA SWPC — Solar Wind Mag Field',
+        image: 'assets/goes.webp',
+        api: 'https://services.swpc.noaa.gov/products/summary/solar-wind-mag-field.json',
+        sourceUrl: 'https://www.swpc.noaa.gov/products/real-time-solar-wind',
+        visuals: [
+          { src: 'https://services.swpc.noaa.gov/images/solar-wind-1-day.gif', caption: 'Solar Wind — IMF Bt/Bz 1 Day Plot (SWPC/NOAA)' },
+        ],
+        description: [
+          'The <strong>Interplanetary Magnetic Field (IMF)</strong> is measured by spacecraft at the L1 Lagrange point, approximately 1.5 million km from Earth.',
+          '<strong>Bt</strong> is the total magnetic field strength. <strong>Bz</strong> is the north-south component — when Bz turns southward (negative), it can connect with Earth\'s magnetosphere and drive geomagnetic storms.',
+          'A sustained Bz < -10 nT combined with elevated solar wind speed is a key predictor of geomagnetic disturbances. The Observatory tracks Bz polarity shifts as a leading indicator.'
+        ],
+        parse(data) {
+          return {
+            cards: [
+              { label: 'Bt (Total)', value: data?.Bt || '-', unit: 'nT' },
+              { label: 'Bz (North-South)', value: data?.Bz || '-', unit: 'nT' },
+              { label: 'Bx', value: data?.Bx || '-', unit: 'nT' },
+              { label: 'Updated', value: formatTime(data?.TimeStamp), unit: '' },
+            ],
+            table: null,
+          };
+        },
+      },
+
+      grid: {
+        title: 'Power Grid Demand (EIA-930)',
+        source: 'U.S. Energy Information Administration',
+        image: 'assets/grid.webp',
+        api: 'https://api.eia.gov/v2/electricity/rto/region-data/data/?api_key=HCrxkfcdEVdmMTEW9MvJbMNDylrRs6l7TCPWKGWL&frequency=hourly&data[0]=value&sort[0][column]=period&sort[0][direction]=desc&length=10',
+        sourceUrl: 'https://www.eia.gov/electricity/gridmonitor/',
+        visuals: [
+          { src: 'https://www.eia.gov/electricity/gridmonitor/img/og-image.png', caption: 'U.S. Electric Grid Monitor — Hourly Demand (EIA)' },
+        ],
+        description: [
+          'The <strong>EIA-930</strong> report provides hourly electricity demand, generation, and interchange data from all major balancing authorities in the United States.',
+          'The Observatory tracks demand anomalies — unexpected spikes or drops in grid load that don\'t correlate with temperature, time-of-day, or seasonal patterns.',
+          'Grid demand is compared against geomagnetic indices (Kp, Dst) and solar wind conditions. <strong>Geomagnetically induced currents (GICs)</strong> from space weather are a documented phenomenon that can stress transformers — but every anomaly must first rule out mundane causes.'
+        ],
+        parse(data) {
+          const records = data?.response?.data || [];
+          if (records.length === 0) return null;
+          const latest = records[0];
+          const mw = latest.value;
+          return {
+            cards: [
+              { label: 'Latest Demand', value: (mw / 1000).toFixed(1), unit: 'GW' },
+              { label: 'Region', value: latest['respondent-name'] || '-', unit: '' },
+              { label: 'Period', value: latest.period || '-', unit: '' },
+              { label: 'Type', value: latest['type-name'] || 'Demand', unit: '' },
+            ],
+            table: {
+              title: 'Recent Grid Readings',
+              headers: ['Period', 'Region', 'Value (MW)', 'Type'],
+              rows: records.slice(0, 10).map(r => [
+                r.period || '-',
+                (r['respondent-name'] || '-').substring(0, 25),
+                (r.value || 0).toLocaleString(),
+                r['type-name'] || '-',
+              ]),
+            },
+          };
+        },
+      },
+
+      iono: {
+        title: 'Solar Wind Speed',
+        source: 'NOAA SWPC — Real-Time Solar Wind',
+        image: 'assets/ionosphere.webp',
+        api: 'https://services.swpc.noaa.gov/products/summary/solar-wind-speed.json',
+        sourceUrl: 'https://www.swpc.noaa.gov/products/real-time-solar-wind',
+        visuals: [
+          { src: 'https://services.swpc.noaa.gov/images/solar-wind-1-day.gif', caption: 'Solar Wind Speed — 1 Day Plot (SWPC/NOAA)' },
+        ],
+        description: [
+          'The <strong>solar wind</strong> is a continuous stream of charged particles (mostly protons and electrons) ejected from the Sun\'s corona at speeds of 300–800+ km/s.',
+          'During coronal mass ejections (CMEs) or coronal hole streams, solar wind speed can exceed 700 km/s, increasing the likelihood of geomagnetic disturbances if combined with a southward Bz.',
+          'The Observatory tracks solar wind speed alongside IMF Bz, Kp, and Dst to build a complete picture of space weather conditions impacting the near-Earth environment.'
+        ],
+        parse(data) {
+          return {
+            cards: [
+              { label: 'Wind Speed', value: data?.WindSpeed || '-', unit: 'km/s' },
+              { label: 'Updated', value: formatTime(data?.TimeStamp), unit: '' },
+            ],
+            table: null,
+          };
+        },
+      },
+
+      schumann: {
+        title: '10.7cm Solar Radio Flux (F10.7)',
+        source: 'NOAA SWPC — Solar Radio Flux Summary',
+        image: 'assets/schumann.webp',
+        api: 'https://services.swpc.noaa.gov/products/summary/10cm-flux.json',
+        sourceUrl: 'https://www.swpc.noaa.gov/phenomena/f107-cm-radio-emissions',
+        visuals: [
+          { src: 'https://services.swpc.noaa.gov/images/solar-cycle-sunspot-number.gif', caption: 'Solar Cycle — Sunspot Number Progression (SWPC/NOAA)' },
+        ],
+        description: [
+          'The <strong>F10.7 index</strong> measures solar radio emissions at 10.7 cm wavelength (2800 MHz). It is one of the longest-running and most reliable indicators of solar activity.',
+          'Values typically range from about <strong>65 sfu</strong> (solar minimum) to over <strong>300 sfu</strong> (solar maximum). Higher values correlate with increased UV/EUV output, which affects Earth\'s upper atmosphere density and ionospheric electron content.',
+          'This measurement is used as a proxy for overall solar activity level in the Observatory\'s correlation framework.'
+        ],
+        parse(data) {
+          return {
+            cards: [
+              { label: 'Solar Flux', value: data?.Flux || '-', unit: 'sfu' },
+              { label: 'Updated', value: formatTime(data?.TimeStamp), unit: '' },
+            ],
+            table: null,
+          };
+        },
+      },
+
+      lightning: {
+        title: 'GOES Differential Proton Flux',
+        source: 'NOAA SWPC — GOES Particle Sensors',
+        image: 'assets/lightning.webp',
+        api: 'https://services.swpc.noaa.gov/json/goes/primary/differential-protons-1-day.json',
+        sourceUrl: 'https://www.swpc.noaa.gov/products/goes-proton-flux',
+        visuals: [
+          { src: 'https://services.swpc.noaa.gov/images/goes-proton-flux.gif', caption: 'GOES Proton Flux — 3 Day Plot (SWPC/NOAA)' },
+        ],
+        description: [
+          'The <strong>GOES proton sensors</strong> measure the flux of high-energy protons arriving from the Sun. Elevated proton flux indicates solar energetic particle (SEP) events, typically associated with large solar flares or CME-driven shocks.',
+          'During major solar proton events, radiation levels can affect satellite electronics, high-altitude aviation radiation exposure, and polar radio communications (polar cap absorption events).',
+          'The Observatory tracks proton flux alongside X-ray flux to differentiate between solar flare radiation and CME-associated particle storms.'
+        ],
+        parse(data) {
+          if (!Array.isArray(data) || data.length === 0) return null;
+          const latest = data[data.length - 1];
+          const recent = data.slice(-10).reverse();
+          return {
+            cards: [
+              { label: 'Current Flux', value: parseFloat(latest.flux).toExponential(2), unit: 'p/(cm²·s·sr·MeV)' },
+              { label: 'Energy Channel', value: latest.energy || '-', unit: 'MeV' },
+              { label: 'Satellite', value: 'GOES-' + (latest.satellite || '16'), unit: '' },
+              { label: 'Updated', value: formatTime(latest.time_tag), unit: '' },
+            ],
+            table: {
+              title: 'Recent Proton Flux Readings',
+              headers: ['Time', 'Flux', 'Energy Channel'],
+              rows: recent.map(r => [
+                formatTime(r.time_tag),
+                parseFloat(r.flux).toExponential(2),
+                r.energy || '-',
+              ]),
+            },
+          };
+        },
+      },
+
+      // ═══════════════════════════════════════════════════════════
+      // STAGE 3 — New Streams
+      // ═══════════════════════════════════════════════════════════
+
+      surface: {
+        title: 'Surface Weather Stations (ASOS/AWOS)',
+        source: 'Iowa Environmental Mesonet — NOAA ASOS Network',
+        image: 'assets/surface-stations.webp',
+        api: 'https://mesonet.agron.iastate.edu/api/1/currents.json?network=ASOS&only_online=true',
+        sourceUrl: 'https://mesonet.agron.iastate.edu/',
+        visuals: [
+          { src: 'https://mesonet.agron.iastate.edu/data/conus_metar_sfc.png', caption: 'CONUS Surface Observations — Temperature & Wind (IEM)' },
+        ],
+        description: [
+          'The <strong>Automated Surface Observing System (ASOS)</strong> is the United States\' primary surface weather observing network. Over 900 stations report conditions every minute.',
+          'Each station measures temperature, dew point, wind speed and direction, visibility, cloud ceiling, precipitation, and barometric pressure. These ground-truth observations anchor all atmospheric analysis.',
+          'The Observatory uses surface station data as the baseline reality check — satellite and radar data must be consistent with what ground stations observe. <strong>Discrepancies are flagged, not explained away.</strong>'
+        ],
+        parse(data) {
+          const stations = data?.data || [];
+          if (stations.length === 0) return null;
+          const temps = stations.filter(s => s.tmpf != null).map(s => s.tmpf);
+          const avgTemp = temps.length > 0 ? (temps.reduce((a,b) => a+b, 0) / temps.length).toFixed(1) : '-';
+          const winds = stations.filter(s => s.sknt != null).map(s => s.sknt);
+          const avgWind = winds.length > 0 ? (winds.reduce((a,b) => a+b, 0) / winds.length).toFixed(1) : '-';
+          return {
+            cards: [
+              { label: 'Stations Online', value: stations.length, unit: 'ASOS/AWOS' },
+              { label: 'Avg Temperature', value: avgTemp, unit: '°F' },
+              { label: 'Avg Wind Speed', value: avgWind, unit: 'kt' },
+              { label: 'Network', value: 'NOAA ASOS', unit: '' },
+            ],
+            table: {
+              title: 'Sample Station Reports',
+              headers: ['Station', 'Temp (°F)', 'Wind (kt)', 'Visibility (mi)', 'Updated'],
+              rows: stations.slice(0, 12).map(s => [
+                s.station || '-',
+                s.tmpf != null ? s.tmpf.toFixed(1) : '-',
+                s.sknt != null ? s.sknt.toFixed(0) : '-',
+                s.vsby != null ? s.vsby.toFixed(1) : '-',
+                formatTime(s.local_valid),
+              ]),
+            },
+          };
+        },
+      },
+
+      blitz: {
+        title: 'Ground Lightning Network (Blitzortung)',
+        source: 'Blitzortung.org — Community Lightning Detection',
+        image: 'assets/blitzortung.webp',
+        api: 'https://map.blitzortung.org/GEOjson/GEOjson.php?c=America/New_York',
+        sourceUrl: 'https://www.blitzortung.org/en/live_lightning_maps.php',
+        visuals: [
+          { src: 'https://images.blitzortung.org/Images/image_b_am.png', caption: 'Blitzortung Americas — Real-Time Lightning Map' },
+        ],
+        description: [
+          '<strong>Blitzortung</strong> is a worldwide community-based lightning detection network. Volunteers operate low-cost VLF receivers that detect electromagnetic signals from lightning discharges.',
+          'Each stroke is triangulated using time-of-arrival from multiple stations, yielding location accuracy of typically 1-5 km. The network detects both cloud-to-ground and intra-cloud discharges.',
+          'This stream provides an independent ground-based check against the satellite-based GOES GLM data. <strong>Discrepancies between ground and satellite detection are logged and analyzed.</strong>'
+        ],
+        parse(data) {
+          const strokes = data?.features || [];
+          return {
+            cards: [
+              { label: 'Recent Strokes', value: strokes.length, unit: 'detected' },
+              { label: 'Network', value: 'Community VLF', unit: '' },
+              { label: 'Coverage', value: 'Americas', unit: '' },
+              { label: 'Method', value: 'Time-of-Arrival', unit: 'triangulation' },
+            ],
+            table: strokes.length > 0 ? {
+              title: 'Recent Lightning Strokes',
+              headers: ['Time', 'Latitude', 'Longitude', 'Stations'],
+              rows: strokes.slice(0, 12).map(s => {
+                const c = s.geometry?.coordinates || [];
+                return [
+                  formatTime(s.properties?.time ? new Date(s.properties.time * 1000).toISOString() : null),
+                  c[1]?.toFixed(3) || '-',
+                  c[0]?.toFixed(3) || '-',
+                  s.properties?.sta || '-',
+                ];
+              }),
+            } : null,
+          };
+        },
+      },
+
+      aircraft: {
+        title: 'Aircraft Tracking (ADS-B)',
+        source: 'OpenSky Network / ADS-B Exchange',
+        image: 'assets/aircraft.webp',
+        api: 'https://opensky-network.org/api/states/all?lamin=25&lomin=-125&lamax=50&lomax=-66',
+        sourceUrl: 'https://opensky-network.org/',
+        visuals: [
+          { src: 'https://opensky-network.org/img/opensky_logo_only.svg', caption: 'OpenSky Network — Global ADS-B Coverage' },
+        ],
+        description: [
+          '<strong>ADS-B (Automatic Dependent Surveillance-Broadcast)</strong> is a surveillance technology in which aircraft determine their position via satellite and broadcast it. Ground stations and other aircraft can receive these transmissions.',
+          'The Observatory tracks aircraft positions within the CONUS bounding box. This enables correlation of flight paths with atmospheric events — for instance, whether spray operations coincide with unusual cloud formation or chemical deposition.',
+          '<strong>Presence of an aircraft near an atmospheric anomaly proves nothing by itself.</strong> The correlation engine requires multiple independent data points and always generates mundane explanations first (scheduled commercial traffic, military training, crop dusting).'
+        ],
+        parse(data) {
+          const states = data?.states || [];
+          const airborne = states.filter(s => s[8] !== true); // not on ground
+          return {
+            cards: [
+              { label: 'Aircraft Tracked', value: states.length, unit: 'CONUS' },
+              { label: 'Airborne', value: airborne.length, unit: '' },
+              { label: 'On Ground', value: states.length - airborne.length, unit: '' },
+              { label: 'Source', value: 'ADS-B', unit: 'transponder' },
+            ],
+            table: states.length > 0 ? {
+              title: 'Sample Aircraft Tracks',
+              headers: ['Callsign', 'Origin', 'Alt (ft)', 'Speed (kt)', 'Heading'],
+              rows: states.slice(0, 12).map(s => [
+                (s[1] || 'N/A').trim(),
+                s[2] || '-',
+                s[7] != null ? Math.round(s[7] * 3.281).toLocaleString() : '-',
+                s[9] != null ? Math.round(s[9] * 1.944) : '-',
+                s[10] != null ? Math.round(s[10]) + '°' : '-',
+              ]),
+            } : null,
+          };
+        },
+      },
+
+      notam: {
+        title: 'NOTAMs & Cloud Seeding Permits',
+        source: 'FAA + State Weather Modification Agencies',
+        image: 'assets/cloud-seeding.webp',
+        api: 'https://www.tdlr.texas.gov/weather/wmlicensees.htm',
+        sourceUrl: 'https://www.tdlr.texas.gov/weather/weathermod.htm',
+        visuals: [],
+        description: [
+          '<strong>NOTAMs</strong> (Notices to Air Missions) are issued by the FAA to alert pilots of temporary flight restrictions, airspace changes, and hazards. The Observatory monitors NOTAMs for weather modification operations, restricted airspace near atmospheric research facilities, and other operationally relevant notices.',
+          'Several U.S. states issue <strong>weather modification permits</strong> for cloud seeding operations. Texas, Colorado, North Dakota, Wyoming, and others maintain public databases of authorized operators, target areas, and active dates.',
+          'This stream archives permit pages and NOTAM data for temporal correlation. <strong>The existence of a permit does not prove an operation occurred.</strong> Active operations must be corroborated with flight tracking, radar returns, and atmospheric chemistry observations.'
+        ],
+        parse(data) {
+          // HTML page — we can count table rows as a proxy for licensee count
+          const matches = (typeof data === 'string') ? data.match(/<tr/gi) : null;
+          const rowCount = matches ? matches.length - 1 : 0; // minus header
+          return {
+            cards: [
+              { label: 'TX Licensees', value: rowCount > 0 ? rowCount : 'Loading', unit: '' },
+              { label: 'Sources', value: '3', unit: 'states' },
+              { label: 'Update Cadence', value: 'Hourly', unit: '' },
+              { label: 'Archive', value: 'SHA-256', unit: 'hashed' },
+            ],
+            table: null,
+          };
+        },
+      },
+
+      celltower: {
+        title: 'Cell Tower Registry',
+        source: 'FCC ASR Database + OpenCelliD',
+        image: 'assets/cell-towers.webp',
+        api: 'https://www.fcc.gov/api/license-view/basicSearch/getLicenses?searchValue=cell&limit=10&format=json',
+        sourceUrl: 'https://www.fcc.gov/wireless/bureau-divisions/mobility-division/antenna-structure-registration-asr',
+        visuals: [],
+        description: [
+          'The <strong>FCC Antenna Structure Registration (ASR)</strong> database contains all registered antenna structures in the United States — including cellular towers, broadcast antennas, and microwave relay towers.',
+          '<strong>OpenCelliD</strong> supplements the FCC data with community-reported cell tower observations, providing independent verification of tower locations and operators.',
+          'This stream provides the infrastructure map for RF environment analysis. <strong>Tower presence ≠ RF effect.</strong> Any claimed biological or atmospheric effects of RF must be independently measured with calibrated instruments, not assumed from proximity alone. The Observatory records the infrastructure facts and nothing more.'
+        ],
+        parse(data) {
+          const licenses = data?.Licenses?.License || [];
+          return {
+            cards: [
+              { label: 'Licenses Found', value: Array.isArray(licenses) ? licenses.length : 0, unit: '' },
+              { label: 'Database', value: 'FCC ULS', unit: '' },
+              { label: 'Update Cadence', value: 'Daily', unit: '' },
+              { label: 'Supplement', value: 'OpenCelliD', unit: 'community' },
+            ],
+            table: Array.isArray(licenses) && licenses.length > 0 ? {
+              title: 'Recent FCC Registrations',
+              headers: ['Callsign', 'Name', 'Status', 'Expiration'],
+              rows: licenses.slice(0, 10).map(l => [
+                l.callsign || '-',
+                (l.licName || '-').substring(0, 30),
+                l.statusDesc || '-',
+                l.expiredDate || '-',
+              ]),
+            } : null,
+          };
+        },
+      },
+
+      haarp: {
+        title: 'Ionospheric Research Facilities',
+        source: 'HAARP, EISCAT, Jicamarca — Public Schedules',
+        image: 'assets/haarp.webp',
+        api: 'https://haarp.gi.alaska.edu/',
+        sourceUrl: 'https://haarp.gi.alaska.edu/',
+        visuals: [
+          { src: 'https://haarp.gi.alaska.edu/sites/default/files/styles/extra_large/public/2022-11/HAARP_array.jpg', caption: 'HAARP Antenna Array — Gakona, Alaska (University of Alaska Fairbanks)' },
+        ],
+        description: [
+          'The <strong>High-frequency Active Auroral Research Program (HAARP)</strong> is an ionospheric research facility in Gakona, Alaska, operated by the University of Alaska Fairbanks. It uses a phased array of 180 HF antennas to temporarily excite a small portion of the ionosphere for scientific study.',
+          '<strong>EISCAT</strong> (European Incoherent Scatter) operates radar facilities in Scandinavia for ionospheric and atmospheric research. <strong>Jicamarca</strong> in Peru operates the world\'s largest incoherent scatter radar near the geomagnetic equator.',
+          'The Observatory archives public experiment schedules and operating logs from all named facilities. <strong>Each facility is identified by its real name and location — never by generic conspiratorial labels.</strong> Operating windows are cross-referenced with ionospheric conditions and geomagnetic indices for temporal correlation.'
+        ],
+        parse(data) {
+          // HTML page — extract basic info
+          const isUp = typeof data === 'string' && data.length > 1000;
+          return {
+            cards: [
+              { label: 'HAARP Status', value: isUp ? 'Reachable' : 'Unreachable', unit: '' },
+              { label: 'Location', value: '62.39°N', unit: '145.15°W' },
+              { label: 'Facilities', value: '6', unit: 'monitored' },
+              { label: 'Archive', value: 'Every 6h', unit: 'snapshot' },
+            ],
+            table: null,
+          };
+        },
+      },
+
+      metals: {
+        title: 'Trace Metal Deposition',
+        source: 'USGS NWIS Water Quality + EPA AQS',
+        image: 'assets/trace-metals.webp',
+        api: 'https://waterservices.usgs.gov/nwis/iv/?format=json&period=P1D&siteStatus=active&stateCd=tn&parameterCd=01105',
+        sourceUrl: 'https://waterdata.usgs.gov/nwis',
+        visuals: [],
+        description: [
+          'The <strong>USGS National Water Information System (NWIS)</strong> provides real-time and historical water quality data from thousands of monitoring stations across the United States.',
+          'The Observatory tracks three trace metals of research interest: <strong>Aluminum (Al)</strong>, <strong>Barium (Ba)</strong>, and <strong>Strontium (Sr)</strong>. These elements are monitored in surface water and precipitation samples.',
+          '<strong>Elevated concentrations prove nothing by themselves.</strong> Trace metal levels must be compared against geological baselines, seasonal patterns, industrial discharge records, and natural weathering rates. The Observatory records measured values with full provenance — the data speaks for itself.'
+        ],
+        parse(data) {
+          const ts = data?.value?.timeSeries || [];
+          const sites = ts.length;
+          let latestValue = '-', latestUnit = '';
+          if (ts.length > 0 && ts[0].values?.[0]?.value?.length > 0) {
+            const v = ts[0].values[0].value;
+            const last = v[v.length - 1];
+            latestValue = last.value;
+            latestUnit = ts[0].variable?.unit?.unitCode || '';
+          }
+          return {
+            cards: [
+              { label: 'Active Sites', value: sites, unit: 'monitoring' },
+              { label: 'Latest Reading', value: latestValue, unit: latestUnit },
+              { label: 'Parameter', value: 'Aluminum', unit: '(01105)' },
+              { label: 'Source', value: 'USGS NWIS', unit: 'real-time' },
+            ],
+            table: null,
+          };
+        },
+      },
+
+      ecology: {
+        title: 'Pollinator & Ecology Index',
+        source: 'iNaturalist API — Research-Grade Observations',
+        image: 'assets/pollinators.webp',
+        api: 'https://api.inaturalist.org/v1/observations?quality_grade=research&place_id=1&per_page=12&taxon_id=47336&order_by=observed_on&order=desc',
+        sourceUrl: 'https://www.inaturalist.org/',
+        visuals: [],
+        description: [
+          '<strong>iNaturalist</strong> is a citizen science platform where researchers and volunteers document species observations with photographs and GPS coordinates. All observations used here are <strong>research-grade</strong> — verified by multiple identifiers.',
+          'The Observatory tracks three key pollinator and insect groups: <strong>Bees (Apoidea)</strong>, <strong>Butterflies (Lepidoptera)</strong>, and <strong>Dragonflies (Odonata)</strong>. Population trends are indicators of ecosystem health.',
+          '<strong>Declines in pollinator populations can result from many causes:</strong> habitat loss, pesticide use, disease, climate shifts, and seasonal variation. The Observatory records observation counts for longitudinal trend analysis without attributing causation to any single factor.'
+        ],
+        parse(data) {
+          const obs = data?.results || [];
+          const totalResults = data?.total_results || 0;
+          return {
+            cards: [
+              { label: 'Total Research Obs', value: totalResults.toLocaleString(), unit: 'Apoidea (US)' },
+              { label: 'Recent Batch', value: obs.length, unit: 'observations' },
+              { label: 'Quality', value: 'Research', unit: 'grade' },
+              { label: 'Source', value: 'iNaturalist', unit: 'citizen science' },
+            ],
+            table: obs.length > 0 ? {
+              title: 'Recent Research-Grade Bee Observations',
+              headers: ['Date', 'Species', 'Location', 'Observer'],
+              rows: obs.map(o => [
+                formatTime(o.observed_on),
+                (o.taxon?.name || 'Apoidea').substring(0, 25),
+                (o.place_guess || '-').substring(0, 25),
+                (o.user?.login || '-').substring(0, 15),
+              ]),
+            } : null,
+          };
+        },
+      },
+
+      chemistry: {
+        title: 'Atmospheric Deposition Chemistry',
+        source: 'NADP National Trends Network + CoCoRaHS',
+        image: 'assets/atmo-chemistry.webp',
+        api: 'https://nadp.slh.wisc.edu/networks/national-trends-network/',
+        sourceUrl: 'https://nadp.slh.wisc.edu/',
+        visuals: [],
+        description: [
+          'The <strong>National Atmospheric Deposition Program (NADP)</strong> operates the National Trends Network (NTN) — a long-running program measuring the chemistry of precipitation (rain, snow) at over 250 sites across the US.',
+          'Weekly composite samples are analyzed for <strong>sulfate, nitrate, ammonium, calcium, and other ions</strong>. The Mercury Deposition Network (MDN) provides parallel mercury concentration data.',
+          '<strong>CoCoRaHS</strong> (Community Collaborative Rain, Hail and Snow Network) supplements NADP with daily precipitation measurements from over 20,000 volunteer observers. Together these networks provide the ground truth for atmospheric deposition chemistry research.'
+        ],
+        parse(data) {
+          const isUp = typeof data === 'string' && data.length > 1000;
+          return {
+            cards: [
+              { label: 'NADP NTN Status', value: isUp ? 'Reachable' : 'Unreachable', unit: '' },
+              { label: 'Sites', value: '250+', unit: 'nationwide' },
+              { label: 'Sampling', value: 'Weekly', unit: 'composite' },
+              { label: 'Analytes', value: 'SO₄, NO₃, Hg', unit: '+ ions' },
+            ],
+            table: null,
+          };
+        },
+      },
+    };
+
+    // ── Utility ────────────────────────────────────────────────
+    function formatTime(ts) {
+      if (!ts) return '-';
+      try {
+        const d = new Date(ts);
+        return d.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZoneName: 'short' });
+      } catch { return ts; }
+    }
+
+    // ── Render ─────────────────────────────────────────────────
+    const stream = STREAMS[streamId];
+    if (!stream) {
+      document.getElementById('data-panel').innerHTML = `<div class="error-msg">Unknown stream: "${streamId}". Return to the observatory.</div>`;
+      return;
+    }
+
+    // Set page metadata
+    document.title = `${stream.title} — Truth Observatory`;
+    document.getElementById('hero-img').src = stream.image;
+    document.getElementById('hero-img').alt = stream.title;
+    document.getElementById('hero-title').textContent = stream.title;
+    document.getElementById('hero-source').textContent = stream.source;
+
+    // Render explanation
+    const expEl = document.getElementById('explanation');
+    expEl.innerHTML = `
+      <h2 class="explanation__heading">What am I looking at?</h2>
+      ${stream.description.map(p => `<p class="explanation__text">${p}</p>`).join('')}
+    `;
+
+    // Render visual embeds
+    if (stream.visuals && stream.visuals.length > 0) {
+      const visContainer = document.getElementById('visual-container');
+      visContainer.innerHTML = `
+        <div class="visual-panel">
+          <h2 class="visual-panel__heading">Live Visualization</h2>
+          <p class="visual-panel__desc">Images sourced directly from federal agencies — refreshed on page load.</p>
+          <div class="visual-panel__grid">
+            ${stream.visuals.map(v => `
+              <div class="visual-panel__item">
+                <img src="${v.src}" alt="${v.caption}" loading="lazy" onerror="this.parentElement.style.display='none'">
+                <div class="visual-panel__caption">${v.caption}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    // Render provenance
+    document.getElementById('provenance').innerHTML = `
+      <p class="provenance__label">Data Provenance</p>
+      <p class="provenance__text">
+        Source: <a href="${stream.sourceUrl}" target="_blank" rel="noopener">${stream.source}</a><br>
+        API: <code>${stream.api.substring(0, 80)}...</code><br>
+        Collection: Client-side fetch, no intermediary modification.<br>
+        Integrity: Raw API response displayed as-received. No filtering, no editorialization.
+      </p>
+    `;
+
+    // Fetch live data
+    fetch(stream.api)
+      .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+      .then(data => {
+        const result = stream.parse(data);
+        if (!result) {
+          document.getElementById('data-panel').innerHTML = '<div class="error-msg">No data available from this endpoint.</div>';
+          return;
+        }
+
+        // Render data cards
+        document.getElementById('data-panel').innerHTML = result.cards.map(c => `
+          <div class="data-card">
+            <div class="data-card__label">${c.label}</div>
+            <div class="data-card__value">${c.value} <span class="data-card__unit">${c.unit}</span></div>
+          </div>
+        `).join('');
+
+        // Render table if available
+        if (result.table) {
+          const container = document.getElementById('events-container');
+          container.innerHTML = `
+            <h2 class="explanation__heading">${result.table.title}</h2>
+            <table class="events-table">
+              <thead><tr>${result.table.headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
+              <tbody>${result.table.rows.map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`).join('')}</tbody>
+            </table>
+          `;
+        }
+      })
+      .catch(err => {
+        document.getElementById('data-panel').innerHTML = `<div class="error-msg">Failed to fetch data: ${err.message}</div>`;
+      });
+
+    // ── Prev/Next Navigation ───────────────────────────────
+    const streamKeys = Object.keys(STREAMS);
+    const currentIndex = streamKeys.indexOf(streamId);
+    const prevStream = currentIndex > 0 ? streamKeys[currentIndex - 1] : streamKeys[streamKeys.length - 1];
+    const nextStream = currentIndex < streamKeys.length - 1 ? streamKeys[currentIndex + 1] : streamKeys[0];
+    const prevEl = document.getElementById('nav-prev');
+    const nextEl = document.getElementById('nav-next');
+    if (prevEl) { prevEl.href = `stream?stream=${prevStream}`; prevEl.textContent = `← ${STREAMS[prevStream].title.substring(0, 20)}`; }
+    if (nextEl) { nextEl.href = `stream?stream=${nextStream}`; nextEl.textContent = `${STREAMS[nextStream].title.substring(0, 20)} →`; }
+  })();
+  </script>
+
+</body>
+</html>

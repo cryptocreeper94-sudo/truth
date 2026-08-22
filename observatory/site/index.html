@@ -3,327 +3,533 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Truth Observatory — Mission Control</title>
-  <meta name="description" content="18-stream atmospheric, geophysical, and infrastructure monitoring cockpit with AtmosCore 4/42 deterministic state engine. Live feeds, cross-feed correlation, observation suitability governance.">
-  <link rel="stylesheet" href="style.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Outfit:wght@400;600;800;900&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <title>Truth Observatory — Atmospheric & Geophysical Monitoring</title>
+  <meta name="description" content="Continuous atmospheric, geophysical, and infrastructure monitoring. 18 independent data streams with cross-feed correlation analysis. Every observation hashed, manifest-logged, and provenance-tracked.">
+  <meta property="og:title" content="Truth Observatory — 18-Stream Atmospheric & Geophysical Monitoring">
+  <meta property="og:description" content="Continuous monitoring across 18 independent data streams. Cross-feed correlation engine with skeptic analysis. Every observation SHA-256 hashed with full provenance.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://observatory.tlid.io">
+  <meta property="og:image" content="https://observatory.tlid.io/assets/hero-1.webp">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Truth Observatory — DarkWave Studios">
+  <meta name="twitter:description" content="18 live data streams. Cross-feed correlation engine. SHA-256 integrity. The system watches. The data decides.">
+  <link rel="stylesheet" href="landing.css">
+  <style>
+    .hero__cta {
+      display: inline-block;
+      margin-top: 1.5rem;
+      padding: 0.9rem 2.4rem;
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: #1a1714;
+      background: #d4a054;
+      border: none;
+      transition: all 0.3s ease;
+    }
+    .hero__cta:hover {
+      background: #e0b06a;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(212, 160, 84, 0.3);
+    }
+  </style>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔭</text></svg>">
 </head>
 <body>
-  <!-- ═══ TOP STATUS BAR ═══ -->
-  <header class="topbar" id="topbar">
-    <div class="topbar__left">
-      <span class="topbar__logo">&#9673;</span>
-      <span class="topbar__title">TRUTH OBSERVATORY</span>
-      <span class="topbar__version">v3.0</span>
-    </div>
-    <div class="topbar__center">
-      <div class="topbar__stat" data-info="stat-feeds">
-        <span class="topbar__stat-label">FEEDS <span class="topbar__info-icon">ⓘ</span></span>
-        <span class="topbar__stat-value" id="stat-live">&mdash;/18</span>
-      </div>
-      <div class="topbar__stat" data-info="stat-atmoscore">
-        <span class="topbar__stat-label">ATMOSCORE <span class="topbar__info-icon">ⓘ</span></span>
-        <span class="topbar__stat-value" id="stat-atmoscore">INIT</span>
-      </div>
-      <div class="topbar__stat" data-info="stat-suitability">
-        <span class="topbar__stat-label">SUITABILITY <span class="topbar__info-icon">ⓘ</span></span>
-        <span class="topbar__stat-value" id="stat-suitability">&mdash;</span>
-      </div>
-    </div>
-    <div class="topbar__right">
-      <span class="topbar__clock" id="utc-clock">00:00:00 UTC</span>
-      <span class="topbar__pulse" id="global-pulse" data-info="stat-pulse" title="Data connection status"></span>
-    </div>
-  </header>
 
-  <!-- ═══ STAT INFO TOOLTIP ═══ -->
-  <div class="stat-tooltip" id="stat-tooltip">
-    <div class="stat-tooltip__header">
-      <span class="stat-tooltip__title" id="stat-tooltip-title"></span>
-      <button class="stat-tooltip__close" id="stat-tooltip-close">&#10005;</button>
-    </div>
-    <div class="stat-tooltip__body" id="stat-tooltip-body"></div>
-  </div>
+  <main class="observatory" id="observatory">
+    <div class="observatory__content">
 
-  <!-- ═══ MOBILE MAP PREVIEW ═══ -->
-  <div class="map-preview" id="map-preview">
-    <div class="map-preview__map" id="map-preview-container"></div>
-    <div class="map-preview__overlay">
-      <span class="map-preview__label">TAP FOR FULL MAP</span>
-    </div>
-  </div>
-
-  <!-- ═══ LOCATION BAR (mobile) ═══ -->
-  <div class="location-bar" id="location-bar">
-    <button class="location-bar__geo" id="geo-btn" title="Use my location">&#9673;</button>
-    <input class="location-bar__input" id="zip-input" type="text" placeholder="ZIP CODE" maxlength="5" inputmode="numeric">
-    <button class="location-bar__set" id="zip-set">SET</button>
-    <span class="location-bar__status" id="location-status"></span>
-  </div>
-
-  <!-- ═══ FULLSCREEN MAP OVERLAY ═══ -->
-  <div class="map-fullscreen" id="map-fullscreen">
-    <div class="map-fullscreen__toolbar">
-      <button class="map-fullscreen__close" id="map-fullscreen-close">&#10005; CLOSE</button>
-      <div class="map-fullscreen__toggles" id="fullscreen-layer-toggles">
-        <label class="layer-toggle"><input type="checkbox" data-fslayer="radar" checked> RADAR</label>
-        <label class="layer-toggle"><input type="checkbox" data-fslayer="satellite"> VIS</label>
-        <label class="layer-toggle"><input type="checkbox" data-fslayer="infrared"> IR</label>
-        <label class="layer-toggle"><input type="checkbox" data-fslayer="watervapor"> WV</label>
-        <label class="layer-toggle"><input type="checkbox" data-fslayer="precip"> PRECIP</label>
+    <!-- ── Hero (Ken Burns Slideshow) ────────────────────────── -->
+    <section class="hero" id="hero">
+      <div class="hero__slideshow">
+        <div class="hero__slide hero__slide--active" style="background-image: url('assets/hero-1.webp')"></div>
+        <div class="hero__slide" style="background-image: url('assets/hero-2.webp')"></div>
+        <div class="hero__slide" style="background-image: url('assets/hero-3.webp')"></div>
+        <div class="hero__slide" style="background-image: url('assets/hero-4.webp')"></div>
+        <div class="hero__overlay"></div>
       </div>
-      <button class="map-fullscreen__anim-btn" id="anim-toggle" title="Toggle animation loop">▶ LOOP</button>
-      <button class="map-fullscreen__anim-btn" id="fullscreen-style-toggle" title="Toggle light/dark map">☀ LIGHT</button>
-    </div>
-    <div class="map-fullscreen__map" id="map-fullscreen-container"></div>
-    <div class="map-fullscreen__legend" id="map-fullscreen-legend"></div>
-    <div class="map-fullscreen__anim-bar" id="anim-bar">
-      <span class="anim-bar__label" id="anim-label">LIVE</span>
-      <div class="anim-bar__track" id="anim-track"></div>
-    </div>
-  </div>
-
-  <!-- ═══ MAIN COCKPIT ═══ -->
-  <main class="cockpit" id="cockpit" data-view="cockpit">
-
-    <!-- LEFT: MAP PANEL -->
-    <section class="cockpit__map" id="map-panel">
-      <div class="panel-header">
-        <span class="panel-header__icon">&#9678;</span>
-        <span class="panel-header__title">GEOSPATIAL OVERLAY</span>
-        <button class="refresh-btn" id="refresh-map" title="Refresh overlays">&#8635;</button>
-        <span class="panel-header__badge" id="map-layers">1 layers active</span>
-        <button class="panel-header__expand" id="map-expand" title="Open fullscreen map">⛶</button>
-      </div>
-      <div class="layer-toggles" id="layer-toggles">
-        <label class="layer-toggle"><input type="checkbox" data-layer="radar" checked> RADAR</label>
-        <label class="layer-toggle"><input type="checkbox" data-layer="satellite"> GOES VIS</label>
-        <label class="layer-toggle"><input type="checkbox" data-layer="infrared"> GOES IR</label>
-        <label class="layer-toggle"><input type="checkbox" data-layer="watervapor"> WATER VAPOR</label>
-        <label class="layer-toggle"><input type="checkbox" data-layer="precip"> PRECIP</label>
-        <button class="layer-toggle layer-toggle--style" id="map-style-toggle" title="Toggle light/dark map">☀ LIGHT</button>
-      </div>
-      <div id="map" class="map-container">
-        <!-- Dynamic Legend -->
-        <div class="map-legend" id="map-legend"></div>
-      </div>
-    </section>
-
-    <!-- RIGHT: FEED CAROUSELS -->
-    <section class="cockpit__feeds" id="feeds-panel">
-      <div class="panel-header">
-        <span class="panel-header__icon">&#9635;</span>
-        <span class="panel-header__title">DATA STREAMS</span>
-      </div>
-      <div class="feed-carousels" id="feed-carousels">
-        <!-- Dynamically populated domain carousels -->
-      </div>
-    </section>
-
-    <!-- ATMOSCORE PANEL -->
-    <section class="cockpit__atmoscore" id="atmoscore-panel">
-      <div class="panel-header">
-        <span class="panel-header__icon" style="color: #1E6FA8">&#9673;</span>
-        <span class="panel-header__title">ATMOSCORE 4/42 STATE ENGINE</span>
-        <span class="panel-header__badge" id="atmoscore-provenance"></span>
-      </div>
-      <div class="atmoscore-layout">
-        <div class="atmoscore-ring-wrap">
-          <canvas id="atmoscore-ring"></canvas>
+      <div class="hero__content">
+        <div class="hero__badge">
+          <span class="hero__pulse"></span>
+          <span>18 streams active</span>
         </div>
-        <div class="atmoscore-readouts">
-          <div class="atmoscore-primitive" data-primitive="TH">
-            <div class="atmoscore-primitive__bar"></div>
-            <div class="atmoscore-primitive__info">
-              <span class="atmoscore-primitive__label">THERMODYNAMIC</span>
-              <span class="atmoscore-primitive__value" id="prim-TH">0.00</span>
-            </div>
+        <h1 class="hero__title">Truth Observatory</h1>
+        <p class="hero__subtitle">
+          Continuous atmospheric, geophysical, and infrastructure monitoring.
+          Every observation hashed, manifest-logged, and provenance-tracked.
+          The system watches. The data decides.
+        </p>
+        <div class="hero__divider"></div>
+        <a href="/cockpit" class="hero__cta">ENTER COCKPIT ⟶</a>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- LAYER 1 — Atmospheric Observation                      -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section>
+      <div class="section-header">
+        <p class="section-header__label">Layer 1</p>
+        <h2 class="section-header__title">Atmospheric Observation</h2>
+      </div>
+      <div class="carousel-wrapper">
+        <div class="stream-carousel">
+
+        <article class="stream-card reveal" data-stream="nexrad" id="card-nexrad">
+          <div class="stream-card__color-bar"></div>
+          <span class="stream-card__badge">Live</span>
+          <img class="stream-card__image" src="assets/nexrad.webp" alt="NEXRAD Doppler radar" loading="lazy">
+          <div class="stream-card__body">
+            <div class="stream-card__header"><span class="stream-card__dot"></span><h3 class="stream-card__title">Doppler Radar Network</h3></div>
+            <p class="stream-card__source">NOAA NEXRAD Level II</p>
+            <div class="stream-card__stats"><span class="stream-card__stat">160 stations</span><span class="stream-card__stat">5-min cycles</span><span class="stream-card__stat">Volumetric</span></div>
+            <p class="stream-card__desc">Real-time radar reflectivity, velocity, and spectrum width from the national Doppler network.</p>
           </div>
-          <div class="atmoscore-primitive" data-primitive="OP">
-            <div class="atmoscore-primitive__bar"></div>
-            <div class="atmoscore-primitive__info">
-              <span class="atmoscore-primitive__label">OPTICAL PROPAGATION</span>
-              <span class="atmoscore-primitive__value" id="prim-OP">0.00</span>
-            </div>
+        </article>
+
+        <article class="stream-card reveal" data-stream="goes" id="card-goes">
+          <div class="stream-card__color-bar"></div>
+          <span class="stream-card__badge">Live</span>
+          <img class="stream-card__image" src="assets/goes.webp" alt="GOES satellite ground station" loading="lazy">
+          <div class="stream-card__body">
+            <div class="stream-card__header"><span class="stream-card__dot"></span><h3 class="stream-card__title">Geostationary Satellite</h3></div>
+            <p class="stream-card__source">GOES-19 East + GOES-18 West</p>
+            <div class="stream-card__stats"><span class="stream-card__stat">CONUS</span><span class="stream-card__stat">10-min cycles</span><span class="stream-card__stat">IR + Vis + WV</span></div>
+            <p class="stream-card__desc">Multi-band satellite imagery covering the continental US. Infrared, visible, and water vapor channels.</p>
           </div>
-          <div class="atmoscore-primitive" data-primitive="DY">
-            <div class="atmoscore-primitive__bar"></div>
-            <div class="atmoscore-primitive__info">
-              <span class="atmoscore-primitive__label">DYNAMIC FLOW</span>
-              <span class="atmoscore-primitive__value" id="prim-DY">0.00</span>
-            </div>
+        </article>
+
+        <article class="stream-card reveal" data-stream="lightning" id="card-lightning">
+          <div class="stream-card__color-bar"></div>
+          <span class="stream-card__badge">Live</span>
+          <img class="stream-card__image" src="assets/lightning.webp" alt="Lightning strike" loading="lazy">
+          <div class="stream-card__body">
+            <div class="stream-card__header"><span class="stream-card__dot"></span><h3 class="stream-card__title">Lightning Detection (GLM)</h3></div>
+            <p class="stream-card__source">GOES GLM L2 Clusters</p>
+            <div class="stream-card__stats"><span class="stream-card__stat">Dual satellite</span><span class="stream-card__stat">5-min cycles</span><span class="stream-card__stat">NetCDF</span></div>
+            <p class="stream-card__desc">Geostationary Lightning Mapper cluster data from both GOES East and West platforms.</p>
           </div>
-          <div class="atmoscore-primitive" data-primitive="TS">
-            <div class="atmoscore-primitive__bar"></div>
-            <div class="atmoscore-primitive__info">
-              <span class="atmoscore-primitive__label">TEMPORAL STABILITY</span>
-              <span class="atmoscore-primitive__value" id="prim-TS">0.00</span>
-            </div>
+        </article>
+
+        <article class="stream-card reveal" data-stream="surface" id="card-surface">
+          <div class="stream-card__color-bar"></div>
+          <span class="stream-card__badge">Live</span>
+          <img class="stream-card__image" src="assets/surface-stations.webp" alt="Weather monitoring station" loading="lazy">
+          <div class="stream-card__body">
+            <div class="stream-card__header"><span class="stream-card__dot"></span><h3 class="stream-card__title">Surface Stations</h3></div>
+            <p class="stream-card__source">NOAA ASOS / Mesonet</p>
+            <div class="stream-card__stats"><span class="stream-card__stat">Wind + Temp</span><span class="stream-card__stat">15-min cycles</span><span class="stream-card__stat">Pressure</span></div>
+            <p class="stream-card__desc">Ground-level weather observations — wind speed, temperature, pressure, humidity, visibility from automated stations.</p>
           </div>
-          <div class="atmoscore-suitability">
-            <div class="atmoscore-suitability__label">OBSERVATION SUITABILITY</div>
-            <div class="atmoscore-suitability__score" id="atmoscore-suit-score">&mdash;</div>
-            <div class="atmoscore-suitability__status" id="atmoscore-suit-status">INITIALIZING</div>
-            <div class="atmoscore-suitability__trend" id="atmoscore-suit-trend"></div>
+        </article>
+
+        <article class="stream-card reveal" data-stream="blitz" id="card-blitz">
+          <div class="stream-card__color-bar"></div>
+          <span class="stream-card__badge">Live</span>
+          <img class="stream-card__image" src="assets/blitzortung.webp" alt="Lightning detection antenna" loading="lazy">
+          <div class="stream-card__body">
+            <div class="stream-card__header"><span class="stream-card__dot"></span><h3 class="stream-card__title">Ground Lightning Network</h3></div>
+            <p class="stream-card__source">Blitzortung</p>
+            <div class="stream-card__stats"><span class="stream-card__stat">Stroke location</span><span class="stream-card__stat">1-min cycles</span><span class="stream-card__stat">Amplitude</span></div>
+            <p class="stream-card__desc">Ground-based lightning detection network — stroke location, time, and amplitude from independent community sensors.</p>
           </div>
-          <div class="atmoscore-hc" id="atmoscore-hc-bar" style="display:none">
-            <span class="atmoscore-hc__icon">⚠</span>
-            <span class="atmoscore-hc__text" id="atmoscore-hc-text"></span>
-          </div>
+        </article>
+
+        </div>
+        <div class="carousel-nav">
+          <button class="carousel-arrow carousel-arrow--prev" aria-label="Previous">&#8592;</button>
+          <div class="carousel-dots"></div>
+          <button class="carousel-arrow carousel-arrow--next" aria-label="Next">&#8594;</button>
         </div>
       </div>
     </section>
-
-    <!-- RESIZE HANDLE -->
-    <div class="cockpit__resize-handle" id="cockpit-resize-handle">
-      <div class="cockpit__resize-grip"></div>
     </div>
 
-    <!-- BOTTOM: EVENT LEDGER -->
-    <section class="cockpit__corr" id="ledger-panel">
-      <div class="panel-header">
-        <span class="panel-header__icon">&#9638;</span>
-        <span class="panel-header__title">EVENT LEDGER</span>
-        <button class="panel-header__info-btn" id="ledger-info-btn" title="About the Event Ledger">ⓘ</button>
-        <span class="panel-header__badge" id="ledger-count">loading...</span>
+    <!-- LAYER 2 — CREAM (full-bleed) -->
+    <section class="section--cream">
+      <div class="observatory__content">
+      <div class="section-header">
+        <p class="section-header__label">Layer 2</p>
+        <h2 class="section-header__title">Solar, Geophysical & Seismic</h2>
       </div>
-      <div class="ledger-stream" id="ledger-stream">
-        <div class="ledger-loading">Loading event stream...</div>
+      <div class="carousel-wrapper">
+        <div class="stream-carousel">
+
+        <article class="stream-card reveal" data-stream="solar" id="card-solar">
+          <div class="stream-card__color-bar"></div>
+          <span class="stream-card__badge">Live</span>
+          <img class="stream-card__image" src="assets/solar.webp" alt="Sun with solar flares" loading="lazy">
+          <div class="stream-card__body">
+            <div class="stream-card__header"><span class="stream-card__dot"></span><h3 class="stream-card__title">Solar & Space Weather</h3></div>
+            <p class="stream-card__source">NOAA SWPC</p>
+            <div class="stream-card__stats"><span class="stream-card__stat">7 products</span><span class="stream-card__stat">15-min cycles</span><span class="stream-card__stat">X-ray to particles</span></div>
+            <p class="stream-card__desc">X-ray flux, planetary Kp index, electron and proton flux, solar flare alerts from the Space Weather Prediction Center.</p>
+          </div>
+        </article>
+
+        <article class="stream-card reveal" data-stream="geomag" id="card-geomag">
+          <div class="stream-card__color-bar"></div>
+          <span class="stream-card__badge">Live</span>
+          <img class="stream-card__image" src="assets/geomagnetic.webp" alt="Magnetometer instrument" loading="lazy">
+          <div class="stream-card__body">
+            <div class="stream-card__header"><span class="stream-card__dot"></span><h3 class="stream-card__title">Geomagnetic Field</h3></div>
+            <p class="stream-card__source">SWPC + USGS Ground Stations</p>
+            <div class="stream-card__stats"><span class="stream-card__stat">6 sources</span><span class="stream-card__stat">Satellite + Ground</span><span class="stream-card__stat">4 observatories</span></div>
+            <p class="stream-card__desc">Real-time magnetic field measurements from SWPC satellite data and USGS observatories at Boulder, Fredericksburg, Barrow, and Honolulu.</p>
+          </div>
+        </article>
+
+        <article class="stream-card reveal" data-stream="iono" id="card-iono">
+          <div class="stream-card__color-bar"></div>
+          <span class="stream-card__badge">Live</span>
+          <img class="stream-card__image" src="assets/ionosphere.webp" alt="Aurora borealis" loading="lazy">
+          <div class="stream-card__body">
+            <div class="stream-card__header"><span class="stream-card__dot"></span><h3 class="stream-card__title">Ionospheric Conditions</h3></div>
+            <p class="stream-card__source">NOAA SWPC Products</p>
+            <div class="stream-card__stats"><span class="stream-card__stat">6 products</span><span class="stream-card__stat">R/S/G scales</span><span class="stream-card__stat">3-day forecast</span></div>
+            <p class="stream-card__desc">Aurora power, EUV flux, planetary Kp, 3-day forecast, and solar event probabilities.</p>
+          </div>
+        </article>
+
+        <article class="stream-card reveal" data-stream="schumann" id="card-schumann">
+          <div class="stream-card__color-bar"></div>
+          <span class="stream-card__badge">Live</span>
+          <img class="stream-card__image" src="assets/schumann.webp" alt="Oscilloscope waveform" loading="lazy">
+          <div class="stream-card__body">
+            <div class="stream-card__header"><span class="stream-card__dot"></span><h3 class="stream-card__title">Schumann Resonance</h3></div>
+            <p class="stream-card__source">Multi-Station Aggregator</p>
+            <div class="stream-card__stats"><span class="stream-card__stat">4+ stations</span><span class="stream-card__stat">Tomsk • HeartMath</span><span class="stream-card__stat">7.83 Hz</span></div>
+            <p class="stream-card__desc">Electromagnetic resonance from multiple independent stations. Never single-source — cross-referenced for anomaly detection.</p>
+          </div>
+        </article>
+
+        <article class="stream-card reveal" data-stream="seismic" id="card-seismic">
+          <div class="stream-card__color-bar"></div>
+          <span class="stream-card__badge">Live</span>
+          <img class="stream-card__image" src="assets/seismic.webp" alt="Seismograph waveform" loading="lazy">
+          <div class="stream-card__body">
+            <div class="stream-card__header"><span class="stream-card__dot"></span><h3 class="stream-card__title">Earthquake Catalog</h3></div>
+            <p class="stream-card__source">USGS FDSN Event API</p>
+            <div class="stream-card__stats"><span class="stream-card__stat">M2.5+ global</span><span class="stream-card__stat">15-min cycles</span><span class="stream-card__stat">PAGER alerts</span></div>
+            <p class="stream-card__desc">Global seismic event monitoring with magnitude, depth, felt reports, and review status.</p>
+          </div>
+        </article>
+
+        </div>
+        <div class="carousel-nav">
+          <button class="carousel-arrow carousel-arrow--prev" aria-label="Previous">&#8592;</button>
+          <div class="carousel-dots"></div>
+          <button class="carousel-arrow carousel-arrow--next" aria-label="Next">&#8594;</button>
+        </div>
+      </div>
       </div>
     </section>
+
+    <div class="observatory__content">
+    <!-- LAYER 3 -->
+    <section>
+      <div class="section-header">
+        <p class="section-header__label">Layer 3</p>
+        <h2 class="section-header__title">Human Infrastructure</h2>
+      </div>
+      <div class="carousel-wrapper">
+        <div class="stream-carousel">
+
+        <article class="stream-card reveal" data-stream="grid" id="card-grid">
+          <div class="stream-card__color-bar"></div>
+          <span class="stream-card__badge">Live</span>
+          <img class="stream-card__image" src="assets/grid.webp" alt="Power transmission towers" loading="lazy">
+          <div class="stream-card__body">
+            <div class="stream-card__header"><span class="stream-card__dot"></span><h3 class="stream-card__title">Power Grid Monitor</h3></div>
+            <p class="stream-card__source">EIA-930 Open Data</p>
+            <div class="stream-card__stats"><span class="stream-card__stat">Demand + Gen</span><span class="stream-card__stat">Hourly</span><span class="stream-card__stat">Interchange</span></div>
+            <p class="stream-card__desc">US power grid demand by balancing authority, generation by fuel type, and interstate power flows.</p>
+          </div>
+        </article>
+
+        <article class="stream-card reveal" data-stream="aircraft" id="card-aircraft">
+          <div class="stream-card__color-bar"></div>
+          <span class="stream-card__badge">Live</span>
+          <img class="stream-card__image" src="assets/aircraft.webp" alt="Aircraft with contrails" loading="lazy">
+          <div class="stream-card__body">
+            <div class="stream-card__header"><span class="stream-card__dot"></span><h3 class="stream-card__title">Aircraft Tracking</h3></div>
+            <p class="stream-card__source">ADS-B Exchange</p>
+            <div class="stream-card__stats"><span class="stream-card__stat">Position</span><span class="stream-card__stat">5-min cycles</span><span class="stream-card__stat">Transponder</span></div>
+            <p class="stream-card__desc">Aircraft tracks — position, altitude, type, and transponder data for correlating flight paths with atmospheric events.</p>
+          </div>
+        </article>
+
+        <article class="stream-card reveal" data-stream="notam" id="card-notam">
+          <div class="stream-card__color-bar"></div>
+          <span class="stream-card__badge">Live</span>
+          <img class="stream-card__image" src="assets/cloud-seeding.webp" alt="Cloud seeding aircraft" loading="lazy">
+          <div class="stream-card__body">
+            <div class="stream-card__header"><span class="stream-card__dot"></span><h3 class="stream-card__title">NOTAMs & Cloud Seeding</h3></div>
+            <p class="stream-card__source">FAA + State Permits</p>
+            <div class="stream-card__stats"><span class="stream-card__stat">Airspace notices</span><span class="stream-card__stat">Daily</span><span class="stream-card__stat">Permits</span></div>
+            <p class="stream-card__desc">Active flight restrictions, airspace notices, and authorized weather modification operations from state permit databases.</p>
+          </div>
+        </article>
+
+        <article class="stream-card reveal" data-stream="celltower" id="card-celltower">
+          <div class="stream-card__color-bar"></div>
+          <span class="stream-card__badge">Live</span>
+          <img class="stream-card__image" src="assets/cell-towers.webp" alt="Cell tower infrastructure" loading="lazy">
+          <div class="stream-card__body">
+            <div class="stream-card__header"><span class="stream-card__dot"></span><h3 class="stream-card__title">Cell Tower Registry</h3></div>
+            <p class="stream-card__source">FCC DB + OpenCelliD</p>
+            <div class="stream-card__stats"><span class="stream-card__stat">4G/5G sites</span><span class="stream-card__stat">Weekly refresh</span><span class="stream-card__stat">Frequencies</span></div>
+            <p class="stream-card__desc">Cell tower locations, operators, and frequencies. Presence ≠ effect — RF must be independently measured, not assumed.</p>
+          </div>
+        </article>
+
+        </div>
+        <div class="carousel-nav">
+          <button class="carousel-arrow carousel-arrow--prev" aria-label="Previous">&#8592;</button>
+          <div class="carousel-dots"></div>
+          <button class="carousel-arrow carousel-arrow--next" aria-label="Next">&#8594;</button>
+        </div>
+      </div>
+    </section>
+    </div>
+
+    <!-- LAYER 4 — CREAM (full-bleed) -->
+    <section class="section--cream">
+      <div class="observatory__content">
+      <div class="section-header">
+        <p class="section-header__label">Layer 4</p>
+        <h2 class="section-header__title">RF & Ionospheric Research</h2>
+      </div>
+      <div class="carousel-wrapper">
+        <div class="stream-carousel">
+
+        <article class="stream-card reveal" data-stream="haarp" id="card-haarp">
+          <div class="stream-card__color-bar"></div>
+          <span class="stream-card__badge">Live</span>
+          <img class="stream-card__image" src="assets/haarp.webp" alt="HAARP antenna array" loading="lazy">
+          <div class="stream-card__body">
+            <div class="stream-card__header"><span class="stream-card__dot"></span><h3 class="stream-card__title">Ionospheric Heaters</h3></div>
+            <p class="stream-card__source">HAARP, EISCAT, Sura + Schedules</p>
+            <div class="stream-card__stats"><span class="stream-card__stat">Named facilities</span><span class="stream-card__stat">Daily</span><span class="stream-card__stat">Operating logs</span></div>
+            <p class="stream-card__desc">Research facility operating windows and logs. Each facility identified by real name — not generic labels. Frequency, location, and documentation.</p>
+          </div>
+        </article>
+
+        </div>
+        <div class="carousel-nav">
+          <button class="carousel-arrow carousel-arrow--prev" aria-label="Previous">&#8592;</button>
+          <div class="carousel-dots"></div>
+          <button class="carousel-arrow carousel-arrow--next" aria-label="Next">&#8594;</button>
+        </div>
+      </div>
+      </div>
+    </section>
+
+    <div class="observatory__content">
+    <!-- LAYER 5 -->
+    <section>
+      <div class="section-header">
+        <p class="section-header__label">Layer 5</p>
+        <h2 class="section-header__title">Ecological & Atmospheric Chemistry</h2>
+      </div>
+      <div class="carousel-wrapper">
+        <div class="stream-carousel">
+
+        <article class="stream-card reveal" data-stream="metals" id="card-metals">
+          <div class="stream-card__color-bar"></div>
+          <span class="stream-card__badge">Live</span>
+          <img class="stream-card__image" src="assets/trace-metals.webp" alt="Water sampling equipment" loading="lazy">
+          <div class="stream-card__body">
+            <div class="stream-card__header"><span class="stream-card__dot"></span><h3 class="stream-card__title">Trace Metal Deposition</h3></div>
+            <p class="stream-card__source">USGS / EPA AQS / NADP</p>
+            <div class="stream-card__stats"><span class="stream-card__stat">Al, Ba, Sr, Ti</span><span class="stream-card__stat">As published</span><span class="stream-card__stat">Water + Soil</span></div>
+            <p class="stream-card__desc">Trace metal concentrations in surface water, snow, and soil. Requires baseline comparison, geographic controls, and source attribution alternatives.</p>
+          </div>
+        </article>
+
+        <article class="stream-card reveal" data-stream="ecology" id="card-ecology">
+          <div class="stream-card__color-bar"></div>
+          <span class="stream-card__badge">Live</span>
+          <img class="stream-card__image" src="assets/pollinators.webp" alt="Bee on wildflower" loading="lazy">
+          <div class="stream-card__body">
+            <div class="stream-card__header"><span class="stream-card__dot"></span><h3 class="stream-card__title">Pollinator & Ecology Index</h3></div>
+            <p class="stream-card__source">USGS Bee Lab / iNaturalist</p>
+            <div class="stream-card__stats"><span class="stream-card__stat">Species counts</span><span class="stream-card__stat">Weekly</span><span class="stream-card__stat">Citizen science</span></div>
+            <p class="stream-card__desc">Pollinator populations, native insect indices, and wild species observation trends. Alternative explanations (habitat, pesticide, disease) always tested first.</p>
+          </div>
+        </article>
+
+        <article class="stream-card reveal" data-stream="chemistry" id="card-chemistry">
+          <div class="stream-card__color-bar"></div>
+          <span class="stream-card__badge">Live</span>
+          <img class="stream-card__image" src="assets/atmo-chemistry.webp" alt="Atmospheric deposition collector" loading="lazy">
+          <div class="stream-card__body">
+            <div class="stream-card__header"><span class="stream-card__dot"></span><h3 class="stream-card__title">Atmospheric Deposition</h3></div>
+            <p class="stream-card__source">NADP / CoCoRaHS</p>
+            <div class="stream-card__stats"><span class="stream-card__stat">Wet + Dry</span><span class="stream-card__stat">Weekly composite</span><span class="stream-card__stat">Chemistry</span></div>
+            <p class="stream-card__desc">Wet and dry deposition chemistry — sulfate, nitrate, and trace metals. Community rain-gauge network with precipitation anomaly flags.</p>
+          </div>
+        </article>
+
+        </div>
+        <div class="carousel-nav">
+          <button class="carousel-arrow carousel-arrow--prev" aria-label="Previous">&#8592;</button>
+          <div class="carousel-dots"></div>
+          <button class="carousel-arrow carousel-arrow--next" aria-label="Next">&#8594;</button>
+        </div>
+      </div>
+    </section>
+    <div class="status-bar" id="status-bar">
+      <div class="status-bar__item">
+        <span class="status-bar__value" id="stat-streams">18 / 18</span>
+        <span class="status-bar__label">Streams Live</span>
+      </div>
+      <div class="status-bar__item">
+        <span class="status-bar__value" id="stat-sources">40+</span>
+        <span class="status-bar__label">Data Sources</span>
+      </div>
+      <div class="status-bar__item">
+        <span class="status-bar__value" id="stat-layers">5</span>
+        <span class="status-bar__label">Evidence Layers</span>
+      </div>
+      <div class="status-bar__item">
+        <span class="status-bar__value" id="stat-cadence">5m</span>
+        <span class="status-bar__label">Min Cadence</span>
+      </div>
+      <div class="status-bar__item">
+        <span class="status-bar__value" id="stat-integrity">SHA-256</span>
+        <span class="status-bar__label">Hash Integrity</span>
+      </div>
+    </div>
+    </div>
+
+    <!-- ── Correlation Engine ─────────────────────────────────── -->
+    <section class="section--cream" id="correlation-engine">
+      <div class="observatory__content">
+      <div class="section-header">
+        <p class="section-header__label">Correlation Engine</p>
+        <h2 class="section-header__title">Recognized Patterns</h2>
+      </div>
+      <p class="methodology__text" style="margin-bottom: 1.5rem;">
+        The correlation engine models baseline behavior for each of the 18 feeds, identifies statistical deviations
+        (≥2σ from hourly mean), and cross-correlates them across all streams — including lagged relationships up to 6 hours.
+        <strong>Correlation is never presented as causation.</strong> The skeptic engine generates mundane explanations
+        scored higher than anomalous interpretations by default.
+      </p>
+
+      <div class="carousel-wrapper">
+        <div class="stream-carousel" id="pattern-carousel">
+          <div class="stream-card reveal" style="min-width: 320px; max-width: 420px;">
+            <div class="stream-card__color-bar"></div>
+            <div class="stream-card__body" style="padding: 1.5rem;">
+              <div class="stream-card__header"><span class="stream-card__dot"></span><h3 class="stream-card__title">Modeling Baselines</h3></div>
+              <p class="stream-card__desc" style="margin-top: 0.75rem;">
+                The correlation engine is collecting baseline data from all 18 feeds.
+                Recognized patterns will appear here as cross-feed deviations are identified.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="carousel-nav">
+          <button class="carousel-arrow carousel-arrow--prev" aria-label="Previous">&#8592;</button>
+          <div class="carousel-dots"></div>
+          <button class="carousel-arrow carousel-arrow--next" aria-label="Next">&#8594;</button>
+        </div>
+      </div>
+
+      <div id="correlation-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; margin-top: 2rem;">
+        <div class="status-bar__item" style="text-align: center;">
+          <span class="status-bar__value" id="corr-feeds">18</span>
+          <span class="status-bar__label">Feeds Analyzed</span>
+        </div>
+        <div class="status-bar__item" style="text-align: center;">
+          <span class="status-bar__value" id="corr-observations">—</span>
+          <span class="status-bar__label">Observations</span>
+        </div>
+        <div class="status-bar__item" style="text-align: center;">
+          <span class="status-bar__value" id="corr-deviations">—</span>
+          <span class="status-bar__label">Deviations</span>
+        </div>
+        <div class="status-bar__item" style="text-align: center;">
+          <span class="status-bar__value" id="corr-patterns">—</span>
+          <span class="status-bar__label">Patterns</span>
+        </div>
+      </div>
+
+      <p style="text-align: center; font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.12em; margin-top: 1.5rem;">
+        Correlation ≠ Causation · Skeptic engine non-overridable · 42-Doctrine [13][14][26]
+      </p>
+      </div>
+    </section>
+
+    <!-- ── Methodology ───────────────────────────────────────── -->
+    <section class="section--cream methodology reveal" id="methodology">
+      <div class="observatory__content">
+      <div class="section-header">
+        <p class="section-header__label">Operating Principle</p>
+        <h2 class="section-header__title">The Instrument, Not the Interpreter</h2>
+      </div>
+      <p class="methodology__text">
+        The Truth Observatory collects raw atmospheric, geophysical, and infrastructure data from public scientific sources.
+        Every observation is <strong>hashed at collection time</strong>, logged to a permanent manifest, and stored with full provenance metadata.
+        The raw artifact is the evidence. The manifest is the chain of custody.
+      </p>
+      <p class="methodology__text">
+        We do not editorialize. We do not filter for narrative fit.
+        When streams coincide — a geomagnetic anomaly alongside an unusual radar pattern alongside a grid demand spike — the system flags the temporal proximity.
+        <strong>Proximity is not causation.</strong> That distinction is enforced architecturally, not by policy.
+      </p>
+      <div class="methodology__quote">
+        <p>"The system must be capable of disproving the investigator's preferred explanation. If the skeptic engine is disabled, it becomes advocacy software."</p>
+      </div>
+      </div>
+    </section>
+
+    <!-- ── Canonical Footer ──────────────────────────────────── -->
+    <div class="observatory__content">
+    <footer class="footer" id="footer">
+      <div class="footer__top">
+        <div class="footer__brand-block">
+          <p class="footer__brand">DarkWave Studios LLC</p>
+          <p class="footer__tagline">Deterministic systems for an indeterminate world.</p>
+        </div>
+        <nav class="footer__nav">
+          <div class="footer__nav-group">
+            <p class="footer__nav-label">Ecosystem</p>
+            <a class="footer__link" href="https://invariant.tlid.io" target="_blank" rel="noopener">Invariant</a>
+            <a class="footer__link" href="https://truth.tlid.io" target="_blank" rel="noopener">Truth Archive</a>
+            <a class="footer__link" href="https://axiom42.com" target="_blank" rel="noopener">Axiom42</a>
+            <a class="footer__link" href="https://dwtl.io" target="_blank" rel="noopener">Trust Layer</a>
+          </div>
+          <div class="footer__nav-group">
+            <p class="footer__nav-label">Resources</p>
+            <a class="footer__link" href="https://invariant.tlid.io" target="_blank" rel="noopener">Documentation</a>
+            <a class="footer__link" href="https://github.com/cryptocreeper94-sudo" target="_blank" rel="noopener">GitHub</a>
+          </div>
+          <div class="footer__nav-group">
+            <p class="footer__nav-label">Legal</p>
+            <a class="footer__link" href="#terms">Terms of Service</a>
+            <a class="footer__link" href="#privacy">Privacy Policy</a>
+            <a class="footer__link" href="#disclaimer">Data Disclaimer</a>
+          </div>
+        </nav>
+      </div>
+      <div class="footer__bottom">
+        <p class="footer__copy">&copy; 2026 DarkWave Studios LLC. All rights reserved.</p>
+        <p class="footer__legal">All data sourced from public scientific APIs. Observatory outputs are observational records, not claims. Data provenance is cryptographically verifiable via SHA-256 manifest hashes. This platform does not constitute financial, medical, legal, or scientific advice.</p>
+      </div>
+    </footer>
+    </div>
+
   </main>
 
-  <!-- ═══ DETAIL MODAL ═══ -->
-  <div class="modal-overlay" id="modal-overlay">
-    <div class="modal" id="detail-modal">
-      <div class="modal__header">
-        <div class="modal__title-row">
-          <span class="modal__icon" id="modal-icon"></span>
-          <h2 class="modal__title" id="modal-title"></h2>
-          <span class="modal__badge" id="modal-badge"></span>
-        </div>
-        <button class="modal__close" id="modal-close">&#10005;</button>
-      </div>
-      <div class="modal__body">
-        <div class="modal__meta" id="modal-meta"></div>
-        <div class="modal__sparkline-lg">
-          <canvas id="modal-sparkline" width="600" height="120"></canvas>
-          <span class="modal__sparkline-label">24-HOUR ACTIVITY</span>
-        </div>
-        <div class="modal__entries" id="modal-entries">
-          <h3 class="modal__section-title">RECENT OBSERVATIONS</h3>
-          <div class="modal__entry-list" id="modal-entry-list"></div>
-        </div>
-      </div>
-      <div class="modal__footer">
-        <button class="modal__back-btn" id="modal-back">&larr; BACK TO COCKPIT</button>
-        <button class="modal__share-btn" id="modal-share">&#9993; SHARE</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ═══ LEGEND INFO MODAL ═══ -->
-  <div class="legend-info-overlay" id="legend-info-overlay">
-    <div class="legend-info-modal" id="legend-info-modal">
-      <div class="legend-info-modal__header">
-        <h3 class="legend-info-modal__title" id="legend-info-title"></h3>
-        <button class="legend-info-modal__close" id="legend-info-close">&#10005;</button>
-      </div>
-      <div class="legend-info-modal__body" id="legend-info-body"></div>
-    </div>
-  </div>
-
-  <!-- ═══ CORRELATION DETAIL MODAL ═══ -->
-  <div class="corr-detail-overlay" id="corr-detail-overlay">
-    <div class="corr-detail-modal" id="corr-detail-modal">
-      <div class="corr-detail-modal__header">
-        <h3 class="corr-detail-modal__title" id="corr-detail-title">CORRELATION</h3>
-        <button class="corr-detail-modal__close" id="corr-detail-close">&#10005;</button>
-      </div>
-      <div class="corr-detail-modal__body" id="corr-detail-body"></div>
-      <div class="corr-detail-modal__footer">
-        <div class="corr-detail-modal__verdict" id="corr-detail-verdict"></div>
-        <div class="corr-detail-modal__skeptic" id="corr-detail-skeptic"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ═══ LEDGER INFO MODAL ═══ -->
-  <div class="ledger-info-overlay" id="ledger-info-overlay">
-    <div class="ledger-info-modal">
-      <div class="ledger-info-modal__header">
-        <h3>EVENT LEDGER — DATA RETENTION</h3>
-        <button class="ledger-info-modal__close" id="ledger-info-close">&#10005;</button>
-      </div>
-      <div class="ledger-info-modal__body">
-        <p><strong>What is this?</strong> The Event Ledger is a chronological stream of every observation, data gap, deviation, and correlation detected across all 18 feeds.</p>
-        <p><strong>Block Numbers:</strong> Events are grouped into 15-minute blocks. Each event carries a deterministic hash for integrity verification.</p>
-        <p><strong>Correlations:</strong> When deviations in multiple feeds coincide within a 1-hour window, they are highlighted as a potential correlation. All correlations carry a <em>skeptic note</em> — the mundane explanation is always scored higher than the anomalous one.</p>
-        <p><strong>Data Retention:</strong> Raw observation data is pruned after <strong>30 days</strong>. Block hashes and metadata summaries are retained <strong>permanently</strong>. Full manifests are accessible via <code>/api/ledger</code>.</p>
-        <p><strong>Architectural Guarantee:</strong> CORRELATION ≠ CAUSATION. This is architecturally enforced — the skeptic explanation cannot be overridden.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- ═══ CANONICAL FOOTER ═══ -->
-  <footer class="site-footer" id="site-footer">
-    <div class="site-footer__row">
-      <div class="site-footer__brand">
-        <span class="site-footer__logo">&#9673;</span>
-        <span class="site-footer__name">Truth Observatory</span>
-        <span class="site-footer__copy">&copy; 2026 DarkWave Studios LLC</span>
-      </div>
-      <div class="site-footer__links">
-        <a href="/about" class="site-footer__link">About</a>
-        <a href="/explorer" class="site-footer__link">Explorer</a>
-        <a href="/terms" class="site-footer__link">Terms of Service</a>
-        <a href="/privacy" class="site-footer__link">Privacy Policy</a>
-        <a href="/legal" class="site-footer__link">Legal</a>
-        <a href="/sms-optin" class="site-footer__link">SMS Alerts</a>
-      </div>
-      <div class="site-footer__donate">
-        <span class="site-footer__donate-label">SUPPORT THE PROJECT</span>
-        <div class="site-footer__donate-links">
-          <a href="https://venmo.com/DarkWaveStudios" target="_blank" rel="noopener" class="site-footer__donate-btn">Venmo @DarkWaveStudios</a>
-          <a href="https://cash.app/$darkwavestudios" target="_blank" rel="noopener" class="site-footer__donate-btn">CashApp $darkwavestudios</a>
-        </div>
-      </div>
-    </div>
-    <div class="site-footer__legal-bar">
-      All atmospheric data is sourced from public government APIs (NOAA, USGS, FAA, EPA, EIA, SWPC). Observatory does not generate, modify, or editorialize data. All observations are timestamped, source-attributed, and hash-verified.
-    </div>
-  </footer>
-
-  <!-- ═══ BOTTOM NAV ═══ -->
-  <nav class="bottomnav" id="bottomnav">
-    <button class="bottomnav__btn bottomnav__btn--active" data-view="cockpit">
-      <span class="bottomnav__icon">&#9673;</span>
-      <span class="bottomnav__label">Cockpit</span>
-    </button>
-    <button class="bottomnav__btn" data-view="feeds">
-      <span class="bottomnav__icon">&#9635;</span>
-      <span class="bottomnav__label">Feeds</span>
-    </button>
-    <button class="bottomnav__btn" data-view="atmoscore">
-      <span class="bottomnav__icon" style="color: #1E6FA8">&#9678;</span>
-      <span class="bottomnav__label">AtmosCore</span>
-    </button>
-    <button class="bottomnav__btn" data-view="correlations">
-      <span class="bottomnav__icon">&#9638;</span>
-      <span class="bottomnav__label">Ledger</span>
-    </button>
-    <button class="bottomnav__btn" data-view="map">
-      <span class="bottomnav__icon">&#9678;</span>
-      <span class="bottomnav__label">Map</span>
-    </button>
-  </nav>
-
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="atmoscore.js"></script>
-  <script src="atmoscore-viz.js"></script>
+  <!-- ── Lume Bundle ─────────────────────────────────────────── -->
   <script src="app.js"></script>
+  <script src="live.js"></script>
+
 </body>
 </html>

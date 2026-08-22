@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Truth Observatory — Mission Control</title>
+  <meta name="description" content="18-stream atmospheric, geophysical, and infrastructure monitoring cockpit with AtmosCore 4/42 deterministic state engine. Live feeds, cross-feed correlation, observation suitability governance.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Outfit:wght@400;600;800;900&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔭</text></svg>">
+</head>
+<body>
+  <!-- ═══ TOP STATUS BAR ═══ -->
+  <header class="topbar" id="topbar">
+    <div class="topbar__left">
+      <span class="topbar__logo">&#9673;</span>
+      <span class="topbar__title">TRUTH OBSERVATORY</span>
+      <span class="topbar__version">v3.0</span>
+    </div>
+    <div class="topbar__center">
+      <div class="topbar__stat" data-info="stat-feeds">
+        <span class="topbar__stat-label">FEEDS <span class="topbar__info-icon">ⓘ</span></span>
+        <span class="topbar__stat-value" id="stat-live">&mdash;/18</span>
+      </div>
+      <div class="topbar__stat" data-info="stat-atmoscore">
+        <span class="topbar__stat-label">ATMOSCORE <span class="topbar__info-icon">ⓘ</span></span>
+        <span class="topbar__stat-value" id="stat-atmoscore">INIT</span>
+      </div>
+      <div class="topbar__stat" data-info="stat-suitability">
+        <span class="topbar__stat-label">SUITABILITY <span class="topbar__info-icon">ⓘ</span></span>
+        <span class="topbar__stat-value" id="stat-suitability">&mdash;</span>
+      </div>
+    </div>
+    <div class="topbar__right">
+      <span class="topbar__clock" id="utc-clock">00:00:00 UTC</span>
+      <span class="topbar__pulse" id="global-pulse" data-info="stat-pulse" title="Data connection status"></span>
+    </div>
+  </header>
+
+  <!-- ═══ STAT INFO TOOLTIP ═══ -->
+  <div class="stat-tooltip" id="stat-tooltip">
+    <div class="stat-tooltip__header">
+      <span class="stat-tooltip__title" id="stat-tooltip-title"></span>
+      <button class="stat-tooltip__close" id="stat-tooltip-close">&#10005;</button>
+    </div>
+    <div class="stat-tooltip__body" id="stat-tooltip-body"></div>
+  </div>
+
+  <!-- ═══ MOBILE MAP PREVIEW ═══ -->
+  <div class="map-preview" id="map-preview">
+    <div class="map-preview__map" id="map-preview-container"></div>
+    <div class="map-preview__overlay">
+      <span class="map-preview__label">TAP FOR FULL MAP</span>
+    </div>
+  </div>
+
+  <!-- ═══ LOCATION BAR (mobile) ═══ -->
+  <div class="location-bar" id="location-bar">
+    <button class="location-bar__geo" id="geo-btn" title="Use my location">&#9673;</button>
+    <input class="location-bar__input" id="zip-input" type="text" placeholder="ZIP CODE" maxlength="5" inputmode="numeric">
+    <button class="location-bar__set" id="zip-set">SET</button>
+    <span class="location-bar__status" id="location-status"></span>
+  </div>
+
+  <!-- ═══ FULLSCREEN MAP OVERLAY ═══ -->
+  <div class="map-fullscreen" id="map-fullscreen">
+    <div class="map-fullscreen__toolbar">
+      <button class="map-fullscreen__close" id="map-fullscreen-close">&#10005; CLOSE</button>
+      <div class="map-fullscreen__toggles" id="fullscreen-layer-toggles">
+        <label class="layer-toggle"><input type="checkbox" data-fslayer="radar" checked> RADAR</label>
+        <label class="layer-toggle"><input type="checkbox" data-fslayer="satellite"> VIS</label>
+        <label class="layer-toggle"><input type="checkbox" data-fslayer="infrared"> IR</label>
+        <label class="layer-toggle"><input type="checkbox" data-fslayer="watervapor"> WV</label>
+        <label class="layer-toggle"><input type="checkbox" data-fslayer="precip"> PRECIP</label>
+      </div>
+      <button class="map-fullscreen__anim-btn" id="anim-toggle" title="Toggle animation loop">▶ LOOP</button>
+      <button class="map-fullscreen__anim-btn" id="fullscreen-style-toggle" title="Toggle light/dark map">☀ LIGHT</button>
+    </div>
+    <div class="map-fullscreen__map" id="map-fullscreen-container"></div>
+    <div class="map-fullscreen__legend" id="map-fullscreen-legend"></div>
+    <div class="map-fullscreen__anim-bar" id="anim-bar">
+      <span class="anim-bar__label" id="anim-label">LIVE</span>
+      <div class="anim-bar__track" id="anim-track"></div>
+    </div>
+  </div>
+
+  <!-- ═══ MAIN COCKPIT ═══ -->
+  <main class="cockpit" id="cockpit" data-view="cockpit">
+
+    <!-- LEFT: MAP PANEL -->
+    <section class="cockpit__map" id="map-panel">
+      <div class="panel-header">
+        <span class="panel-header__icon">&#9678;</span>
+        <span class="panel-header__title">GEOSPATIAL OVERLAY</span>
+        <button class="refresh-btn" id="refresh-map" title="Refresh overlays">&#8635;</button>
+        <span class="panel-header__badge" id="map-layers">1 layers active</span>
+        <button class="panel-header__expand" id="map-expand" title="Open fullscreen map">⛶</button>
+      </div>
+      <div class="layer-toggles" id="layer-toggles">
+        <label class="layer-toggle"><input type="checkbox" data-layer="radar" checked> RADAR</label>
+        <label class="layer-toggle"><input type="checkbox" data-layer="satellite"> GOES VIS</label>
+        <label class="layer-toggle"><input type="checkbox" data-layer="infrared"> GOES IR</label>
+        <label class="layer-toggle"><input type="checkbox" data-layer="watervapor"> WATER VAPOR</label>
+        <label class="layer-toggle"><input type="checkbox" data-layer="precip"> PRECIP</label>
+        <button class="layer-toggle layer-toggle--style" id="map-style-toggle" title="Toggle light/dark map">☀ LIGHT</button>
+      </div>
+      <div id="map" class="map-container">
+        <!-- Dynamic Legend -->
+        <div class="map-legend" id="map-legend"></div>
+      </div>
+    </section>
+
+    <!-- RIGHT: FEED CAROUSELS -->
+    <section class="cockpit__feeds" id="feeds-panel">
+      <div class="panel-header">
+        <span class="panel-header__icon">&#9635;</span>
+        <span class="panel-header__title">DATA STREAMS</span>
+      </div>
+      <div class="feed-carousels" id="feed-carousels">
+        <!-- Dynamically populated domain carousels -->
+      </div>
+    </section>
+
+    <!-- ATMOSCORE PANEL -->
+    <section class="cockpit__atmoscore" id="atmoscore-panel">
+      <div class="panel-header">
+        <span class="panel-header__icon" style="color: #1E6FA8">&#9673;</span>
+        <span class="panel-header__title">ATMOSCORE 4/42 STATE ENGINE</span>
+        <span class="panel-header__badge" id="atmoscore-provenance"></span>
+      </div>
+      <div class="atmoscore-layout">
+        <div class="atmoscore-ring-wrap">
+          <canvas id="atmoscore-ring"></canvas>
+        </div>
+        <div class="atmoscore-readouts">
+          <div class="atmoscore-primitive" data-primitive="TH">
+            <div class="atmoscore-primitive__bar"></div>
+            <div class="atmoscore-primitive__info">
+              <span class="atmoscore-primitive__label">THERMODYNAMIC</span>
+              <span class="atmoscore-primitive__value" id="prim-TH">0.00</span>
+            </div>
+          </div>
+          <div class="atmoscore-primitive" data-primitive="OP">
+            <div class="atmoscore-primitive__bar"></div>
+            <div class="atmoscore-primitive__info">
+              <span class="atmoscore-primitive__label">OPTICAL PROPAGATION</span>
+              <span class="atmoscore-primitive__value" id="prim-OP">0.00</span>
+            </div>
+          </div>
+          <div class="atmoscore-primitive" data-primitive="DY">
+            <div class="atmoscore-primitive__bar"></div>
+            <div class="atmoscore-primitive__info">
+              <span class="atmoscore-primitive__label">DYNAMIC FLOW</span>
+              <span class="atmoscore-primitive__value" id="prim-DY">0.00</span>
+            </div>
+          </div>
+          <div class="atmoscore-primitive" data-primitive="TS">
+            <div class="atmoscore-primitive__bar"></div>
+            <div class="atmoscore-primitive__info">
+              <span class="atmoscore-primitive__label">TEMPORAL STABILITY</span>
+              <span class="atmoscore-primitive__value" id="prim-TS">0.00</span>
+            </div>
+          </div>
+          <div class="atmoscore-suitability">
+            <div class="atmoscore-suitability__label">OBSERVATION SUITABILITY</div>
+            <div class="atmoscore-suitability__score" id="atmoscore-suit-score">&mdash;</div>
+            <div class="atmoscore-suitability__status" id="atmoscore-suit-status">INITIALIZING</div>
+            <div class="atmoscore-suitability__trend" id="atmoscore-suit-trend"></div>
+          </div>
+          <div class="atmoscore-hc" id="atmoscore-hc-bar" style="display:none">
+            <span class="atmoscore-hc__icon">⚠</span>
+            <span class="atmoscore-hc__text" id="atmoscore-hc-text"></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RESIZE HANDLE -->
+    <div class="cockpit__resize-handle" id="cockpit-resize-handle">
+      <div class="cockpit__resize-grip"></div>
+    </div>
+
+    <!-- BOTTOM: EVENT LEDGER -->
+    <section class="cockpit__corr" id="ledger-panel">
+      <div class="panel-header">
+        <span class="panel-header__icon">&#9638;</span>
+        <span class="panel-header__title">EVENT LEDGER</span>
+        <button class="panel-header__info-btn" id="ledger-info-btn" title="About the Event Ledger">ⓘ</button>
+        <span class="panel-header__badge" id="ledger-count">loading...</span>
+      </div>
+      <div class="ledger-stream" id="ledger-stream">
+        <div class="ledger-loading">Loading event stream...</div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ═══ DETAIL MODAL ═══ -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal" id="detail-modal">
+      <div class="modal__header">
+        <div class="modal__title-row">
+          <span class="modal__icon" id="modal-icon"></span>
+          <h2 class="modal__title" id="modal-title"></h2>
+          <span class="modal__badge" id="modal-badge"></span>
+        </div>
+        <button class="modal__close" id="modal-close">&#10005;</button>
+      </div>
+      <div class="modal__body">
+        <div class="modal__meta" id="modal-meta"></div>
+        <div class="modal__sparkline-lg">
+          <canvas id="modal-sparkline" width="600" height="120"></canvas>
+          <span class="modal__sparkline-label">24-HOUR ACTIVITY</span>
+        </div>
+        <div class="modal__entries" id="modal-entries">
+          <h3 class="modal__section-title">RECENT OBSERVATIONS</h3>
+          <div class="modal__entry-list" id="modal-entry-list"></div>
+        </div>
+      </div>
+      <div class="modal__footer">
+        <button class="modal__back-btn" id="modal-back">&larr; BACK TO COCKPIT</button>
+        <button class="modal__share-btn" id="modal-share">&#9993; SHARE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ LEGEND INFO MODAL ═══ -->
+  <div class="legend-info-overlay" id="legend-info-overlay">
+    <div class="legend-info-modal" id="legend-info-modal">
+      <div class="legend-info-modal__header">
+        <h3 class="legend-info-modal__title" id="legend-info-title"></h3>
+        <button class="legend-info-modal__close" id="legend-info-close">&#10005;</button>
+      </div>
+      <div class="legend-info-modal__body" id="legend-info-body"></div>
+    </div>
+  </div>
+
+  <!-- ═══ CORRELATION DETAIL MODAL ═══ -->
+  <div class="corr-detail-overlay" id="corr-detail-overlay">
+    <div class="corr-detail-modal" id="corr-detail-modal">
+      <div class="corr-detail-modal__header">
+        <h3 class="corr-detail-modal__title" id="corr-detail-title">CORRELATION</h3>
+        <button class="corr-detail-modal__close" id="corr-detail-close">&#10005;</button>
+      </div>
+      <div class="corr-detail-modal__body" id="corr-detail-body"></div>
+      <div class="corr-detail-modal__footer">
+        <div class="corr-detail-modal__verdict" id="corr-detail-verdict"></div>
+        <div class="corr-detail-modal__skeptic" id="corr-detail-skeptic"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ LEDGER INFO MODAL ═══ -->
+  <div class="ledger-info-overlay" id="ledger-info-overlay">
+    <div class="ledger-info-modal">
+      <div class="ledger-info-modal__header">
+        <h3>EVENT LEDGER — DATA RETENTION</h3>
+        <button class="ledger-info-modal__close" id="ledger-info-close">&#10005;</button>
+      </div>
+      <div class="ledger-info-modal__body">
+        <p><strong>What is this?</strong> The Event Ledger is a chronological stream of every observation, data gap, deviation, and correlation detected across all 18 feeds.</p>
+        <p><strong>Block Numbers:</strong> Events are grouped into 15-minute blocks. Each event carries a deterministic hash for integrity verification.</p>
+        <p><strong>Correlations:</strong> When deviations in multiple feeds coincide within a 1-hour window, they are highlighted as a potential correlation. All correlations carry a <em>skeptic note</em> — the mundane explanation is always scored higher than the anomalous one.</p>
+        <p><strong>Data Retention:</strong> Raw observation data is pruned after <strong>30 days</strong>. Block hashes and metadata summaries are retained <strong>permanently</strong>. Full manifests are accessible via <code>/api/ledger</code>.</p>
+        <p><strong>Architectural Guarantee:</strong> CORRELATION ≠ CAUSATION. This is architecturally enforced — the skeptic explanation cannot be overridden.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ CANONICAL FOOTER ═══ -->
+  <footer class="site-footer" id="site-footer">
+    <div class="site-footer__row">
+      <div class="site-footer__brand">
+        <span class="site-footer__logo">&#9673;</span>
+        <span class="site-footer__name">Truth Observatory</span>
+        <span class="site-footer__copy">&copy; 2026 DarkWave Studios LLC</span>
+      </div>
+      <div class="site-footer__links">
+        <a href="/about" class="site-footer__link">About</a>
+        <a href="/explorer" class="site-footer__link">Explorer</a>
+        <a href="/terms" class="site-footer__link">Terms of Service</a>
+        <a href="/privacy" class="site-footer__link">Privacy Policy</a>
+        <a href="/legal" class="site-footer__link">Legal</a>
+        <a href="/sms-optin" class="site-footer__link">SMS Alerts</a>
+      </div>
+      <div class="site-footer__donate">
+        <span class="site-footer__donate-label">SUPPORT THE PROJECT</span>
+        <div class="site-footer__donate-links">
+          <a href="https://venmo.com/DarkWaveStudios" target="_blank" rel="noopener" class="site-footer__donate-btn">Venmo @DarkWaveStudios</a>
+          <a href="https://cash.app/$darkwavestudios" target="_blank" rel="noopener" class="site-footer__donate-btn">CashApp $darkwavestudios</a>
+        </div>
+      </div>
+    </div>
+    <div class="site-footer__legal-bar">
+      All atmospheric data is sourced from public government APIs (NOAA, USGS, FAA, EPA, EIA, SWPC). Observatory does not generate, modify, or editorialize data. All observations are timestamped, source-attributed, and hash-verified.
+    </div>
+  </footer>
+
+  <!-- ═══ BOTTOM NAV ═══ -->
+  <nav class="bottomnav" id="bottomnav">
+    <button class="bottomnav__btn bottomnav__btn--active" data-view="cockpit">
+      <span class="bottomnav__icon">&#9673;</span>
+      <span class="bottomnav__label">Cockpit</span>
+    </button>
+    <button class="bottomnav__btn" data-view="feeds">
+      <span class="bottomnav__icon">&#9635;</span>
+      <span class="bottomnav__label">Feeds</span>
+    </button>
+    <button class="bottomnav__btn" data-view="atmoscore">
+      <span class="bottomnav__icon" style="color: #1E6FA8">&#9678;</span>
+      <span class="bottomnav__label">AtmosCore</span>
+    </button>
+    <button class="bottomnav__btn" data-view="correlations">
+      <span class="bottomnav__icon">&#9638;</span>
+      <span class="bottomnav__label">Ledger</span>
+    </button>
+    <button class="bottomnav__btn" data-view="map">
+      <span class="bottomnav__icon">&#9678;</span>
+      <span class="bottomnav__label">Map</span>
+    </button>
+  </nav>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="atmoscore.js"></script>
+  <script src="atmoscore-viz.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
