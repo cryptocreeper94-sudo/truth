@@ -290,8 +290,14 @@ body::after {
   align-items: center;
   gap: 4px;
 }
-.layer-toggle:has(input:checked) { color: var(--signal-cyan); border-color: var(--border-active); background: rgba(6, 182, 212, 0.05); }
+.layer-toggle:has(input:checked) { color: var(--brass); border-color: var(--border-active); background: var(--brass-dim); }
 .layer-toggle input { width: 0; height: 0; opacity: 0; position: absolute; }
+.layer-toggle--style {
+  color: var(--brass);
+  border-color: var(--border-active);
+  background: var(--brass-dim);
+  margin-left: auto;
+}
 
 /* ═══ MAP ═══════════════════════════════════════════════════ */
 .map-container {

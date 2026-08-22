@@ -115,6 +115,12 @@ const Observatory = {
   },
 
   // ── Map Init with Expanded Layers ────────────────────────────
+  mapStyle: 'light',
+  mapTiles: {
+    light: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+    dark:  'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+  },
+
   initMap() {
     this.map = L.map('map', {
       center: [39.5, -98.35],
@@ -123,8 +129,8 @@ const Observatory = {
       attributionControl: false,
     });
 
-    // Base layer — CartoDB dark
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    // Base layer — swappable light/dark
+    this.baseLayer = L.tileLayer(this.mapTiles[this.mapStyle], {
       maxZoom: 19,
       subdomains: 'abcd',
     }).addTo(this.map);
@@ -187,6 +193,21 @@ const Observatory = {
       if (this.map.hasLayer(layer)) count++;
     });
     document.getElementById('map-layers').textContent = `${count + 1} layers active`;
+  },
+
+  // ── Toggle Map Style (light/dark) ───────────────────────────
+  toggleMapStyle() {
+    this.mapStyle = this.mapStyle === 'light' ? 'dark' : 'light';
+    this.map.removeLayer(this.baseLayer);
+    this.baseLayer = L.tileLayer(this.mapTiles[this.mapStyle], {
+      maxZoom: 19,
+      subdomains: 'abcd',
+    }).addTo(this.map);
+    // Move base layer below overlays
+    this.baseLayer.bringToBack();
+    // Update button
+    const btn = document.getElementById('map-style-toggle');
+    btn.textContent = this.mapStyle === 'light' ? '☀ LIGHT' : '🌙 DARK';
   },
 
   // ── Dynamic Legend ───────────────────────────────────────────
@@ -898,6 +919,11 @@ const Observatory = {
       }
       this.updateLayerCount();
       this.updateDynamicLegend();
+    });
+
+    // Map style toggle (light/dark)
+    document.getElementById('map-style-toggle').addEventListener('click', () => {
+      this.toggleMapStyle();
     });
 
     // ── Cockpit resize handle (drag to resize map/ledger split) ──
