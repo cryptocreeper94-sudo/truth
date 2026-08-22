@@ -124,7 +124,7 @@ const Observatory = {
     });
 
     // Base layer — CartoDB dark
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
       maxZoom: 19,
       subdomains: 'abcd',
     }).addTo(this.map);
@@ -526,7 +526,7 @@ const Observatory = {
         return { text: 'CLEAR', color: 'var(--signal-live)' };
 
       case 'goes':
-        return { text: 'IMAGING', color: 'var(--signal-cyan)' };
+        return { text: 'IMAGING', color: 'var(--brass)' };
 
       case 'lightning':
       case 'blitzortung':
@@ -540,7 +540,7 @@ const Observatory = {
         return { text: 'GRID STABLE', color: 'var(--signal-live)' };
 
       case 'surface':
-        return { text: 'REPORTING', color: 'var(--signal-cyan)' };
+        return { text: 'REPORTING', color: 'var(--brass)' };
 
       case 'ionosonde':
         if (rate > avg * 2) return { text: 'TEC ELEVATED', color: 'var(--signal-stale)' };
@@ -551,14 +551,14 @@ const Observatory = {
         return { text: 'BASELINE', color: 'var(--signal-live)' };
 
       case 'aircraft':
-        return { text: `${feed.entries} TRACKED`, color: 'var(--signal-cyan)' };
+        return { text: `${feed.entries} TRACKED`, color: 'var(--brass)' };
 
       case 'notam':
         if (feed.entries > 20) return { text: 'HIGH ACTIVITY', color: 'var(--signal-stale)' };
         return { text: `${feed.entries} ACTIVE`, color: 'var(--signal-live)' };
 
       case 'celltower':
-        return { text: 'MONITORING', color: 'var(--signal-cyan)' };
+        return { text: 'MONITORING', color: 'var(--brass)' };
 
       case 'heater':
         if (feed.entries > 0) return { text: 'FACILITY ACTIVE', color: 'var(--signal-stale)' };
@@ -569,10 +569,10 @@ const Observatory = {
         return { text: 'BASELINE', color: 'var(--signal-live)' };
 
       case 'ecology':
-        return { text: 'INDEXING', color: 'var(--signal-cyan)' };
+        return { text: 'INDEXING', color: 'var(--brass)' };
 
       case 'deposition':
-        return { text: 'SAMPLING', color: 'var(--signal-cyan)' };
+        return { text: 'SAMPLING', color: 'var(--brass)' };
 
       default:
         if (rate > avg * 1.5 && avg > 0) return { text: 'HIGH ACTIVITY', color: 'var(--signal-stale)' };
@@ -1093,7 +1093,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
       keyboard: false,
     });
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
       maxZoom: 19,
     }).addTo(this.previewMap);
 
@@ -1158,7 +1158,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
       zoomControl: true,
     });
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
       maxZoom: 19,
     }).addTo(this.fullscreenMap);
 

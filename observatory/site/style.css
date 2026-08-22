@@ -9,24 +9,38 @@
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --bg-void:        #050508;
-  --bg-primary:     #0a0a0e;
-  --bg-raised:      #111118;
-  --bg-tile:        #14141c;
-  --bg-hover:       #1a1a24;
-  --bg-active:      #1e1e2a;
+  /* ── Invariant Apex Brutalist palette ─────────────────────── */
+  --bg-void:        #050505;
+  --bg-primary:     #0a0a0a;
+  --bg-secondary:   #0a0a0a;
+  --bg-raised:      #111111;
+  --bg-tile:        #0d0d0d;
+  --bg-card:        #0d0d0d;
+  --bg-hover:       #161616;
+  --bg-active:      #1a1a1a;
+  --bg-parchment:   #f5f0e8;
+  --bg-parchment-dim: #e8e0d4;
 
-  --border-dim:     #1e1e28;
-  --border-mid:     #2a2a38;
-  --border-active:  #3a3a50;
-  --border-bright:  #4a4a66;
+  --border:         rgba(255, 255, 255, 0.08);
+  --border-dim:     rgba(255, 255, 255, 0.08);
+  --border-mid:     rgba(255, 255, 255, 0.12);
+  --border-active:  rgba(255, 255, 255, 0.18);
+  --border-bright:  rgba(255, 255, 255, 0.25);
+  --border-light:   rgba(255, 255, 255, 0.15);
 
+  /* Accent — brass & oxblood */
+  --brass:          #d4a054;
+  --brass-dim:      rgba(212, 160, 84, 0.08);
+  --oxblood:        #9f1d1d;
+  --oxblood-dim:    rgba(159, 29, 29, 0.08);
+
+  /* Functional signal colors — these indicate real data states */
   --signal-live:    #00ff88;
   --signal-stale:   #ff9500;
   --signal-offline: #ff3b30;
   --signal-blue:    #0af;
   --signal-purple:  #a855f7;
-  --signal-cyan:    #06b6d4;
+  --signal-cyan:    var(--brass);  /* Decorative cyan → brass */
   --signal-yellow:  #ffd60a;
 
   /* AtmosCore palette */
@@ -39,14 +53,21 @@
   --ac-caution:     #D4601A;
   --ac-critical:    #8B1A1A;
 
-  --text-primary:   #e8e8f0;
-  --text-secondary: #8888a0;
-  --text-dim:       #555568;
-  --text-accent:    #00ff88;
+  /* Text — clean monochrome */
+  --text-primary:   #FFFFFF;
+  --text-secondary: #888888;
+  --text-dim:       #555555;
+  --text-dark:      #1a1714;
+  --text-dark-secondary: #4a443c;
+  --text-accent:    var(--brass);
 
+  /* Typography */
   --font-mono:      'JetBrains Mono', 'Courier New', monospace;
   --font-body:      'Inter', system-ui, -apple-system, sans-serif;
+  --font-heading:   'Outfit', sans-serif;
+  --font-document:  'Merriweather', 'Georgia', serif;
 
+  /* Spacing */
   --space-xs: 0.25rem;
   --space-sm: 0.5rem;
   --space-md: 1rem;
@@ -57,17 +78,20 @@
   --radius-sm: 2px;
   --radius-md: 3px;
 
+  /* Layout */
   --topbar-h: 48px;
   --bottomnav-h: 56px;
   --footer-h: 72px;
 }
 
 html, body {
-  height: 100%;
+  height: auto;
+  min-height: 100%;
   font-family: var(--font-body);
   background: var(--bg-void);
   color: var(--text-primary);
-  overflow: hidden;
+  overflow: auto;
+  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -100,74 +124,72 @@ body::after {
 .topbar__left { display: flex; align-items: center; gap: var(--space-sm); }
 .topbar__logo { color: var(--signal-live); font-size: 1.1rem; animation: pulse-glow 3s ease-in-out infinite; }
 .topbar__title { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.2em; color: var(--text-primary); }
-.topbar__version { font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.1em; }
-.topbar__center { display: flex; gap: var(--space-xl); }
+/* Mobile-first: compact topbar defaults */
+.topbar__version { display: none; }
+.topbar__center { display: flex; gap: var(--space-md); }
 .topbar__stat { display: flex; flex-direction: column; align-items: center; gap: 1px; }
-.topbar__stat-label { font-size: 0.55rem; color: var(--text-dim); letter-spacing: 0.15em; }
-.topbar__stat-value { font-size: 0.75rem; font-weight: 600; color: var(--signal-live); letter-spacing: 0.05em; }
+.topbar__stat-label { font-size: 0.4rem; color: var(--text-dim); letter-spacing: 0.15em; }
+.topbar__stat-value { font-size: 0.55rem; font-weight: 600; color: var(--signal-live); letter-spacing: 0.05em; }
 .topbar__right { display: flex; align-items: center; gap: var(--space-md); }
-.topbar__clock { font-size: 0.7rem; color: var(--text-secondary); letter-spacing: 0.1em; }
+.topbar__clock { font-size: 0.55rem; color: var(--text-secondary); letter-spacing: 0.1em; }
 .topbar__pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--signal-live); animation: pulse-dot 2s ease-in-out infinite; }
+.topbar__title { font-size: 0.55rem; font-weight: 700; letter-spacing: 0.08em; color: var(--text-primary); }
 
-/* ═══ COCKPIT LAYOUT ═══════════════════════════════════════════ */
+/* ═══ COCKPIT LAYOUT — Mobile-first (scrollable column) ══════ */
 .cockpit {
-  position: fixed;
-  top: var(--topbar-h);
-  left: 0; right: 0;
-  bottom: calc(var(--bottomnav-h) + var(--footer-h));
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr auto minmax(80px, 200px);
-  gap: 1px;
-  background: var(--border-dim);
-  overflow: hidden;
+  position: relative;
+  margin-top: var(--topbar-h);
+  margin-bottom: calc(var(--bottomnav-h) + var(--footer-h));
+  display: flex;
+  flex-direction: column;
+  overflow-y: visible;
+  overflow-x: hidden;
+  height: auto;
+  min-height: calc(100vh - var(--topbar-h) - var(--bottomnav-h) - var(--footer-h));
+  background: var(--bg-primary);
+  gap: 0;
 }
 
+/* Mobile-first: map hidden, feeds full-width */
 .cockpit__map {
-  grid-column: 1;
-  grid-row: 1;
+  display: none;
   background: var(--bg-primary);
-  display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
 .cockpit__feeds {
-  grid-column: 2;
-  grid-row: 1;
-  background: var(--bg-primary);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: visible;
+  width: 100%;
+  background: var(--bg-primary);
 }
 
 .cockpit__atmoscore {
   display: none;
-  grid-column: 1 / -1;
-  grid-row: 1;
+  width: 100%;
   background: var(--bg-primary);
   flex-direction: column;
   overflow: hidden;
 }
 
+/* Mobile-first: correlations hidden by default */
 .cockpit__corr {
-  grid-column: 1 / -1;
-  grid-row: 3;
+  display: none;
+  width: 100%;
   background: var(--bg-primary);
-  min-height: 80px;
-  max-height: 300px;
-  display: flex;
+  max-height: none;
+  min-height: 0;
   flex-direction: column;
-  overflow: hidden;
+  overflow: visible;
 }
 
-/* ── Resize Handle ──────────────────────────────────────────── */
+/* Mobile-first: resize handle hidden */
 .cockpit__resize-handle {
-  grid-column: 1 / -1;
-  grid-row: 2;
+  display: none;
   height: 8px;
   cursor: ns-resize;
-  display: flex;
   align-items: center;
   justify-content: center;
   background: var(--bg-primary);
@@ -190,36 +212,23 @@ body::after {
   opacity: 1; background: var(--signal-cyan);
 }
 
-/* ── View Switching ──────────────────────────────────────────── */
-.cockpit[data-view="cockpit"] .cockpit__map,
-.cockpit[data-view="cockpit"] .cockpit__feeds,
+/* ── Mobile-first View Switching ─────────────────────────────── */
+/* Default mobile: feeds visible, map/atmoscore/corr hidden */
+.cockpit[data-view="cockpit"] .cockpit__feeds { display: flex; }
 .cockpit[data-view="cockpit"] .cockpit__corr { display: flex; }
-.cockpit[data-view="cockpit"] .cockpit__resize-handle { display: flex; }
-.cockpit[data-view="cockpit"] .cockpit__atmoscore { display: none; }
 
-.cockpit[data-view="feeds"] .cockpit__feeds { display: flex; grid-column: 1 / -1; grid-row: 1 / -1; }
-.cockpit[data-view="feeds"] .cockpit__map { display: none; }
-.cockpit[data-view="feeds"] .cockpit__atmoscore { display: none; }
+.cockpit[data-view="feeds"] .cockpit__feeds { display: flex; flex: 1; }
 .cockpit[data-view="feeds"] .cockpit__corr { display: none; }
-.cockpit[data-view="feeds"] .cockpit__resize-handle { display: none; }
 
-.cockpit[data-view="atmoscore"] .cockpit__atmoscore { display: flex; grid-column: 1 / -1; grid-row: 1 / -1; }
-.cockpit[data-view="atmoscore"] .cockpit__map { display: none; }
+.cockpit[data-view="atmoscore"] .cockpit__atmoscore { display: flex; overflow: visible; }
 .cockpit[data-view="atmoscore"] .cockpit__feeds { display: none; }
 .cockpit[data-view="atmoscore"] .cockpit__corr { display: none; }
-.cockpit[data-view="atmoscore"] .cockpit__resize-handle { display: none; }
 
-.cockpit[data-view="correlations"] .cockpit__corr { display: flex; grid-column: 1 / -1; grid-row: 1; max-height: none; min-height: 0; flex: 1; overflow: hidden; }
-.cockpit[data-view="correlations"] .cockpit__map { display: none; }
+.cockpit[data-view="correlations"] .cockpit__corr { display: flex; max-height: none; overflow: visible; }
 .cockpit[data-view="correlations"] .cockpit__feeds { display: none; }
-.cockpit[data-view="correlations"] .cockpit__atmoscore { display: none; }
-.cockpit[data-view="correlations"] .cockpit__resize-handle { display: none; }
 
-.cockpit[data-view="map"] .cockpit__map { display: flex; grid-column: 1 / -1; }
 .cockpit[data-view="map"] .cockpit__feeds { display: none; }
 .cockpit[data-view="map"] .cockpit__corr { display: none; }
-.cockpit[data-view="map"] .cockpit__resize-handle { display: none; }
-.cockpit[data-view="map"] .cockpit__atmoscore { display: none; }
 
 /* ═══ PANEL HEADER ═══════════════════════════════════════════ */
 .panel-header {
@@ -529,11 +538,11 @@ body::after {
 }
 .feed-carousel__dot--active { background: var(--text-secondary); }
 
-/* ── Feed Card ───────────────────────────────────────────────── */
+/* ── Feed Card (mobile-first: compact) ───────────────────────── */
 .feed-card {
   flex-shrink: 0;
-  width: 220px;
-  min-height: 180px;
+  width: 180px;
+  min-height: 160px;
   background: var(--bg-tile);
   border: 1px solid var(--border-dim);
   border-left: 3px solid var(--border-mid);
@@ -545,24 +554,29 @@ body::after {
   overflow: hidden;
   position: relative;
 }
-.feed-card:hover { border-color: var(--border-active); background: var(--bg-hover); transform: translateY(-2px); }
-.feed-card--live { border-left-color: var(--signal-live); }
+.feed-card:hover {
+  border-color: var(--brass);
+  background: var(--bg-hover);
+  transform: perspective(800px) rotateX(-2deg) rotateY(3deg) translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+.feed-card--live { border-left-color: var(--brass); }
 .feed-card--stale { border-left-color: var(--signal-stale); }
 .feed-card--offline { border-left-color: var(--signal-offline); }
 
 .feed-card__image-wrap {
   position: relative;
-  height: 80px;
+  height: 65px;
   overflow: hidden;
 }
 .feed-card__image {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: brightness(0.35) saturate(0) contrast(1.1);
+  filter: sepia(0.1) brightness(0.4) saturate(0) contrast(1.1);
   transition: filter 0.4s ease;
 }
-.feed-card:hover .feed-card__image { filter: brightness(0.6) saturate(0.7) contrast(1); }
+.feed-card:hover .feed-card__image { filter: sepia(0) brightness(0.65) saturate(1) contrast(1.05); }
 
 .feed-card__image-overlay {
   position: absolute;
@@ -652,10 +666,12 @@ body::after {
 .feed-card__share:hover { color: var(--signal-cyan); border-color: var(--signal-cyan); }
 
 /* ═══ ATMOSCORE PANEL ═══════════════════════════════════════════ */
+/* Mobile-first: single column atmoscore */
 .atmoscore-layout {
   flex: 1;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr;
   gap: 1px;
   background: var(--border-dim);
   overflow: hidden;
@@ -874,7 +890,11 @@ body::after {
 }
 .modal__close:hover { color: var(--text-primary); border-color: var(--border-active); }
 
-.modal__body { padding: var(--space-lg); }
+.modal__body {
+  padding: var(--space-lg);
+  background: var(--bg-parchment);
+  color: var(--text-dark);
+}
 .modal__meta {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -1143,8 +1163,9 @@ body::after {
 .stat-tooltip__body strong { color: var(--text-primary); }
 
 /* ═══ MOBILE MAP PREVIEW ═════════════════════════════════════ */
+/* Mobile-first: map preview visible by default */
 .map-preview {
-  display: none; /* shown only on mobile */
+  display: block;
   position: relative;
   width: 100%;
   height: 38vh;
@@ -1178,8 +1199,9 @@ body::after {
 }
 
 /* ═══ LOCATION BAR ═══════════════════════════════════════════ */
+/* Mobile-first: location bar visible by default */
 .location-bar {
-  display: none; /* shown only on mobile */
+  display: flex;
   align-items: center;
   gap: var(--space-sm);
   padding: var(--space-sm) var(--space-md);
@@ -1341,117 +1363,124 @@ body::after {
 }
 .anim-bar__dot--active { background: var(--signal-cyan); }
 
-/* ═══ MOBILE RESPONSIVE ═══════════════════════════════════════ */
-@media (max-width: 768px) {
-  /* ── Topbar compact ─────────────────────────────── */
-  .topbar__center { display: flex; gap: var(--space-md); }
-  .topbar__stat-label { font-size: 0.4rem; }
-  .topbar__stat-value { font-size: 0.55rem; }
-  .topbar__title { font-size: 0.55rem; letter-spacing: 0.08em; }
-  .topbar__version { display: none; }
-  .topbar__clock { font-size: 0.55rem; }
+/* ═══ DESKTOP UPGRADE — min-width: 769px ══════════════════════ */
+@media (min-width: 769px) {
+  /* ── Topbar expands ──────────────────────────────── */
+  .topbar__version { display: inline; font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.1em; }
+  .topbar__center { gap: var(--space-xl); }
+  .topbar__stat-label { font-size: 0.55rem; }
+  .topbar__stat-value { font-size: 0.75rem; }
+  .topbar__title { font-size: 0.75rem; letter-spacing: 0.2em; }
+  .topbar__clock { font-size: 0.7rem; }
 
-  /* ── Mobile-only elements ───────────────────────── */
-  .map-preview { display: block; }
-  .location-bar { display: flex; }
+  /* ── Hide mobile-only elements ──────────────────── */
+  .map-preview { display: none; }
+  .location-bar { display: none; }
 
-  /* ── Cockpit = scrollable column ─────────────────── */
+  /* ── Cockpit = fixed two-column grid ────────────── */
   html, body {
-    overflow: auto;
-    overflow-x: hidden;
-    height: auto;
-    min-height: 100%;
+    overflow: hidden;
+    height: 100%;
   }
 
   .cockpit {
-    position: relative;
-    top: auto; left: auto; right: auto; bottom: auto;
-    margin-top: var(--topbar-h);
-    margin-bottom: calc(var(--bottomnav-h) + var(--footer-h));
-    display: flex;
-    flex-direction: column;
-    overflow-y: visible;
-    overflow-x: hidden;
+    position: fixed;
+    top: var(--topbar-h);
+    left: 0; right: 0;
+    bottom: calc(var(--bottomnav-h) + var(--footer-h));
+    margin-top: 0;
+    margin-bottom: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr auto minmax(80px, 200px);
+    gap: 1px;
+    background: var(--border-dim);
+    overflow: hidden;
     height: auto;
-    min-height: calc(100vh - var(--topbar-h) - var(--bottomnav-h) - var(--footer-h));
-    background: var(--bg-primary);
-    gap: 0;
+    min-height: 0;
   }
 
-  /* Hide desktop map + resize handle on mobile */
-  .cockpit__map { display: none !important; }
-  .cockpit__resize-handle { display: none !important; }
+  .cockpit__map {
+    display: flex;
+    grid-column: 1;
+    grid-row: 1;
+    overflow: hidden;
+  }
 
-  /* Feeds: full width column */
   .cockpit__feeds {
-    display: flex; flex-direction: column;
-    overflow: visible; width: 100%;
+    grid-column: 2;
+    grid-row: 1;
+    overflow: hidden;
+    width: auto;
   }
 
-  /* Ledger: full width, no height constraint */
   .cockpit__corr {
-    display: none; width: 100%;
-    max-height: none; min-height: 0;
-    overflow: visible;
+    display: flex;
+    grid-column: 1 / -1;
+    grid-row: 3;
+    min-height: 80px;
+    max-height: 300px;
+    overflow: hidden;
+    width: auto;
   }
 
-  /* AtmosCore: hidden by default */
-  .cockpit__atmoscore { display: none; width: 100%; }
+  .cockpit__atmoscore {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    width: auto;
+  }
 
-  /* ── View: Cockpit (feeds + ledger) ─────────────── */
+  .cockpit__resize-handle { display: flex; }
+
+  /* ── Desktop view switching ─────────────────────── */
+  .cockpit[data-view="cockpit"] .cockpit__map { display: flex; }
   .cockpit[data-view="cockpit"] .cockpit__feeds { display: flex; }
   .cockpit[data-view="cockpit"] .cockpit__corr { display: flex; }
+  .cockpit[data-view="cockpit"] .cockpit__resize-handle { display: flex; }
+  .cockpit[data-view="cockpit"] .cockpit__atmoscore { display: none; }
 
-  /* ── View: Feeds only ───────────────────────────── */
-  .cockpit[data-view="feeds"] .cockpit__feeds { display: flex; flex: 1; }
+  .cockpit[data-view="feeds"] .cockpit__feeds { display: flex; grid-column: 1 / -1; grid-row: 1 / -1; }
+  .cockpit[data-view="feeds"] .cockpit__map { display: none; }
+  .cockpit[data-view="feeds"] .cockpit__atmoscore { display: none; }
   .cockpit[data-view="feeds"] .cockpit__corr { display: none; }
+  .cockpit[data-view="feeds"] .cockpit__resize-handle { display: none; }
 
-  /* ── View: AtmosCore ────────────────────────────── */
-  .cockpit[data-view="atmoscore"] .cockpit__atmoscore {
-    display: flex; overflow: visible;
-  }
+  .cockpit[data-view="atmoscore"] .cockpit__atmoscore { display: flex; grid-column: 1 / -1; grid-row: 1 / -1; }
+  .cockpit[data-view="atmoscore"] .cockpit__map { display: none; }
   .cockpit[data-view="atmoscore"] .cockpit__feeds { display: none; }
   .cockpit[data-view="atmoscore"] .cockpit__corr { display: none; }
+  .cockpit[data-view="atmoscore"] .cockpit__resize-handle { display: none; }
 
-  /* ── View: Ledger only ──────────────────────────── */
-  .cockpit[data-view="correlations"] .cockpit__corr {
-    display: flex; max-height: none; overflow: visible;
-  }
+  .cockpit[data-view="correlations"] .cockpit__corr { display: flex; grid-column: 1 / -1; grid-row: 1; max-height: none; min-height: 0; flex: 1; overflow: hidden; }
+  .cockpit[data-view="correlations"] .cockpit__map { display: none; }
   .cockpit[data-view="correlations"] .cockpit__feeds { display: none; }
+  .cockpit[data-view="correlations"] .cockpit__atmoscore { display: none; }
+  .cockpit[data-view="correlations"] .cockpit__resize-handle { display: none; }
 
-  /* ── View: Map ──────────────────────────────────── */
+  .cockpit[data-view="map"] .cockpit__map { display: flex; grid-column: 1 / -1; }
   .cockpit[data-view="map"] .cockpit__feeds { display: none; }
   .cockpit[data-view="map"] .cockpit__corr { display: none; }
-  .cockpit[data-view="map"] .cockpit__map { display: none !important; }
+  .cockpit[data-view="map"] .cockpit__resize-handle { display: none; }
+  .cockpit[data-view="map"] .cockpit__atmoscore { display: none; }
 
-  /* ── AtmosCore single column ────────────────────── */
+  /* ── AtmosCore two columns ──────────────────────── */
   .atmoscore-layout {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr;
-  }
-  .atmoscore-ring-wrap { padding: var(--space-md); min-height: 250px; }
-
-  /* ── Feed cards ─────────────────────────────────── */
-  .feed-card { width: 180px; min-height: 160px; }
-  .feed-card__image-wrap { height: 65px; }
-
-  /* ── Domain carousel ────────────────────────────── */
-  .domain-carousel__track {
-    padding: 0 var(--space-sm);
-    -webkit-overflow-scrolling: touch;
+    grid-template-columns: 1fr 1fr;
   }
 
-  /* ── Ledger mobile ──────────────────────────────── */
-  .ledger-stream { max-height: none; overflow-y: visible; }
+  /* ── Feed cards wider ───────────────────────────── */
+  .feed-card { width: 220px; min-height: 180px; }
+  .feed-card__image-wrap { height: 80px; }
 
-  /* ── Panel headers compact ──────────────────────── */
-  .panel-header__title { font-size: 0.6rem; }
-  .panel-header__badge { font-size: 0.5rem; }
-
-  /* ── Bottom nav compact ─────────────────────────── */
-  .bottomnav__label { font-size: 0.45rem; }
+  /* ── Ledger scrollable ──────────────────────────── */
+  .ledger-stream { max-height: unset; overflow-y: auto; }
+  .ledger-event {
+    grid-template-columns: 60px 24px 1fr auto;
+    font-size: 0.65rem;
+  }
 }
 
+/* ═══ SMALL SCREENS — max-width: 480px ═══════════════════════ */
 @media (max-width: 480px) {
   .topbar__center { gap: var(--space-sm); }
   .topbar__stat-label { font-size: 0.35rem; }
@@ -1590,7 +1619,7 @@ body::after {
 
 .corr-detail-modal, .ledger-info-modal {
   background: var(--bg-secondary); border: 1px solid var(--border-dim);
-  border-radius: 6px; max-width: 520px; width: 90%; max-height: 80vh;
+  border-radius: 2px; max-width: 520px; width: 90%; max-height: 80vh;
   overflow-y: auto; font-family: var(--font-mono);
 }
 .corr-detail-modal__header, .ledger-info-modal__header {
