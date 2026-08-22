@@ -242,7 +242,7 @@ body::after {
   flex-shrink: 0;
 }
 
-.panel-header__icon { color: var(--signal-cyan); font-size: 0.8rem; }
+.panel-header__icon { color: var(--brass); font-size: 0.8rem; }
 .panel-header__title { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.15em; color: var(--text-secondary); }
 .panel-header__badge {
   margin-left: auto;
@@ -253,6 +253,21 @@ body::after {
   padding: 2px 6px;
   border: 1px solid var(--border-dim);
 }
+.panel-header__expand {
+  background: none;
+  border: 1px solid var(--border-dim);
+  color: var(--brass);
+  font-size: 0.85rem;
+  width: 26px;
+  height: 26px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: var(--space-sm);
+  transition: all 0.2s;
+}
+.panel-header__expand:hover { color: var(--text-primary); border-color: var(--brass); background: var(--brass-dim); }
 
 .refresh-btn {
   background: none; border: 1px solid var(--border-dim);

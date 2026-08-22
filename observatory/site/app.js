@@ -926,6 +926,16 @@ const Observatory = {
       this.toggleMapStyle();
     });
 
+    // Desktop map expand → fullscreen
+    document.getElementById('map-expand').addEventListener('click', () => {
+      this.openFullscreenMap();
+    });
+
+    // Fullscreen map style toggle
+    document.getElementById('fullscreen-style-toggle').addEventListener('click', () => {
+      this.toggleFullscreenMapStyle();
+    });
+
     // ── Cockpit resize handle (drag to resize map/ledger split) ──
     const resizeHandle = document.getElementById('cockpit-resize-handle');
     if (resizeHandle) {
@@ -1136,6 +1146,8 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
   // FULLSCREEN MAP — interactive with animation loop
   // ═══════════════════════════════════════════════════════════════
   fullscreenMap: null,
+  fsBaseLayer: null,
+  fsMapStyle: 'light',
   fsMapLayers: {},
   animFrames: [],
   animLayers: [],
@@ -1184,8 +1196,9 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
       zoomControl: true,
     });
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    this.fsBaseLayer = L.tileLayer(this.mapTiles[this.fsMapStyle], {
       maxZoom: 19,
+      subdomains: 'abcd',
     }).addTo(this.fullscreenMap);
 
     // Build FS layers
@@ -1229,6 +1242,20 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
     this._loadAnimationFrames();
 
     setTimeout(() => this.fullscreenMap.invalidateSize(), 200);
+  },
+
+  // ── Toggle Fullscreen Map Style ──────────────────────────────
+  toggleFullscreenMapStyle() {
+    if (!this.fullscreenMap) return;
+    this.fsMapStyle = this.fsMapStyle === 'light' ? 'dark' : 'light';
+    this.fullscreenMap.removeLayer(this.fsBaseLayer);
+    this.fsBaseLayer = L.tileLayer(this.mapTiles[this.fsMapStyle], {
+      maxZoom: 19,
+      subdomains: 'abcd',
+    }).addTo(this.fullscreenMap);
+    this.fsBaseLayer.bringToBack();
+    const btn = document.getElementById('fullscreen-style-toggle');
+    btn.textContent = this.fsMapStyle === 'light' ? '☀ LIGHT' : '🌙 DARK';
   },
 
   async _loadAnimationFrames() {
