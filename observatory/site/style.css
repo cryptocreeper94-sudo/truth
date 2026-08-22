@@ -913,8 +913,8 @@ body::after {
 
 .modal__body {
   padding: var(--space-lg);
-  background: var(--bg-parchment);
-  color: var(--text-dark);
+  background: var(--bg-primary);
+  color: var(--text-primary);
 }
 .modal__meta {
   display: grid;
@@ -923,16 +923,16 @@ body::after {
   margin-bottom: var(--space-lg);
 }
 .meta-item {
-  background: var(--bg-tile);
-  border: 1px solid var(--border-dim);
+  background: var(--bg-raised);
+  border: 1px solid var(--border-mid);
   padding: var(--space-sm);
 }
 .meta-item__label { font-family: var(--font-mono); font-size: 0.5rem; color: var(--text-dim); letter-spacing: 0.15em; margin-bottom: 2px; }
 .meta-item__value { font-family: var(--font-mono); font-size: 0.75rem; font-weight: 600; }
 
 .modal__sparkline-lg {
-  background: var(--bg-tile);
-  border: 1px solid var(--border-dim);
+  background: var(--bg-raised);
+  border: 1px solid var(--border-mid);
   padding: var(--space-md);
   margin-bottom: var(--space-lg);
   position: relative;
