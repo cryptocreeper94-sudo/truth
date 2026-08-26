@@ -768,19 +768,36 @@ async function main() {
   auditWrite('[38/PRE-STRUCTURE] Running initial research cycle...');
   await runCycle(client, state, budget, method);
 
-  // Schedule recurring cycles
+  // Schedule recurring cycles — wrapped in try/catch to prevent silent death
   setInterval(async () => {
-    const currentBudget = loadBudget();
-    if (currentBudget.spentCents / currentBudget.budgetCents >= CONFIG.pauseThreshold) {
-      auditWrite('[35/COLLAPSE] Budget paused. Waiting for cycle reset.');
-      return;
+    try {
+      const currentBudget = loadBudget();
+      if (currentBudget.spentCents / currentBudget.budgetCents >= CONFIG.pauseThreshold) {
+        auditWrite('[35/COLLAPSE] Budget paused. Waiting for cycle reset.');
+        return;
+      }
+      auditWrite('[38/PRE-STRUCTURE] Starting scheduled research cycle...');
+      await runCycle(client, state, currentBudget, method);
+    } catch (e) {
+      auditWrite(`[42/DEVOID] Scheduled cycle error (non-fatal, will retry next interval): ${e.message}`);
+      console.error(`[DAEMON] Cycle error:`, e);
     }
-    auditWrite('[38/PRE-STRUCTURE] Starting scheduled research cycle...');
-    await runCycle(client, state, currentBudget, method);
   }, CONFIG.cycleIntervalMs);
 }
 
-// [42] Devoid Limit — clean shutdown on unrecoverable error
+// [42] Devoid Limit — global safety nets
+process.on('unhandledRejection', (reason) => {
+  const msg = `[42/DEVOID] Unhandled rejection: ${reason}`;
+  try { auditWrite(msg); } catch (_) { console.error(msg); }
+  // Do NOT exit — keep the daemon alive
+});
+
+process.on('uncaughtException', (err) => {
+  const msg = `[42/DEVOID] Uncaught exception: ${err.message}`;
+  try { auditWrite(msg); } catch (_) { console.error(msg); }
+  // Do NOT exit — keep the daemon alive
+});
+
 main().catch(e => {
   const msg = `[42/DEVOID] Fatal: ${e.message}`;
   try { auditWrite(msg); } catch (_) { console.error(msg); }
