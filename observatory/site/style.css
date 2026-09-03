@@ -139,13 +139,13 @@ body::after {
 .cockpit {
   position: relative;
   margin-top: var(--topbar-h);
-  margin-bottom: calc(var(--bottomnav-h) + var(--footer-h));
+  margin-bottom: var(--bottomnav-h);
   display: flex;
   flex-direction: column;
   overflow-y: visible;
   overflow-x: hidden;
   height: auto;
-  min-height: calc(100vh - var(--topbar-h) - var(--bottomnav-h) - var(--footer-h));
+  min-height: calc(100vh - var(--topbar-h) - var(--bottomnav-h));
   background: var(--bg-primary);
   gap: 0;
 }
@@ -996,9 +996,9 @@ body::after {
 
 /* ═══ CANONICAL FOOTER ═══════════════════════════════════════ */
 .site-footer {
-  position: fixed;
-  left: 0; right: 0;
-  bottom: var(--bottomnav-h);
+  position: relative;
+  left: auto; right: auto;
+  bottom: auto;
   z-index: 50;
   background: var(--bg-primary);
   border-top: 1px solid var(--border-dim);
@@ -1419,6 +1419,12 @@ body::after {
     overflow: hidden;
     height: auto;
     min-height: 0;
+  }
+
+  .site-footer {
+    position: fixed;
+    left: 0; right: 0;
+    bottom: var(--bottomnav-h);
   }
 
   .cockpit__map {

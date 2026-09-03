@@ -115,10 +115,14 @@ const Observatory = {
   },
 
   // ── Map Init with Expanded Layers ────────────────────────────
-  mapStyle: 'light',
+  mapStyle: 'dark',
   mapTiles: {
-    light: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-    dark:  'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+    light: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    dark:  'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+  },
+  mapTileOpts: {
+    light: { maxZoom: 19, subdomains: 'abc' },
+    dark:  { maxZoom: 18 },
   },
 
   initMap() {
@@ -130,10 +134,9 @@ const Observatory = {
     });
 
     // Base layer — swappable light/dark
-    this.baseLayer = L.tileLayer(this.mapTiles[this.mapStyle], {
-      maxZoom: 19,
-      subdomains: 'abcd',
-    }).addTo(this.map);
+    this.baseLayer = L.tileLayer(this.mapTiles[this.mapStyle],
+      this.mapTileOpts[this.mapStyle]
+    ).addTo(this.map);
 
     // NOAA Radar
     this.mapLayers.radar = L.tileLayer.wms('https://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0q.cgi', {
@@ -199,10 +202,9 @@ const Observatory = {
   toggleMapStyle() {
     this.mapStyle = this.mapStyle === 'light' ? 'dark' : 'light';
     this.map.removeLayer(this.baseLayer);
-    this.baseLayer = L.tileLayer(this.mapTiles[this.mapStyle], {
-      maxZoom: 19,
-      subdomains: 'abcd',
-    }).addTo(this.map);
+    this.baseLayer = L.tileLayer(this.mapTiles[this.mapStyle],
+      this.mapTileOpts[this.mapStyle]
+    ).addTo(this.map);
     // Move base layer below overlays
     this.baseLayer.bringToBack();
     // Update button
@@ -1129,9 +1131,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
       keyboard: false,
     });
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-      maxZoom: 19,
-    }).addTo(this.previewMap);
+    L.tileLayer(this.mapTiles.dark, this.mapTileOpts.dark).addTo(this.previewMap);
 
     // Add radar overlay to preview
     this.previewRadar = L.tileLayer('https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913/{z}/{x}/{y}.png', {
@@ -1198,10 +1198,9 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
       zoomControl: true,
     });
 
-    this.fsBaseLayer = L.tileLayer(this.mapTiles[this.fsMapStyle], {
-      maxZoom: 19,
-      subdomains: 'abcd',
-    }).addTo(this.fullscreenMap);
+    this.fsBaseLayer = L.tileLayer(this.mapTiles[this.fsMapStyle],
+      this.mapTileOpts[this.fsMapStyle]
+    ).addTo(this.fullscreenMap);
 
     // Build FS layers
     this.fsMapLayers.radar = L.tileLayer('https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913/{z}/{x}/{y}.png', {
@@ -1251,10 +1250,9 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
     if (!this.fullscreenMap) return;
     this.fsMapStyle = this.fsMapStyle === 'light' ? 'dark' : 'light';
     this.fullscreenMap.removeLayer(this.fsBaseLayer);
-    this.fsBaseLayer = L.tileLayer(this.mapTiles[this.fsMapStyle], {
-      maxZoom: 19,
-      subdomains: 'abcd',
-    }).addTo(this.fullscreenMap);
+    this.fsBaseLayer = L.tileLayer(this.mapTiles[this.fsMapStyle],
+      this.mapTileOpts[this.fsMapStyle]
+    ).addTo(this.fullscreenMap);
     this.fsBaseLayer.bringToBack();
     const btn = document.getElementById('fullscreen-style-toggle');
     btn.textContent = this.fsMapStyle === 'light' ? '☀ LIGHT' : '🌙 DARK';
