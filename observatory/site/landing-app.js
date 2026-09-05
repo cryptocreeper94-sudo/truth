@@ -154,7 +154,7 @@
   });
 
   // ── Live Feed Metrics on Cards ────────────────────────────
-  const FEEDS_API = 'https://observatory-sentinel.tlid.io/api/feeds';
+  const FEEDS_API = '/api/feeds';
 
   // Map card data-stream IDs → server feed IDs (where they differ)
   const FEED_ID_MAP = {
@@ -234,8 +234,8 @@
   setInterval(fetchFeedMetrics, 60000);
 
   // ── Correlation Engine — Pattern Fetcher ──────────────────
-  const CORRELATION_API = 'https://observatory-sentinel.tlid.io/api/correlations';
-  const EVENTS_API = 'https://observatory-sentinel.tlid.io/api/events';
+  const CORRELATION_API = '/api/correlations';
+  const EVENTS_API = '/api/events';
 
   async function fetchCorrelations() {
     try {
