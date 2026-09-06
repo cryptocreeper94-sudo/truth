@@ -206,6 +206,9 @@ const FEEDS = [
   { id: 'metals',     manifest: 'trace-metals-manifest.jsonl', name: 'Trace Metals',        domain: 'Ecological',     icon: '⬡', interval: 86400000 },
   { id: 'ecology',    manifest: 'ecology-manifest.jsonl',      name: 'Pollinator Index',    domain: 'Ecological',     icon: '❀', interval: 86400000 },
   { id: 'deposition', manifest: 'deposition-manifest.jsonl',   name: 'Atmo. Deposition',    domain: 'Ecological',     icon: '◌', interval: 86400000 },
+  // Stage 4
+  { id: 'wildfire',   manifest: 'wildfire-manifest.jsonl',    name: 'Wildfires (NIFC)',    domain: 'Ecological',     icon: '🔥', interval: 1800000 },
+  { id: 'volcanic',   manifest: 'volcanic-manifest.jsonl',    name: 'Volcanic Activity',   domain: 'Geological',     icon: '🌋', interval: 3600000 },
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -807,6 +810,38 @@ const server = createServer(async (req, res) => {
       }
     } catch {}
     return jsonResponse(res, 200, { timestamp: new Date().toISOString(), count: 0, stations: [] });
+  }
+
+  // ── Geo API: Wildfires ──────────────────────────────────────────────
+  if (path === '/api/geo/wildfires') {
+    try {
+      const rawDir = join(STATE_DIR, 'raw', 'wildfire');
+      if (existsSync(rawDir)) {
+        const files = readdirSync(rawDir).filter(f => f.endsWith('.json')).sort().reverse();
+        if (files.length > 0) {
+          const data = JSON.parse(readFileSync(join(rawDir, files[0]), 'utf-8'));
+          return jsonResponse(res, 200, { timestamp: new Date().toISOString(), count: (data.fires || []).length, fires: data.fires || [] });
+        }
+      }
+    } catch {}
+    return jsonResponse(res, 200, { timestamp: new Date().toISOString(), count: 0, fires: [] });
+  }
+
+  // ── Geo API: Volcanoes ──────────────────────────────────────────────
+  if (path === '/api/geo/volcanoes') {
+    try {
+      const rawDir = join(STATE_DIR, 'raw', 'volcanic');
+      if (existsSync(rawDir)) {
+        const files = readdirSync(rawDir).filter(f => f.endsWith('.json')).sort().reverse();
+        if (files.length > 0) {
+          const data = JSON.parse(readFileSync(join(rawDir, files[0]), 'utf-8'));
+          // Only return elevated volcanoes for map markers (not all 160+)
+          const elevated = (data.volcanoes || []).filter(v => v.alertLevel && v.alertLevel !== 'NORMAL' && v.alertLevel !== 'UNASSIGNED');
+          return jsonResponse(res, 200, { timestamp: new Date().toISOString(), count: elevated.length, total: (data.volcanoes || []).length, volcanoes: elevated });
+        }
+      }
+    } catch {}
+    return jsonResponse(res, 200, { timestamp: new Date().toISOString(), count: 0, total: 0, volcanoes: [] });
   }
 
   // ── Protected Page Routes ───────────────────────────────────────────

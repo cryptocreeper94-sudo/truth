@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Truth Observatory — About</title>
-  <meta name="description" content="Truth Observatory: 18-stream deterministic multi-domain observation platform. Electromagnetic, atmospheric, infrastructure, and ecological data — cross-correlated and anchored to the Trust Layer.">
+  <meta name="description" content="Truth Observatory: 20-stream deterministic multi-domain observation platform. Electromagnetic, atmospheric, infrastructure, and ecological data — cross-correlated and anchored to the Trust Layer.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔭</text></svg>">
@@ -266,22 +266,78 @@
       <h1 class="hero__title">Truth Observatory</h1>
       <div class="hero__sub">Deterministic Multi-Domain Observation</div>
       <p class="hero__desc">
-        18 independent data streams across electromagnetic, atmospheric, infrastructure, and ecological domains. Zero editorialization. Every observation timestamped, source-attributed, hash-verified, and anchored to the Trust Layer. We don't tell you what to think — we show you what the instruments are reading.
+        20 independent data streams across electromagnetic, atmospheric, infrastructure, ecological, and geophysical domains. Zero editorialization. Every observation timestamped, source-attributed, hash-verified, and anchored to the Trust Layer. We don't tell you what to think — we show you what the instruments are reading.
       </p>
     </div>
+
+    <!-- ═══ GETTING STARTED ═══ -->
+    <section class="section">
+      <div class="section__label">00 — Getting Started</div>
+      <h2 class="section__title">How to Use This Thing</h2>
+      <p>
+        If you just got here, here's what you need to know. This isn't a weather app. It's a multi-domain observation platform. Think of it as 20 different scientific instruments all feeding into one dashboard — and the dashboard is watching for moments when those instruments say the same thing at the same time.
+      </p>
+
+      <div class="guarantee">
+        <div class="guarantee__title">⚡ The Cockpit</div>
+        <div class="guarantee__text">
+          This is your main view. Left side: the map with toggleable layers — radar, satellite, infrared, water vapor, precipitation, active fires, ionospheric heaters, live aircraft tracking, wildfires, and volcanic activity. Right side: the 20 data feed cards organized by domain. Each card shows what the feed is reading right now, when it last updated, and whether it's live, stale, or offline. Click any card to drill into the raw data and integrity hashes.
+        </div>
+      </div>
+
+      <div class="guarantee">
+        <div class="guarantee__title">🗺️ The Map</div>
+        <div class="guarantee__text">
+          Toggle layers on and off with the checkboxes above the map. You can stack them — radar over satellite over infrared is a common combo. Earthquake markers show real-time USGS seismic activity. Pink pulsing dots are ionospheric research facilities (HAARP, EISCAT, Sura, etc.). If you're a subscriber, you can toggle live ADS-B aircraft tracking. Hit the expand button (⛶) for fullscreen, or tap "LOOP" to watch an animated radar playback.
+        </div>
+      </div>
+
+      <div class="guarantee">
+        <div class="guarantee__title">📊 The Feeds</div>
+        <div class="guarantee__text">
+          Feeds are grouped by domain: Electromagnetic (solar, geomagnetic, ionospheric, Schumann), Atmospheric (radar, satellite, surface stations, deposition), Infrastructure (power grid, cell towers, aircraft, NOTAMs), and Ecological (pollinator index, trace metals, deposition chemistry). Each feed pulls directly from public government and scientific APIs — NOAA, USGS, FAA, EPA, EIA. Nothing is generated or estimated.
+        </div>
+      </div>
+
+      <div class="guarantee">
+        <div class="guarantee__title">🔗 Correlations</div>
+        <div class="guarantee__text">
+          This is where it gets interesting. The system builds statistical baselines for every feed — it learns what "normal" looks like hour by hour. When a feed deviates from its baseline by more than 2 standard deviations, it flags it. When <em>multiple</em> feeds across <em>different domains</em> deviate at the same time, that's a cross-domain correlation. Solar flare → geomagnetic spike → ionospheric disturbance → power grid anomaly. Four domains, one chain of events. <strong>But here's the rule: every correlation comes with a skeptic note that's scored higher than the anomalous interpretation.</strong> Coincidence is always the default verdict. We show you the pattern — you decide what it means.
+        </div>
+      </div>
+
+      <div class="guarantee">
+        <div class="guarantee__title">📋 The Event Explorer</div>
+        <div class="guarantee__text">
+          Every observation, every data gap, every deviation, every correlation — it all flows into the Event Ledger. The Explorer lets you search, filter, and browse the full history. You can filter by feed, event type, severity, and time range. Everything is hash-verified and traceable back to its original source.
+        </div>
+      </div>
+
+      <div class="guarantee">
+        <div class="guarantee__title">⬇️ Export Your Data</div>
+        <div class="guarantee__text">
+          In the cockpit, hit the "EXPORT" button in the top bar to download a CSV report. You choose what to include — feed data, AtmosCore state, correlations, event ledger, daily digests. It's your data. Take it, analyze it, share it. That's the point.
+        </div>
+      </div>
+
+      <p>
+        The bottom line: this platform doesn't tell you what to think. It shows you what the instruments are reading, flags when multiple instruments agree something unusual is happening, and then reminds you that coincidence is statistically expected. Everything else is up to you.
+      </p>
+    </section>
 
     <!-- ═══ WHAT IT IS ═══ -->
     <section class="section">
       <div class="section__label">01 — The Platform</div>
       <h2 class="section__title">What Observatory Does</h2>
       <p>
-        Truth Observatory is a <strong>real-time multi-domain observation platform</strong> that collects data from 18 public government and scientific data sources spanning four domains:
+        Truth Observatory is a <strong>real-time multi-domain observation platform</strong> that collects data from 20 public government and scientific data sources spanning five domains:
       </p>
       <p>
         <strong>Electromagnetic</strong> — solar flux, geomagnetic indices, ionospheric TEC, Schumann resonance, ionospheric heater schedules.<br>
         <strong>Atmospheric</strong> — NEXRAD radar, GOES satellite imagery, surface stations, deposition chemistry, precipitation.<br>
         <strong>Infrastructure</strong> — power grid demand (EIA-930), cell tower registries (FCC ASR), aircraft tracking (ADS-B), NOTAMs.<br>
-        <strong>Ecological</strong> — pollinator observation indices, trace metals in waterways, atmospheric deposition monitoring.
+        <strong>Ecological</strong> — pollinator observation indices, trace metals in waterways, atmospheric deposition monitoring, active wildfire incidents (NIFC).<br>
+        <strong>Geophysical</strong> — USGS seismic activity, USGS volcanic activity monitoring (alert levels, aviation color codes, threat assessments).
       </p>
       <p>
         The platform models statistical baselines for each stream, detects deviations from normal, and cross-correlates anomalies <strong>across all domains</strong>. Solar flare → geomagnetic spike → ionospheric disturbance → grid demand anomaly — four domains, one observable chain. That's the 10-mile-high view, built from the bottom up.
@@ -305,7 +361,7 @@
           <span class="pipeline__num">01</span>
           <div>
             <div class="pipeline__label">COLLECTORS</div>
-            <div class="pipeline__desc">18 independent Node.js processes pull data from public APIs on continuous loops. Each collector writes an append-only NDJSON manifest with SHA-256 hashes, timestamps, and source attribution.</div>
+            <div class="pipeline__desc">20 independent Node.js processes pull data from public APIs on continuous loops. Each collector writes an append-only NDJSON manifest with SHA-256 hashes, timestamps, and source attribution.</div>
           </div>
         </div>
         <div class="pipeline__step">
@@ -356,7 +412,7 @@
     <!-- ═══ DATA SOURCES ═══ -->
     <section class="section">
       <div class="section__label">03 — Data Sources</div>
-      <h2 class="section__title">18 Independent Feeds</h2>
+      <h2 class="section__title">20 Independent Feeds</h2>
       <p>Every feed pulls from a public, freely accessible source. No API keys, no paywalls, no proprietary data.</p>
 
       <div class="feed-grid">
@@ -378,6 +434,8 @@
         <div class="feed-item"><span class="feed-item__icon">⬡</span><div><div class="feed-item__name">Trace Metals</div><div class="feed-item__source">USGS NWIS</div></div></div>
         <div class="feed-item"><span class="feed-item__icon">❀</span><div><div class="feed-item__name">Pollinator Index</div><div class="feed-item__source">iNaturalist</div></div></div>
         <div class="feed-item"><span class="feed-item__icon">◌</span><div><div class="feed-item__name">Atmo. Deposition</div><div class="feed-item__source">NADP / CoCoRaHS</div></div></div>
+        <div class="feed-item"><span class="feed-item__icon">🔥</span><div><div class="feed-item__name">Wildfires (NIFC)</div><div class="feed-item__source">NIFC / IRWIN / ESRI</div></div></div>
+        <div class="feed-item"><span class="feed-item__icon">🌋</span><div><div class="feed-item__name">Volcanic Activity</div><div class="feed-item__source">USGS VHP</div></div></div>
       </div>
     </section>
 
@@ -386,7 +444,7 @@
       <div class="section__label">04 — The Model</div>
       <h2 class="section__title">AtmosCore 4/42</h2>
       <p>
-        AtmosCore is the composite state engine that distills all 18 feeds into a single observation suitability score. It computes four physical primitives, each derived from a subset of feeds:
+        AtmosCore is the composite state engine that distills all 20 feeds into a single observation suitability score. It computes four physical primitives, each derived from a subset of feeds:
       </p>
 
       <div class="primitives">
@@ -493,7 +551,7 @@
       <div class="api-block">
         <span class="api-block__method">GET</span>
         <span class="api-block__url">/api/feeds</span>
-        <div class="api-block__desc">All 18 feeds with live/stale/offline status, entry counts, last update timestamps, and 24-hour sparkline data.</div>
+        <div class="api-block__desc">All 20 feeds with live/stale/offline status, entry counts, last update timestamps, and 24-hour sparkline data.</div>
       </div>
       <div class="api-block">
         <span class="api-block__method">GET</span>
@@ -522,7 +580,7 @@
       <div class="section__label">08 — Investment</div>
       <h2 class="section__title">For Partners & Investors</h2>
       <p>
-        Observatory currently runs on a <strong>$8/month</strong> Hetzner VPS. The entire platform — 18 collectors, the correlation engine, the API server, and the dashboard — operates within this budget using exclusively free public data sources.
+        Observatory currently runs on a <strong>$8/month</strong> Hetzner VPS. The entire platform — 20 collectors, the correlation engine, the API server, and the dashboard — operates within this budget using exclusively free public data sources.
       </p>
       <p>
         <strong>What funding enables:</strong>

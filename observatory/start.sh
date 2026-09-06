@@ -98,7 +98,13 @@ run_collector "ECOLOGY"     "$SCRIPT_DIR/collectors/pollinator-ecology.mjs"    &
 sleep 2
 run_collector "DEPOSITION"  "$SCRIPT_DIR/collectors/atmospheric-deposition.mjs" &
 
-echo "[SUPERVISOR] All collectors launched (18 total — 9 Stage 1+2 + 9 Stage 3)."
+# Stage 4 — Geophysical + Hazard expansion
+sleep 2
+run_collector "WILDFIRE"   "$SCRIPT_DIR/collectors/wildfire-nifc.mjs"            &
+sleep 2
+run_collector "VOLCANIC"   "$SCRIPT_DIR/collectors/volcanic-usgs.mjs"            &
+
+echo "[SUPERVISOR] All collectors launched (20 total — 9 Stage 1+2 + 9 Stage 3 + 2 Stage 4)."
 
 # ── API Server (serves dashboard + REST API) ────────────────────────────────
 echo "[SUPERVISOR] Starting API server on port ${PORT:-3000}..."

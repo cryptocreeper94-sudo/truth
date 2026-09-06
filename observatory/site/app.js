@@ -88,6 +88,16 @@ const Observatory = {
       info: { source: 'ADS-B Exchange via RapidAPI', what: 'Live aircraft transponder positions within 500nm of CONUS center. Shows flight, altitude, speed, and heading.', update: 'Every 5 minutes', attribution: 'ADS-B Exchange' },
       legend: { type: 'dots', heading: 'AIRCRAFT (ADS-B)', items: [{ color: '#4ecbff', label: 'Tracked Aircraft' }] },
     },
+    wildfires: {
+      name: 'Active Wildfires',
+      info: { source: 'NIFC / IRWIN via ESRI ArcGIS', what: 'Active wildfire incidents across the US from the National Interagency Fire Center. Shows fire name, acreage, containment, and cause.', update: 'Every 30 minutes', attribution: 'NIFC / IRWIN' },
+      legend: { type: 'dots', heading: 'WILDFIRES (NIFC)', items: [{ color: '#ff5722', label: '>10,000 acres' }, { color: '#ff9800', label: '1,000-10,000' }, { color: '#ffc107', label: '<1,000 acres' }] },
+    },
+    volcanoes: {
+      name: 'Volcanic Activity',
+      info: { source: 'USGS Volcano Hazards Program', what: 'US volcanoes with elevated alert levels (ADVISORY, WATCH, or WARNING). Shows alert level, aviation color code, and threat assessment.', update: 'Every hour', attribution: 'USGS VHP' },
+      legend: { type: 'dots', heading: 'VOLCANIC ACTIVITY', items: [{ color: '#f44336', label: 'WARNING' }, { color: '#ff9800', label: 'WATCH' }, { color: '#ffeb3b', label: 'ADVISORY' }] },
+    },
   },
 
   // ── State ────────────────────────────────────────────────────
@@ -95,7 +105,7 @@ const Observatory = {
   correlations: [],
   map: null,
   mapLayers: {},
-  markers: { earthquakes: [], lightning: [], heaters: [], aircraft: [], fire: [] },
+  markers: { earthquakes: [], lightning: [], heaters: [], aircraft: [], fire: [], wildfires: [], volcanoes: [] },
   refreshInterval: 60000,
 
   // ── Init ─────────────────────────────────────────────────────
@@ -186,6 +196,8 @@ const Observatory = {
     this.mapLayers.heaters = L.layerGroup();
     this.mapLayers.heaters.addTo(this.map);
     this.mapLayers.aircraft = L.layerGroup();
+    this.mapLayers.wildfires = L.layerGroup();
+    this.mapLayers.volcanoes = L.layerGroup();
 
     // Default: show radar + heaters
     this.mapLayers.radar.addTo(this.map);
@@ -193,6 +205,8 @@ const Observatory = {
     // Load geo marker data
     this.loadHeaterMarkers();
     this.loadAircraftMarkers();
+    this.loadWildfireMarkers();
+    this.loadVolcanoMarkers();
 
     this.updateLayerCount();
     this.updateDynamicLegend();
@@ -986,6 +1000,79 @@ const Observatory = {
       this.updateLayerCount();
       this.updateDynamicLegend();
     } catch (e) { console.warn('[Observatory] Aircraft load failed:', e.message); }
+  },
+
+  // ── Wildfire Markers ────────────────────────────────────────
+  async loadWildfireMarkers() {
+    try {
+      const res = await fetch('/api/geo/wildfires');
+      const data = await res.json();
+      this.markers.wildfires.forEach(m => this.mapLayers.wildfires.removeLayer(m));
+      this.markers.wildfires = [];
+      (data.fires || []).forEach(f => {
+        if (!f.lat || !f.lon) return;
+        const acres = f.acres || 0;
+        const color = acres > 10000 ? '#ff5722' : acres > 1000 ? '#ff9800' : '#ffc107';
+        const radius = Math.min(12, Math.max(4, Math.log10(acres + 1) * 3));
+        const marker = L.circleMarker([f.lat, f.lon], {
+          radius, color, fillColor: color, fillOpacity: 0.35, weight: 2,
+        });
+        marker.bindPopup(`
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#e8e8f0;background:#0a0a0e;padding:10px;border:1px solid #ff572233;border-radius:2px;min-width:180px;">
+            <div style="color:#ff5722;font-weight:700;font-size:13px;margin-bottom:4px;">🔥 ${f.name}</div>
+            <div style="color:#aaa;margin-bottom:2px;">${f.state || 'Unknown location'}</div>
+            <div style="color:#888;font-size:9px;">Acres: ${acres.toLocaleString()}</div>
+            <div style="color:#888;font-size:9px;">Contained: ${f.contained != null ? f.contained + '%' : 'N/A'}</div>
+            <div style="color:#888;font-size:9px;">Cause: ${f.cause || 'Under Investigation'}</div>
+            ${f.personnel ? '<div style="color:#555;font-size:9px;">Personnel: ' + f.personnel.toLocaleString() + '</div>' : ''}
+            ${f.residences_destroyed ? '<div style="color:#f44;font-size:9px;">Residences Destroyed: ' + f.residences_destroyed + '</div>' : ''}
+          </div>
+        `, { className: 'obs-popup' });
+        this.mapLayers.wildfires.addLayer(marker);
+        this.markers.wildfires.push(marker);
+      });
+      if (data.count > 0) console.log(`[Observatory] Plotted ${data.count} wildfires`);
+      this.updateLayerCount();
+      this.updateDynamicLegend();
+    } catch (e) { console.warn('[Observatory] Wildfire load failed:', e.message); }
+  },
+
+  // ── Volcano Markers ─────────────────────────────────────────
+  async loadVolcanoMarkers() {
+    try {
+      const res = await fetch('/api/geo/volcanoes');
+      const data = await res.json();
+      this.markers.volcanoes.forEach(m => this.mapLayers.volcanoes.removeLayer(m));
+      this.markers.volcanoes = [];
+      (data.volcanoes || []).forEach(v => {
+        if (!v.lat || !v.lon) return;
+        const colorMap = { WARNING: '#f44336', WATCH: '#ff9800', ADVISORY: '#ffeb3b' };
+        const color = colorMap[v.alertLevel] || '#e040fb';
+        const marker = L.circleMarker([v.lat, v.lon], {
+          radius: 9, color, fillColor: color, fillOpacity: 0.35, weight: 2,
+        });
+        // Triangle-like outer marker for visibility
+        const ring = L.circleMarker([v.lat, v.lon], {
+          radius: 16, color, fillColor: 'transparent', fillOpacity: 0, weight: 1, opacity: 0.5,
+        });
+        marker.bindPopup(`
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#e8e8f0;background:#0a0a0e;padding:10px;border:1px solid ${color}33;border-radius:2px;min-width:180px;">
+            <div style="color:${color};font-weight:700;font-size:13px;margin-bottom:4px;">🌋 ${v.name}</div>
+            <div style="color:#aaa;margin-bottom:2px;">${v.region || ''}</div>
+            <div style="color:#888;font-size:9px;">Alert: ${v.alertLevel} / ${v.colorCode}</div>
+            <div style="color:#888;font-size:9px;">Threat: ${v.threatLevel || 'Unknown'}</div>
+            ${v.synopsis ? '<div style="color:#aaa;font-size:9px;margin-top:4px;border-top:1px solid #333;padding-top:4px;">' + v.synopsis + '</div>' : ''}
+          </div>
+        `, { className: 'obs-popup' });
+        this.mapLayers.volcanoes.addLayer(ring);
+        this.mapLayers.volcanoes.addLayer(marker);
+        this.markers.volcanoes.push(ring);
+        this.markers.volcanoes.push(marker);
+      });
+      if (data.count > 0) console.log(`[Observatory] Plotted ${data.count} elevated volcanoes (${data.total} monitored)`);
+      this.updateLayerCount();
+      this.updateDynamicLegend();
+    } catch (e) { console.warn('[Observatory] Volcano load failed:', e.message); }
   },
 
   // ── Bind Events ──────────────────────────────────────────────
