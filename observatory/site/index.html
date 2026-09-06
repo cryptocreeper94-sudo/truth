@@ -557,19 +557,9 @@
   <script src="landing-app.js"></script>
   <script src="live.js"></script>
   <script>
-    // Subscribe handler
-    window.__subscribe = async function() {
-      const btn = document.getElementById('subscribe-cta');
-      if (btn) btn.textContent = 'Redirecting...';
-      try {
-        const res = await fetch('/api/subscribe', { method: 'POST' });
-        const data = await res.json();
-        if (data.url) window.location.href = data.url;
-        else alert('Subscription is not available right now.');
-      } catch (err) {
-        alert('Connection error. Please try again.');
-        if (btn) btn.textContent = '🔒 SUBSCRIBE — $4.99/MO';
-      }
+    // Subscribe handler — direct Stripe Payment Link (no server needed)
+    window.__subscribe = function() {
+      window.location.href = 'https://buy.stripe.com/bJe8wR4Zq2vM83Z3vTfEk00';
     };
 
     // Handle redirect from protected pages
@@ -578,13 +568,10 @@
       if (params.get('upgrade') === '1') {
         const banner = document.createElement('div');
         banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:linear-gradient(135deg,#d4a054,#e0b06a);color:#1a1714;text-align:center;padding:1rem;font-family:var(--font-mono);font-size:0.8rem;font-weight:600;letter-spacing:0.05em;cursor:pointer;';
-        banner.textContent = '🔒 This area requires a subscription. Click here to subscribe — $4.99/mo';
+        banner.textContent = '\ud83d\udd12 This area requires a subscription. Click here to subscribe \u2014 $4.99/mo';
         banner.onclick = window.__subscribe;
         document.body.prepend(banner);
         setTimeout(() => banner.remove(), 10000);
-      }
-      if (params.get('cancelled') === '1') {
-        console.log('[Observatory] Checkout cancelled');
       }
     })();
   </script>
