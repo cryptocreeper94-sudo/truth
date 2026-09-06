@@ -34,6 +34,8 @@ const Observatory = {
     metals: 'assets/metals.jpg',
     ecology: 'assets/ecology.jpg',
     deposition: 'assets/deposition.jpg',
+    wildfire: 'assets/wildfire.jpg',
+    volcanic: 'assets/volcanic.jpg',
   },
 
   // ── Domain Config ────────────────────────────────────────────
