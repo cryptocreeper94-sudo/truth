@@ -34,6 +34,7 @@ let pool = null;
 const STRIPE_PRICE_ID = process.env.STRIPE_PRICE_ID || '';
 const SITE_URL = process.env.SITE_URL || 'https://observatory.tlid.io';
 const SESSION_SECRET = process.env.SESSION_SECRET || 'dev-secret-change-me';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '';
 const PK_KEY = process.env.STRIPE_PUBLISHABLE_KEY || '';
 
 // Load Stripe (optional — server starts without it)
@@ -612,6 +613,22 @@ const server = createServer(async (req, res) => {
     return res.end(JSON.stringify({ status: 'ok', timestamp: new Date().toISOString(), feeds: FEEDS.length, billing: !!STRIPE_PRICE_ID }));
   }
 
+  // ── Dev Auth — validates admin password, sets bypass cookie ──────────
+  if (path === '/api/dev-auth' && req.method === 'POST') {
+    if (!ADMIN_PASSWORD) return jsonResponse(res, 403, { error: 'Admin access not configured' });
+    try {
+      const { password } = JSON.parse(body);
+      if (password === ADMIN_PASSWORD) {
+        res.writeHead(200, {
+          'Content-Type': 'application/json',
+          'Set-Cookie': `obs_dev_bypass=${ADMIN_PASSWORD}; Path=/; Max-Age=31536000; SameSite=Lax; HttpOnly`,
+        });
+        return res.end(JSON.stringify({ ok: true }));
+      }
+      return jsonResponse(res, 401, { error: 'Invalid code' });
+    } catch { return jsonResponse(res, 400, { error: 'Bad request' }); }
+  }
+
   if (path === '/api/feeds') {
     const statuses = FEEDS.map(getFeedStatus);
     const live = statuses.filter(s => s.status === 'live').length;
@@ -743,7 +760,7 @@ const server = createServer(async (req, res) => {
   if (path === '/api/geo/aircraft') {
     // Subscriber-only
     const cookies = parseCookies(req);
-    const devBypass = cookies.obs_dev_bypass === 'darkwave42';
+    const devBypass = ADMIN_PASSWORD && cookies.obs_dev_bypass === ADMIN_PASSWORD;
     if (!devBypass) {
       const subscriber = await getSubscriberFromRequest(req);
       if (!isSubscribed(subscriber)) return jsonResponse(res, 401, { error: 'Subscription required' });
@@ -797,7 +814,7 @@ const server = createServer(async (req, res) => {
   if (PREMIUM_PAGES.some(p => path === p || path.startsWith(p + '?'))) {
     // Dev bypass: obs_dev_bypass cookie skips subscription check
     const cookies = parseCookies(req);
-    const devBypass = cookies.obs_dev_bypass === 'darkwave42';
+    const devBypass = ADMIN_PASSWORD && cookies.obs_dev_bypass === ADMIN_PASSWORD;
     if (!devBypass) {
       const subscriber = await getSubscriberFromRequest(req);
       if (!isSubscribed(subscriber)) {

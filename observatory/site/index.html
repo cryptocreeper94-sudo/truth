@@ -642,16 +642,22 @@
       });
     })();
 
-    function __devBypassSubmit() {
+    async function __devBypassSubmit() {
       const pin = document.getElementById('dev-pin').value;
-      if (pin === 'darkwave42') {
-        document.cookie = 'obs_dev_bypass=darkwave42;path=/;max-age=31536000;SameSite=Lax';
-        document.getElementById('dev-bypass-modal').style.display = 'none';
-        window.location.href = '/cockpit';
-      } else {
-        const err = document.getElementById('dev-pin-error');
-        err.textContent = 'INVALID CODE'; err.style.display = 'block';
-        document.getElementById('dev-pin').value = '';
+      const err = document.getElementById('dev-pin-error');
+      err.style.display = 'none';
+      try {
+        const res = await fetch('/api/dev-auth', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: pin }) });
+        const data = await res.json();
+        if (data.ok) {
+          document.getElementById('dev-bypass-modal').style.display = 'none';
+          window.location.href = '/cockpit';
+        } else {
+          err.textContent = data.error || 'INVALID CODE'; err.style.display = 'block';
+          document.getElementById('dev-pin').value = '';
+        }
+      } catch (e) {
+        err.textContent = 'CONNECTION ERROR'; err.style.display = 'block';
       }
     }
     // Enter key support
