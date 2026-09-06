@@ -64,7 +64,10 @@
           The system watches. The data decides.
         </p>
         <div class="hero__divider"></div>
-        <a href="/cockpit" class="hero__cta">ENTER COCKPIT ⟶</a>
+        <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:center;">
+          <a href="/cockpit" class="hero__cta">ENTER COCKPIT ⟶</a>
+          <button id="subscribe-cta" class="hero__cta" style="background:transparent;border:2px solid #d4a054;color:#d4a054;cursor:pointer;" onclick="window.__subscribe()">🔒 SUBSCRIBE — $4.99/MO</button>
+        </div>
       </div>
     </section>
 
@@ -489,6 +492,29 @@
       </div>
     </section>
 
+    <!-- ── Pricing Section ─────────────────────────────────────── -->
+    <section class="pricing" id="pricing" style="padding:var(--space-2xl) var(--space-md);max-width:680px;margin:0 auto;text-align:center;">
+      <p style="font-family:var(--font-mono);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--text-muted);margin-bottom:0.5rem;">Full Access</p>
+      <h2 style="font-family:var(--font-display);font-size:2rem;color:var(--text-primary);margin-bottom:1rem;">$4.99 / month</h2>
+      <p style="color:var(--text-secondary);line-height:1.7;margin-bottom:2rem;font-size:0.95rem;">
+        18 live data streams. Cross-feed correlation engine. Deviation alerts.
+        SHA-256 verified data integrity. Full cockpit access. Cancel anytime.
+      </p>
+      <div style="display:flex;flex-direction:column;gap:0.75rem;align-items:center;margin-bottom:2rem;">
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;justify-content:center;">
+          <span style="font-family:var(--font-mono);font-size:0.65rem;padding:0.3rem 0.7rem;border:1px solid var(--border-dim);border-radius:100px;color:var(--text-muted);">NEXRAD Radar</span>
+          <span style="font-family:var(--font-mono);font-size:0.65rem;padding:0.3rem 0.7rem;border:1px solid var(--border-dim);border-radius:100px;color:var(--text-muted);">GOES Satellite</span>
+          <span style="font-family:var(--font-mono);font-size:0.65rem;padding:0.3rem 0.7rem;border:1px solid var(--border-dim);border-radius:100px;color:var(--text-muted);">Solar / SWPC</span>
+          <span style="font-family:var(--font-mono);font-size:0.65rem;padding:0.3rem 0.7rem;border:1px solid var(--border-dim);border-radius:100px;color:var(--text-muted);">USGS Seismic</span>
+          <span style="font-family:var(--font-mono);font-size:0.65rem;padding:0.3rem 0.7rem;border:1px solid var(--border-dim);border-radius:100px;color:var(--text-muted);">ADS-B Aircraft</span>
+          <span style="font-family:var(--font-mono);font-size:0.65rem;padding:0.3rem 0.7rem;border:1px solid var(--border-dim);border-radius:100px;color:var(--text-muted);">Correlation Engine</span>
+          <span style="font-family:var(--font-mono);font-size:0.65rem;padding:0.3rem 0.7rem;border:1px solid var(--border-dim);border-radius:100px;color:var(--text-muted);">+ 12 more</span>
+        </div>
+      </div>
+      <button class="hero__cta" style="font-size:0.85rem;padding:1rem 2.5rem;cursor:pointer;" onclick="window.__subscribe()">🔒 SUBSCRIBE NOW</button>
+      <p style="font-family:var(--font-mono);font-size:0.6rem;color:var(--text-muted);margin-top:1rem;text-transform:uppercase;letter-spacing:0.1em;">Secure checkout via Stripe · Cancel anytime</p>
+    </section>
+
     <!-- ── Canonical Footer ──────────────────────────────────── -->
     <div class="observatory__content">
     <footer class="footer" id="footer">
@@ -530,6 +556,38 @@
   <!-- ── Lume Bundle ─────────────────────────────────────────── -->
   <script src="landing-app.js"></script>
   <script src="live.js"></script>
+  <script>
+    // Subscribe handler
+    window.__subscribe = async function() {
+      const btn = document.getElementById('subscribe-cta');
+      if (btn) btn.textContent = 'Redirecting...';
+      try {
+        const res = await fetch('/api/subscribe', { method: 'POST' });
+        const data = await res.json();
+        if (data.url) window.location.href = data.url;
+        else alert('Subscription is not available right now.');
+      } catch (err) {
+        alert('Connection error. Please try again.');
+        if (btn) btn.textContent = '🔒 SUBSCRIBE — $4.99/MO';
+      }
+    };
+
+    // Handle redirect from protected pages
+    (function() {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('upgrade') === '1') {
+        const banner = document.createElement('div');
+        banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:linear-gradient(135deg,#d4a054,#e0b06a);color:#1a1714;text-align:center;padding:1rem;font-family:var(--font-mono);font-size:0.8rem;font-weight:600;letter-spacing:0.05em;cursor:pointer;';
+        banner.textContent = '🔒 This area requires a subscription. Click here to subscribe — $4.99/mo';
+        banner.onclick = window.__subscribe;
+        document.body.prepend(banner);
+        setTimeout(() => banner.remove(), 10000);
+      }
+      if (params.get('cancelled') === '1') {
+        console.log('[Observatory] Checkout cancelled');
+      }
+    })();
+  </script>
 
 </body>
 </html>

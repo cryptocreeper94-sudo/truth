@@ -18,11 +18,136 @@ import { createServer } from 'http';
 import { readFileSync, existsSync, readdirSync, statSync } from 'fs';
 import { join, extname, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { randomBytes, createHmac } from 'crypto';
+import Stripe from 'stripe';
+import pg from 'pg';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const STATE_DIR = process.env.STATE_DIR || join(__dirname, 'state');
 const SITE_DIR = join(__dirname, 'site');
 const PORT = parseInt(process.env.PORT || '3000', 10);
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Stripe & Database Configuration
+// ═══════════════════════════════════════════════════════════════════════════
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', { apiVersion: '2024-12-18.acacia' });
+const STRIPE_PRICE_ID = process.env.STRIPE_PRICE_ID || '';
+const SITE_URL = process.env.SITE_URL || 'https://observatory.tlid.io';
+const SESSION_SECRET = process.env.SESSION_SECRET || 'dev-secret-change-me';
+const PK_KEY = process.env.STRIPE_PUBLISHABLE_KEY || '';
+
+// PostgreSQL connection pool
+const pool = process.env.DATABASE_URL
+  ? new pg.Pool({ connectionString: process.env.DATABASE_URL, ssl: false, max: 5 })
+  : null;
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Database Initialization
+// ═══════════════════════════════════════════════════════════════════════════
+async function initDatabase() {
+  if (!pool) { console.warn('[OBSERVATORY] No DATABASE_URL — billing disabled'); return; }
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS subscribers (
+        id SERIAL PRIMARY KEY,
+        email TEXT UNIQUE NOT NULL,
+        stripe_customer_id TEXT UNIQUE NOT NULL,
+        stripe_subscription_id TEXT,
+        status TEXT DEFAULT 'active',
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      );
+      CREATE TABLE IF NOT EXISTS sessions (
+        id TEXT PRIMARY KEY,
+        subscriber_id INTEGER REFERENCES subscribers(id) ON DELETE CASCADE,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        expires_at TIMESTAMPTZ DEFAULT NOW() + INTERVAL '30 days'
+      );
+    `);
+    console.log('[OBSERVATORY] Database tables ready');
+  } catch (err) {
+    console.error('[OBSERVATORY] Database init error:', err.message);
+  }
+}
+initDatabase();
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Session Management
+// ═══════════════════════════════════════════════════════════════════════════
+function signCookie(value) {
+  return value + '.' + createHmac('sha256', SESSION_SECRET).update(value).digest('hex').slice(0, 16);
+}
+
+function verifyCookie(signed) {
+  if (!signed) return null;
+  const idx = signed.lastIndexOf('.');
+  if (idx < 0) return null;
+  const value = signed.slice(0, idx);
+  const sig = signed.slice(idx + 1);
+  const expected = createHmac('sha256', SESSION_SECRET).update(value).digest('hex').slice(0, 16);
+  return sig === expected ? value : null;
+}
+
+function parseCookies(req) {
+  const header = req.headers.cookie || '';
+  const cookies = {};
+  header.split(';').forEach(c => {
+    const [k, ...v] = c.trim().split('=');
+    if (k) cookies[k.trim()] = decodeURIComponent(v.join('='));
+  });
+  return cookies;
+}
+
+function setSessionCookie(res, sessionId) {
+  const signed = signCookie(sessionId);
+  res.setHeader('Set-Cookie', `obs_session=${encodeURIComponent(signed)}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${30 * 24 * 3600}`);
+}
+
+function clearSessionCookie(res) {
+  res.setHeader('Set-Cookie', 'obs_session=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0');
+}
+
+async function getSubscriberFromRequest(req) {
+  if (!pool) return null;
+  const cookies = parseCookies(req);
+  const sessionId = verifyCookie(cookies.obs_session);
+  if (!sessionId) return null;
+  try {
+    const result = await pool.query(
+      `SELECT s.*, sub.email, sub.status, sub.stripe_customer_id, sub.stripe_subscription_id
+       FROM sessions s JOIN subscribers sub ON s.subscriber_id = sub.id
+       WHERE s.id = $1 AND s.expires_at > NOW()`,
+      [sessionId]
+    );
+    return result.rows[0] || null;
+  } catch { return null; }
+}
+
+function isSubscribed(subscriber) {
+  return subscriber && (subscriber.status === 'active' || subscriber.status === 'trialing');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Request Body Parser
+// ═══════════════════════════════════════════════════════════════════════════
+function readBody(req) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    req.on('data', c => chunks.push(c));
+    req.on('end', () => resolve(Buffer.concat(chunks)));
+    req.on('error', reject);
+  });
+}
+
+function jsonResponse(res, status, data) {
+  res.writeHead(status, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify(data));
+}
+
+function redirect(res, url) {
+  res.writeHead(303, { Location: url });
+  res.end();
+}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // MIME types for static serving
@@ -293,17 +418,151 @@ function simpleHash(str) {
 // ═══════════════════════════════════════════════════════════════════════════
 // HTTP Server
 // ═══════════════════════════════════════════════════════════════════════════
-const server = createServer((req, res) => {
+const server = createServer(async (req, res) => {
   const url = new URL(req.url, `http://localhost:${PORT}`);
   const path = url.pathname;
 
   // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
 
+  // ── Billing Routes ──────────────────────────────────────────────────
+  if (path === '/api/subscribe' && req.method === 'POST') {
+    if (!STRIPE_PRICE_ID) return jsonResponse(res, 500, { error: 'Billing not configured' });
+    try {
+      const session = await stripe.checkout.sessions.create({
+        mode: 'subscription',
+        payment_method_types: ['card'],
+        line_items: [{ price: STRIPE_PRICE_ID, quantity: 1 }],
+        success_url: `${SITE_URL}/api/subscribe/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${SITE_URL}/?cancelled=1`,
+        allow_promotion_codes: true,
+      });
+      jsonResponse(res, 200, { url: session.url });
+    } catch (err) {
+      console.error('[BILLING] Checkout error:', err.message);
+      jsonResponse(res, 500, { error: 'Failed to create checkout session' });
+    }
+    return;
+  }
+
+  if (path === '/api/subscribe/success' && req.method === 'GET') {
+    const sessionId = url.searchParams.get('session_id');
+    if (!sessionId || !pool) return redirect(res, '/');
+    try {
+      const session = await stripe.checkout.sessions.retrieve(sessionId, { expand: ['subscription'] });
+      if (session.payment_status !== 'paid') return redirect(res, '/?error=payment');
+
+      const email = session.customer_details?.email || session.customer_email || '';
+      const customerId = session.customer;
+      const subscriptionId = typeof session.subscription === 'object' ? session.subscription.id : session.subscription;
+
+      // Upsert subscriber
+      await pool.query(
+        `INSERT INTO subscribers (email, stripe_customer_id, stripe_subscription_id, status, updated_at)
+         VALUES ($1, $2, $3, 'active', NOW())
+         ON CONFLICT (stripe_customer_id) DO UPDATE SET
+           email = EXCLUDED.email,
+           stripe_subscription_id = EXCLUDED.stripe_subscription_id,
+           status = 'active',
+           updated_at = NOW()`,
+        [email, customerId, subscriptionId]
+      );
+
+      const sub = await pool.query('SELECT id FROM subscribers WHERE stripe_customer_id = $1', [customerId]);
+      const subscriberId = sub.rows[0]?.id;
+
+      // Create session
+      const sid = randomBytes(32).toString('hex');
+      await pool.query(
+        'INSERT INTO sessions (id, subscriber_id, expires_at) VALUES ($1, $2, NOW() + INTERVAL \'30 days\')',
+        [sid, subscriberId]
+      );
+      setSessionCookie(res, sid);
+      redirect(res, '/cockpit?welcome=1');
+    } catch (err) {
+      console.error('[BILLING] Success handler error:', err.message);
+      redirect(res, '/?error=setup');
+    }
+    return;
+  }
+
+  if (path === '/api/webhook' && req.method === 'POST') {
+    const body = await readBody(req);
+    const sig = req.headers['stripe-signature'];
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+    let event;
+    if (webhookSecret && sig) {
+      try { event = stripe.webhooks.constructEvent(body, sig, webhookSecret); }
+      catch (err) { console.error('[WEBHOOK] Signature failed:', err.message); return jsonResponse(res, 400, { error: 'Invalid signature' }); }
+    } else {
+      try { event = JSON.parse(body.toString()); }
+      catch { return jsonResponse(res, 400, { error: 'Invalid JSON' }); }
+    }
+
+    if (pool) {
+      try {
+        if (event.type === 'customer.subscription.updated' || event.type === 'customer.subscription.deleted') {
+          const sub = event.data.object;
+          const status = sub.status === 'active' || sub.status === 'trialing' ? 'active' : sub.status;
+          await pool.query(
+            'UPDATE subscribers SET status = $1, updated_at = NOW() WHERE stripe_subscription_id = $2',
+            [status, sub.id]
+          );
+          console.log(`[WEBHOOK] Subscription ${sub.id} → ${status}`);
+        }
+        if (event.type === 'invoice.payment_failed') {
+          const invoice = event.data.object;
+          if (invoice.subscription) {
+            await pool.query(
+              'UPDATE subscribers SET status = $1, updated_at = NOW() WHERE stripe_subscription_id = $2',
+              ['past_due', invoice.subscription]
+            );
+            console.log(`[WEBHOOK] Subscription ${invoice.subscription} → past_due`);
+          }
+        }
+      } catch (err) { console.error('[WEBHOOK] DB error:', err.message); }
+    }
+    return jsonResponse(res, 200, { received: true });
+  }
+
+  if (path === '/api/account' && req.method === 'GET') {
+    const subscriber = await getSubscriberFromRequest(req);
+    if (isSubscribed(subscriber)) {
+      return jsonResponse(res, 200, { subscribed: true, email: subscriber.email, status: subscriber.status });
+    }
+    return jsonResponse(res, 200, { subscribed: false });
+  }
+
+  if (path === '/api/portal' && req.method === 'POST') {
+    const subscriber = await getSubscriberFromRequest(req);
+    if (!isSubscribed(subscriber)) return jsonResponse(res, 401, { error: 'Not subscribed' });
+    try {
+      const session = await stripe.billingPortal.sessions.create({
+        customer: subscriber.stripe_customer_id,
+        return_url: `${SITE_URL}/cockpit`,
+      });
+      return jsonResponse(res, 200, { url: session.url });
+    } catch (err) {
+      console.error('[BILLING] Portal error:', err.message);
+      return jsonResponse(res, 500, { error: 'Portal unavailable' });
+    }
+  }
+
+  if (path === '/api/logout' && req.method === 'POST') {
+    const cookies = parseCookies(req);
+    const sessionId = verifyCookie(cookies.obs_session);
+    if (sessionId && pool) {
+      try { await pool.query('DELETE FROM sessions WHERE id = $1', [sessionId]); } catch {}
+    }
+    clearSessionCookie(res);
+    return redirect(res, '/');
+  }
+
   // ── API Routes ──────────────────────────────────────────────────────
   if (path === '/api/health') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    return res.end(JSON.stringify({ status: 'ok', timestamp: new Date().toISOString(), feeds: FEEDS.length }));
+    return res.end(JSON.stringify({ status: 'ok', timestamp: new Date().toISOString(), feeds: FEEDS.length, billing: !!STRIPE_PRICE_ID }));
   }
 
   if (path === '/api/feeds') {
@@ -319,6 +578,10 @@ const server = createServer((req, res) => {
   }
 
   if (path.startsWith('/api/feed/')) {
+    // Premium route — requires subscription
+    const subscriber = await getSubscriberFromRequest(req);
+    if (!isSubscribed(subscriber)) return jsonResponse(res, 401, { error: 'Subscription required', subscribe_url: '/api/subscribe' });
+
     const feedId = path.split('/')[3];
     const feed = FEEDS.find(f => f.id === feedId);
     if (!feed) {
@@ -333,6 +596,10 @@ const server = createServer((req, res) => {
   }
 
   if (path === '/api/events' || path === '/api/correlations') {
+    // Premium routes — require subscription
+    const subscriber = await getSubscriberFromRequest(req);
+    if (!isSubscribed(subscriber)) return jsonResponse(res, 401, { error: 'Subscription required', subscribe_url: '/api/subscribe' });
+
     // Read from correlation engine output
     const corrFile = join(STATE_DIR, 'correlations.json');
     if (existsSync(corrFile)) {
@@ -371,6 +638,10 @@ const server = createServer((req, res) => {
 
   // ── Event Ledger — unified stream of events + correlations ──────────
   if (path === '/api/ledger') {
+    // Premium route — requires subscription
+    const subscriber = await getSubscriberFromRequest(req);
+    if (!isSubscribed(subscriber)) return jsonResponse(res, 401, { error: 'Subscription required', subscribe_url: '/api/subscribe' });
+
     const limit = Math.min(parseInt(url.searchParams.get('limit') || '40', 10), 100);
     const ledger = buildEventLedger(limit);
     res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -390,6 +661,15 @@ const server = createServer((req, res) => {
     return res.end(JSON.stringify({ timestamp: new Date().toISOString(), digests }));
   }
 
+  // ── Protected Page Routes ───────────────────────────────────────────
+  const PREMIUM_PAGES = ['/cockpit', '/explorer', '/stream'];
+  if (PREMIUM_PAGES.some(p => path === p || path.startsWith(p + '?'))) {
+    const subscriber = await getSubscriberFromRequest(req);
+    if (!isSubscribed(subscriber)) {
+      return redirect(res, '/?upgrade=1');
+    }
+  }
+
   // ── Static File Serving ─────────────────────────────────────────────
   // Page routes → static HTML files
   const PAGE_ROUTES = {
@@ -400,6 +680,7 @@ const server = createServer((req, res) => {
     '/sms-optin': '/sms-optin.html',
     '/about': '/about.html',
     '/explorer': '/explorer.html',
+    '/stream': '/stream.html',
   };
   let filePath = PAGE_ROUTES[path] || (path === '/' ? '/index.html' : path);
   const fullPath = join(SITE_DIR, filePath);
