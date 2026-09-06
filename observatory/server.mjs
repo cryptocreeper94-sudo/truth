@@ -564,6 +564,38 @@ const server = createServer(async (req, res) => {
     }
   }
 
+  // Email-based portal — for Payment Link subscribers without session cookies
+  if (path === '/api/portal-email' && req.method === 'POST') {
+    if (!stripe || !pool) return jsonResponse(res, 503, { error: 'Billing not configured' });
+    try {
+      const { email } = JSON.parse(body);
+      if (!email) return jsonResponse(res, 400, { error: 'Email required' });
+      const result = await pool.query(
+        'SELECT stripe_customer_id, status FROM subscribers WHERE LOWER(email) = LOWER($1)',
+        [email]
+      );
+      if (result.rows.length === 0) {
+        // Try Stripe directly — Payment Link customers may not be in our DB yet
+        const customers = await stripe.customers.list({ email: email.toLowerCase(), limit: 1 });
+        if (customers.data.length === 0) return jsonResponse(res, 404, { error: 'No subscription found for this email' });
+        const session = await stripe.billingPortal.sessions.create({
+          customer: customers.data[0].id,
+          return_url: `${SITE_URL}/cockpit`,
+        });
+        return jsonResponse(res, 200, { url: session.url });
+      }
+      const sub = result.rows[0];
+      const session = await stripe.billingPortal.sessions.create({
+        customer: sub.stripe_customer_id,
+        return_url: `${SITE_URL}/cockpit`,
+      });
+      return jsonResponse(res, 200, { url: session.url });
+    } catch (err) {
+      console.error('[BILLING] Email portal error:', err.message);
+      return jsonResponse(res, 500, { error: 'Portal unavailable' });
+    }
+  }
+
   if (path === '/api/logout' && req.method === 'POST') {
     const cookies = parseCookies(req);
     const sessionId = verifyCookie(cookies.obs_session);

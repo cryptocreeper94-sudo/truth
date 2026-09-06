@@ -34,10 +34,43 @@
       </div>
     </div>
     <div class="topbar__right">
+      <button id="manage-sub-btn" onclick="document.getElementById('manage-sub-modal').style.display='flex'" style="background:transparent;border:1px solid #d4a054;color:#d4a054;padding:0.3rem 0.8rem;border-radius:4px;cursor:pointer;font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.05em;margin-right:0.5rem;">MANAGE SUBSCRIPTION</button>
+      <a href="/" style="color:#d4a054;text-decoration:none;font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.05em;margin-right:0.5rem;">← BACK</a>
       <span class="topbar__clock" id="utc-clock">00:00:00 UTC</span>
       <span class="topbar__pulse" id="global-pulse" data-info="stat-pulse" title="Data connection status"></span>
     </div>
   </header>
+
+  <!-- Manage Subscription Modal -->
+  <div id="manage-sub-modal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.7);align-items:center;justify-content:center;">
+    <div style="background:#1a1714;border:1px solid #d4a054;border-radius:8px;padding:2rem;max-width:400px;width:90%;font-family:var(--font-mono);">
+      <h3 style="color:#d4a054;margin:0 0 0.5rem;font-size:1rem;letter-spacing:0.05em;">MANAGE SUBSCRIPTION</h3>
+      <p style="color:#a09080;font-size:0.75rem;margin:0 0 1rem;">Enter the email you used to subscribe. You'll be redirected to Stripe to manage billing, update payment, or cancel.</p>
+      <input id="portal-email" type="email" placeholder="your@email.com" style="width:100%;padding:0.7rem;background:#0d0b09;border:1px solid #3a3530;border-radius:4px;color:#e8dfd6;font-family:var(--font-mono);font-size:0.8rem;box-sizing:border-box;margin-bottom:0.75rem;">
+      <p id="portal-error" style="color:#e05050;font-size:0.7rem;margin:0 0 0.75rem;display:none;"></p>
+      <div style="display:flex;gap:0.75rem;">
+        <button id="portal-submit" onclick="__manageSubscription()" style="flex:1;padding:0.7rem;background:#d4a054;color:#1a1714;border:none;border-radius:4px;cursor:pointer;font-family:var(--font-mono);font-weight:600;font-size:0.75rem;letter-spacing:0.05em;">OPEN BILLING PORTAL</button>
+        <button onclick="document.getElementById('manage-sub-modal').style.display='none'" style="padding:0.7rem 1rem;background:transparent;border:1px solid #3a3530;color:#a09080;border-radius:4px;cursor:pointer;font-family:var(--font-mono);font-size:0.75rem;">CLOSE</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    async function __manageSubscription() {
+      const email = document.getElementById('portal-email').value.trim();
+      const errEl = document.getElementById('portal-error');
+      const btn = document.getElementById('portal-submit');
+      errEl.style.display = 'none';
+      if (!email) { errEl.textContent = 'Please enter your email.'; errEl.style.display = 'block'; return; }
+      btn.textContent = 'LOADING...'; btn.disabled = true;
+      try {
+        const res = await fetch('/api/portal-email', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) });
+        const data = await res.json();
+        if (data.url) { window.location.href = data.url; }
+        else { errEl.textContent = data.error || 'No subscription found.'; errEl.style.display = 'block'; }
+      } catch (err) { errEl.textContent = 'Connection error. Try again.'; errEl.style.display = 'block'; }
+      btn.textContent = 'OPEN BILLING PORTAL'; btn.disabled = false;
+    }
+  </script>
 
   <!-- ═══ STAT INFO TOOLTIP ═══ -->
   <div class="stat-tooltip" id="stat-tooltip">
