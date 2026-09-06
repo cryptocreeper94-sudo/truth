@@ -3,7 +3,7 @@ FROM node:20-slim
 WORKDIR /app
 
 # Cache-bust: ensures fresh code on every build
-ARG CACHEBUST=1
+ARG CACHEBUST=20260905
 
 # Copy observatory directory
 COPY observatory/ observatory/
