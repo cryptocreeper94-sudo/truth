@@ -19,8 +19,6 @@ import { readFileSync, existsSync, readdirSync, statSync } from 'fs';
 import { join, extname, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { randomBytes, createHmac } from 'crypto';
-import Stripe from 'stripe';
-import pg from 'pg';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const STATE_DIR = process.env.STATE_DIR || join(__dirname, 'state');
@@ -28,18 +26,35 @@ const SITE_DIR = join(__dirname, 'site');
 const PORT = parseInt(process.env.PORT || '3000', 10);
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Stripe & Database Configuration
+// Stripe & Database Configuration (dynamic imports — graceful degradation)
 // ═══════════════════════════════════════════════════════════════════════════
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', { apiVersion: '2024-12-18.acacia' });
+let stripe = null;
+let pool = null;
+
 const STRIPE_PRICE_ID = process.env.STRIPE_PRICE_ID || '';
 const SITE_URL = process.env.SITE_URL || 'https://observatory.tlid.io';
 const SESSION_SECRET = process.env.SESSION_SECRET || 'dev-secret-change-me';
 const PK_KEY = process.env.STRIPE_PUBLISHABLE_KEY || '';
 
-// PostgreSQL connection pool
-const pool = process.env.DATABASE_URL
-  ? new pg.Pool({ connectionString: process.env.DATABASE_URL, ssl: false, max: 5 })
-  : null;
+// Load Stripe (optional — server starts without it)
+try {
+  const Stripe = (await import('stripe')).default;
+  stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', { apiVersion: '2024-12-18.acacia' });
+  console.log('[OBSERVATORY] Stripe loaded');
+} catch (err) {
+  console.warn('[OBSERVATORY] Stripe not available:', err.message);
+}
+
+// Load PostgreSQL (optional — server starts without it)
+try {
+  if (process.env.DATABASE_URL) {
+    const pg = (await import('pg')).default;
+    pool = new pg.Pool({ connectionString: process.env.DATABASE_URL, ssl: false, max: 5 });
+    console.log('[OBSERVATORY] PostgreSQL pool created');
+  }
+} catch (err) {
+  console.warn('[OBSERVATORY] PostgreSQL not available:', err.message);
+}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Database Initialization
