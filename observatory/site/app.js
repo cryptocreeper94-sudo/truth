@@ -73,6 +73,21 @@ const Observatory = {
       info: { source: 'RainViewer Global Radar', what: 'Global precipitation radar composite from weather radar stations worldwide.', update: 'Every 10 minutes', attribution: 'RainViewer' },
       legend: { type: 'gradient', heading: 'PRECIPITATION', colors: ['transparent','#00ccff','#0066ff','#00ff00','#ffff00','#ff0000'], labels: ['None','Light','Mod','Heavy'] },
     },
+    fire: {
+      name: 'Active Fires',
+      info: { source: 'NASA FIRMS', what: 'Active fire/thermal hotspots detected by MODIS and VIIRS satellite instruments. Updated every 6 hours.', update: 'Every 6 hours', attribution: 'NASA FIRMS / MODIS / VIIRS' },
+      legend: { type: 'dots', heading: 'ACTIVE FIRES (FIRMS)', items: [{ color: '#ff3b30', label: 'High Confidence' }, { color: '#ff9500', label: 'Nominal' }, { color: '#ffd60a', label: 'Low Confidence' }] },
+    },
+    heaters: {
+      name: 'Ionospheric Heaters',
+      info: { source: 'HAARP, EISCAT, Sura, Jicamarca, MU Radar', what: 'Known ionospheric research facilities with high-power RF transmitters. Shows location, power output, and operating frequency.', update: 'Static locations, status checked every 6h', attribution: 'Public Records' },
+      legend: { type: 'dots', heading: 'IONOSPHERIC HEATERS', items: [{ color: '#ff4ecf', label: 'Active Facility' }, { color: '#666', label: 'Decommissioned' }] },
+    },
+    aircraft: {
+      name: 'ADS-B Aircraft',
+      info: { source: 'ADS-B Exchange via RapidAPI', what: 'Live aircraft transponder positions within 500nm of CONUS center. Shows flight, altitude, speed, and heading.', update: 'Every 5 minutes', attribution: 'ADS-B Exchange' },
+      legend: { type: 'dots', heading: 'AIRCRAFT (ADS-B)', items: [{ color: '#4ecbff', label: 'Tracked Aircraft' }] },
+    },
   },
 
   // ── State ────────────────────────────────────────────────────
@@ -80,7 +95,7 @@ const Observatory = {
   correlations: [],
   map: null,
   mapLayers: {},
-  markers: { earthquakes: [], lightning: [] },
+  markers: { earthquakes: [], lightning: [], heaters: [], aircraft: [], fire: [] },
   refreshInterval: 60000,
 
   // ── Init ─────────────────────────────────────────────────────
@@ -162,8 +177,22 @@ const Observatory = {
     this.mapLayers.precip = L.tileLayer('', { opacity: 0.5, maxZoom: 18 });
     this._loadRainViewerTiles();
 
-    // Default: show radar
+    // NASA FIRMS active fires (WMS)
+    this.mapLayers.fire = L.tileLayer.wms('https://firms.modaps.eosdis.nasa.gov/mapserver/wms/fires/c6f75a0e97da205067925e1b3a2ee1df/', {
+      layers: 'fires_viirs_snpp', format: 'image/png', transparent: true, opacity: 0.7, maxZoom: 12,
+    });
+
+    // Heaters and Aircraft are marker-based layers (L.layerGroup)
+    this.mapLayers.heaters = L.layerGroup();
+    this.mapLayers.heaters.addTo(this.map);
+    this.mapLayers.aircraft = L.layerGroup();
+
+    // Default: show radar + heaters
     this.mapLayers.radar.addTo(this.map);
+
+    // Load geo marker data
+    this.loadHeaterMarkers();
+    this.loadAircraftMarkers();
 
     this.updateLayerCount();
     this.updateDynamicLegend();
@@ -237,6 +266,10 @@ const Observatory = {
           html += `<span>${l}</span>`;
         }
         html += `</div>`;
+      } else if (leg.type === 'dots') {
+        for (const item of leg.items) {
+          html += `<div style="display:flex;align-items:center;gap:6px;margin:3px 0;"><span style="width:8px;height:8px;border-radius:50%;background:${item.color};display:inline-block;"></span><span style="font-size:9px;color:#aaa;">${item.label}</span></div>`;
+        }
       }
       html += `</div>`;
     }
@@ -884,6 +917,75 @@ const Observatory = {
 
     this.updateLayerCount();
     this.updateDynamicLegend();
+  },
+
+  // ── Heater Markers ──────────────────────────────────────────
+  async loadHeaterMarkers() {
+    try {
+      const res = await fetch('/api/geo/heaters');
+      const data = await res.json();
+      this.markers.heaters.forEach(m => this.mapLayers.heaters.removeLayer(m));
+      this.markers.heaters = [];
+      (data.heaters || []).forEach(h => {
+        const color = h.status === 'decommissioned' ? '#666' : '#ff4ecf';
+        const marker = L.circleMarker([h.lat, h.lon], {
+          radius: 8, color: color, fillColor: color, fillOpacity: 0.3, weight: 2,
+        });
+        // Outer pulsing ring for active facilities
+        if (h.status !== 'decommissioned') {
+          const ring = L.circleMarker([h.lat, h.lon], {
+            radius: 16, color: '#ff4ecf', fillColor: 'transparent', fillOpacity: 0, weight: 1, opacity: 0.4,
+          });
+          this.mapLayers.heaters.addLayer(ring);
+          this.markers.heaters.push(ring);
+        }
+        marker.bindPopup(`
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#e8e8f0;background:#0a0a0e;padding:10px;border:1px solid #ff4ecf33;border-radius:2px;min-width:180px;">
+            <div style="color:#ff4ecf;font-weight:700;font-size:13px;margin-bottom:4px;">⚡ ${h.name}</div>
+            <div style="color:#aaa;margin-bottom:2px;">${h.location}</div>
+            <div style="color:#888;font-size:9px;">Power: ${h.power}</div>
+            <div style="color:#888;font-size:9px;">Freq: ${h.frequency}</div>
+            <div style="color:#555;font-size:9px;margin-top:4px;">${h.status.toUpperCase()}</div>
+          </div>
+        `, { className: 'obs-popup' });
+        this.mapLayers.heaters.addLayer(marker);
+        this.markers.heaters.push(marker);
+      });
+      this.updateLayerCount();
+      this.updateDynamicLegend();
+    } catch (e) { console.warn('[Observatory] Heater load failed:', e.message); }
+  },
+
+  // ── Aircraft Markers ────────────────────────────────────────
+  async loadAircraftMarkers() {
+    try {
+      const res = await fetch('/api/geo/aircraft');
+      if (res.status === 401) return; // Not subscribed
+      const data = await res.json();
+      this.markers.aircraft.forEach(m => this.mapLayers.aircraft.removeLayer(m));
+      this.markers.aircraft = [];
+      (data.aircraft || []).forEach(a => {
+        const marker = L.circleMarker([a.lat, a.lon], {
+          radius: 3, color: '#4ecbff', fillColor: '#4ecbff', fillOpacity: 0.6, weight: 1,
+        });
+        const alt = a.alt ? `${Math.round(a.alt).toLocaleString()} ft` : 'N/A';
+        const spd = a.speed ? `${Math.round(a.speed)} kts` : 'N/A';
+        marker.bindPopup(`
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#e8e8f0;background:#0a0a0e;padding:10px;border:1px solid #4ecbff33;border-radius:2px;min-width:160px;">
+            <div style="color:#4ecbff;font-weight:700;font-size:13px;margin-bottom:4px;">✈ ${a.flight || a.hex}</div>
+            <div style="color:#aaa;font-size:9px;">Alt: ${alt}</div>
+            <div style="color:#aaa;font-size:9px;">Speed: ${spd}</div>
+            <div style="color:#aaa;font-size:9px;">Heading: ${a.heading ? a.heading + '°' : 'N/A'}</div>
+            ${a.type ? '<div style="color:#555;font-size:9px;margin-top:4px;">Type: ' + a.type + '</div>' : ''}
+          </div>
+        `, { className: 'obs-popup' });
+        this.mapLayers.aircraft.addLayer(marker);
+        this.markers.aircraft.push(marker);
+      });
+      if (data.count > 0) console.log(`[Observatory] Plotted ${data.count} aircraft`);
+      this.updateLayerCount();
+      this.updateDynamicLegend();
+    } catch (e) { console.warn('[Observatory] Aircraft load failed:', e.message); }
   },
 
   // ── Bind Events ──────────────────────────────────────────────

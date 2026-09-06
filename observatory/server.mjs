@@ -708,6 +708,90 @@ const server = createServer(async (req, res) => {
     return res.end(JSON.stringify({ timestamp: new Date().toISOString(), digests }));
   }
 
+  // ── Geo API: Ionospheric Heater Locations ────────────────────────────
+  if (path === '/api/geo/heaters') {
+    const heaters = [
+      { id: 'haarp', name: 'HAARP', lat: 62.39, lon: -145.15, location: 'Gakona, Alaska', status: 'active', power: '3.6 MW ERP', frequency: '2.8-10 MHz' },
+      { id: 'eiscat', name: 'EISCAT', lat: 69.58, lon: 19.23, location: 'Tromsø, Norway', status: 'active', power: '1.2 GW ERP', frequency: '224-931 MHz' },
+      { id: 'eiscat-3d', name: 'EISCAT_3D', lat: 69.34, lon: 20.31, location: 'Skibotn, Norway', status: 'active', power: 'Phased Array', frequency: '233 MHz' },
+      { id: 'sura', name: 'Sura', lat: 56.15, lon: 46.10, location: 'Vasilsursk, Russia', status: 'active', power: '190 MW ERP', frequency: '4.5-9.3 MHz' },
+      { id: 'jicamarca', name: 'Jicamarca', lat: -11.95, lon: -76.87, location: 'Lima, Peru', status: 'active', power: '6 MW', frequency: '49.92 MHz' },
+      { id: 'arecibo', name: 'Arecibo', lat: 18.34, lon: -66.75, location: 'Arecibo, Puerto Rico', status: 'decommissioned', power: 'N/A', frequency: 'N/A' },
+      { id: 'mu-radar', name: 'MU Radar', lat: 34.85, lon: 136.10, location: 'Shigaraki, Japan', status: 'active', power: '1 MW', frequency: '46.5 MHz' },
+      { id: 'sondrestrom', name: 'Sondrestrom', lat: 67.0, lon: -50.95, location: 'Kangerlussuaq, Greenland', status: 'active', power: '1.2 MW', frequency: '1290 MHz' },
+    ];
+    // Check heater manifest for latest status
+    try {
+      const manifest = join(STATE_DIR, 'heater-manifest.jsonl');
+      if (existsSync(manifest)) {
+        const lines = readFileSync(manifest, 'utf-8').trim().split('\n').slice(-20);
+        for (const line of lines) {
+          try {
+            const entry = JSON.parse(line);
+            if (entry.facilityId) {
+              const h = heaters.find(x => x.id === entry.facilityId);
+              if (h && entry.type !== 'DATA-GAP') h.lastSeen = entry.retrievedAt;
+            }
+          } catch {}
+        }
+      }
+    } catch {}
+    return jsonResponse(res, 200, { timestamp: new Date().toISOString(), heaters });
+  }
+
+  // ── Geo API: ADS-B Aircraft (subscriber-only) ───────────────────────
+  if (path === '/api/geo/aircraft') {
+    // Subscriber-only
+    const cookies = parseCookies(req);
+    const devBypass = cookies.obs_dev_bypass === 'darkwave42';
+    if (!devBypass) {
+      const subscriber = await getSubscriberFromRequest(req);
+      if (!isSubscribed(subscriber)) return jsonResponse(res, 401, { error: 'Subscription required' });
+    }
+    // Read latest aircraft data from raw files
+    const rawDir = join(STATE_DIR, 'raw', 'aircraft');
+    try {
+      if (existsSync(rawDir)) {
+        const files = readdirSync(rawDir).filter(f => f.endsWith('.json')).sort().reverse();
+        if (files.length > 0) {
+          const data = JSON.parse(readFileSync(join(rawDir, files[0]), 'utf-8'));
+          const aircraft = (data.ac || []).slice(0, 200).map(a => ({
+            hex: a.hex, flight: (a.flight || '').trim(), lat: a.lat, lon: a.lon,
+            alt: a.alt_baro || a.alt_geom, speed: a.gs, heading: a.track,
+            type: a.t, squawk: a.squawk, category: a.category,
+          })).filter(a => a.lat && a.lon);
+          return jsonResponse(res, 200, { timestamp: new Date().toISOString(), count: aircraft.length, aircraft });
+        }
+      }
+    } catch {}
+    return jsonResponse(res, 200, { timestamp: new Date().toISOString(), count: 0, aircraft: [], message: 'No aircraft data available. Ensure ADSB_API_KEY is set.' });
+  }
+
+  // ── Geo API: Surface Stations ───────────────────────────────────────
+  if (path === '/api/geo/surface') {
+    try {
+      const rawDir = join(STATE_DIR, 'raw', 'surface');
+      if (existsSync(rawDir)) {
+        const files = readdirSync(rawDir).filter(f => f.endsWith('.json')).sort().reverse();
+        if (files.length > 0) {
+          const data = JSON.parse(readFileSync(join(rawDir, files[0]), 'utf-8'));
+          const stations = (data.stations || data.features || []).slice(0, 100).map(s => {
+            const props = s.properties || s;
+            return {
+              id: props.station || props.id, name: props.name || props.station,
+              lat: s.geometry?.coordinates?.[1] || props.lat, lon: s.geometry?.coordinates?.[0] || props.lon,
+              temp: props.temp_f || props.temperature, wind_speed: props.wind_speed_kt || props.windSpeed,
+              wind_dir: props.wind_dir || props.windDirection, visibility: props.visibility_mi,
+              sky: props.sky_condition || props.weather,
+            };
+          }).filter(s => s.lat && s.lon);
+          return jsonResponse(res, 200, { timestamp: new Date().toISOString(), count: stations.length, stations });
+        }
+      }
+    } catch {}
+    return jsonResponse(res, 200, { timestamp: new Date().toISOString(), count: 0, stations: [] });
+  }
+
   // ── Protected Page Routes ───────────────────────────────────────────
   const PREMIUM_PAGES = ['/cockpit', '/explorer', '/stream'];
   if (PREMIUM_PAGES.some(p => path === p || path.startsWith(p + '?'))) {
