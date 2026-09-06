@@ -9,7 +9,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Outfit:wght@400;600;800;900&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔭</text></svg>">
+  <link rel="icon" href="/assets/icon-512.jpg">
+  <link rel="apple-touch-icon" href="/assets/icon-512.jpg">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#1a1714">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Observatory">
 </head>
 <body>
   <!-- ═══ TOP STATUS BAR ═══ -->
@@ -34,7 +40,8 @@
       </div>
     </div>
     <div class="topbar__right">
-      <button id="manage-sub-btn" onclick="document.getElementById('manage-sub-modal').style.display='flex'" style="background:transparent;border:1px solid #d4a054;color:#d4a054;padding:0.3rem 0.8rem;border-radius:4px;cursor:pointer;font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.05em;margin-right:0.5rem;">MANAGE SUBSCRIPTION</button>
+      <button onclick="document.getElementById('download-modal').style.display='flex'" style="background:transparent;border:1px solid #4a9;color:#4a9;padding:0.3rem 0.8rem;border-radius:4px;cursor:pointer;font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.05em;margin-right:0.5rem;" title="Download CSV Report">⬇ EXPORT</button>
+      <button id="manage-sub-btn" onclick="document.getElementById('manage-sub-modal').style.display='flex'" style="background:transparent;border:1px solid #d4a054;color:#d4a054;padding:0.3rem 0.8rem;border-radius:4px;cursor:pointer;font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.05em;margin-right:0.5rem;">ACCOUNT</button>
       <a href="/" style="color:#d4a054;text-decoration:none;font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.05em;margin-right:0.5rem;">← BACK</a>
       <span class="topbar__clock" id="utc-clock">00:00:00 UTC</span>
       <span class="topbar__pulse" id="global-pulse" data-info="stat-pulse" title="Data connection status"></span>
@@ -354,9 +361,106 @@
     </button>
   </nav>
 
+  <!-- Download Report Modal -->
+  <div id="download-modal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.8);align-items:center;justify-content:center;">
+    <div style="background:#1a1714;border:1px solid #4a9;border-radius:8px;padding:2rem;max-width:420px;width:90%;font-family:var(--font-mono);">
+      <h3 style="color:#4a9;margin:0 0 0.5rem;font-size:0.9rem;letter-spacing:0.05em;">⬇ EXPORT DATA</h3>
+      <p style="color:#a09080;font-size:0.7rem;margin:0 0 1.25rem;">Select the datasets to include in your CSV report. Data reflects the latest observations.</p>
+      <div id="export-options" style="display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1.25rem;">
+        <label style="display:flex;align-items:center;gap:0.6rem;color:#e8dfd6;font-size:0.75rem;cursor:pointer;"><input type="checkbox" value="feeds" checked style="accent-color:#4a9;"> All Feed Data (18 streams)</label>
+        <label style="display:flex;align-items:center;gap:0.6rem;color:#e8dfd6;font-size:0.75rem;cursor:pointer;"><input type="checkbox" value="atmoscore" checked style="accent-color:#4a9;"> AtmosCore State Engine</label>
+        <label style="display:flex;align-items:center;gap:0.6rem;color:#e8dfd6;font-size:0.75rem;cursor:pointer;"><input type="checkbox" value="correlations" style="accent-color:#4a9;"> Cross-Feed Correlations</label>
+        <label style="display:flex;align-items:center;gap:0.6rem;color:#e8dfd6;font-size:0.75rem;cursor:pointer;"><input type="checkbox" value="ledger" style="accent-color:#4a9;"> Event Ledger</label>
+        <label style="display:flex;align-items:center;gap:0.6rem;color:#e8dfd6;font-size:0.75rem;cursor:pointer;"><input type="checkbox" value="digests" style="accent-color:#4a9;"> Daily Digests</label>
+      </div>
+      <div style="display:flex;gap:0.75rem;">
+        <button id="export-btn" onclick="__exportData()" style="flex:1;padding:0.7rem;background:#4a9;color:#0d0b09;border:none;border-radius:4px;cursor:pointer;font-family:var(--font-mono);font-weight:600;font-size:0.75rem;letter-spacing:0.05em;">GENERATE CSV</button>
+        <button onclick="document.getElementById('download-modal').style.display='none'" style="padding:0.7rem 1rem;background:transparent;border:1px solid #3a3530;color:#a09080;border-radius:4px;cursor:pointer;font-family:var(--font-mono);font-size:0.75rem;">CLOSE</button>
+      </div>
+      <p id="export-status" style="color:#a09080;font-size:0.65rem;margin:0.75rem 0 0;text-align:center;display:none;"></p>
+    </div>
+  </div>
+
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="atmoscore.js"></script>
   <script src="atmoscore-viz.js"></script>
   <script src="app.js"></script>
+  <script>
+    // CSV Export
+    async function __exportData() {
+      const btn = document.getElementById('export-btn');
+      const status = document.getElementById('export-status');
+      const checked = [...document.querySelectorAll('#export-options input:checked')].map(i => i.value);
+      if (!checked.length) { status.textContent = 'Select at least one dataset.'; status.style.color = '#e05050'; status.style.display = 'block'; return; }
+      btn.textContent = 'GENERATING...'; btn.disabled = true;
+      status.textContent = 'Fetching data...'; status.style.color = '#a09080'; status.style.display = 'block';
+      try {
+        const sheets = [];
+        if (checked.includes('feeds')) {
+          const r = await fetch('/api/feeds').then(r => r.json());
+          if (r.feeds) {
+            sheets.push('## FEED DATA');
+            sheets.push('Feed,Status,Value,Unit,Timestamp,Source,SHA256');
+            r.feeds.forEach(f => sheets.push([f.name,f.status,f.value||'',f.unit||'',f.timestamp||'',f.source||'',f.sha256||''].map(v => '"'+String(v).replace(/"/g,'""')+'"').join(',')));
+            sheets.push('');
+          }
+        }
+        if (checked.includes('atmoscore')) {
+          const r = await fetch('/api/atmoscore').then(r => r.json());
+          if (r) {
+            sheets.push('## ATMOSCORE STATE');
+            sheets.push('Field,Value');
+            Object.entries(r).forEach(([k,v]) => { if (typeof v !== 'object') sheets.push('"'+k+'","'+v+'"'); });
+            if (r.components) { r.components.forEach(c => sheets.push('"component:'+c.name+'","'+c.value+' ('+c.status+')"')); }
+            sheets.push('');
+          }
+        }
+        if (checked.includes('correlations')) {
+          const r = await fetch('/api/correlations').then(r => r.json());
+          if (r.correlations) {
+            sheets.push('## CORRELATIONS');
+            sheets.push('Feed A,Feed B,Coefficient,Significance,Detected At');
+            r.correlations.forEach(c => sheets.push([c.feedA,c.feedB,c.coefficient,c.significance||'',c.detectedAt||''].map(v => '"'+String(v).replace(/"/g,'""')+'"').join(',')));
+            sheets.push('');
+          }
+        }
+        if (checked.includes('ledger')) {
+          const r = await fetch('/api/ledger?limit=100').then(r => r.json());
+          if (r.events) {
+            sheets.push('## EVENT LEDGER');
+            sheets.push('Timestamp,Type,Feed,Description,Severity,SHA256');
+            r.events.forEach(e => sheets.push([e.timestamp,e.type,e.feed||'',e.description||'',e.severity||'',e.sha256||''].map(v => '"'+String(v).replace(/"/g,'""')+'"').join(',')));
+            sheets.push('');
+          }
+        }
+        if (checked.includes('digests')) {
+          const r = await fetch('/api/digests').then(r => r.json());
+          if (r.digests) {
+            sheets.push('## DAILY DIGESTS');
+            sheets.push('Date,Summary,Feeds Active,Events,AtmosCore Score');
+            r.digests.forEach(d => sheets.push([d.date||d.timestamp,d.summary||'',d.feedsActive||'',d.eventCount||'',d.atmoscore||''].map(v => '"'+String(v).replace(/"/g,'""')+'"').join(',')));
+            sheets.push('');
+          }
+        }
+        const csv = sheets.join('\n');
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'observatory-report-' + new Date().toISOString().split('T')[0] + '.csv';
+        a.click();
+        URL.revokeObjectURL(url);
+        status.textContent = '✓ Report downloaded'; status.style.color = '#4a9';
+      } catch (err) {
+        status.textContent = 'Error: ' + err.message; status.style.color = '#e05050';
+      }
+      btn.textContent = 'GENERATE CSV'; btn.disabled = false;
+    }
+
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    }
+  </script>
 </body>
 </html>

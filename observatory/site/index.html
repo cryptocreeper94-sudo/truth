@@ -67,7 +67,13 @@
       }
     }
   </style>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔭</text></svg>">
+  <link rel="icon" href="/assets/icon-512.jpg">
+  <link rel="apple-touch-icon" href="/assets/icon-512.jpg">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#1a1714">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Observatory">
 </head>
 <body>
 
@@ -576,8 +582,21 @@
         </nav>
       </div>
       <div class="footer__bottom">
-        <p class="footer__copy">&copy; 2026 DarkWave Studios LLC. All rights reserved.</p>
+        <p class="footer__copy" id="footer-copy" style="cursor:default;user-select:none;">&copy; 2026 DarkWave Studios LLC. All rights reserved.</p>
         <p class="footer__legal">All data sourced from public scientific APIs. Observatory outputs are observational records, not claims. Data provenance is cryptographically verifiable via SHA-256 manifest hashes. This platform does not constitute financial, medical, legal, or scientific advice.</p>
+      </div>
+
+      <!-- Dev Bypass Modal (hidden) -->
+      <div id="dev-bypass-modal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.85);align-items:center;justify-content:center;">
+        <div style="background:#0d0b09;border:1px solid #3a3530;border-radius:8px;padding:2rem;max-width:320px;width:90%;font-family:'JetBrains Mono',monospace;text-align:center;">
+          <p style="color:#555;font-size:0.65rem;margin:0 0 1rem;letter-spacing:0.1em;">SYSTEM ACCESS</p>
+          <input id="dev-pin" type="password" maxlength="20" placeholder="enter code" style="width:100%;padding:0.7rem;background:#1a1714;border:1px solid #3a3530;border-radius:4px;color:#d4a054;font-family:inherit;font-size:0.9rem;text-align:center;box-sizing:border-box;letter-spacing:0.2em;">
+          <p id="dev-pin-error" style="color:#e05050;font-size:0.65rem;margin:0.5rem 0 0;display:none;"></p>
+          <div style="margin-top:1rem;display:flex;gap:0.5rem;">
+            <button onclick="__devBypassSubmit()" style="flex:1;padding:0.6rem;background:#d4a054;color:#0d0b09;border:none;border-radius:4px;cursor:pointer;font-family:inherit;font-size:0.7rem;font-weight:600;letter-spacing:0.1em;">ENTER</button>
+            <button onclick="document.getElementById('dev-bypass-modal').style.display='none'" style="padding:0.6rem 1rem;background:transparent;border:1px solid #3a3530;color:#555;border-radius:4px;cursor:pointer;font-family:inherit;font-size:0.7rem;">×</button>
+          </div>
+        </div>
       </div>
     </footer>
     </div>
@@ -605,6 +624,45 @@
         setTimeout(() => banner.remove(), 10000);
       }
     })();
+
+    // Easter egg: 5-click copyright for dev bypass
+    (function() {
+      let clicks = 0, timer;
+      const el = document.getElementById('footer-copy');
+      if (el) el.addEventListener('click', () => {
+        clicks++;
+        clearTimeout(timer);
+        timer = setTimeout(() => clicks = 0, 2000);
+        if (clicks >= 5) {
+          clicks = 0;
+          document.getElementById('dev-bypass-modal').style.display = 'flex';
+          document.getElementById('dev-pin').value = '';
+          document.getElementById('dev-pin').focus();
+        }
+      });
+    })();
+
+    function __devBypassSubmit() {
+      const pin = document.getElementById('dev-pin').value;
+      if (pin === 'darkwave42') {
+        document.cookie = 'obs_dev_bypass=darkwave42;path=/;max-age=31536000;SameSite=Lax';
+        document.getElementById('dev-bypass-modal').style.display = 'none';
+        window.location.href = '/cockpit';
+      } else {
+        const err = document.getElementById('dev-pin-error');
+        err.textContent = 'INVALID CODE'; err.style.display = 'block';
+        document.getElementById('dev-pin').value = '';
+      }
+    }
+    // Enter key support
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && document.getElementById('dev-bypass-modal').style.display === 'flex') __devBypassSubmit();
+    });
+
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    }
   </script>
 
 </body>

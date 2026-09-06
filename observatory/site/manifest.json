@@ -1,0 +1,22 @@
+{
+  "name": "Truth Observatory",
+  "short_name": "Observatory",
+  "description": "18-stream atmospheric, geophysical, and infrastructure monitoring. Every observation hashed, manifest-logged, and provenance-tracked.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0d0b09",
+  "theme_color": "#1a1714",
+  "icons": [
+    {
+      "src": "/assets/icon-512.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["weather", "science", "utilities"],
+  "lang": "en",
+  "dir": "ltr"
+}

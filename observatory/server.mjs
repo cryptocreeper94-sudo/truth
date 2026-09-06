@@ -711,9 +711,14 @@ const server = createServer(async (req, res) => {
   // ── Protected Page Routes ───────────────────────────────────────────
   const PREMIUM_PAGES = ['/cockpit', '/explorer', '/stream'];
   if (PREMIUM_PAGES.some(p => path === p || path.startsWith(p + '?'))) {
-    const subscriber = await getSubscriberFromRequest(req);
-    if (!isSubscribed(subscriber)) {
-      return redirect(res, '/?upgrade=1');
+    // Dev bypass: obs_dev_bypass cookie skips subscription check
+    const cookies = parseCookies(req);
+    const devBypass = cookies.obs_dev_bypass === 'darkwave42';
+    if (!devBypass) {
+      const subscriber = await getSubscriberFromRequest(req);
+      if (!isSubscribed(subscriber)) {
+        return redirect(res, '/?upgrade=1');
+      }
     }
   }
 
