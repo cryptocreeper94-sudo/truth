@@ -620,6 +620,7 @@ const server = createServer(async (req, res) => {
   if (path === '/api/dev-auth' && req.method === 'POST') {
     if (!ADMIN_PASSWORD) return jsonResponse(res, 403, { error: 'Admin access not configured' });
     try {
+      const body = await readBody(req);
       const { password } = JSON.parse(body);
       if (password === ADMIN_PASSWORD) {
         res.writeHead(200, {
