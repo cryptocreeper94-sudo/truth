@@ -201,6 +201,11 @@ const Observatory = {
     this.mapLayers.wildfires = L.layerGroup();
     this.mapLayers.volcanoes = L.layerGroup();
 
+    // State/country boundaries + labels overlay (always on over satellite imagery)
+    this.boundaryLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png', {
+      subdomains: 'abcd', maxZoom: 19, opacity: 0.8, pane: 'overlayPane',
+    }).addTo(this.map);
+
     // Default: show radar + heaters
     this.mapLayers.radar.addTo(this.map);
 
