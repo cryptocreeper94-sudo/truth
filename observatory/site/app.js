@@ -1412,10 +1412,25 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
 
     L.tileLayer(this.mapTiles.dark, this.mapTileOpts.dark).addTo(this.previewMap);
 
+    // State/country boundaries on preview map
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
+      maxZoom: 19, opacity: 0.9,
+    }).addTo(this.previewMap);
+
     // Add radar overlay to preview
     this.previewRadar = L.tileLayer('https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913/{z}/{x}/{y}.png', {
       opacity: 0.5, maxZoom: 8,
     }).addTo(this.previewMap);
+
+    // Floating layers button on preview
+    const layersBtn = document.createElement('button');
+    layersBtn.className = 'map-preview__layers-btn';
+    layersBtn.innerHTML = '⚙ LAYERS';
+    layersBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.openFullscreenMap();
+    });
+    preview.appendChild(layersBtn);
 
     // Tap to open fullscreen
     preview.addEventListener('click', () => this.openFullscreenMap());

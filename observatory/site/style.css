@@ -1330,6 +1330,17 @@ body::after {
   padding: 4px 12px;
   background: rgba(10,10,14,0.7);
 }
+.map-preview__layers-btn {
+  position: absolute; bottom: 10px; right: 10px; z-index: 10;
+  background: rgba(10,10,14,0.85); border: 1px solid var(--brass);
+  color: var(--brass); padding: 6px 12px; border-radius: 4px;
+  font-family: var(--font-mono); font-size: 0.6rem; font-weight: 600;
+  letter-spacing: 0.1em; cursor: pointer; pointer-events: all;
+  backdrop-filter: blur(4px); transition: all 0.2s;
+}
+.map-preview__layers-btn:active {
+  background: var(--brass); color: var(--bg-primary);
+}
 
 /* ═══ LOCATION BAR ═══════════════════════════════════════════ */
 /* Mobile-first: location bar visible by default */
