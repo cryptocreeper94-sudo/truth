@@ -113,12 +113,15 @@ const Observatory = {
   // ── Init ─────────────────────────────────────────────────────
   async init() {
     this.startClock();
+    this.renderSkeletons();
     this.initMap();
     this.bindEvents();
     this.initStatTooltips();
     this.initMobileMapPreview();
     this.initLocation();
     this.initLedger();
+    this.initTopbarDrawer();
+    this.initWelcome();
 
     // Initialize AtmosCore engine
     AtmosCore.init();
@@ -128,6 +131,63 @@ const Observatory = {
     this.fetchLedger();
     setInterval(() => this.fetchAll(), this.refreshInterval);
     setInterval(() => this.fetchLedger(), 60000); // Refresh ledger every 60s
+  },
+
+  // ── Skeleton Loading States ──────────────────────────────────
+  renderSkeletons() {
+    const carousels = document.getElementById('feed-carousels');
+    if (!carousels || carousels.children.length > 0) return;
+    const skeletonHTML = Array(6).fill(
+      '<div class="feed-card skeleton-card"><div class="skeleton-shimmer" style="height:60px;border-radius:4px;"></div><div class="skeleton-shimmer" style="height:12px;width:70%;margin-top:8px;border-radius:2px;"></div><div class="skeleton-shimmer" style="height:10px;width:50%;margin-top:6px;border-radius:2px;"></div></div>'
+    ).join('');
+    carousels.innerHTML = `<div class="feed-domain-group"><div class="feed-domain-label skeleton-shimmer" style="width:120px;height:14px;border-radius:2px;"></div><div class="feed-carousel" style="display:flex;gap:12px;padding:8px 16px;overflow:hidden;">${skeletonHTML}</div></div>`;
+  },
+
+  // ── Topbar Mobile Drawer ─────────────────────────────────────
+  initTopbarDrawer() {
+    const toggle = document.getElementById('topbar-menu-toggle');
+    const drawer = document.getElementById('topbar-drawer');
+    if (!toggle || !drawer) return;
+    toggle.addEventListener('click', () => {
+      drawer.classList.toggle('topbar-drawer--open');
+      toggle.classList.toggle('topbar-menu-toggle--open');
+    });
+    // Close drawer when any link/button inside is clicked
+    drawer.querySelectorAll('button, a').forEach(el => {
+      el.addEventListener('click', () => {
+        drawer.classList.remove('topbar-drawer--open');
+        toggle.classList.remove('topbar-menu-toggle--open');
+      });
+    });
+  },
+
+  // ── Welcome Onboarding ───────────────────────────────────────
+  initWelcome() {
+    if (localStorage.getItem('obs_welcomed')) return;
+    const overlay = document.getElementById('welcome-overlay');
+    if (!overlay) return;
+    overlay.style.display = 'flex';
+    document.getElementById('welcome-dismiss').addEventListener('click', () => {
+      overlay.style.display = 'none';
+      localStorage.setItem('obs_welcomed', '1');
+    });
+    // Also advance tour steps
+    let step = 0;
+    const steps = overlay.querySelectorAll('.welcome-step');
+    const nextBtn = document.getElementById('welcome-next');
+    if (nextBtn) {
+      nextBtn.addEventListener('click', () => {
+        steps[step].classList.remove('welcome-step--active');
+        step++;
+        if (step < steps.length) {
+          steps[step].classList.add('welcome-step--active');
+          if (step === steps.length - 1) nextBtn.textContent = 'GET STARTED';
+        } else {
+          overlay.style.display = 'none';
+          localStorage.setItem('obs_welcomed', '1');
+        }
+      });
+    }
   },
 
   // ── UTC Clock ────────────────────────────────────────────────
@@ -202,8 +262,9 @@ const Observatory = {
     this.mapLayers.volcanoes = L.layerGroup();
 
     // State/country boundaries + labels overlay (always on over satellite imagery)
-    this.boundaryLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png', {
-      subdomains: 'abcd', maxZoom: 19, opacity: 0.8, pane: 'overlayPane',
+    // ESRI Reference overlay — guaranteed compatible with ESRI World Imagery base
+    this.boundaryLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
+      maxZoom: 19, opacity: 0.9, pane: 'overlayPane',
     }).addTo(this.map);
 
     // Default: show radar + heaters
@@ -378,6 +439,9 @@ const Observatory = {
     liveEl.textContent = `${live}/${data.total || 18}`;
     liveEl.style.color = live === data.total ? 'var(--signal-live)' :
                          live > 0 ? 'var(--signal-stale)' : 'var(--signal-offline)';
+    // Update mobile summary card
+    const sf = document.getElementById('summary-feeds');
+    if (sf) { sf.textContent = `${live}/${data.total || 20}`; sf.style.color = liveEl.style.color; }
   },
 
   // ── Update AtmosCore UI ──────────────────────────────────────
@@ -433,6 +497,12 @@ const Observatory = {
       suitStat.textContent = v >= 0 ? `+${v.toFixed(2)}` : v.toFixed(2);
       suitStat.style.color = AtmosCore.getBandColor(v);
     }
+
+    // Update mobile summary cards
+    const sa = document.getElementById('summary-atmoscore');
+    if (sa) { sa.textContent = suit.status.toUpperCase(); sa.style.color = acStat ? acStat.style.color : ''; }
+    const ss = document.getElementById('summary-suitability');
+    if (ss && suitStat) { ss.textContent = suitStat.textContent; ss.style.color = suitStat.style.color; }
 
     // Provenance badge
     const provEl = document.getElementById('atmoscore-provenance');
@@ -1134,6 +1204,15 @@ const Observatory = {
       this.toggleFullscreenMapStyle();
     });
 
+    // Summary card → bottom nav shortcuts
+    document.querySelectorAll('.summary-card[data-goto]').forEach(card => {
+      card.addEventListener('click', () => {
+        const view = card.dataset.goto;
+        const btn = document.querySelector(`.bottomnav__btn[data-view="${view}"]`);
+        if (btn) btn.click();
+      });
+    });
+
     // ── Cockpit resize handle (drag to resize map/ledger split) ──
     const resizeHandle = document.getElementById('cockpit-resize-handle');
     if (resizeHandle) {
@@ -1209,6 +1288,10 @@ const Observatory = {
         // Resize map if switching to map view
         if (view === 'map' || view === 'cockpit') {
           setTimeout(() => this.map.invalidateSize(), 100);
+        }
+        // Auto-open fullscreen map on mobile when Map tab selected
+        if (view === 'map' && window.innerWidth < 769) {
+          setTimeout(() => this.openFullscreenMap(), 150);
         }
         // Resize AtmosCore ring if switching to atmoscore view
         if (view === 'atmoscore') {
@@ -1397,6 +1480,11 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
     this.fsBaseLayer = L.tileLayer(this.mapTiles[this.fsMapStyle],
       this.mapTileOpts[this.fsMapStyle]
     ).addTo(this.fullscreenMap);
+
+    // State/country boundaries overlay for fullscreen map
+    this.fsBoundaryLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
+      maxZoom: 19, opacity: 0.9, pane: 'overlayPane',
+    }).addTo(this.fullscreenMap);
 
     // Build FS layers
     this.fsMapLayers.radar = L.tileLayer('https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913/{z}/{x}/{y}.png', {

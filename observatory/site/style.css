@@ -135,6 +135,118 @@ body::after {
 .topbar__pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--signal-live); animation: pulse-dot 2s ease-in-out infinite; }
 .topbar__title { font-size: 0.55rem; font-weight: 700; letter-spacing: 0.08em; color: var(--text-primary); }
 
+/* ── Topbar Action Buttons ─────────────────────────────────── */
+.topbar__action-btn {
+  background: transparent; border: 1px solid var(--border-dim);
+  color: var(--brass); padding: 0.3rem 0.8rem; border-radius: 4px;
+  cursor: pointer; font-family: var(--font-mono); font-size: 0.65rem;
+  letter-spacing: 0.05em; margin-right: 0.25rem; transition: all 0.2s;
+}
+.topbar__action-btn:hover { border-color: var(--brass); background: var(--brass-dim); }
+/* Hide desktop buttons on mobile */
+.topbar__action-btn--desktop { display: none; }
+
+/* ── Kebab Menu Toggle (mobile-only) ───────────────────────── */
+.topbar-menu-toggle {
+  display: flex; align-items: center; justify-content: center;
+  background: none; border: 1px solid var(--border-dim); color: var(--text-primary);
+  font-size: 1.2rem; width: 32px; height: 32px; border-radius: 4px;
+  cursor: pointer; transition: all 0.2s; font-family: var(--font-mono);
+}
+.topbar-menu-toggle:hover, .topbar-menu-toggle--open {
+  background: var(--brass-dim); border-color: var(--brass); color: var(--brass);
+}
+
+/* ── Mobile Slide-Down Drawer ──────────────────────────────── */
+.topbar-drawer {
+  position: fixed; top: var(--topbar-h); left: 0; right: 0;
+  background: var(--bg-secondary); border-bottom: 1px solid var(--brass);
+  display: flex; flex-direction: column; gap: 0;
+  z-index: 99; font-family: var(--font-mono);
+  max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding 0.3s ease;
+  padding: 0 var(--space-lg);
+}
+.topbar-drawer--open { max-height: 300px; padding: var(--space-sm) var(--space-lg); }
+.topbar-drawer button, .topbar-drawer a {
+  display: block; width: 100%; padding: 12px 0;
+  background: none; border: none; border-bottom: 1px solid var(--border-dim);
+  color: var(--text-primary); font-family: var(--font-mono); font-size: 0.75rem;
+  letter-spacing: 0.1em; text-align: left; cursor: pointer; text-decoration: none;
+  transition: color 0.2s;
+}
+.topbar-drawer button:last-child, .topbar-drawer a:last-child { border-bottom: none; }
+.topbar-drawer button:hover, .topbar-drawer a:hover { color: var(--brass); }
+
+/* ── Mobile Summary Cards ──────────────────────────────────── */
+.cockpit-summary {
+  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;
+  padding: 8px 12px; margin-top: var(--topbar-h);
+  font-family: var(--font-mono);
+}
+.summary-card {
+  background: var(--bg-tile); border: 1px solid var(--border-dim);
+  border-radius: 4px; padding: 10px 8px; text-align: center;
+  cursor: pointer; transition: all 0.2s;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+}
+.summary-card:active { transform: scale(0.97); }
+.summary-card--feeds { border-top: 2px solid var(--signal-live); }
+.summary-card--atmoscore { border-top: 2px solid #1E6FA8; }
+.summary-card--suitability { border-top: 2px solid var(--brass); }
+.summary-card__icon { font-size: 0.9rem; color: var(--brass); }
+.summary-card__value { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); letter-spacing: 0.05em; }
+.summary-card__label { font-size: 0.45rem; color: var(--text-dim); letter-spacing: 0.15em; }
+
+/* ── Skeleton Shimmer Animation ────────────────────────────── */
+.skeleton-shimmer {
+  background: linear-gradient(90deg, var(--bg-tile) 25%, rgba(255,255,255,0.06) 50%, var(--bg-tile) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+.skeleton-card {
+  min-width: 160px; min-height: 140px; padding: 12px;
+  display: flex; flex-direction: column; gap: 0;
+}
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Welcome Overlay ───────────────────────────────────────── */
+.welcome-overlay {
+  position: fixed; inset: 0; z-index: 10001;
+  background: rgba(0,0,0,0.92); backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px;
+}
+.welcome-modal {
+  background: var(--bg-secondary); border: 1px solid var(--brass);
+  border-radius: 8px; max-width: 420px; width: 100%;
+  padding: 2rem 1.5rem; font-family: var(--font-mono); text-align: center;
+}
+.welcome-header { margin-bottom: 1.5rem; }
+.welcome-logo { font-size: 2rem; color: var(--signal-live); display: block; margin-bottom: 8px; animation: pulse-glow 3s ease-in-out infinite; }
+.welcome-header h2 { font-size: 1rem; color: var(--text-primary); letter-spacing: 0.25em; margin: 0; }
+.welcome-sub { font-size: 0.65rem; color: var(--text-dim); letter-spacing: 0.1em; margin: 4px 0 0; }
+.welcome-steps { min-height: 120px; margin-bottom: 1.5rem; }
+.welcome-step { display: none; }
+.welcome-step--active { display: block; animation: fadeIn 0.3s ease; }
+.welcome-step__icon { font-size: 1.5rem; color: var(--brass); display: block; margin-bottom: 8px; }
+.welcome-step h3 { font-size: 0.75rem; color: var(--brass); letter-spacing: 0.15em; margin: 0 0 8px; }
+.welcome-step p { font-size: 0.7rem; color: var(--text-secondary); line-height: 1.6; margin: 0; }
+.welcome-actions { display: flex; gap: 8px; justify-content: center; margin-bottom: 1rem; }
+.welcome-btn {
+  padding: 10px 20px; border-radius: 4px; cursor: pointer;
+  font-family: var(--font-mono); font-size: 0.7rem; font-weight: 600;
+  letter-spacing: 0.1em; transition: all 0.2s;
+}
+.welcome-btn--primary { background: var(--brass); color: var(--bg-primary); border: none; }
+.welcome-btn--primary:hover { background: #e0b06a; }
+.welcome-btn--skip { background: transparent; border: 1px solid var(--border-dim); color: var(--text-dim); }
+.welcome-btn--skip:hover { border-color: var(--text-secondary); color: var(--text-secondary); }
+.welcome-footer { font-size: 0.5rem; color: var(--text-dim); letter-spacing: 0.1em; margin: 0; opacity: 0.5; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
 /* ═══ COCKPIT LAYOUT — Mobile-first (scrollable column) ══════ */
 .cockpit {
   position: relative;
@@ -1189,7 +1301,7 @@ body::after {
   display: block;
   position: relative;
   width: 100%;
-  height: 38vh;
+  height: 25vh;
   background: var(--bg-primary);
   border-bottom: 1px solid var(--border-dim);
   cursor: pointer;
@@ -1397,6 +1509,10 @@ body::after {
   /* ── Hide mobile-only elements ──────────────────── */
   .map-preview { display: none; }
   .location-bar { display: none; }
+  .topbar-menu-toggle { display: none; }
+  .topbar-drawer { display: none; }
+  .cockpit-summary { display: none; }
+  .topbar__action-btn--desktop { display: inline-block; }
 
   /* ── Cockpit = fixed two-column grid ────────────── */
   html, body {
@@ -1518,7 +1634,7 @@ body::after {
   .feed-card__name { font-size: 0.55rem; }
   .feed-card__condition { font-size: 0.5rem; }
 
-  .map-preview { height: 32vh; }
+  .map-preview { height: 22vh; }
 
   /* Ledger events compact */
   .ledger-event { font-size: 0.55rem; padding: 4px 6px; }

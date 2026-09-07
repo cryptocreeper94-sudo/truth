@@ -40,13 +40,24 @@
       </div>
     </div>
     <div class="topbar__right">
-      <button onclick="document.getElementById('download-modal').style.display='flex'" style="background:transparent;border:1px solid #4a9;color:#4a9;padding:0.3rem 0.8rem;border-radius:4px;cursor:pointer;font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.05em;margin-right:0.5rem;" title="Download CSV Report">⬇ EXPORT</button>
-      <button id="manage-sub-btn" onclick="document.getElementById('manage-sub-modal').style.display='flex'" style="background:transparent;border:1px solid #d4a054;color:#d4a054;padding:0.3rem 0.8rem;border-radius:4px;cursor:pointer;font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.05em;margin-right:0.5rem;">ACCOUNT</button>
-      <a href="/" style="color:#d4a054;text-decoration:none;font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.05em;margin-right:0.5rem;">← BACK</a>
+      <!-- Desktop-only inline buttons -->
+      <button class="topbar__action-btn topbar__action-btn--desktop" onclick="document.getElementById('download-modal').style.display='flex'" title="Download CSV Report">⬇ EXPORT</button>
+      <button class="topbar__action-btn topbar__action-btn--desktop" id="manage-sub-btn" onclick="document.getElementById('manage-sub-modal').style.display='flex'">ACCOUNT</button>
+      <a class="topbar__action-btn topbar__action-btn--desktop" href="/" style="text-decoration:none;">← BACK</a>
       <span class="topbar__clock" id="utc-clock">00:00:00 UTC</span>
       <span class="topbar__pulse" id="global-pulse" data-info="stat-pulse" title="Data connection status"></span>
+      <!-- Mobile kebab menu -->
+      <button class="topbar-menu-toggle" id="topbar-menu-toggle" aria-label="Menu">⋮</button>
     </div>
   </header>
+
+  <!-- Mobile slide-down drawer -->
+  <div class="topbar-drawer" id="topbar-drawer">
+    <button onclick="document.getElementById('download-modal').style.display='flex'">⬇ EXPORT DATA</button>
+    <button id="manage-sub-btn-mobile" onclick="document.getElementById('manage-sub-modal').style.display='flex'">👤 ACCOUNT</button>
+    <a href="/about">ℹ ABOUT</a>
+    <a href="/">← BACK TO HOME</a>
+  </div>
 
   <!-- Manage Subscription Modal -->
   <div id="manage-sub-modal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.7);align-items:center;justify-content:center;">
@@ -86,6 +97,25 @@
       <button class="stat-tooltip__close" id="stat-tooltip-close">&#10005;</button>
     </div>
     <div class="stat-tooltip__body" id="stat-tooltip-body"></div>
+  </div>
+
+  <!-- ═══ MOBILE SUMMARY CARDS ═══ -->
+  <div class="cockpit-summary" id="cockpit-summary">
+    <div class="summary-card summary-card--feeds" data-goto="feeds">
+      <span class="summary-card__icon">◫</span>
+      <span class="summary-card__value" id="summary-feeds">—/20</span>
+      <span class="summary-card__label">LIVE FEEDS</span>
+    </div>
+    <div class="summary-card summary-card--atmoscore" data-goto="atmoscore">
+      <span class="summary-card__icon" style="color:#1E6FA8">◉</span>
+      <span class="summary-card__value" id="summary-atmoscore">INIT</span>
+      <span class="summary-card__label">ATMOSCORE</span>
+    </div>
+    <div class="summary-card summary-card--suitability" data-goto="correlations">
+      <span class="summary-card__icon">◆</span>
+      <span class="summary-card__value" id="summary-suitability">—</span>
+      <span class="summary-card__label">SUITABILITY</span>
+    </div>
   </div>
 
   <!-- ═══ MOBILE MAP PREVIEW ═══ -->
@@ -388,6 +418,39 @@
         <button onclick="document.getElementById('download-modal').style.display='none'" style="padding:0.7rem 1rem;background:transparent;border:1px solid #3a3530;color:#a09080;border-radius:4px;cursor:pointer;font-family:var(--font-mono);font-size:0.75rem;">CLOSE</button>
       </div>
       <p id="export-status" style="color:#a09080;font-size:0.65rem;margin:0.75rem 0 0;text-align:center;display:none;"></p>
+    </div>
+  </div>
+
+  <!-- ═══ WELCOME OVERLAY ═══ -->
+  <div id="welcome-overlay" class="welcome-overlay" style="display:none;">
+    <div class="welcome-modal">
+      <div class="welcome-header">
+        <span class="welcome-logo">◉</span>
+        <h2>TRUTH OBSERVATORY</h2>
+        <p class="welcome-sub">Mission Control — v3.0</p>
+      </div>
+      <div class="welcome-steps">
+        <div class="welcome-step welcome-step--active">
+          <span class="welcome-step__icon">◫</span>
+          <h3>20 LIVE DATA STREAMS</h3>
+          <p>Atmospheric, geophysical, and infrastructure feeds from NOAA, USGS, FAA, EPA, EIA, and SWPC — updating every 5 minutes with SHA-256 hash verification.</p>
+        </div>
+        <div class="welcome-step">
+          <span class="welcome-step__icon">◎</span>
+          <h3>INTERACTIVE GEOSPATIAL MAP</h3>
+          <p>10 toggleable overlay layers — radar, satellite, infrared, water vapor, precipitation, fire, heaters, ADS-B aircraft, wildfires, and volcanic activity. All on a real-time satellite base.</p>
+        </div>
+        <div class="welcome-step">
+          <span class="welcome-step__icon" style="color:#1E6FA8">◉</span>
+          <h3>ATMOSCORE 4/42 ENGINE</h3>
+          <p>Deterministic atmospheric state scoring across 4 primitives — Thermodynamic, Optical Propagation, Dynamic Flow, and Temporal Stability. Observation suitability governance, not prediction.</p>
+        </div>
+      </div>
+      <div class="welcome-actions">
+        <button id="welcome-next" class="welcome-btn welcome-btn--primary">NEXT →</button>
+        <button id="welcome-dismiss" class="welcome-btn welcome-btn--skip">SKIP TOUR</button>
+      </div>
+      <p class="welcome-footer">© 2026 DarkWave Studios LLC — Deterministic Truth Platform</p>
     </div>
   </div>
 
