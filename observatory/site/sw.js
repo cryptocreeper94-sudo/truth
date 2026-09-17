@@ -1,6 +1,6 @@
 // Truth Observatory — Service Worker
 // Caches shell assets for offline splash + fast reload
-const CACHE_NAME = 'observatory-v6';
+const CACHE_NAME = 'observatory-v7';
 const SHELL_ASSETS = [
   '/',
   '/landing.css',

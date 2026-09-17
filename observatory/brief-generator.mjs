@@ -22,6 +22,7 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { LumeV } from './lib/lume-v/index.js';
+import { anchorBrief, anchorLumeVCert } from './trustlayer-anchor.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const STATE_DIR = process.env.STATE_DIR || join(__dirname, 'state');
@@ -287,6 +288,40 @@ export async function generateDailyBrief() {
   writeFileSync(BRIEF_PATH, JSON.stringify(brief, null, 2));
   console.log(`[BRIEF] Saved to ${BRIEF_PATH}`);
   console.log(`[BRIEF] SHA-256: ${brief.sha256}`);
+
+  // Anchor to TrustLayer PoA blockchain
+  try {
+    const anchor = await anchorBrief(brief.sha256, {
+      generatedAt: brief.generatedAt,
+      activeFeeds: brief.activeFeeds,
+      totalObservations: brief.totalObservations,
+    });
+    if (anchor.success) {
+      brief.trustLayer = {
+        txHash: anchor.txHash,
+        blockHeight: anchor.blockHeight,
+        anchoredAt: anchor.timestamp,
+      };
+      // Re-save with trustLayer data
+      writeFileSync(BRIEF_PATH, JSON.stringify(brief, null, 2));
+      console.log(`[BRIEF] ✓ Anchored to TrustLayer — tx: ${anchor.txHash}`);
+    } else {
+      console.warn(`[BRIEF] TrustLayer anchor failed: ${anchor.error}`);
+      brief.trustLayer = { status: 'pending', error: anchor.error };
+      writeFileSync(BRIEF_PATH, JSON.stringify(brief, null, 2));
+    }
+
+    // Also anchor each Lume-V certificate individually
+    for (const [level, data] of Object.entries(briefs)) {
+      if (data.governance?.certificateHash) {
+        anchorLumeVCert(data.governance.certificateHash, { level, briefHash: brief.sha256 })
+          .then(r => { if (r.success) console.log(`[BRIEF] ✓ Lume-V cert (${level}) anchored — tx: ${r.txHash}`); })
+          .catch(() => {});
+      }
+    }
+  } catch (err) {
+    console.warn(`[BRIEF] TrustLayer anchor error: ${err.message}`);
+  }
 
   return brief;
 }

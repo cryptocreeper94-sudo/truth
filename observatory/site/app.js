@@ -222,7 +222,16 @@ const Observatory = {
         certEl.textContent = '';
       }
 
-      if (sourceEl) {
+      // Show TrustLayer anchor info
+      if (brief.trustLayer?.txHash) {
+        if (certEl) {
+          certEl.textContent += ` → TX ${brief.trustLayer.txHash.substring(0, 10)}…`;
+          certEl.title += `\n\nTrustLayer Anchor:\nTX: ${brief.trustLayer.txHash}\nBlock: ${brief.trustLayer.blockHeight || 'pending'}`;
+        }
+        if (sourceEl) {
+          sourceEl.textContent = 'Verified by Lume-V → Anchored on TrustLayer';
+        }
+      } else if (sourceEl) {
         sourceEl.textContent = data.source === 'ai' ? 'Verified by Lume-V' : 'Deterministic template';
       }
     } catch (err) {
