@@ -235,7 +235,7 @@ function readManifest(filename, limit = 100) {
 // Feed Status — computes live/stale/offline status for each feed
 // ═══════════════════════════════════════════════════════════════════════════
 function getFeedStatus(feed) {
-  const entries = readManifest(feed.manifest, 200);
+  const entries = readManifest(feed.manifest, 500);
   const total = entries.length;
   if (total === 0) return { ...feed, status: 'offline', entries: 0, last: null, sparkline: [] };
 
