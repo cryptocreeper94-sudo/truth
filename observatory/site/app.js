@@ -109,6 +109,47 @@ const Observatory = {
   mapLayers: {},
   markers: { earthquakes: [], lightning: [], heaters: [], aircraft: [], fire: [], wildfires: [], volcanoes: [] },
   refreshInterval: 60000,
+  _alertLayersActive: [],  // tracks which layers were auto-activated by alerts
+
+  // ── Correlation Layer Groups ────────────────────────────────
+  // When a trigger feed shows elevated conditions, related layers auto-activate
+  layerCorrelationGroups: {
+    'space-weather': {
+      name: 'Space Weather Event',
+      triggers: ['solar', 'geomag'],
+      layers: ['heaters'],  // heaters are the only map-layer feeds in this group
+      icon: '☀️',
+      description: 'Solar activity or geomagnetic storm detected — showing ionospheric heater facilities for cross-reference.',
+    },
+    'severe-weather': {
+      name: 'Severe Weather',
+      triggers: ['nexrad', 'lightning', 'blitzortung'],
+      layers: ['radar', 'precip', 'satellite', 'fire'],
+      icon: '⛈️',
+      description: 'Severe weather detected — activating radar, precipitation, satellite, and fire layers.',
+    },
+    'atmospheric-anomaly': {
+      name: 'Atmospheric Anomaly',
+      triggers: ['heater', 'ionosonde', 'schumann'],
+      layers: ['radar', 'heaters', 'aircraft'],
+      icon: '📡',
+      description: 'Ionospheric or RF activity detected — showing radar, heaters, and aircraft for cross-correlation.',
+    },
+    'wildfire-event': {
+      name: 'Wildfire Activity',
+      triggers: ['wildfire'],
+      layers: ['fire', 'wildfires', 'satellite'],
+      icon: '🔥',
+      description: 'Active wildfires detected — showing fire satellite detections, incident map, and satellite imagery.',
+    },
+    'volcanic-event': {
+      name: 'Volcanic Activity',
+      triggers: ['volcanic'],
+      layers: ['volcanoes', 'satellite', 'infrared'],
+      icon: '🌋',
+      description: 'Elevated volcanic alert — showing volcanic markers, satellite, and infrared imagery.',
+    },
+  },
 
   // ── Init ─────────────────────────────────────────────────────
   async init() {
@@ -423,6 +464,9 @@ const Observatory = {
         AtmosCore.compute(this.feeds);
         AtmosCoreViz.update(AtmosCore);
         this.updateAtmosCoreUI();
+
+        // Check for alert conditions and auto-activate related layers
+        this.checkAlertLayers();
       }
 
       if (corrRes) {
@@ -436,6 +480,145 @@ const Observatory = {
       console.warn('[Observatory] Fetch error:', err.message);
       const pulse = document.getElementById('global-pulse');
       pulse.style.background = 'var(--signal-stale)';
+    }
+  },
+
+  // ── Is Feed Elevated? ──────────────────────────────────────
+  _isElevated(feed) {
+    if (!feed || feed.status === 'offline') return false;
+    const rate = feed.sparkline ? feed.sparkline[feed.sparkline.length - 1] || 0 : 0;
+    const avg = feed.sparkline ? feed.sparkline.reduce((a, b) => a + b, 0) / (feed.sparkline.length || 1) : 0;
+    switch (feed.id) {
+      case 'earthquake': return feed.entries > 15;
+      case 'solar': return rate > avg * 2;
+      case 'geomag': return rate > avg * 2;
+      case 'nexrad': return rate > avg * 2 && avg > 0;
+      case 'lightning': case 'blitzortung': return feed.entries > 10;
+      case 'grid': return rate > avg * 1.5 && avg > 0;
+      case 'ionosonde': return rate > avg * 2;
+      case 'schumann': return rate > avg * 2;
+      case 'heater': return feed.entries > 0;
+      case 'metals': return rate > avg * 1.5 && avg > 0;
+      case 'wildfire': return feed.entries > 0;
+      case 'volcanic': return feed.entries > 0;
+      case 'notam': return feed.entries > 20;
+      default: return rate > avg * 1.5 && avg > 0;
+    }
+  },
+
+  // ── Smart Alert-Based Layer Activation ──────────────────────
+  checkAlertLayers() {
+    if (!this.feeds || !this.map) return;
+
+    const triggered = [];
+    const layersToActivate = new Set();
+
+    for (const [groupId, group] of Object.entries(this.layerCorrelationGroups)) {
+      const triggerFeed = this.feeds.find(f => group.triggers.includes(f.id) && this._isElevated(f));
+      if (triggerFeed) {
+        triggered.push({ groupId, group, triggerFeed });
+        group.layers.forEach(l => layersToActivate.add(l));
+      }
+    }
+
+    // Activate layers that aren't already on
+    const newlyActivated = [];
+    for (const layerName of layersToActivate) {
+      if (this.mapLayers[layerName] && !this.map.hasLayer(this.mapLayers[layerName])) {
+        this.mapLayers[layerName].addTo(this.map);
+        newlyActivated.push(layerName);
+        // Sync checkbox
+        const cb = document.querySelector(`input[data-layer="${layerName}"]`);
+        if (cb) cb.checked = true;
+      }
+    }
+
+    // Track auto-activated layers
+    this._alertLayersActive = [...new Set([...this._alertLayersActive, ...newlyActivated])];
+
+    // Show alert notification if new layers were activated
+    if (newlyActivated.length > 0 && triggered.length > 0) {
+      this._showAlertBanner(triggered, newlyActivated);
+      // Expand layer panel if collapsed
+      const layerToggles = document.getElementById('layer-toggles');
+      const layersBtn = document.getElementById('layers-btn');
+      if (layerToggles && layerToggles.classList.contains('layer-toggles--collapsed')) {
+        layerToggles.classList.remove('layer-toggles--collapsed');
+        if (layersBtn) layersBtn.classList.add('layers-btn--active');
+        setTimeout(() => { if (this.map) this.map.invalidateSize(); }, 350);
+      }
+    }
+
+    this.updateLayerCount();
+    this.updateDynamicLegend();
+    this.checkLayerDensity();
+  },
+
+  // ── Alert Banner ───────────────────────────────────────────
+  _showAlertBanner(triggered, newLayers) {
+    // Remove existing banner if any
+    const existing = document.getElementById('alert-layer-banner');
+    if (existing) existing.remove();
+
+    const firstGroup = triggered[0].group;
+    const level = (typeof Levels !== 'undefined') ? (Levels.get() || 'observer') : 'researcher';
+
+    let message;
+    if (level === 'observer') {
+      message = `${firstGroup.icon} Something interesting is happening — we've turned on ${newLayers.length} extra map layer${newLayers.length > 1 ? 's' : ''} to show you the full picture.`;
+    } else if (level === 'analyst') {
+      message = `${firstGroup.icon} ${firstGroup.name} — Auto-activated ${newLayers.join(', ').toUpperCase()} layers for cross-correlation.`;
+    } else {
+      message = `${firstGroup.icon} ${firstGroup.name} detected. Auto-enabled: ${newLayers.join(', ').toUpperCase()}. ${firstGroup.description}`;
+    }
+
+    const banner = document.createElement('div');
+    banner.id = 'alert-layer-banner';
+    banner.className = 'alert-layer-banner';
+    banner.innerHTML = `
+      <span class="alert-layer-banner__text">${message}</span>
+      <button class="alert-layer-banner__close" onclick="this.parentElement.remove()">✕</button>
+    `;
+    const mapPanel = document.getElementById('map-panel');
+    if (mapPanel) {
+      mapPanel.insertBefore(banner, document.getElementById('map'));
+    }
+
+    // Auto-dismiss after 15 seconds
+    setTimeout(() => { if (banner.parentElement) banner.remove(); }, 15000);
+  },
+
+  // ── Layer Density Warning ──────────────────────────────────
+  checkLayerDensity() {
+    let activeCount = 0;
+    Object.values(this.mapLayers).forEach(layer => {
+      if (this.map.hasLayer(layer)) activeCount++;
+    });
+
+    // Remove existing warning
+    const existing = document.getElementById('layer-density-warning');
+    if (existing) existing.remove();
+
+    if (activeCount >= 8) {
+      const level = (typeof Levels !== 'undefined') ? (Levels.get() || 'observer') : 'researcher';
+      let msg;
+      if (activeCount >= 10) {
+        msg = level === 'observer'
+          ? `🤯 You've got ${activeCount} layers on! This might look like a Jackson Pollock painting. That's okay — sometimes the full picture IS chaotic.`
+          : `⚠ ${activeCount} layers active. Full 20-collector overlay may produce visual noise. Data integrity is unaffected — only visual clarity is reduced.`;
+      } else {
+        msg = level === 'observer'
+          ? `📊 ${activeCount} layers active — getting detailed! Some overlays may overlap.`
+          : `${activeCount} layers active. Consider disabling unused overlays for clarity.`;
+      }
+
+      const warning = document.createElement('div');
+      warning.id = 'layer-density-warning';
+      warning.className = 'layer-density-warning';
+      warning.innerHTML = `<span>${msg}</span><button onclick="this.parentElement.remove()">✕</button>`;
+
+      const mapEl = document.getElementById('map');
+      if (mapEl) mapEl.appendChild(warning);
     }
   },
 
@@ -1224,6 +1407,7 @@ const Observatory = {
       }
       this.updateLayerCount();
       this.updateDynamicLegend();
+      this.checkLayerDensity();
     });
 
     // Map style toggle (light/dark)

@@ -475,6 +475,76 @@ body[data-level="observer"] .layer-name-researcher { display: none; }
 body[data-level="analyst"] .layer-name-observer { display: none; }
 body[data-level="analyst"] .layer-name-researcher { display: inline; }
 
+/* ═══ ALERT LAYER BANNER ═══════════════════════════════════ */
+.alert-layer-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: rgba(212, 160, 84, 0.12);
+  border-bottom: 1px solid rgba(212, 160, 84, 0.3);
+  animation: alert-slide-in 0.4s ease;
+  flex-shrink: 0;
+}
+@keyframes alert-slide-in {
+  from { transform: translateY(-100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.alert-layer-banner__text {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--brass);
+  line-height: 1.5;
+  flex: 1;
+}
+.alert-layer-banner__close {
+  background: none;
+  border: 1px solid rgba(212, 160, 84, 0.3);
+  color: var(--brass);
+  font-size: 0.6rem;
+  padding: 2px 6px;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  transition: all 0.2s;
+}
+.alert-layer-banner__close:hover {
+  background: rgba(212, 160, 84, 0.15);
+}
+
+/* ═══ LAYER DENSITY WARNING ═══════════════════════════════ */
+.layer-density-warning {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  right: 8px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: rgba(10, 10, 14, 0.88);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 171, 0, 0.3);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  animation: alert-slide-in 0.3s ease;
+}
+.layer-density-warning span { flex: 1; }
+.layer-density-warning button {
+  background: none;
+  border: 1px solid rgba(255, 171, 0, 0.3);
+  color: var(--text-dim);
+  font-size: 0.55rem;
+  padding: 2px 6px;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  transition: all 0.2s;
+}
+.layer-density-warning button:hover { color: var(--text-primary); }
+
 /* ═══ MAP ═══════════════════════════════════════════════════ */
 .map-container {
   flex: 1;
