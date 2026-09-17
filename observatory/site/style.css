@@ -698,6 +698,88 @@ body[data-level="analyst"] .layer-name-researcher { display: inline; }
 }
 .legend-info-modal__body .info-row:last-child { border-bottom: none; }
 
+/* ═══ DAILY BRIEF CARD ══════════════════════════════════════ */
+.daily-brief {
+  margin: var(--space-sm) var(--space-md);
+  padding: var(--space-md);
+  background: rgba(212, 160, 84, 0.04);
+  border: 1px solid rgba(212, 160, 84, 0.15);
+  border-left: 3px solid var(--brass);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+}
+.daily-brief__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: var(--space-sm);
+}
+.daily-brief__icon {
+  color: var(--brass);
+  font-size: 1rem;
+}
+.daily-brief__title {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: var(--brass);
+}
+.daily-brief__badge {
+  font-size: 0.5rem;
+  padding: 1px 6px;
+  border-radius: 2px;
+  letter-spacing: 0.1em;
+  border: 1px solid var(--border-dim);
+  color: var(--text-dim);
+}
+.daily-brief__badge--verified {
+  color: var(--signal-live);
+  border-color: rgba(0, 255, 136, 0.3);
+  background: rgba(0, 255, 136, 0.08);
+}
+.daily-brief__badge--template {
+  color: var(--brass);
+  border-color: rgba(212, 160, 84, 0.3);
+  background: rgba(212, 160, 84, 0.08);
+}
+.daily-brief__badge--unverified {
+  color: var(--text-dim);
+  border-color: var(--border-dim);
+}
+.daily-brief__time {
+  font-size: 0.5rem;
+  color: var(--text-dim);
+  margin-left: auto;
+}
+.daily-brief__body {
+  font-size: 0.7rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  font-family: var(--font-primary);
+}
+.daily-brief__footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: var(--space-sm);
+  padding-top: var(--space-xs);
+  border-top: 1px solid var(--border-dim);
+}
+.daily-brief__cert {
+  font-size: 0.45rem;
+  font-family: var(--font-mono);
+  color: var(--text-dim);
+  letter-spacing: 0.05em;
+  cursor: help;
+}
+.daily-brief__source {
+  font-size: 0.45rem;
+  font-family: var(--font-mono);
+  color: var(--signal-live);
+  letter-spacing: 0.08em;
+  margin-left: auto;
+}
+
 /* ═══ FEED CAROUSELS ═══════════════════════════════════════════ */
 .feed-carousels {
   flex: 1;

@@ -19,6 +19,7 @@ import { readFileSync, existsSync, readdirSync, statSync } from 'fs';
 import { join, extname, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { randomBytes, createHmac } from 'crypto';
+import { generateDailyBrief, getCurrentBrief } from './brief-generator.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const STATE_DIR = process.env.STATE_DIR || join(__dirname, 'state');
@@ -656,6 +657,15 @@ const server = createServer(async (req, res) => {
       return jsonResponse(res, 401, { error: 'Invalid code' });
     } catch { return jsonResponse(res, 400, { error: 'Bad request' }); }
   }
+  // ── Daily Brief API ─────────────────────────────────────────
+  if (path === '/api/brief') {
+    const brief = getCurrentBrief();
+    if (brief) {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify(brief));
+    }
+    return jsonResponse(res, 404, { error: 'No brief available yet' });
+  }
 
   if (path === '/api/feeds') {
     const statuses = FEEDS.map(getFeedStatus);
@@ -926,4 +936,19 @@ server.listen(PORT, () => {
   console.log(`[OBSERVATORY API] State dir: ${STATE_DIR}`);
   console.log(`[OBSERVATORY API] Site dir: ${SITE_DIR}`);
   console.log(`[OBSERVATORY API] Feeds configured: ${FEEDS.length}`);
+
+  // ── Daily Brief Generation Cycle ────────────────────────
+  const BRIEF_INTERVAL = 6 * 3600000; // 6 hours
+  const runBrief = async () => {
+    try {
+      console.log('[OBSERVATORY API] Generating Daily Brief...');
+      await generateDailyBrief();
+    } catch (err) {
+      console.warn('[OBSERVATORY API] Brief generation failed:', err.message);
+    }
+  };
+  // First brief 30s after startup (let collectors write initial data)
+  setTimeout(runBrief, 30000);
+  // Then every 6 hours
+  setInterval(runBrief, BRIEF_INTERVAL);
 });

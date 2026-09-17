@@ -170,8 +170,64 @@ const Observatory = {
 
     await this.fetchAll();
     this.fetchLedger();
+    this.fetchBrief();
     setInterval(() => this.fetchAll(), this.refreshInterval);
-    setInterval(() => this.fetchLedger(), 60000); // Refresh ledger every 60s
+    setInterval(() => this.fetchLedger(), 60000);
+    setInterval(() => this.fetchBrief(), 300000); // Refresh brief every 5 min
+  },
+
+  // ── Fetch Daily Brief ──────────────────────────────────────
+  async fetchBrief() {
+    try {
+      const res = await fetch('/api/brief');
+      if (!res.ok) return;
+      const brief = await res.json();
+
+      const level = (typeof Levels !== 'undefined') ? (Levels.get() || 'observer') : 'observer';
+      const data = brief.briefs?.[level];
+      if (!data) return;
+
+      const bodyEl = document.getElementById('brief-body');
+      const badgeEl = document.getElementById('brief-badge');
+      const timeEl = document.getElementById('brief-time');
+      const footerEl = document.getElementById('brief-footer');
+      const certEl = document.getElementById('brief-cert');
+      const sourceEl = document.getElementById('brief-source');
+
+      if (bodyEl) bodyEl.textContent = data.text;
+
+      if (badgeEl) {
+        if (data.governance && data.governance.decision === 'approved') {
+          badgeEl.textContent = '✓ VERIFIED';
+          badgeEl.className = 'daily-brief__badge daily-brief__badge--verified';
+        } else if (data.source === 'template') {
+          badgeEl.textContent = '◆ TEMPLATE';
+          badgeEl.className = 'daily-brief__badge daily-brief__badge--template';
+        } else {
+          badgeEl.textContent = '○ UNVERIFIED';
+          badgeEl.className = 'daily-brief__badge daily-brief__badge--unverified';
+        }
+      }
+
+      if (timeEl && brief.generatedAt) {
+        timeEl.textContent = this.timeAgo(brief.generatedAt);
+      }
+
+      if (footerEl) footerEl.style.display = 'flex';
+
+      if (certEl && data.governance?.certificateHash) {
+        certEl.textContent = `LTC ${data.governance.certificateHash.substring(0, 12)}…`;
+        certEl.title = `Lume-V Trust Certificate: ${data.governance.certificateHash}\nInvariants: ${data.governance.invariantsPassed}/${data.governance.invariantsTotal} passed\nLatency: ${data.governance.latency}ms`;
+      } else if (certEl) {
+        certEl.textContent = '';
+      }
+
+      if (sourceEl) {
+        sourceEl.textContent = data.source === 'ai' ? 'Verified by Lume-V' : 'Deterministic template';
+      }
+    } catch (err) {
+      console.warn('[Observatory] Brief fetch error:', err.message);
+    }
   },
 
   // ── Refresh (re-render for level change) ─────────────────────
