@@ -248,17 +248,41 @@ function getFeedStatus(feed) {
   // stale = more than 3x the expected interval
   const status = age > feed.interval * 3 ? 'stale' : 'live';
 
-  // Build sparkline: count entries per hour over last 24h
+  // Build sparkline with adaptive resolution
+  // Fast feeds (< 12h interval): hourly bins over 24h
+  // Slow feeds (>= 12h interval): daily bins over 14 days
   const now = Date.now();
   const sparkline = [];
-  for (let h = 23; h >= 0; h--) {
-    const start = now - (h + 1) * 3600000;
-    const end = now - h * 3600000;
-    const count = entries.filter(e => {
-      const ts = new Date(e.timestamp || e.retrievedAt || e.fetchedAt || e.collected_at || e.at || e.writtenAt || 0).getTime();
-      return ts >= start && ts < end;
-    }).length;
-    sparkline.push(count);
+  const isSlowFeed = feed.interval >= 43200000; // >= 12 hours
+
+  if (isSlowFeed) {
+    // Daily bins over 14 days — produces natural variation for daily collectors
+    for (let d = 13; d >= 0; d--) {
+      const start = now - (d + 1) * 86400000;
+      const end = now - d * 86400000;
+      const dayEntries = dataEntries.filter(e => {
+        const ts = new Date(e.timestamp || e.retrievedAt || e.fetchedAt || e.collected_at || e.at || e.writtenAt || 0).getTime();
+        return ts >= start && ts < end;
+      });
+      // Use actual data values when available for more meaningful sparklines
+      if (dayEntries.length > 0) {
+        const valueEntry = dayEntries.find(e => e.totalResults || e.magnitude || e.value);
+        sparkline.push(valueEntry ? (valueEntry.totalResults || valueEntry.magnitude || valueEntry.value || dayEntries.length) : dayEntries.length);
+      } else {
+        sparkline.push(0);
+      }
+    }
+  } else {
+    // Hourly bins over 24h — rich data for fast collectors
+    for (let h = 23; h >= 0; h--) {
+      const start = now - (h + 1) * 3600000;
+      const end = now - h * 3600000;
+      const count = entries.filter(e => {
+        const ts = new Date(e.timestamp || e.retrievedAt || e.fetchedAt || e.collected_at || e.at || e.writtenAt || 0).getTime();
+        return ts >= start && ts < end;
+      }).length;
+      sparkline.push(count);
+    }
   }
 
   return {
