@@ -175,16 +175,17 @@
         <span class="panel-header__title">GEOSPATIAL OVERLAY</span>
         <button class="refresh-btn" id="refresh-map" title="Refresh overlays">&#8635;</button>
         <span class="panel-header__badge" id="map-layers">1 layers active</span>
+        <button class="layers-btn" id="layers-btn" title="Toggle map layers">⚡ LAYERS</button>
         <button class="panel-header__expand" id="map-expand" title="Open fullscreen map">⛶</button>
       </div>
-      <div class="layer-toggles" id="layer-toggles">
-        <label class="layer-toggle"><input type="checkbox" data-layer="radar" checked> RADAR</label>
-        <label class="layer-toggle"><input type="checkbox" data-layer="satellite"> GOES VIS</label>
-        <label class="layer-toggle"><input type="checkbox" data-layer="infrared"> GOES IR</label>
-        <label class="layer-toggle"><input type="checkbox" data-layer="watervapor"> WATER VAPOR</label>
-        <label class="layer-toggle"><input type="checkbox" data-layer="precip"> PRECIP</label>
+      <div class="layer-toggles layer-toggles--collapsed" id="layer-toggles">
+        <label class="layer-toggle"><input type="checkbox" data-layer="radar" checked> <span class="layer-name-researcher">RADAR</span><span class="layer-name-observer">Weather Radar</span></label>
+        <label class="layer-toggle"><input type="checkbox" data-layer="satellite"> <span class="layer-name-researcher">GOES VIS</span><span class="layer-name-observer">Satellite</span></label>
+        <label class="layer-toggle"><input type="checkbox" data-layer="infrared"> <span class="layer-name-researcher">GOES IR</span><span class="layer-name-observer">Infrared</span></label>
+        <label class="layer-toggle"><input type="checkbox" data-layer="watervapor"> <span class="layer-name-researcher">WATER VAPOR</span><span class="layer-name-observer">Moisture</span></label>
+        <label class="layer-toggle"><input type="checkbox" data-layer="precip"> <span class="layer-name-researcher">PRECIP</span><span class="layer-name-observer">Rain</span></label>
         <label class="layer-toggle" style="color:#ff6b6b;"><input type="checkbox" data-layer="fire"> 🔥 FIRE</label>
-        <label class="layer-toggle" style="color:#ff4ecf;"><input type="checkbox" data-layer="heaters" checked> ⚡ HEATERS</label>
+        <label class="layer-toggle" style="color:#ff4ecf;"><input type="checkbox" data-layer="heaters" checked> <span class="layer-name-researcher">⚡ HEATERS</span><span class="layer-name-observer">⚡ Research Transmitters</span></label>
         <label class="layer-toggle" style="color:#4ecbff;"><input type="checkbox" data-layer="aircraft"> ✈ ADS-B</label>
         <label class="layer-toggle" style="color:#ff5722;"><input type="checkbox" data-layer="wildfires"> 💥 WILDFIRES</label>
         <label class="layer-toggle" style="color:#e040fb;"><input type="checkbox" data-layer="volcanoes"> 🌋 VOLCANIC</label>

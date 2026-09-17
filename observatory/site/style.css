@@ -391,6 +391,37 @@ body::after {
 .refresh-btn:hover { color: var(--text-primary); border-color: var(--border-active); }
 .refresh-btn--spin { animation: spin 0.8s linear; }
 
+/* ═══ LAYERS BUTTON ═══════════════════════════════════════════ */
+.layers-btn {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--bg-primary);
+  background: var(--brass);
+  border: 1px solid var(--brass);
+  padding: 3px 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  animation: layers-pulse 2s ease-in-out 3;
+}
+.layers-btn:hover {
+  background: #e0b06a;
+  border-color: #e0b06a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(212, 160, 84, 0.3);
+}
+.layers-btn--active {
+  background: transparent;
+  color: var(--brass);
+  animation: none;
+}
+
+@keyframes layers-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(212, 160, 84, 0); }
+  50% { box-shadow: 0 0 12px 4px rgba(212, 160, 84, 0.3); }
+}
+
 /* ═══ LAYER TOGGLES ═══════════════════════════════════════════ */
 .layer-toggles {
   display: flex;
@@ -401,6 +432,16 @@ body::after {
   overflow-x: auto;
   flex-shrink: 0;
   scrollbar-width: none;
+  max-height: 200px;
+  transition: max-height 0.3s ease, padding 0.3s ease, opacity 0.3s ease;
+}
+.layer-toggles--collapsed {
+  max-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  opacity: 0;
+  overflow: hidden;
+  border-bottom: none;
 }
 .layer-toggles::-webkit-scrollbar { display: none; }
 
@@ -425,6 +466,14 @@ body::after {
   background: var(--brass-dim);
   margin-left: auto;
 }
+
+/* Level-aware layer names */
+.layer-name-observer { display: none; }
+.layer-name-researcher { display: inline; }
+body[data-level="observer"] .layer-name-observer { display: inline; }
+body[data-level="observer"] .layer-name-researcher { display: none; }
+body[data-level="analyst"] .layer-name-observer { display: none; }
+body[data-level="analyst"] .layer-name-researcher { display: inline; }
 
 /* ═══ MAP ═══════════════════════════════════════════════════ */
 .map-container {

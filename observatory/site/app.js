@@ -1310,6 +1310,18 @@ const Observatory = {
       });
     }
 
+    // LAYERS button — toggles layer panel visibility
+    const layersBtn = document.getElementById('layers-btn');
+    const layerToggles = document.getElementById('layer-toggles');
+    if (layersBtn && layerToggles) {
+      layersBtn.addEventListener('click', () => {
+        layerToggles.classList.toggle('layer-toggles--collapsed');
+        layersBtn.classList.toggle('layers-btn--active');
+        // Invalidate map size after panel toggle animation
+        setTimeout(() => { if (this.map) this.map.invalidateSize(); }, 350);
+      });
+    }
+
     // Bottom nav — view switching
     document.querySelectorAll('.bottomnav__btn').forEach(btn => {
       btn.addEventListener('click', () => {
