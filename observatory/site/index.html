@@ -76,6 +76,7 @@
   <meta name="apple-mobile-web-app-title" content="Observatory">
 </head>
 <body>
+<script src="levels.js"></script>
 
   <main class="observatory" id="observatory">
     <div class="observatory__content">
@@ -95,14 +96,14 @@
           <span>18 streams active</span>
         </div>
         <h1 class="hero__title">Truth Observatory</h1>
-        <p class="hero__subtitle">
+        <p class="hero__subtitle" id="hero-subtitle">
           Continuous atmospheric, geophysical, and infrastructure monitoring.
           Every observation hashed, manifest-logged, and provenance-tracked.
           The system watches. The data decides.
         </p>
         <div class="hero__divider"></div>
         <div class="hero__buttons">
-          <a href="/cockpit" class="hero__cta">ENTER COCKPIT →</a>
+          <a href="/cockpit" class="hero__cta" id="hero-cta">ENTER COCKPIT →</a>
           <button id="subscribe-cta" class="hero__cta hero__cta--outline" onclick="window.__subscribe()">🔒 SUBSCRIBE — $4.99/MO</button>
         </div>
       </div>
@@ -669,6 +670,17 @@
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js').catch(() => {});
     }
+
+    // Adapt hero text to expertise level
+    (function() {
+      if (typeof Levels === 'undefined') return;
+      const meta = Levels.getCurrentMeta();
+      if (!meta) return;
+      const subtitle = document.getElementById('hero-subtitle');
+      const cta = document.getElementById('hero-cta');
+      if (subtitle && meta.heroSubtitle) subtitle.textContent = meta.heroSubtitle;
+      if (cta && meta.cockpitLabel) cta.textContent = meta.cockpitLabel + ' →';
+    })();
   </script>
 
 </body>

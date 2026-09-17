@@ -17,7 +17,9 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Observatory">
 </head>
-<body>
+<body data-level="researcher">
+  <script src="levels.js"></script>
+  <script>Levels.apply();</script>
   <!-- ═══ TOP STATUS BAR ═══ -->
   <header class="topbar" id="topbar">
     <div class="topbar__left">
@@ -44,6 +46,7 @@
       <button class="topbar__action-btn topbar__action-btn--desktop" onclick="document.getElementById('download-modal').style.display='flex'" title="Download CSV Report">⬇ EXPORT</button>
       <button class="topbar__action-btn topbar__action-btn--desktop" id="manage-sub-btn" onclick="document.getElementById('manage-sub-modal').style.display='flex'">ACCOUNT</button>
       <a class="topbar__action-btn topbar__action-btn--desktop" href="/" style="text-decoration:none;">← BACK</a>
+      <button class="topbar__action-btn topbar__action-btn--desktop level-toggle-btn" id="level-toggle-btn" title="Change expertise level">🟢 OBSERVER</button>
       <span class="topbar__clock" id="utc-clock">00:00:00 UTC</span>
       <span class="topbar__pulse" id="global-pulse" data-info="stat-pulse" title="Data connection status"></span>
       <!-- Mobile kebab menu -->
@@ -55,6 +58,7 @@
   <div class="topbar-drawer" id="topbar-drawer">
     <button onclick="document.getElementById('download-modal').style.display='flex'">⬇ EXPORT DATA</button>
     <button id="manage-sub-btn-mobile" onclick="document.getElementById('manage-sub-modal').style.display='flex'">👤 ACCOUNT</button>
+    <button id="level-toggle-btn-mobile" class="level-toggle-btn">🟢 OBSERVER</button>
     <a href="/about">ℹ ABOUT</a>
     <a href="/">← BACK TO HOME</a>
   </div>
@@ -534,6 +538,88 @@
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js').catch(() => {});
     }
+
+    // ── Expertise Level Onboarding & Toggle ─────────────────
+    (function initLevelSystem() {
+      const overlay = document.getElementById('level-onboarding');
+      const toggleBtn = document.getElementById('level-toggle-btn');
+      const toggleBtnMobile = document.getElementById('level-toggle-btn-mobile');
+      const allToggleBtns = [toggleBtn, toggleBtnMobile].filter(Boolean);
+
+      function updateToggleBtn() {
+        const meta = Levels.getCurrentMeta();
+        allToggleBtns.forEach(btn => {
+          btn.textContent = meta.icon + ' ' + meta.label;
+          btn.style.borderColor = meta.color;
+          btn.style.color = meta.color;
+        });
+      }
+
+      // Show onboarding if first visit
+      if (Levels.needsOnboarding() && overlay) {
+        overlay.style.display = 'flex';
+      }
+
+      // Onboarding selection
+      if (overlay) {
+        overlay.querySelectorAll('[data-select-level]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const level = btn.getAttribute('data-select-level');
+            Levels.set(level);
+            overlay.style.display = 'none';
+            updateToggleBtn();
+            if (typeof Observatory !== 'undefined') Observatory.refresh();
+          });
+        });
+      }
+
+      // Toggle buttons cycle levels
+      allToggleBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const current = Levels.get() || 'observer';
+          const next = current === 'observer' ? 'analyst' : current === 'analyst' ? 'researcher' : 'observer';
+          Levels.set(next);
+          updateToggleBtn();
+          if (typeof Observatory !== 'undefined') Observatory.refresh();
+        });
+      });
+      updateToggleBtn();
+
+      // Listen for level changes from other sources
+      window.addEventListener('level-change', updateToggleBtn);
+    })();
   </script>
+
+  <!-- ═══ EXPERTISE LEVEL ONBOARDING ═══ -->
+  <div class="level-onboarding" id="level-onboarding" style="display:none;">
+    <div class="level-onboarding__content">
+      <div class="level-onboarding__header">
+        <span class="level-onboarding__icon">&#9673;</span>
+        <h2 class="level-onboarding__title">TRUTH OBSERVATORY</h2>
+        <p class="level-onboarding__subtitle">Choose your experience level</p>
+        <p class="level-onboarding__hint">You can change this anytime from the menu bar.</p>
+      </div>
+      <div class="level-onboarding__cards">
+        <button class="level-onboarding__card" data-select-level="observer">
+          <span class="level-onboarding__card-icon" style="color:#00e676;">&#9679;</span>
+          <span class="level-onboarding__card-label">OBSERVER</span>
+          <span class="level-onboarding__card-desc">I'm curious. Show me what's happening and explain it like I'm new to this.</span>
+          <span class="level-onboarding__card-hint">Plain English &bull; Guided explanations &bull; No jargon</span>
+        </button>
+        <button class="level-onboarding__card" data-select-level="analyst">
+          <span class="level-onboarding__card-icon" style="color:#ffab00;">&#9679;</span>
+          <span class="level-onboarding__card-label">ANALYST</span>
+          <span class="level-onboarding__card-desc">I know the basics. I want to explore the data and understand the patterns.</span>
+          <span class="level-onboarding__card-hint">Technical context &bull; Cross-references &bull; Pattern analysis</span>
+        </button>
+        <button class="level-onboarding__card" data-select-level="researcher">
+          <span class="level-onboarding__card-icon" style="color:#ff5252;">&#9679;</span>
+          <span class="level-onboarding__card-label">RESEARCHER</span>
+          <span class="level-onboarding__card-desc">Give me the raw data, provenance, and full technical interface.</span>
+          <span class="level-onboarding__card-hint">Full API access &bull; SHA-256 provenance &bull; NDJSON manifests</span>
+        </button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>

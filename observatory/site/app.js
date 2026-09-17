@@ -133,6 +133,13 @@ const Observatory = {
     setInterval(() => this.fetchLedger(), 60000); // Refresh ledger every 60s
   },
 
+  // ── Refresh (re-render for level change) ─────────────────────
+  refresh() {
+    if (this.feeds && this.feeds.length > 0) {
+      this.renderCarousels();
+    }
+  },
+
   // ── Skeleton Loading States ──────────────────────────────────
   renderSkeletons() {
     const carousels = document.getElementById('feed-carousels');
@@ -550,7 +557,7 @@ const Observatory = {
       section.innerHTML = `
         <div class="feed-carousel__header">
           <div class="feed-carousel__domain-bar" style="background: ${domainConf.color}"></div>
-          <span class="feed-carousel__domain">${domain.toUpperCase()}</span>
+          <span class="feed-carousel__domain">${(typeof Levels !== 'undefined' ? Levels.getDomainLabel(domain) : domain).toUpperCase()}</span>
           <span class="feed-carousel__count">${feeds.length} feeds</span>
         </div>
         <div class="feed-carousel__track-wrap">
@@ -612,18 +619,25 @@ const Observatory = {
     const imgSrc = this.feedImages[feed.id] || 'assets/nexrad.jpg';
     const condition = this.getConditionText(feed);
 
+    const levelContent = (typeof Levels !== 'undefined') ? Levels.getFeedContent(feed.id) : null;
+    const displayName = levelContent ? levelContent.name : feed.name;
+    const currentLevel = (typeof Levels !== 'undefined') ? (Levels.get() || 'observer') : 'researcher';
+    const whyBlock = (levelContent && levelContent.why && currentLevel !== 'researcher')
+      ? `<div class="feed-card__why">${levelContent.why}</div>` : '';
+
     card.innerHTML = `
       <div class="feed-card__image-wrap">
-        <img class="feed-card__image" src="${imgSrc}" alt="${feed.name}" loading="lazy">
+        <img class="feed-card__image" src="${imgSrc}" alt="${displayName}" loading="lazy">
         <div class="feed-card__image-overlay"></div>
         <span class="feed-card__badge feed-card__badge--${feed.status}">${feed.status.toUpperCase()}</span>
-        <div class="feed-card__name">${feed.name}</div>
+        <div class="feed-card__name">${displayName}</div>
       </div>
       <div class="feed-card__content">
         ${condition ? `<div class="feed-card__condition" style="color: ${condition.color}">${condition.text}</div>` : ''}
         <canvas class="feed-card__sparkline" id="${sparkId}" width="200" height="24"></canvas>
+        ${whyBlock}
         <div class="feed-card__footer">
-          <span>${feed.entries} obs</span>
+          <span>${currentLevel === 'observer' ? feed.entries + ' readings' : feed.entries + ' obs'}</span>
           <span>${ago}</span>
         </div>
       </div>
@@ -861,22 +875,33 @@ const Observatory = {
 
     const imgSrc = this.feedImages[feed.id] || 'assets/nexrad.jpg';
     document.getElementById('modal-icon').innerHTML = `<img src="${imgSrc}" class="modal__icon-img" alt="">`;
-    document.getElementById('modal-title').textContent = feed.name;
+    const levelContent = (typeof Levels !== 'undefined') ? Levels.getFeedContent(feed.id) : null;
+    const displayName = levelContent ? levelContent.name : feed.name;
+    const currentLevel = (typeof Levels !== 'undefined') ? (Levels.get() || 'observer') : 'researcher';
+    const domainLabel = (typeof Levels !== 'undefined') ? Levels.getDomainLabel(feed.domain) : feed.domain;
+
+    document.getElementById('modal-title').textContent = displayName;
 
     const badge = document.getElementById('modal-badge');
     badge.textContent = feed.status.toUpperCase();
     badge.className = `modal__badge bento-tile__badge--${feed.status}`;
 
+    const whyHtml = (levelContent && levelContent.why && currentLevel !== 'researcher')
+      ? `<div class="meta-item" style="grid-column: 1 / -1"><div class="meta-item__label">WHY THIS MATTERS</div><div class="feed-card__why" style="margin-top:4px">${levelContent.why}</div></div>` : '';
+    const taglineHtml = (levelContent && levelContent.tagline)
+      ? `<div class="meta-item" style="grid-column: 1 / -1"><div class="meta-item__label">${currentLevel === 'observer' ? 'WHAT IS THIS' : 'DESCRIPTION'}</div><div class="meta-item__value" style="font-size: 0.7rem; font-weight: 400; line-height: 1.5">${levelContent.tagline}</div></div>` : '';
+
     const meta = document.getElementById('modal-meta');
     const ago = this.timeAgo(feed.last);
     const condition = this.getConditionText(feed);
     meta.innerHTML = `
+      ${taglineHtml}
       <div class="meta-item">
         <div class="meta-item__label">STATUS</div>
         <div class="meta-item__value" style="color: var(--signal-${feed.status === 'live' ? 'live' : feed.status === 'stale' ? 'stale' : 'offline'})">${feed.status.toUpperCase()}</div>
       </div>
       <div class="meta-item">
-        <div class="meta-item__label">OBSERVATIONS</div>
+        <div class="meta-item__label">${currentLevel === 'observer' ? 'READINGS' : 'OBSERVATIONS'}</div>
         <div class="meta-item__value">${feed.entries}</div>
       </div>
       <div class="meta-item">
@@ -884,17 +909,18 @@ const Observatory = {
         <div class="meta-item__value">${ago}</div>
       </div>
       <div class="meta-item">
-        <div class="meta-item__label">DOMAIN</div>
-        <div class="meta-item__value">${feed.domain}</div>
+        <div class="meta-item__label">${currentLevel === 'observer' ? 'CATEGORY' : 'DOMAIN'}</div>
+        <div class="meta-item__value">${domainLabel}</div>
       </div>
       <div class="meta-item">
         <div class="meta-item__label">CONDITION</div>
         <div class="meta-item__value" style="color: ${condition?.color || 'var(--text-secondary)'}">${condition?.text || '—'}</div>
       </div>
-      <div class="meta-item">
+      <div class="meta-item researcher-only">
         <div class="meta-item__label">FEED ID</div>
         <div class="meta-item__value" style="font-size: 0.7rem">${feed.id}</div>
       </div>
+      ${whyHtml}
     `;
 
     this.drawSparklineLarge(feed.sparkline, feed.status);

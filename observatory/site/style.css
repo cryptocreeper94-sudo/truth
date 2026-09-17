@@ -1829,3 +1829,179 @@ body::after {
   .ledger-event__detail { font-size: 0.55rem; }
 }
 
+/* ═══ EXPERTISE LEVEL SYSTEM ═══════════════════════════════════ */
+
+/* ── Level-Aware Visibility ──────────────────────────────────── */
+body[data-level="observer"] .researcher-only,
+body[data-level="observer"] .analyst-only { display: none !important; }
+body[data-level="analyst"] .researcher-only { display: none !important; }
+body[data-level="analyst"] .observer-only { display: none !important; }
+body[data-level="researcher"] .observer-only,
+body[data-level="researcher"] .analyst-only { display: none !important; }
+
+/* Show explanations for observer/analyst only */
+body[data-level="researcher"] .feed-card__why { display: none !important; }
+
+/* ── Level Toggle Button ─────────────────────────────────────── */
+.level-toggle-btn {
+  font-size: 0.65rem !important;
+  letter-spacing: 0.1em !important;
+  transition: all 0.3s ease !important;
+}
+.level-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  transform: translateY(-1px);
+}
+
+/* ── Onboarding Overlay ──────────────────────────────────────── */
+.level-onboarding {
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  background: rgba(0, 0, 0, 0.92);
+  backdrop-filter: blur(20px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  animation: level-fade-in 0.6s ease;
+}
+
+@keyframes level-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.level-onboarding__content {
+  max-width: 520px;
+  width: 100%;
+}
+
+.level-onboarding__header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.level-onboarding__icon {
+  font-size: 2rem;
+  color: var(--signal-live, #d4a054);
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.level-onboarding__title {
+  font-family: var(--font-mono);
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: var(--text-primary, #e8dfd6);
+  margin-bottom: 0.5rem;
+}
+
+.level-onboarding__subtitle {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-secondary, #a09080);
+  letter-spacing: 0.08em;
+}
+
+.level-onboarding__hint {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-dim, #5a5040);
+  letter-spacing: 0.06em;
+  margin-top: 0.5rem;
+}
+
+.level-onboarding__cards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.level-onboarding__card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 1.25rem 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: left;
+  color: inherit;
+  font-family: inherit;
+}
+
+.level-onboarding__card:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.level-onboarding__card:active {
+  transform: translateY(0);
+}
+
+.level-onboarding__card-icon {
+  font-size: 1rem;
+}
+
+.level-onboarding__card-label {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: var(--text-primary, #e8dfd6);
+}
+
+.level-onboarding__card-desc {
+  font-size: 0.8rem;
+  color: var(--text-secondary, #a09080);
+  line-height: 1.5;
+}
+
+.level-onboarding__card-hint {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  color: var(--text-dim, #5a5040);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ── Feed Card Why Block (Observer/Analyst) ───────────────────── */
+.feed-card__why {
+  font-size: 0.68rem;
+  color: var(--text-secondary, #a09080);
+  line-height: 1.6;
+  padding: 0.5rem 0.6rem;
+  margin-top: 0.4rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-left: 2px solid rgba(212, 160, 84, 0.3);
+  border-radius: 0 2px 2px 0;
+}
+
+/* ── Level-Up Nudge ──────────────────────────────────────────── */
+.level-nudge {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  color: var(--text-dim, #5a5040);
+  text-align: center;
+  padding: 0.5rem;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+.level-nudge:hover {
+  color: var(--text-secondary, #a09080);
+}
+
+@media (max-width: 768px) {
+  .level-onboarding__card {
+    padding: 1rem;
+  }
+  .level-onboarding__title {
+    font-size: 1rem;
+  }
+}
