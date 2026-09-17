@@ -17,49 +17,42 @@
 
 import { createHash } from 'crypto';
 
-const TRUSTLAYER_RPC = process.env.TRUSTLAYER_RPC_URL || 'https://trustlayer.tlid.io';
+const TRUSTLAYER_RPC = process.env.TRUSTLAYER_RPC_URL || 'https://dwtl.io';
+const TRUSTLAYER_API_KEY = process.env.TRUSTLAYER_API_KEY || '';
 const APP_ID = 'observatory-sentinel';
 const TIMEOUT_MS = 10000;
 
 /**
  * Submit a data hash to TrustLayer chain.
+ * Uses POST /api/hash/submit — the authenticated chain submission endpoint.
+ *
  * @param {string} dataHash - SHA-256 hex string
  * @param {string} category - e.g. 'daily-brief', 'manifest', 'lume-v-cert'
  * @param {object} [metadata] - Additional context for the stamp
  * @returns {{ success: boolean, txHash?: string, blockHeight?: number, error?: string }}
  */
 export async function anchorToTrustLayer(dataHash, category, metadata = {}) {
-  const timestamp = new Date().toISOString();
-
-  // Encode hash submission as chain transaction data
-  const payload = {
-    type: 'hash_submission',
-    hash: dataHash,
-    category: category || 'general',
-    metadata: { ...metadata, appId: APP_ID, stampedAt: timestamp },
-    timestamp,
-  };
-
-  const jsonStr = JSON.stringify(payload);
-  const bytes = new TextEncoder().encode(jsonStr);
-  const hexData = '0x' + Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
-
-  const TREASURY = '0x212686509aec07fab9a5c3e324494e0c8094e637';
+  if (!TRUSTLAYER_API_KEY) {
+    console.warn('[TrustAnchor] No TRUSTLAYER_API_KEY set — skipping anchor');
+    return { success: false, error: 'No API key configured' };
+  }
 
   try {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
-    // Trust Layer API: POST /api/devnet/transaction
-    const res = await fetch(`${TRUSTLAYER_RPC}/api/devnet/transaction`, {
+    const res = await fetch(`${TRUSTLAYER_RPC}/api/hash/submit`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-Key': TRUSTLAYER_API_KEY,
+      },
       signal: controller.signal,
       body: JSON.stringify({
-        from: TREASURY,
-        to: TREASURY,
-        amount: 0,
-        data: hexData,
+        dataHash,
+        category: category || 'general',
+        appId: APP_ID,
+        metadata: { ...metadata, stampedAt: new Date().toISOString() },
       }),
     });
 
@@ -73,30 +66,18 @@ export async function anchorToTrustLayer(dataHash, category, metadata = {}) {
 
     const result = await res.json();
 
-    // Trust Layer response format: { success, transaction: { txHash, blockHeight, ... } }
-    if (result.success && result.transaction) {
-      console.log(`[TrustAnchor] ✓ ${category} anchored — tx: ${result.transaction.txHash}`);
+    if (result.success) {
+      console.log(`[TrustAnchor] ✓ ${category} anchored — tx: ${result.txHash}, block: ${result.blockHeight}`);
       return {
         success: true,
-        txHash: result.transaction.txHash,
-        blockHeight: result.transaction.blockHeight || null,
-        timestamp,
+        txHash: result.txHash,
+        blockHeight: result.blockHeight || null,
+        timestamp: result.timestamp,
       };
     }
 
-    // Fallback: try older response format { tx_hash, status }
-    if (result.tx_hash) {
-      console.log(`[TrustAnchor] ✓ ${category} anchored — tx: ${result.tx_hash}`);
-      return {
-        success: true,
-        txHash: result.tx_hash,
-        blockHeight: result.block_height || null,
-        timestamp,
-      };
-    }
-
-    console.warn(`[TrustAnchor] Unexpected response:`, JSON.stringify(result).substring(0, 200));
-    return { success: false, error: 'Unexpected response format' };
+    console.warn(`[TrustAnchor] Submission failed:`, JSON.stringify(result).substring(0, 200));
+    return { success: false, error: result.error || 'Unknown error' };
   } catch (err) {
     console.warn(`[TrustAnchor] Chain unreachable: ${err.message}`);
     return { success: false, error: err.message };
