@@ -784,9 +784,20 @@ const Observatory = {
     const canvas = document.getElementById('modal-sparkline');
     if (!canvas || !data?.length) return;
 
+    // Responsive: size canvas pixels to container width
+    const container = canvas.parentElement;
+    const dpr = window.devicePixelRatio || 1;
+    const displayW = container.clientWidth - 32; // account for padding
+    const displayH = 120;
+    canvas.width = displayW * dpr;
+    canvas.height = displayH * dpr;
+    canvas.style.width = displayW + 'px';
+    canvas.style.height = displayH + 'px';
+
     const ctx = canvas.getContext('2d');
-    const w = canvas.width;
-    const h = canvas.height;
+    ctx.scale(dpr, dpr);
+    const w = displayW;
+    const h = displayH;
     const max = Math.max(...data, 1);
     const step = w / (data.length - 1 || 1);
 
