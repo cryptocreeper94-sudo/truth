@@ -17,7 +17,7 @@
 
 import { createHash } from 'crypto';
 
-const TRUSTLAYER_RPC = process.env.TRUSTLAYER_RPC_URL || 'https://dwtl.io';
+const TRUSTLAYER_RPC = process.env.TRUSTLAYER_RPC_URL || 'https://trustlayer.tlid.io';
 const APP_ID = 'observatory-sentinel';
 const TIMEOUT_MS = 10000;
 
@@ -44,20 +44,21 @@ export async function anchorToTrustLayer(dataHash, category, metadata = {}) {
   const bytes = new TextEncoder().encode(jsonStr);
   const hexData = '0x' + Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
 
+  const TREASURY = '0x212686509aec07fab9a5c3e324494e0c8094e637';
+
   try {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
-    const res = await fetch(`${TRUSTLAYER_RPC}/transaction`, {
+    // Trust Layer API: POST /api/devnet/transaction
+    const res = await fetch(`${TRUSTLAYER_RPC}/api/devnet/transaction`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       signal: controller.signal,
       body: JSON.stringify({
-        from: '0x212686509aec07fab9a5c3e324494e0c8094e637', // Treasury address
-        to: '0x212686509aec07fab9a5c3e324494e0c8094e637',
+        from: TREASURY,
+        to: TREASURY,
         amount: 0,
-        gas_limit: 50000,
-        gas_price: 1000000,
         data: hexData,
       }),
     });
@@ -66,19 +67,36 @@ export async function anchorToTrustLayer(dataHash, category, metadata = {}) {
 
     if (!res.ok) {
       const errBody = await res.text().catch(() => 'unknown');
-      console.warn(`[TrustAnchor] Chain returned HTTP ${res.status}: ${errBody}`);
+      console.warn(`[TrustAnchor] Chain returned HTTP ${res.status}: ${errBody.substring(0, 200)}`);
       return { success: false, error: `HTTP ${res.status}` };
     }
 
     const result = await res.json();
-    console.log(`[TrustAnchor] ✓ ${category} anchored — tx: ${result.tx_hash}`);
 
-    return {
-      success: true,
-      txHash: result.tx_hash,
-      blockHeight: result.block_height || null,
-      timestamp,
-    };
+    // Trust Layer response format: { success, transaction: { txHash, blockHeight, ... } }
+    if (result.success && result.transaction) {
+      console.log(`[TrustAnchor] ✓ ${category} anchored — tx: ${result.transaction.txHash}`);
+      return {
+        success: true,
+        txHash: result.transaction.txHash,
+        blockHeight: result.transaction.blockHeight || null,
+        timestamp,
+      };
+    }
+
+    // Fallback: try older response format { tx_hash, status }
+    if (result.tx_hash) {
+      console.log(`[TrustAnchor] ✓ ${category} anchored — tx: ${result.tx_hash}`);
+      return {
+        success: true,
+        txHash: result.tx_hash,
+        blockHeight: result.block_height || null,
+        timestamp,
+      };
+    }
+
+    console.warn(`[TrustAnchor] Unexpected response:`, JSON.stringify(result).substring(0, 200));
+    return { success: false, error: 'Unexpected response format' };
   } catch (err) {
     console.warn(`[TrustAnchor] Chain unreachable: ${err.message}`);
     return { success: false, error: err.message };
