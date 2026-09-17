@@ -963,11 +963,27 @@ function initAdminGate() {
   const submitPin = () => {
     const v = pin.value.trim();
     if (v.length >= 4) {
-      // Future: validate PIN against server
-      // For now, store intent and show feedback
-      pin.value = '';
-      gate.style.display = 'none';
-      console.log('[TRUTH] Admin gate triggered. PIN validation not yet implemented.');
+      fetch('/api/dev-auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: v }),
+      })
+        .then(r => r.json())
+        .then(data => {
+          if (data.ok) {
+            window.location.href = '/cockpit';
+          } else {
+            pin.value = '';
+            pin.placeholder = 'DENIED';
+            pin.style.borderColor = '#ff4444';
+            setTimeout(() => { pin.placeholder = 'PIN'; pin.style.borderColor = ''; }, 1500);
+          }
+        })
+        .catch(() => {
+          pin.value = '';
+          pin.placeholder = 'ERROR';
+          setTimeout(() => { pin.placeholder = 'PIN'; }, 1500);
+        });
     }
   };
 
