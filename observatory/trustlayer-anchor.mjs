@@ -17,7 +17,7 @@
 
 import { createHash } from 'crypto';
 
-const TRUSTLAYER_RPC = process.env.TRUSTLAYER_RPC_URL || 'https://dwtl.io';
+const TRUSTLAYER_RPC = process.env.TRUSTLAYER_RPC_URL || 'https://chain.tlid.io';
 const TRUSTLAYER_API_KEY = process.env.TRUSTLAYER_API_KEY || '';
 const APP_ID = 'observatory-sentinel';
 const TIMEOUT_MS = 10000;
