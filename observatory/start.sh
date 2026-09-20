@@ -14,7 +14,11 @@
 #   [35] Collapse Detection → restart on exit with backoff
 #   [42] Devoid Limit       → fatal errors logged, state preserved, container stays alive
 
-set -euo pipefail
+# NOTE: Do NOT use `set -e` here. Background collector processes will exit
+# non-zero on API failures, and `wait` returns the last child's exit code.
+# Under `set -e`, that kills this script → container dies → Coolify restarts → infinite loop.
+# Collectors have their own restart loop via run_collector(). Only use `set -u` for safety.
+set -u
 
 echo "══════════════════════════════════════════════════════════════════"
 echo " TRUTH Observatory — Production Startup"
@@ -109,9 +113,22 @@ echo "[SUPERVISOR] All collectors launched (20 total — 9 Stage 1+2 + 9 Stage 3
 # ── API Server (serves dashboard + REST API) ────────────────────────────────
 echo "[SUPERVISOR] Starting API server on port ${PORT:-3000}..."
 node "$SCRIPT_DIR/server.mjs" &
+SERVER_PID=$!
 
 # ── Correlation Engine (pattern recognition + cross-feed analysis) ──────
 echo "[SUPERVISOR] Starting correlation engine..."
 node "$SCRIPT_DIR/correlation-engine.mjs" &
 
-wait
+# Keep container alive. `wait` returns when ANY child exits.
+# Loop to re-wait so the container never dies from a single child crash.
+# The run_collector() loops handle individual collector restarts.
+while true; do
+    wait -n 2>/dev/null || true
+    # If the API server died, restart it (it's the critical path for health checks)
+    if ! kill -0 "$SERVER_PID" 2>/dev/null; then
+        echo "[SUPERVISOR] API server died — restarting..."
+        sleep 3
+        node "$SCRIPT_DIR/server.mjs" &
+        SERVER_PID=$!
+    fi
+done
