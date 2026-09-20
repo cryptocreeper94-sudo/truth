@@ -21,7 +21,8 @@ import { createHash } from 'crypto';
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { LumeV } from './lib/lume-v/index.js';
+import _lumevPkg from './lib/lume-v/index.js';
+const { LumeV } = _lumevPkg;
 import { anchorBrief, anchorLumeVCert } from './trustlayer-anchor.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
