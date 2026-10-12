@@ -4,15 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Truth Observatory — Atmospheric & Geophysical Monitoring</title>
-  <meta name="description" content="Continuous atmospheric, geophysical, and infrastructure monitoring. 18 independent data streams with cross-feed correlation analysis. Every observation hashed, manifest-logged, and provenance-tracked.">
-  <meta property="og:title" content="Truth Observatory — 18-Stream Atmospheric & Geophysical Monitoring">
-  <meta property="og:description" content="Continuous monitoring across 18 independent data streams. Cross-feed correlation engine with skeptic analysis. Every observation SHA-256 hashed with full provenance.">
+  <meta name="description" content="Continuous atmospheric, geophysical, and infrastructure monitoring. 20 independent data streams with cross-feed correlation analysis. Every observation hashed, manifest-logged, and provenance-tracked.">
+  <meta property="og:title" content="Truth Observatory — 20-Stream Atmospheric & Geophysical Monitoring">
+  <meta property="og:description" content="Continuous monitoring across 20 independent data streams. Cross-feed correlation engine with skeptic analysis. Every observation SHA-256 hashed with full provenance.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://observatory.tlid.io">
   <meta property="og:image" content="https://observatory.tlid.io/assets/hero-1.webp">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Truth Observatory — DarkWave Studios">
-  <meta name="twitter:description" content="18 live data streams. Cross-feed correlation engine. SHA-256 integrity. The system watches. The data decides.">
+  <meta name="twitter:description" content="20 live data streams. Cross-feed correlation engine. SHA-256 integrity. The system watches. The data decides.">
   <link rel="stylesheet" href="landing.css">
   <style>
     .hero__cta {
@@ -54,6 +54,21 @@
       flex-wrap: wrap;
       align-items: center;
     }
+    .hero__help {
+      display: inline-block;
+      margin-top: 1.1rem;
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 0.9rem;
+      color: #e8dfd6;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(212, 160, 84, 0.5);
+      padding-bottom: 2px;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+    .hero__help:hover {
+      color: #d4a054;
+      border-color: #d4a054;
+    }
     @media (max-width: 768px) {
       .hero__buttons {
         flex-direction: column;
@@ -93,7 +108,7 @@
       <div class="hero__content">
         <div class="hero__badge">
           <span class="hero__pulse"></span>
-          <span>18 streams active</span>
+          <span>20 streams active</span>
         </div>
         <h1 class="hero__title">Truth Observatory</h1>
         <p class="hero__subtitle" id="hero-subtitle">
@@ -106,6 +121,7 @@
           <a href="/cockpit" class="hero__cta" id="hero-cta">ENTER COCKPIT →</a>
           <button id="subscribe-cta" class="hero__cta hero__cta--outline" onclick="window.__subscribe()">🔒 SUBSCRIBE — $4.99/MO</button>
         </div>
+        <a href="/about#how-to-use" class="hero__help" id="hero-help">New here? See how it works &rarr;</a>
       </div>
     </section>
 
@@ -426,7 +442,7 @@
     </section>
     <div class="status-bar" id="status-bar">
       <div class="status-bar__item">
-        <span class="status-bar__value" id="stat-streams">18 / 18</span>
+        <span class="status-bar__value" id="stat-streams">20 / 20</span>
         <span class="status-bar__label">Streams Live</span>
       </div>
       <div class="status-bar__item">
@@ -449,14 +465,14 @@
     </div>
 
     <!-- ── Correlation Engine ─────────────────────────────────── -->
-    <section class="section--cream" id="correlation-engine">
+    <section class="section--cream" id="correlation-engine" style="display:none;">
       <div class="observatory__content">
       <div class="section-header">
         <p class="section-header__label">Correlation Engine</p>
         <h2 class="section-header__title">Recognized Patterns</h2>
       </div>
       <p class="methodology__text" style="margin-bottom: 1.5rem;">
-        The correlation engine models baseline behavior for each of the 18 feeds, identifies statistical deviations
+        The correlation engine models baseline behavior for each of the 20 feeds, identifies statistical deviations
         (≥2σ from hourly mean), and cross-correlates them across all streams — including lagged relationships up to 6 hours.
         <strong>Correlation is never presented as causation.</strong> The skeptic engine generates mundane explanations
         scored higher than anomalous interpretations by default.
@@ -469,7 +485,7 @@
             <div class="stream-card__body" style="padding: 1.5rem;">
               <div class="stream-card__header"><span class="stream-card__dot"></span><h3 class="stream-card__title">Modeling Baselines</h3></div>
               <p class="stream-card__desc" style="margin-top: 0.75rem;">
-                The correlation engine is collecting baseline data from all 18 feeds.
+                The correlation engine is collecting baseline data from all 20 feeds.
                 Recognized patterns will appear here as cross-feed deviations are identified.
               </p>
             </div>
@@ -484,7 +500,7 @@
 
       <div id="correlation-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; margin-top: 2rem;">
         <div class="status-bar__item" style="text-align: center;">
-          <span class="status-bar__value" id="corr-feeds">18</span>
+          <span class="status-bar__value" id="corr-feeds">20</span>
           <span class="status-bar__label">Feeds Analyzed</span>
         </div>
         <div class="status-bar__item" style="text-align: center;">
@@ -535,7 +551,7 @@
       <p style="font-family:var(--font-mono);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--text-muted);margin-bottom:0.5rem;">Full Access</p>
       <h2 style="font-family:var(--font-display);font-size:2rem;color:var(--text-primary);margin-bottom:1rem;">$4.99 / month</h2>
       <p style="color:var(--text-secondary);line-height:1.7;margin-bottom:2rem;font-size:0.95rem;">
-        18 live data streams. Cross-feed correlation engine. Deviation alerts.
+        20 live data streams. Cross-feed correlation engine. Deviation alerts.
         SHA-256 verified data integrity. Full cockpit access. Cancel anytime.
       </p>
       <div style="display:flex;flex-direction:column;gap:0.75rem;align-items:center;margin-bottom:2rem;">
@@ -571,14 +587,16 @@
           </div>
           <div class="footer__nav-group">
             <p class="footer__nav-label">Resources</p>
+            <a class="footer__link" href="/about#how-to-use">How It Works</a>
+            <a class="footer__link" href="/about">About</a>
             <a class="footer__link" href="https://invariant.tlid.io" target="_blank" rel="noopener">Documentation</a>
             <a class="footer__link" href="https://github.com/cryptocreeper94-sudo" target="_blank" rel="noopener">GitHub</a>
           </div>
           <div class="footer__nav-group">
             <p class="footer__nav-label">Legal</p>
-            <a class="footer__link" href="#terms">Terms of Service</a>
-            <a class="footer__link" href="#privacy">Privacy Policy</a>
-            <a class="footer__link" href="#disclaimer">Data Disclaimer</a>
+            <a class="footer__link" href="/terms">Terms of Service</a>
+            <a class="footer__link" href="/privacy">Privacy Policy</a>
+            <a class="footer__link" href="/legal">Data Disclaimer</a>
           </div>
         </nav>
       </div>

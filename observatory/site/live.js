@@ -3,59 +3,53 @@
  *  Truth Observatory — Live Status Engine
  *  DarkWave Studios LLC — Copyright 2026
  *
- *  Pings public APIs to verify stream availability.
- *  Pulses the card dot green when data is confirmed live.
+ *  Reads real collector status from /api/feeds (public) and
+ *  pulses each homepage card green when its collector is live.
+ *  (Previously pinged third-party URLs from the browser, which
+ *  did not reflect collector health and exposed an API key.)
  * ═══════════════════════════════════════════════════════════
  */
 
 const LiveStatus = {
 
-  // Endpoints to health-check — keys MUST match data-stream attributes in HTML
-  endpoints: {
-    nexrad: 'https://api.weather.gov/radar/stations?stationType=WSR-88D',
-    solar: 'https://services.swpc.noaa.gov/json/goes/primary/xrays-6-hour.json',
-    goes: 'https://services.swpc.noaa.gov/products/summary/solar-wind-mag-field.json',
-    geomag: 'https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json',
-    schumann: 'https://services.swpc.noaa.gov/products/summary/10cm-flux.json',
-    seismic: 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson',
-    grid: 'https://api.eia.gov/v2/electricity/rto/region-data/data/?api_key=HCrxkfcdEVdmMTEW9MvJbMNDylrRs6l7TCPWKGWL&frequency=hourly&data[0]=value&sort[0][column]=period&sort[0][direction]=desc&length=1',
-    iono: 'https://services.swpc.noaa.gov/products/summary/solar-wind-speed.json',
-    lightning: 'https://services.swpc.noaa.gov/json/goes/primary/differential-protons-1-day.json',
-    // Stage 3 — new collectors
-    surface: 'https://mesonet.agron.iastate.edu/api/1/currents.json?network=ASOS&only_online=true',
-    blitz: 'https://map.blitzortung.org/GEOjson/GEOjson.php?c=America/New_York',
-    aircraft: 'https://opensky-network.org/api/states/all?lamin=25&lomin=-125&lamax=50&lomax=-66',
-    notam: 'https://www.tdlr.texas.gov/weather/wmlicensees.htm',
-    celltower: 'https://www.fcc.gov/api/license-view/basicSearch/getLicenses?searchValue=cell&limit=1&format=json',
-    haarp: 'https://haarp.gi.alaska.edu/',
-    metals: 'https://waterservices.usgs.gov/nwis/iv/?format=json&period=P1D&siteStatus=active&stateCd=tn&parameterCd=01105',
-    ecology: 'https://api.inaturalist.org/v1/observations?quality_grade=research&place_id=1&per_page=1&taxon_id=47336',
-    chemistry: 'https://nadp.slh.wisc.edu/networks/national-trends-network/',
+  // Homepage card id suffix → /api/feeds feed id
+  cardToFeed: {
+    nexrad: 'nexrad', goes: 'goes', lightning: 'lightning', surface: 'surface',
+    blitz: 'blitzortung', solar: 'solar', geomag: 'geomag', iono: 'ionosonde',
+    schumann: 'schumann', seismic: 'earthquake', grid: 'grid', aircraft: 'aircraft',
+    notam: 'notam', celltower: 'celltower', haarp: 'heater', metals: 'metals',
+    ecology: 'ecology', chemistry: 'deposition',
   },
 
   async checkAll() {
-    const streams = Object.keys(this.endpoints);
-    let liveCount = 0;
-
-    for (const streamId of streams) {
-      try {
-        const resp = await fetch(this.endpoints[streamId]);
-        if (resp.ok) {
-          this.markLive(streamId);
-          liveCount++;
-        }
-      } catch (err) {
-        console.warn(`[Observatory] ${streamId} check failed:`, err.message);
-      }
+    let data;
+    try {
+      const resp = await fetch('/api/feeds');
+      if (!resp.ok) return;
+      data = await resp.json();
+    } catch (err) {
+      console.warn('[Observatory] feed status check failed:', err.message);
+      return;
     }
+    const feeds = Array.isArray(data.feeds) ? data.feeds : [];
+    const byId = {};
+    feeds.forEach(f => { byId[f.id] = f; });
+
+    for (const [cardId, feedId] of Object.entries(this.cardToFeed)) {
+      const f = byId[feedId];
+      if (f && f.status === 'live') this.markLive(cardId);
+    }
+
+    const total = data.total || feeds.length || 20;
+    const live = data.live != null ? data.live : feeds.filter(f => f.status === 'live').length;
 
     // Update the hero badge count
     const heroCount = document.querySelector('.hero__badge span:last-child');
-    if (heroCount) heroCount.textContent = `${liveCount} streams active`;
+    if (heroCount) heroCount.textContent = `${live} of ${total} streams live`;
 
     // Update status bar
     const statStreams = document.getElementById('stat-streams');
-    if (statStreams) statStreams.textContent = `${liveCount} / 18`;
+    if (statStreams) statStreams.textContent = `${live} / ${total}`;
   },
 
   markLive(streamId) {

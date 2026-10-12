@@ -254,7 +254,7 @@
 <body>
 
   <nav class="back-nav">
-    <a href="/" class="back-nav__btn">&larr; COCKPIT</a>
+    <a href="/" class="back-nav__btn" id="about-back" onclick="if (document.referrer && new URL(document.referrer).origin === location.origin) { history.back(); return false; }">&larr; BACK</a>
     <span class="back-nav__title">Truth Observatory — Executive Summary</span>
   </nav>
 
@@ -271,7 +271,7 @@
     </div>
 
     <!-- ═══ GETTING STARTED ═══ -->
-    <section class="section">
+    <section class="section" id="how-to-use">
       <div class="section__label">00 — Getting Started</div>
       <h2 class="section__title">How to Use This Thing</h2>
       <p>

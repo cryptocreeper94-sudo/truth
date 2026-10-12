@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Truth Observatory — Mission Control</title>
-  <meta name="description" content="18-stream atmospheric, geophysical, and infrastructure monitoring cockpit with AtmosCore 4/42 deterministic state engine. Live feeds, cross-feed correlation, observation suitability governance.">
+  <meta name="description" content="20-stream atmospheric, geophysical, and infrastructure monitoring cockpit with AtmosCore 4/42 deterministic state engine. Live feeds, cross-feed correlation, observation suitability governance.">
   <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Outfit:wght@400;600;800;900&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
@@ -29,15 +29,15 @@
     </div>
     <div class="topbar__center">
       <div class="topbar__stat" data-info="stat-feeds">
-        <span class="topbar__stat-label">FEEDS <span class="topbar__info-icon">ⓘ</span></span>
-        <span class="topbar__stat-value" id="stat-live">&mdash;/18</span>
+        <span class="topbar__stat-label"><span data-label-key="stat.feeds">FEEDS</span> <span class="topbar__info-icon">ⓘ</span></span>
+        <span class="topbar__stat-value" id="stat-live">&mdash;/20</span>
       </div>
       <div class="topbar__stat" data-info="stat-atmoscore">
-        <span class="topbar__stat-label">ATMOSCORE <span class="topbar__info-icon">ⓘ</span></span>
+        <span class="topbar__stat-label"><span data-label-key="stat.atmoscore">ATMOSCORE</span> <span class="topbar__info-icon">ⓘ</span></span>
         <span class="topbar__stat-value" id="stat-atmoscore">INIT</span>
       </div>
       <div class="topbar__stat" data-info="stat-suitability">
-        <span class="topbar__stat-label">SUITABILITY <span class="topbar__info-icon">ⓘ</span></span>
+        <span class="topbar__stat-label"><span data-label-key="stat.suitability">SUITABILITY</span> <span class="topbar__info-icon">ⓘ</span></span>
         <span class="topbar__stat-value" id="stat-suitability">&mdash;</span>
       </div>
     </div>
@@ -46,7 +46,7 @@
       <button class="topbar__action-btn topbar__action-btn--desktop" onclick="document.getElementById('download-modal').style.display='flex'" title="Download CSV Report">⬇ EXPORT</button>
       <button class="topbar__action-btn topbar__action-btn--desktop" id="manage-sub-btn" onclick="document.getElementById('manage-sub-modal').style.display='flex'">ACCOUNT</button>
       <a class="topbar__action-btn topbar__action-btn--desktop" href="/" style="text-decoration:none;">← BACK</a>
-      <button class="topbar__action-btn topbar__action-btn--desktop level-toggle-btn" id="level-toggle-btn" title="Change expertise level">🟢 OBSERVER</button>
+      <button class="topbar__action-btn topbar__action-btn--desktop level-toggle-btn" id="level-toggle-btn" title="Change how much detail you see" aria-haspopup="menu" aria-expanded="false">🟢 OBSERVER ▾</button>
       <span class="topbar__clock" id="utc-clock">00:00:00 UTC</span>
       <span class="topbar__pulse" id="global-pulse" data-info="stat-pulse" title="Data connection status"></span>
       <!-- Mobile kebab menu -->
@@ -58,7 +58,8 @@
   <div class="topbar-drawer" id="topbar-drawer">
     <button onclick="document.getElementById('download-modal').style.display='flex'">⬇ EXPORT DATA</button>
     <button id="manage-sub-btn-mobile" onclick="document.getElementById('manage-sub-modal').style.display='flex'">👤 ACCOUNT</button>
-    <button id="level-toggle-btn-mobile" class="level-toggle-btn">🟢 OBSERVER</button>
+    <button id="level-toggle-btn-mobile" class="level-toggle-btn" aria-haspopup="menu">🟢 OBSERVER ▾</button>
+    <a href="/about#how-to-use">? HOW IT WORKS</a>
     <a href="/about">ℹ ABOUT</a>
     <a href="/">← BACK TO HOME</a>
   </div>
@@ -108,17 +109,17 @@
     <div class="summary-card summary-card--feeds" data-goto="feeds">
       <span class="summary-card__icon">◫</span>
       <span class="summary-card__value" id="summary-feeds">—/20</span>
-      <span class="summary-card__label">LIVE FEEDS</span>
+      <span class="summary-card__label" data-label-key="summary.feeds">LIVE FEEDS</span>
     </div>
     <div class="summary-card summary-card--atmoscore" data-goto="atmoscore">
       <span class="summary-card__icon" style="color:#1E6FA8">◉</span>
       <span class="summary-card__value" id="summary-atmoscore">INIT</span>
-      <span class="summary-card__label">ATMOSCORE</span>
+      <span class="summary-card__label" data-label-key="summary.atmoscore">ATMOSCORE</span>
     </div>
     <div class="summary-card summary-card--suitability" data-goto="correlations">
       <span class="summary-card__icon">◆</span>
       <span class="summary-card__value" id="summary-suitability">—</span>
-      <span class="summary-card__label">SUITABILITY</span>
+      <span class="summary-card__label" data-label-key="summary.suit">SUITABILITY</span>
     </div>
   </div>
 
@@ -172,7 +173,7 @@
     <section class="cockpit__map" id="map-panel">
       <div class="panel-header">
         <span class="panel-header__icon">&#9678;</span>
-        <span class="panel-header__title">GEOSPATIAL OVERLAY</span>
+        <span class="panel-header__title" data-label-key="panel.map">GEOSPATIAL OVERLAY</span>
         <button class="refresh-btn" id="refresh-map" title="Refresh overlays">&#8635;</button>
         <span class="panel-header__badge" id="map-layers">1 layers active</span>
         <button class="layers-btn" id="layers-btn" title="Toggle map layers">⚡ LAYERS</button>
@@ -201,14 +202,14 @@
     <section class="cockpit__feeds" id="feeds-panel">
       <div class="panel-header">
         <span class="panel-header__icon">&#9635;</span>
-        <span class="panel-header__title">DATA STREAMS</span>
+        <span class="panel-header__title" data-label-key="panel.feeds">DATA STREAMS</span>
       </div>
 
       <!-- Daily Brief Card -->
       <div class="daily-brief" id="daily-brief">
         <div class="daily-brief__header">
           <span class="daily-brief__icon">&#9737;</span>
-          <span class="daily-brief__title">DAILY BRIEF</span>
+          <span class="daily-brief__title" data-label-key="panel.brief">DAILY BRIEF</span>
           <span class="daily-brief__badge" id="brief-badge">LOADING</span>
           <span class="daily-brief__time" id="brief-time"></span>
         </div>
@@ -232,7 +233,7 @@
     <section class="cockpit__atmoscore" id="atmoscore-panel">
       <div class="panel-header">
         <span class="panel-header__icon" style="color: #1E6FA8">&#9673;</span>
-        <span class="panel-header__title">ATMOSCORE 4/42 STATE ENGINE</span>
+        <span class="panel-header__title" data-label-key="panel.atmoscore">ATMOSCORE 4/42 STATE ENGINE</span>
         <span class="panel-header__badge" id="atmoscore-provenance"></span>
       </div>
       <div class="atmoscore-layout">
@@ -269,7 +270,7 @@
             </div>
           </div>
           <div class="atmoscore-suitability">
-            <div class="atmoscore-suitability__label">OBSERVATION SUITABILITY</div>
+            <div class="atmoscore-suitability__label" data-label-key="suit.label">OBSERVATION SUITABILITY</div>
             <div class="atmoscore-suitability__score" id="atmoscore-suit-score">&mdash;</div>
             <div class="atmoscore-suitability__status" id="atmoscore-suit-status">INITIALIZING</div>
             <div class="atmoscore-suitability__trend" id="atmoscore-suit-trend"></div>
@@ -291,7 +292,7 @@
     <section class="cockpit__corr" id="ledger-panel">
       <div class="panel-header">
         <span class="panel-header__icon">&#9638;</span>
-        <span class="panel-header__title">EVENT LEDGER</span>
+        <span class="panel-header__title" data-label-key="panel.ledger">EVENT LEDGER</span>
         <button class="panel-header__info-btn" id="ledger-info-btn" title="About the Event Ledger">ⓘ</button>
         <span class="panel-header__badge" id="ledger-count">loading...</span>
       </div>
@@ -364,7 +365,7 @@
         <button class="ledger-info-modal__close" id="ledger-info-close">&#10005;</button>
       </div>
       <div class="ledger-info-modal__body">
-        <p><strong>What is this?</strong> The Event Ledger is a chronological stream of every observation, data gap, deviation, and correlation detected across all 18 feeds.</p>
+        <p><strong>What is this?</strong> The Event Ledger is a chronological stream of every observation, data gap, deviation, and correlation detected across all 20 feeds.</p>
         <p><strong>Block Numbers:</strong> Events are grouped into 15-minute blocks. Each event carries a deterministic hash for integrity verification.</p>
         <p><strong>Correlations:</strong> When deviations in multiple feeds coincide within a 1-hour window, they are highlighted as a potential correlation. All correlations carry a <em>skeptic note</em> — the mundane explanation is always scored higher than the anomalous one.</p>
         <p><strong>Data Retention:</strong> Raw observation data is pruned after <strong>30 days</strong>. Block hashes and metadata summaries are retained <strong>permanently</strong>. Full manifests are accessible via <code>/api/ledger</code>.</p>
@@ -414,11 +415,11 @@
     </button>
     <button class="bottomnav__btn" data-view="atmoscore">
       <span class="bottomnav__icon" style="color: #1E6FA8">&#9678;</span>
-      <span class="bottomnav__label">AtmosCore</span>
+      <span class="bottomnav__label" data-label-key="nav.atmoscore">AtmosCore</span>
     </button>
     <button class="bottomnav__btn" data-view="correlations">
       <span class="bottomnav__icon">&#9638;</span>
-      <span class="bottomnav__label">Ledger</span>
+      <span class="bottomnav__label" data-label-key="nav.ledger">Ledger</span>
     </button>
     <button class="bottomnav__btn" data-view="map">
       <span class="bottomnav__icon">&#9678;</span>
@@ -432,7 +433,7 @@
       <h3 style="color:#4a9;margin:0 0 0.5rem;font-size:0.9rem;letter-spacing:0.05em;">⬇ EXPORT DATA</h3>
       <p style="color:#a09080;font-size:0.7rem;margin:0 0 1.25rem;">Select the datasets to include in your CSV report. Data reflects the latest observations.</p>
       <div id="export-options" style="display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1.25rem;">
-        <label style="display:flex;align-items:center;gap:0.6rem;color:#e8dfd6;font-size:0.75rem;cursor:pointer;"><input type="checkbox" value="feeds" checked style="accent-color:#4a9;"> All Feed Data (18 streams)</label>
+        <label style="display:flex;align-items:center;gap:0.6rem;color:#e8dfd6;font-size:0.75rem;cursor:pointer;"><input type="checkbox" value="feeds" checked style="accent-color:#4a9;"> All Feed Data (20 streams)</label>
         <label style="display:flex;align-items:center;gap:0.6rem;color:#e8dfd6;font-size:0.75rem;cursor:pointer;"><input type="checkbox" value="atmoscore" checked style="accent-color:#4a9;"> AtmosCore State Engine</label>
         <label style="display:flex;align-items:center;gap:0.6rem;color:#e8dfd6;font-size:0.75rem;cursor:pointer;"><input type="checkbox" value="correlations" style="accent-color:#4a9;"> Cross-Feed Correlations</label>
         <label style="display:flex;align-items:center;gap:0.6rem;color:#e8dfd6;font-size:0.75rem;cursor:pointer;"><input type="checkbox" value="ledger" style="accent-color:#4a9;"> Event Ledger</label>
@@ -452,9 +453,9 @@
       <div class="welcome-header">
         <span class="welcome-logo">◉</span>
         <h2>TRUTH OBSERVATORY</h2>
-        <p class="welcome-sub">Mission Control — v3.0</p>
+        <p class="welcome-sub">Quick tour — 3 steps</p>
       </div>
-      <div class="welcome-steps">
+      <div class="welcome-steps" id="welcome-steps">
         <div class="welcome-step welcome-step--active">
           <span class="welcome-step__icon">◫</span>
           <h3>20 LIVE DATA STREAMS</h3>
@@ -560,9 +561,10 @@
       navigator.serviceWorker.register('/sw.js').catch(() => {});
     }
 
-    // ── Expertise Level Onboarding & Toggle ─────────────────
-    (function initLevelSystem() {
+    // ── Expertise Level Onboarding & Picker ─────────────────
+    function initLevelSystem() {
       const overlay = document.getElementById('level-onboarding');
+      const menu = document.getElementById('level-menu');
       const toggleBtn = document.getElementById('level-toggle-btn');
       const toggleBtnMobile = document.getElementById('level-toggle-btn-mobile');
       const allToggleBtns = [toggleBtn, toggleBtnMobile].filter(Boolean);
@@ -570,45 +572,84 @@
       function updateToggleBtn() {
         const meta = Levels.getCurrentMeta();
         allToggleBtns.forEach(btn => {
-          btn.textContent = meta.icon + ' ' + meta.label;
+          btn.textContent = meta.icon + ' ' + meta.label + ' ▾';
           btn.style.borderColor = meta.color;
           btn.style.color = meta.color;
         });
+        if (menu) {
+          const current = Levels.get() || 'observer';
+          menu.querySelectorAll('[data-pick-level]').forEach(opt => {
+            const on = opt.getAttribute('data-pick-level') === current;
+            opt.classList.toggle('level-menu__opt--current', on);
+            opt.setAttribute('aria-checked', on ? 'true' : 'false');
+          });
+        }
       }
 
-      // Show onboarding if first visit
+      function applyLevel(level) {
+        Levels.set(level);
+        updateToggleBtn();
+        if (typeof Observatory !== 'undefined') Observatory.refresh();
+      }
+
+      // Plain labels for whatever level is stored (default: observer)
+      Levels.applyLabels();
+
+      // First visit: pick a level, then the 3-step tour for that level
       if (Levels.needsOnboarding() && overlay) {
         overlay.style.display = 'flex';
       }
-
-      // Onboarding selection
       if (overlay) {
         overlay.querySelectorAll('[data-select-level]').forEach(btn => {
           btn.addEventListener('click', () => {
-            const level = btn.getAttribute('data-select-level');
-            Levels.set(level);
             overlay.style.display = 'none';
-            updateToggleBtn();
-            if (typeof Observatory !== 'undefined') Observatory.refresh();
+            applyLevel(btn.getAttribute('data-select-level'));
+            if (typeof Observatory !== 'undefined' && Observatory.startTour) Observatory.startTour();
           });
         });
       }
 
-      // Toggle buttons cycle levels
+      // Level button opens a picker menu (no accidental cycling)
+      function closeMenu() {
+        if (!menu) return;
+        menu.classList.remove('level-menu--open');
+        allToggleBtns.forEach(b => b.setAttribute('aria-expanded', 'false'));
+      }
+      function openMenu(anchor) {
+        if (!menu) return;
+        const r = anchor.getBoundingClientRect();
+        const narrow = window.innerWidth < 640;
+        menu.style.top = (narrow ? 64 : r.bottom + 8) + 'px';
+        menu.style.right = (narrow ? 12 : Math.max(12, window.innerWidth - r.right)) + 'px';
+        menu.classList.add('level-menu--open');
+        anchor.setAttribute('aria-expanded', 'true');
+      }
       allToggleBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-          const current = Levels.get() || 'observer';
-          const next = current === 'observer' ? 'analyst' : current === 'analyst' ? 'researcher' : 'observer';
-          Levels.set(next);
-          updateToggleBtn();
-          if (typeof Observatory !== 'undefined') Observatory.refresh();
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (menu && menu.classList.contains('level-menu--open')) closeMenu();
+          else openMenu(btn.offsetParent ? btn : (toggleBtn || btn));
         });
       });
-      updateToggleBtn();
+      if (menu) {
+        menu.addEventListener('click', (e) => {
+          const opt = e.target.closest('[data-pick-level]');
+          if (!opt) return;
+          applyLevel(opt.getAttribute('data-pick-level'));
+          closeMenu();
+        });
+      }
+      document.addEventListener('click', (e) => {
+        if (menu && !menu.contains(e.target)) closeMenu();
+      });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenu(); });
 
-      // Listen for level changes from other sources
+      updateToggleBtn();
       window.addEventListener('level-change', updateToggleBtn);
-    })();
+    }
+    // Overlay + menu markup sit below this script, so wait for the DOM.
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initLevelSystem);
+    else initLevelSystem();
   </script>
 
   <!-- ═══ EXPERTISE LEVEL ONBOARDING ═══ -->
@@ -641,6 +682,22 @@
         </button>
       </div>
     </div>
+  </div>
+  <!-- ═══ LEVEL PICKER MENU ═══ -->
+  <div class="level-menu" id="level-menu" role="menu" aria-label="Choose how much detail you see">
+    <p class="level-menu__title">How should we explain things?</p>
+    <button class="level-menu__opt" role="menuitemradio" data-pick-level="observer">
+      <span class="level-menu__dot" style="background:#00e676;"></span>
+      <span class="level-menu__text"><strong>Observer</strong><small>Plain English. Explain it like I'm new.</small></span>
+    </button>
+    <button class="level-menu__opt" role="menuitemradio" data-pick-level="analyst">
+      <span class="level-menu__dot" style="background:#ffab00;"></span>
+      <span class="level-menu__text"><strong>Analyst</strong><small>Proper terms, with context and patterns.</small></span>
+    </button>
+    <button class="level-menu__opt" role="menuitemradio" data-pick-level="researcher">
+      <span class="level-menu__dot" style="background:#ff5252;"></span>
+      <span class="level-menu__text"><strong>Researcher</strong><small>Raw data, provenance, full detail.</small></span>
+    </button>
   </div>
 </body>
 </html>

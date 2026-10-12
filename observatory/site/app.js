@@ -244,6 +244,9 @@ const Observatory = {
     if (this.feeds && this.feeds.length > 0) {
       this.renderCarousels();
     }
+    if (typeof Levels !== 'undefined') Levels.applyLabels();
+    if (typeof AtmosCore !== 'undefined' && AtmosCore.suitability) this.updateAtmosCoreUI();
+    this.fetchBrief();
   },
 
   // ── Skeleton Loading States ──────────────────────────────────
@@ -274,33 +277,55 @@ const Observatory = {
     });
   },
 
-  // ── Welcome Onboarding ───────────────────────────────────────
+  // ── Welcome Onboarding (level-aware, runs after level is chosen) ─
   initWelcome() {
     if (localStorage.getItem('obs_welcomed')) return;
+    // First-time visitors pick a level first; the level picker calls
+    // Observatory.startTour() once they choose.
+    if (typeof Levels !== 'undefined' && Levels.needsOnboarding()) return;
+    this.startTour();
+  },
+
+  startTour() {
+    if (localStorage.getItem('obs_welcomed') || this._tourStarted) return;
     const overlay = document.getElementById('welcome-overlay');
-    if (!overlay) return;
+    const stepsWrap = document.getElementById('welcome-steps');
+    const nextBtn = document.getElementById('welcome-next');
+    const skipBtn = document.getElementById('welcome-dismiss');
+    if (!overlay || !stepsWrap || !nextBtn || !skipBtn) return;
+    this._tourStarted = true;
+
+    const tour = (typeof Levels !== 'undefined') ? Levels.getTour() : [];
+    const esc = (s) => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    stepsWrap.innerHTML = tour.map((s, i) => `
+      <div class="welcome-step${i === 0 ? ' welcome-step--active' : ''}">
+        <span class="welcome-step__icon">${esc(s.icon)}</span>
+        <h3>${esc(s.title)}</h3>
+        <p>${esc(s.text)}</p>
+        <span class="welcome-step__count">${i + 1} of ${tour.length}</span>
+      </div>`).join('');
+
+    const steps = stepsWrap.querySelectorAll('.welcome-step');
+    if (steps.length === 0) return;
+    let step = 0;
+    nextBtn.textContent = steps.length === 1 ? 'GET STARTED' : 'NEXT →';
     overlay.style.display = 'flex';
-    document.getElementById('welcome-dismiss').addEventListener('click', () => {
+
+    const finish = () => {
       overlay.style.display = 'none';
       localStorage.setItem('obs_welcomed', '1');
+    };
+    skipBtn.addEventListener('click', finish);
+    nextBtn.addEventListener('click', () => {
+      steps[step].classList.remove('welcome-step--active');
+      step++;
+      if (step < steps.length) {
+        steps[step].classList.add('welcome-step--active');
+        if (step === steps.length - 1) nextBtn.textContent = 'GET STARTED';
+      } else {
+        finish();
+      }
     });
-    // Also advance tour steps
-    let step = 0;
-    const steps = overlay.querySelectorAll('.welcome-step');
-    const nextBtn = document.getElementById('welcome-next');
-    if (nextBtn) {
-      nextBtn.addEventListener('click', () => {
-        steps[step].classList.remove('welcome-step--active');
-        step++;
-        if (step < steps.length) {
-          steps[step].classList.add('welcome-step--active');
-          if (step === steps.length - 1) nextBtn.textContent = 'GET STARTED';
-        } else {
-          overlay.style.display = 'none';
-          localStorage.setItem('obs_welcomed', '1');
-        }
-      });
-    }
   },
 
   // ── UTC Clock ────────────────────────────────────────────────
@@ -691,7 +716,7 @@ const Observatory = {
   updateTopbar(data) {
     const liveEl = document.getElementById('stat-live');
     const live = data.live || 0;
-    liveEl.textContent = `${live}/${data.total || 18}`;
+    liveEl.textContent = `${live}/${data.total || 20}`;
     liveEl.style.color = live === data.total ? 'var(--signal-live)' :
                          live > 0 ? 'var(--signal-stale)' : 'var(--signal-offline)';
     // Update mobile summary card
@@ -725,14 +750,18 @@ const Observatory = {
       scoreEl.textContent = v >= 0 ? `+${v.toFixed(2)}` : v.toFixed(2);
       scoreEl.style.color = AtmosCore.getBandColor(v);
     }
+    const hasLevels = (typeof Levels !== 'undefined');
+    const word = (s) => hasLevels ? Levels.statusWord(s) : String(s).toUpperCase();
+
     if (statusEl) {
-      statusEl.textContent = suit.status.toUpperCase();
+      statusEl.textContent = hasLevels ? Levels.statusLong(suit.status).toUpperCase() : suit.status.toUpperCase();
       statusEl.style.color = suit.status === 'suitable' ? 'var(--ac-optimal)' :
                              suit.status === 'qualified' ? 'var(--ac-advisory)' :
                              suit.status === 'unsuitable' ? 'var(--ac-critical)' : 'var(--text-dim)';
     }
     if (trendEl) {
-      const tChar = suit.trend === 'improving' ? '▲ IMPROVING' : suit.trend === 'degrading' ? '▼ DEGRADING' : '● STABLE';
+      const tChar = hasLevels ? Levels.trendWord(suit.trend) :
+        (suit.trend === 'improving' ? '▲ IMPROVING' : suit.trend === 'degrading' ? '▼ DEGRADING' : '● STABLE');
       const tColor = suit.trend === 'improving' ? 'var(--ac-optimal)' : suit.trend === 'degrading' ? 'var(--ac-caution)' : 'var(--text-dim)';
       trendEl.textContent = tChar;
       trendEl.style.color = tColor;
@@ -741,7 +770,7 @@ const Observatory = {
     // Topbar AtmosCore stat
     const acStat = document.getElementById('stat-atmoscore');
     if (acStat) {
-      acStat.textContent = suit.status.toUpperCase();
+      acStat.textContent = word(suit.status);
       acStat.style.color = suit.status === 'suitable' ? 'var(--signal-live)' :
                            suit.status === 'qualified' ? 'var(--signal-stale)' : 'var(--signal-offline)';
     }
@@ -755,7 +784,7 @@ const Observatory = {
 
     // Update mobile summary cards
     const sa = document.getElementById('summary-atmoscore');
-    if (sa) { sa.textContent = suit.status.toUpperCase(); sa.style.color = acStat ? acStat.style.color : ''; }
+    if (sa) { sa.textContent = word(suit.status); sa.style.color = acStat ? acStat.style.color : ''; }
     const ss = document.getElementById('summary-suitability');
     if (ss && suitStat) { ss.textContent = suitStat.textContent; ss.style.color = suitStat.style.color; }
 
@@ -905,7 +934,7 @@ const Observatory = {
     return card;
   },
 
-  // ── Condition Text (all 18 feeds) ───────────────────────────
+  // ── Condition Text (all 20 feeds) ───────────────────────────
   getConditionText(feed) {
     if (feed.status === 'offline') return { text: 'NO DATA', color: 'var(--signal-offline)' };
 
@@ -1626,7 +1655,7 @@ const Observatory = {
   statInfoContent: {
     'stat-feeds': {
       title: 'LIVE FEEDS',
-      body: `<strong>What this shows:</strong> The number of data feeds currently receiving fresh data, out of 18 total feeds monitored.<br><br>
+      body: `<strong>What this shows:</strong> The number of data feeds currently receiving fresh data, out of 20 total feeds monitored.<br><br>
 <strong>LIVE</strong> = received data within expected interval.<br>
 <strong>STALE</strong> = data is older than 3× the expected refresh interval.<br>
 <strong>OFFLINE</strong> = no data received.<br><br>

@@ -2206,3 +2206,34 @@ body[data-level="researcher"] .feed-card__why { display: none !important; }
     font-size: 1rem;
   }
 }
+
+/* ═══ Level picker menu (replaces click-to-cycle) ═══ */
+.level-menu {
+  position: fixed; z-index: 10050; display: none;
+  width: min(320px, calc(100vw - 24px));
+  background: #1a1714; border: 1px solid #3a3530; border-radius: 10px;
+  box-shadow: 0 18px 48px rgba(0,0,0,0.55); padding: 0.6rem;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+}
+.level-menu--open { display: block; animation: levelMenuIn 0.16s ease-out; }
+@keyframes levelMenuIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+.level-menu__title {
+  margin: 0.2rem 0.4rem 0.5rem; font-size: 0.62rem; letter-spacing: 0.12em;
+  text-transform: uppercase; color: #a09080;
+}
+.level-menu__opt {
+  display: flex; align-items: flex-start; gap: 0.7rem; width: 100%;
+  padding: 0.65rem 0.6rem; background: transparent; border: 1px solid transparent;
+  border-radius: 8px; color: #e8dfd6; text-align: left; cursor: pointer;
+  font-family: inherit; transition: background 0.15s ease, border-color 0.15s ease;
+}
+.level-menu__opt:hover, .level-menu__opt:focus-visible { background: rgba(212,160,84,0.08); outline: none; }
+.level-menu__opt--current { border-color: rgba(212,160,84,0.55); background: rgba(212,160,84,0.06); }
+.level-menu__dot { width: 10px; height: 10px; border-radius: 50%; margin-top: 0.3rem; flex-shrink: 0; }
+.level-menu__text { display: flex; flex-direction: column; gap: 0.15rem; }
+.level-menu__text strong { font-size: 0.8rem; letter-spacing: 0.04em; }
+.level-menu__text small { font-family: 'Inter', system-ui, sans-serif; font-size: 0.74rem; color: #a09080; line-height: 1.35; }
+.welcome-step__count {
+  display: block; margin-top: 0.75rem; font-size: 0.62rem; letter-spacing: 0.12em;
+  text-transform: uppercase; color: #a09080;
+}

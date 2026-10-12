@@ -27,6 +27,7 @@ const Levels = {
     if (!this.VALID.includes(level)) return;
     localStorage.setItem(this.STORAGE_KEY, level);
     document.body.setAttribute('data-level', level);
+    this.applyLabels();
     window.dispatchEvent(new CustomEvent('level-change', { detail: { level } }));
   },
 
@@ -549,5 +550,115 @@ const Levels = {
   getCurrentMeta() {
     const level = this.get() || 'observer';
     return this.meta[level];
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // UI LABELS — any element with data-label-key="<key>" gets
+  // its text from here for the current level.
+  // ═══════════════════════════════════════════════════════════
+  ui: {
+    'panel.map':        { observer: 'LIVE MAP',                analyst: 'MAP OVERLAYS',           researcher: 'GEOSPATIAL OVERLAY' },
+    'panel.feeds':      { observer: "WHAT WE'RE WATCHING",     analyst: 'DATA STREAMS',           researcher: 'DATA STREAMS' },
+    'panel.atmoscore':  { observer: 'SKY CONDITIONS RIGHT NOW', analyst: 'ATMOSCORE — SKY STATE',  researcher: 'ATMOSCORE 4/42 STATE ENGINE' },
+    'panel.ledger':     { observer: 'WHAT JUST HAPPENED',      analyst: 'EVENT LEDGER',           researcher: 'EVENT LEDGER' },
+    'panel.brief':      { observer: 'TODAY IN PLAIN ENGLISH',  analyst: 'DAILY BRIEF',            researcher: 'DAILY BRIEF' },
+    'stat.feeds':       { observer: 'FEEDS LIVE',              analyst: 'FEEDS',                  researcher: 'FEEDS' },
+    'stat.atmoscore':   { observer: 'SKY',                     analyst: 'ATMOSCORE',              researcher: 'ATMOSCORE' },
+    'stat.suitability': { observer: 'SCORE',                   analyst: 'SUITABILITY',            researcher: 'SUITABILITY' },
+    'suit.label':       { observer: 'GOOD TIME TO LOOK UP?',   analyst: 'OBSERVATION SUITABILITY', researcher: 'OBSERVATION SUITABILITY' },
+    'summary.feeds':    { observer: 'FEEDS LIVE',              analyst: 'LIVE FEEDS',             researcher: 'LIVE FEEDS' },
+    'summary.atmoscore':{ observer: 'SKY',                     analyst: 'ATMOSCORE',              researcher: 'ATMOSCORE' },
+    'summary.suit':     { observer: 'SCORE',                   analyst: 'SUITABILITY',            researcher: 'SUITABILITY' },
+    'nav.atmoscore':    { observer: 'Sky',                     analyst: 'AtmosCore',              researcher: 'AtmosCore' },
+    'nav.ledger':       { observer: 'Happening',               analyst: 'Ledger',                 researcher: 'Ledger' },
+  },
+
+  label(key) {
+    const level = this.get() || 'observer';
+    const row = this.ui[key];
+    return row ? (row[level] || row.researcher) : key;
+  },
+
+  applyLabels(root) {
+    const scope = root || document;
+    scope.querySelectorAll('[data-label-key]').forEach(el => {
+      const key = el.getAttribute('data-label-key');
+      if (this.ui[key]) el.textContent = this.label(key);
+    });
+    scope.querySelectorAll('[data-primitive]').forEach(el => {
+      const lbl = el.querySelector('.atmoscore-primitive__label');
+      if (lbl) lbl.textContent = this.getAtmosLabel(el.getAttribute('data-primitive')).toUpperCase();
+    });
+  },
+
+  // ── Suitability wording ────────────────────────────────────
+  // AtmosCore statuses: suitable | qualified | unsuitable | unknown
+  statusWords: {
+    observer:   { suitable: 'GOOD',     qualified: 'SO-SO',     unsuitable: 'POOR',       unknown: 'CHECKING' },
+    analyst:    { suitable: 'SUITABLE', qualified: 'MARGINAL',  unsuitable: 'UNSUITABLE', unknown: 'INITIALIZING' },
+    researcher: { suitable: 'SUITABLE', qualified: 'QUALIFIED', unsuitable: 'UNSUITABLE', unknown: 'INITIALIZING' },
+  },
+  statusSentence: {
+    observer: {
+      suitable: 'Good conditions for watching the sky',
+      qualified: 'Conditions are so-so right now',
+      unsuitable: 'Poor conditions — limited visibility',
+      unknown: 'Still gathering readings…',
+    },
+  },
+
+  statusWord(status) {
+    const level = this.get() || 'observer';
+    const words = this.statusWords[level] || this.statusWords.researcher;
+    return words[status] || String(status || '').toUpperCase();
+  },
+
+  statusLong(status) {
+    const level = this.get() || 'observer';
+    const s = this.statusSentence[level];
+    return s ? (s[status] || this.statusWord(status)) : this.statusWord(status);
+  },
+
+  trendWord(trend) {
+    const level = this.get() || 'observer';
+    if (level === 'observer') {
+      return trend === 'improving' ? '▲ Getting better' : trend === 'degrading' ? '▼ Getting worse' : '● Holding steady';
+    }
+    return trend === 'improving' ? '▲ IMPROVING' : trend === 'degrading' ? '▼ DEGRADING' : '● STABLE';
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // FIRST-VISIT TOUR — 3 steps per level, pointing at real panels
+  // ═══════════════════════════════════════════════════════════
+  tour: {
+    observer: [
+      { icon: '☀', title: 'START WITH TODAY',
+        text: 'The short summary at the top of "What we\'re watching" explains what the sun, sky, and Earth did today — in a few plain sentences. Start there.' },
+      { icon: '◎', title: 'THE LIVE MAP',
+        text: 'The map shows weather radar to start. Tap LAYERS to add satellite views, wildfires, volcanoes, or aircraft. Enter your ZIP code to center it on where you live.' },
+      { icon: '◫', title: 'TAP ANYTHING TO LEARN',
+        text: 'Each card is one thing we watch. Tap a card to see what it measures and why it matters. Tap the ⓘ next to any number for a plain explanation. You can switch to more detail anytime from the level button at the top.' },
+    ],
+    analyst: [
+      { icon: '◫', title: 'DAILY BRIEF + 20 FEEDS',
+        text: 'The brief summarizes the last 24 hours. Below it, feeds are grouped by domain — tap any card for its 24-hour activity chart and recent observations.' },
+      { icon: '◎', title: 'MAP OVERLAYS',
+        text: '10 toggleable layers: radar, GOES visible / IR / water vapor, precipitation, fire detections, ionospheric heaters, ADS-B aircraft, wildfires, and volcanic alerts.' },
+      { icon: '◆', title: 'EVENT LEDGER & CORRELATIONS',
+        text: 'Deviations (≥2σ from the hourly baseline) and cross-feed coincidences within 1-hour windows stream into the ledger. Every correlation carries a skeptic note with the mundane explanation.' },
+    ],
+    researcher: [
+      { icon: '◫', title: '20 LIVE DATA STREAMS',
+        text: 'Atmospheric, geophysical, and infrastructure feeds from NOAA, USGS, FAA, EPA, EIA, and SWPC — SHA-256 hashed at collection, manifest-logged, hourly-anchored to TrustLayer.' },
+      { icon: '◎', title: 'GEOSPATIAL OVERLAY',
+        text: '10 overlay layers on a satellite base, plus fullscreen mode with radar loop playback. Raw manifests and per-feed history are available via the REST API and CSV export.' },
+      { icon: '◉', title: 'ATMOSCORE 4/42',
+        text: 'Deterministic state scoring across 4 primitives — Thermodynamic, Optical Propagation, Dynamic Flow, Temporal Stability — with hard constraints. Observation suitability governance, not prediction.' },
+    ],
+  },
+
+  getTour() {
+    const level = this.get() || 'observer';
+    return this.tour[level] || this.tour.observer;
   },
 };

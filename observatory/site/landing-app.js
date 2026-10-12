@@ -249,9 +249,11 @@
       if (data.totalDeviations != null) el('corr-deviations').textContent = data.totalDeviations.toLocaleString();
       if (data.patterns) el('corr-patterns').textContent = data.patterns.length;
 
-      // Render pattern cards
+      // Render pattern cards — section stays hidden until real patterns exist
       const carousel = document.getElementById('pattern-carousel');
       if (!carousel || !data.patterns || data.patterns.length === 0) return;
+      const section = document.getElementById('correlation-engine');
+      if (section) section.style.display = '';
 
       carousel.innerHTML = '';
 
