@@ -11,7 +11,11 @@
  *   [02] Boundary Engine    → Only NEXRAD source; never writes outside raw/nexrad/
  *   [08] Temporal Engine    → Every file timestamped UTC; filenames encode scan time
  *   [14] Determinacy Engine → SHA-256 hash + retrieval manifest written before processing
- *   [32] Integrity Layer    → Raw file preserved as-is; no modification after download
+ *   [32] Integrity Layer    → Hash-by-reference: each volume is hashed as it streams;
+ *                              the manifest records sha256 + the permanent public
+ *                              source URL. Anyone can re-download and re-verify.
+ *                              (Volumes are not stored locally — nothing reads them,
+ *                              and 2–3 GB of rolling binaries exhausted VPS disk.)
  *   [33] Alignment Layer    → Configurable site list; rate-limited fetch with backoff
  *   [35] Collapse Detection → Consecutive failure counter; halts collector after threshold
  *   [40] Non-Being Guard    → Missing data written to manifest as gap, not silently skipped
@@ -30,6 +34,7 @@ import { createHash } from 'crypto';
 import { mkdirSync, existsSync, readFileSync, writeFileSync, readdirSync, statSync, unlinkSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { readSince } from '../lib/manifest-ledger.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(__dirname, '..', '..');
@@ -116,13 +121,13 @@ function appendManifest(entry) {
   appendFileSync(mp, line);
 }
 
+// Dedupe window: S3 listings cover the current and previous UTC day only,
+// so 48h of ledger entries is sufficient (and bounded, unlike the old
+// whole-manifest read).
 function loadSeenFiles() {
-  const mp = manifestPath();
-  if (!existsSync(mp)) return new Set();
   const seen = new Set();
-  const lines = readFileSync(mp, 'utf8').split('\n').filter(Boolean);
-  for (const line of lines) {
-    try { const e = JSON.parse(line); if (e.filename) seen.add(e.filename); } catch {}
+  for (const e of readSince(STATE_DIR, 'nexrad-manifest.jsonl', 48)) {
+    if (e.filename) seen.add(e.filename);
   }
   return seen;
 }
@@ -153,7 +158,8 @@ async function sha256Stream(readable) {
   return hash.digest('hex');
 }
 
-async function downloadFile(url, destPath, retries = CONFIG.maxRetries) {
+// Streams the volume through SHA-256 without buffering or storing it.
+async function hashRemoteFile(url, retries = CONFIG.maxRetries) {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       const controller = new AbortController();
@@ -166,19 +172,14 @@ async function downloadFile(url, destPath, retries = CONFIG.maxRetries) {
         throw new Error(`HTTP ${res.status}`);
       }
 
-      const bytes = [];
       const hash = createHash('sha256');
+      let bytes = 0;
       for await (const chunk of res.body) {
         hash.update(chunk);
-        bytes.push(chunk);
+        bytes += chunk.length;
       }
-      const sha256 = hash.digest('hex');
-      const buf = Buffer.concat(bytes);
 
-      mkdirSync(dirname(destPath), { recursive: true });
-      writeFileSync(destPath, buf);
-
-      return { status: res.status, sha256, bytes: buf.length };
+      return { status: res.status, sha256: hash.digest('hex'), bytes };
     } catch (err) {
       if (attempt === retries) return { status: 'FETCH_ERROR', error: err.message, sha256: null, bytes: 0 };
       await new Promise(r => setTimeout(r, CONFIG.retryDelayMs * attempt));
@@ -254,15 +255,8 @@ async function collectSite(site, seen, date = new Date()) {
 
   for (const key of toFetch) {
     const filename = key.split('/').pop();
-    const destPath = join(RAW_DIR, yyyy, mm, dd, site, filename);
-
-    if (existsSync(destPath)) {
-      seen.add(filename);
-      continue;
-    }
-
     const fileUrl = `${CONFIG.s3Base}/${key}`;
-    const result = await downloadFile(fileUrl, destPath);
+    const result = await hashRemoteFile(fileUrl);
 
     if (result.status === 200 && result.sha256) {
       seen.add(filename);
@@ -273,7 +267,7 @@ async function collectSite(site, seen, date = new Date()) {
         filename,
         s3Key: key,
         sourceUrl: fileUrl,
-        localPath: `observatory/raw/nexrad/${yyyy}/${mm}/${dd}/${site}/${filename}`,
+        storage: 'reference', // verify: GET sourceUrl, sha256 must equal `sha256`
         retrievedAt: new Date().toISOString(),
         sha256: result.sha256,
         bytes: result.bytes,

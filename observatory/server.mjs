@@ -20,6 +20,7 @@ import { join, extname, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { randomBytes, createHmac } from 'crypto';
 import { generateDailyBrief, getCurrentBrief } from './brief-generator.mjs';
+import { readTail, tailLines, parseLines, segmentsFor, segmentDay, segmentLines, feedArchiveDir, archiveRoot } from './lib/manifest-ledger.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const STATE_DIR = process.env.STATE_DIR || join(__dirname, 'state');
@@ -213,23 +214,11 @@ const FEEDS = [
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Manifest Reader — reads NDJSON manifest, returns parsed entries
+// Manifest Reader — last N parsed entries across the live manifest and sealed
+// daily archive segments. Reads only the tail; cost no longer grows with history.
 // ═══════════════════════════════════════════════════════════════════════════
 function readManifest(filename, limit = 100) {
-  const filepath = join(STATE_DIR, filename);
-  if (!existsSync(filepath)) return [];
-
-  try {
-    const raw = readFileSync(filepath, 'utf-8');
-    const lines = raw.trim().split('\n').filter(Boolean);
-    // Return last N entries (most recent)
-    const slice = lines.slice(-limit);
-    const entries = [];
-    for (const line of slice) {
-      try { entries.push(JSON.parse(line)); } catch {}
-    }
-    return entries;
-  } catch { return []; }
+  return readTail(STATE_DIR, filename, limit);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -695,6 +684,48 @@ const server = createServer(async (req, res) => {
     const status = getFeedStatus(feed);
     res.writeHead(200, { 'Content-Type': 'application/json' });
     return res.end(JSON.stringify({ ...status, recentEntries: entries.slice(-20) }));
+  }
+
+  // ── TrustLayer anchor receipts (public) ─────────────────────────────
+  // Hourly obs-merkle-v1 roots of every manifest line, anchored on chain.tlid.io.
+  if (path === '/api/anchors') {
+    const limit = Math.min(Math.max(parseInt(url.searchParams.get('limit') || '48', 10) || 48, 1), 500);
+    const receipts = parseLines(tailLines(join(archiveRoot(STATE_DIR), 'anchors.jsonl'), limit));
+    return jsonResponse(res, 200, {
+      scheme: 'obs-merkle-v1',
+      verify: 'GET https://chain.tlid.io/api/hash/<txHash> → dataHash must equal root',
+      count: receipts.length,
+      receipts,
+    });
+  }
+
+  // ── Sealed archive (premium) ────────────────────────────────────────
+  // /api/archive/<feedId>        → available days
+  // /api/archive/<feedId>/<day>  → that day's manifest lines (NDJSON)
+  if (path.startsWith('/api/archive/')) {
+    const subscriber = await getSubscriberFromRequest(req);
+    if (!isSubscribed(subscriber)) return jsonResponse(res, 401, { error: 'Subscription required', subscribe_url: '/api/subscribe' });
+
+    const [, , , feedId, day] = path.split('/');
+    const feed = FEEDS.find(f => f.id === feedId);
+    if (!feed) return jsonResponse(res, 404, { error: 'Feed not found' });
+    const segs = segmentsFor(STATE_DIR, feed.manifest);
+
+    if (!day) {
+      const days = [...new Set(segs.map(segmentDay))];
+      return jsonResponse(res, 200, { feed: feed.id, days, live: 'today (see /api/feed/' + feed.id + ')' });
+    }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) return jsonResponse(res, 400, { error: 'Day must be YYYY-MM-DD' });
+    const daySegs = segs.filter(s => segmentDay(s) === day);
+    if (daySegs.length === 0) return jsonResponse(res, 404, { error: 'No sealed archive for that day' });
+    const dir = feedArchiveDir(STATE_DIR, feed.manifest);
+    const body = daySegs.flatMap(s => segmentLines(join(dir, s))).join('\n') + '\n';
+    res.writeHead(200, {
+      'Content-Type': 'application/x-ndjson',
+      'Content-Disposition': `attachment; filename="${feed.id}-${day}.jsonl"`,
+      'X-Anchor-Scheme': 'obs-merkle-v1',
+    });
+    return res.end(body);
   }
 
   if (path === '/api/events' || path === '/api/correlations') {

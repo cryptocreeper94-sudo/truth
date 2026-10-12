@@ -58,6 +58,12 @@ run_collector() {
   done
 }
 
+# ── Archiver / TrustLayer Merkle anchor (seals manifests daily, anchors hourly) ──
+# Compiled from archiver.lume. Started first so a first-boot legacy migration
+# begins before collectors resume appending.
+run_collector "ARCHIVER"    "$SCRIPT_DIR/archiver.mjs"                         &
+sleep 2
+
 # ── Launch collectors ────────────────────────────────────────────────────────
 # Stage 1 — Foundation (existing)
 run_collector "NEXRAD"      "$SCRIPT_DIR/collectors/nexrad.mjs"               &

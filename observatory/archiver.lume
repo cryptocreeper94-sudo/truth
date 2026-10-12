@@ -1,0 +1,369 @@
+/// TRUTH Observatory — Archiver + TrustLayer Merkle Anchor daemon
+/// DarkWave Studios LLC — Copyright 2026
+///
+/// Once per UTC hour:
+///   1. Reads the lines each collector appended since the last cursor.
+///   2. Hashes them (obs-merkle-v1) into one root per feed and one top root.
+///   3. Records a receipt in archive/anchors.jsonl and submits the top root to
+///      TrustLayer (chain.tlid.io /api/hash/submit) via trustlayer-anchor.mjs.
+/// Once per UTC day (first hour after 00:00):
+///   4. Renames each live manifest aside, lets in-flight appends settle, seals
+///      its remaining lines into that hour's anchor, and gzips it into
+///      archive/<stem>/<YYYY-MM-DD>.<NN>.jsonl.gz (immutable).
+/// First boot (no archive/state.json):
+///   5. Splits each legacy manifest into daily sealed segments and anchors the
+///      whole history once as a BACKFILL receipt.
+///
+/// Collectors are never touched: they keep appending to <stem>-manifest.jsonl by
+/// path, so a rename simply causes their next append to start a fresh file.
+///
+/// Verification (anyone): take a feed's sealed segments for a day in NN order,
+/// split into the consecutive line ranges listed in that day's receipts,
+/// sha256 each line, fold with obs-merkle-v1, and compare to the receipt's
+/// feed root; fold sorted sha256("<stem>:<feedRoot>") leaves for the top root;
+/// look the top root's txHash up at chain.tlid.io/api/hash/<txHash>.
+///
+/// DDA 42-Doctrine mapping:
+///   [08] Temporal Engine     → UTC hour/day boundaries define every period
+///   [14] Determinacy Engine  → same bytes → same roots, independent of host
+///   [22] Continuity Layer    → cursors persisted; crash recovery resumes exactly
+///   [32] Integrity Layer     → every line hashed; roots anchored on-chain
+///   [35] Collapse Detection  → failed submissions stay pending and retry hourly
+///   [40] Non-Being Guard     → empty periods produce no anchor, never a fake one
+
+use { existsSync, mkdirSync, readdirSync, renameSync, writeFileSync, readFileSync, statSync, unlinkSync, openSync, readSync, closeSync } from "node:fs"
+use { gzipSync } from "node:zlib"
+use { join } from "node:path"
+use { attempt, tryParse, whenDone, put, sleepSync, iso } from "./lib/lume-shim.mjs"
+use { sha256Hex, merkleRoot, leavesOf, archiveRoot, stemOf, entryTime, isoDayOf } from "./lib/manifest-ledger.mjs"
+use { anchorToTrustLayer } from "./trustlayer-anchor.mjs"
+
+let STATE_DIR = process.env.STATE_DIR or "/app/state/observatory"
+let ARCHIVE = archiveRoot(STATE_DIR)
+let STATE_FILE = join(ARCHIVE, "state.json")
+let RECEIPTS = join(ARCHIVE, "anchors.jsonl")
+let SCHEME = "obs-merkle-v1"
+let CATEGORY = "observatory-merkle"
+let TICK_MS = 60000
+let SETTLE_MS = 2000
+let MAX_RETRIES_PER_TICK = 24
+let MAX_PENDING = 2000
+
+let pending = []
+let CURRENT = null   // live state object, persisted when async anchor results arrive
+
+// ── [08] Temporal ───────────────────────────────────────────────────────────
+to hourOf(ms) -> iso(ms).slice(0, 13)
+
+// ── State ───────────────────────────────────────────────────────────────────
+to loadState():
+    if not existsSync(STATE_FILE):
+        return null
+    return tryParse(readFileSync(STATE_FILE, "utf8"))
+
+to saveState(st):
+    if pending.length > MAX_PENDING:
+        set pending to pending.slice(pending.length - MAX_PENDING)
+    Object.assign(st, { pending: pending, savedAt: iso(Date.now()) })
+    let tmp = STATE_FILE + ".tmp"
+    writeFileSync(tmp, JSON.stringify(st, null, 2))
+    renameSync(tmp, STATE_FILE)
+
+to cursorOf(st, stem):
+    let c = st.feeds[stem]
+    if c == null:
+        return { offset: 0, line: 0 }
+    return c
+
+/// Receipt objects carry a 	ype field; Lume reserves 	ype as a keyword,
+/// so it is attached via put() and kept first for readability.
+to typed(kind, fields) -> Object.assign(put({}, "type", kind), fields)
+
+to appendReceipt(rec):
+    writeFileSync(RECEIPTS, JSON.stringify(rec) + "\n", { flag: "a" })
+
+// ── Files ───────────────────────────────────────────────────────────────────
+to isLiveManifest(name) -> name.endsWith("-manifest.jsonl")
+
+to liveFiles():
+    if not existsSync(STATE_DIR):
+        return []
+    let names = readdirSync(STATE_DIR).filter(isLiveManifest)
+    names.sort()
+    return names
+
+to feedDir(stem):
+    let d = join(ARCHIVE, stem)
+    mkdirSync(d, { recursive: true })
+    return d
+
+to rotatingPath(stem) -> join(feedDir(stem), ".rotating.jsonl")
+to legacyPath(stem) -> join(feedDir(stem), ".legacy.jsonl")
+
+/// First free "<day>.<NN>.jsonl.gz" for a feed.
+to nextSegmentPath(stem, day):
+    let n = 0
+    while n < 100:
+        let p = join(feedDir(stem), day + "." + String(n).padStart(2, "0") + ".jsonl.gz")
+        if not existsSync(p):
+            return p
+        set n to n + 1
+    return join(feedDir(stem), day + "." + String(Date.now()) + ".jsonl.gz")
+
+to writeSegment(stem, day, lines):
+    let p = nextSegmentPath(stem, day)
+    let tmp = p + ".tmp"
+    writeFileSync(tmp, gzipSync(lines.join("\n") + "\n"))
+    renameSync(tmp, p)
+    return p
+
+/// Bytes of `path` from `offset` up to the last complete line.
+/// Returns { lines, nextOffset }.
+to readFrom(path, offset, toEnd):
+    if not existsSync(path):
+        return { lines: [], nextOffset: offset }
+    let size = statSync(path).size
+    let start = offset
+    if size < offset:
+        set start to 0
+    if size == start:
+        return { lines: [], nextOffset: start }
+    let fd = openSync(path, "r")
+    let buf = Buffer.alloc(size - start)
+    let got = readSync(fd, buf, 0, size - start, start)
+    closeSync(fd)
+    let body = buf.subarray(0, got).toString("utf8")
+    let usable = body
+    if not toEnd:
+        let cut = body.lastIndexOf("\n")
+        if cut < 0:
+            return { lines: [], nextOffset: start }
+        set usable to body.slice(0, cut + 1)
+    let consumed = Buffer.byteLength(usable, "utf8")
+    let lines = usable.split("\n").filter(isNonEmpty)
+    return { lines: lines, nextOffset: start + consumed }
+
+to isNonEmpty(s) -> s.length > 0
+
+// ── [32] Anchoring ──────────────────────────────────────────────────────────
+to topRootOf(feeds):
+    let stems = Object.keys(feeds)
+    stems.sort()
+    let leaves = []
+    for each stem in stems:
+        leaves.push(sha256Hex(stem + ":" + feeds[stem].root))
+    return merkleRoot(leaves)
+
+to makeNotRoot(root):
+    to keep(p) -> p.root != root
+    return keep
+
+to makeResultHandler(root, kind, period):
+    to handle(r):
+        let ok_ = r != null and r.success == true
+        appendReceipt(typed("ANCHOR-RESULT", { kind: kind, period: period, root: root, success: ok_, txHash: r.txHash or null, blockHeight: r.blockHeight or null, chainTimestamp: r.timestamp or null, errorMessage: r["error"] or null, at: iso(Date.now()) }))
+        if ok_:
+            set pending to pending.filter(makeNotRoot(root))
+            if CURRENT != null:
+                saveState(CURRENT)
+            show "[ARCHIVER] anchored {kind} {period} root={root.slice(0, 12)} tx={r.txHash}"
+        else:
+            show "[ARCHIVER] anchor pending {kind} {period}: {r["error"]}"
+    return handle
+
+to submitRoot(root, kind, period, meta):
+    let payload = Object.assign({ scheme: SCHEME, kind: kind, period: period }, meta)
+    whenDone(anchorToTrustLayer(root, CATEGORY, payload), makeResultHandler(root, kind, period))
+
+to sealAndAnchor(kind, period, feeds):
+    if Object.keys(feeds).length == 0:
+        return null
+    let root = topRootOf(feeds)
+    appendReceipt(typed(kind, { scheme: SCHEME, period: period, sealedAt: iso(Date.now()), root: root, feeds: feeds }))
+    pending.push({ root: root, kind: kind, period: period, feedCount: Object.keys(feeds).length })
+    submitRoot(root, kind, period, { feedCount: Object.keys(feeds).length })
+    show "[ARCHIVER] sealed {kind} {period} feeds={Object.keys(feeds).length} root={root.slice(0, 12)}"
+    return root
+
+to retryPending():
+    let n = 0
+    for each p in pending:
+        if n >= MAX_RETRIES_PER_TICK:
+            break
+        submitRoot(p.root, p.kind, p.period, { feedCount: p.feedCount, retry: true })
+        set n to n + 1
+
+// ── First boot: legacy split + BACKFILL ─────────────────────────────────────
+to dayOfLine(line, fallback):
+    let e = tryParse(line)
+    if e == null:
+        return fallback
+    let t = entryTime(e)
+    if isNaN(t):
+        return fallback
+    return isoDayOf(t)
+
+to isSegmentName(name) -> name.endsWith(".jsonl.gz")
+
+/// A legacy file present means migration for this stem never completed:
+/// discard any partial segments so the re-run cannot duplicate data.
+to clearPartialSegments(stem):
+    let dir = feedDir(stem)
+    for each name in readdirSync(dir).filter(isSegmentName):
+        unlinkSync(join(dir, name))
+
+to migrateLegacy(st):
+    let files = liveFiles()
+    for each file in files:
+        let stem = stemOf(file)
+        if not existsSync(legacyPath(stem)):
+            renameSync(join(STATE_DIR, file), legacyPath(stem))
+    sleepSync(SETTLE_MS)
+    let today = isoDayOf(Date.now())
+    let feeds = {}
+    for each name in readdirSync(ARCHIVE):
+        if not existsSync(join(ARCHIVE, name, ".legacy.jsonl")):
+            continue
+        let stem = name
+        clearPartialSegments(stem)
+        let lines = readFileSync(legacyPath(stem), "utf8").split("\n").filter(isNonEmpty)
+        let days = {}
+        let order = []
+        let current = today
+        for each line in lines:
+            set current to dayOfLine(line, current)
+            // Clock-skewed (future-dated) entries are filed under today so a day's
+            // sealed segments never precede that day's live line numbering.
+            if current > today:
+                set current to today
+            if days[current] == null:
+                put(days, current, [])
+                order.push(current)
+            days[current].push(line)
+        order.sort()
+        // Feed root is over lines in sealed-segment order (days ascending), so it
+        // can be recomputed by anyone from the segments alone.
+        let dayRoots = {}
+        let ordered = []
+        for each day in order:
+            writeSegment(stem, day, days[day])
+            set ordered to ordered.concat(days[day])
+            put(dayRoots, day, { count: days[day].length, root: merkleRoot(leavesOf(days[day])) })
+        let todayCount = 0
+        if days[today] != null:
+            set todayCount to days[today].length
+        put(st.feeds, stem, { offset: 0, line: todayCount })
+        if lines.length > 0:
+            put(feeds, stem, { count: lines.length, root: merkleRoot(leavesOf(ordered)), days: dayRoots })
+        show "[ARCHIVER] migrated {stem}: {lines.length} lines → {order.length} daily segments"
+    sealAndAnchor("BACKFILL", "genesis-" + today, feeds)
+
+/// Remove legacy sources once the BACKFILL receipt and cursors are on disk.
+to removeLegacy():
+    for each name in readdirSync(ARCHIVE):
+        let p = join(ARCHIVE, name, ".legacy.jsonl")
+        if existsSync(p):
+            unlinkSync(p)
+
+// ── Hourly cycle ────────────────────────────────────────────────────────────
+to stemsWithRotating():
+    let out = []
+    if not existsSync(ARCHIVE):
+        return out
+    for each name in readdirSync(ARCHIVE):
+        if existsSync(join(ARCHIVE, name, ".rotating.jsonl")):
+            out.push(name)
+    return out
+
+to cycle(st, nowMs):
+    finalizeRotations(st)
+    let hour = hourOf(nowMs)
+    if st.lastHour == hour:
+        return false
+    let day = hour.slice(0, 10)
+    let sealDay = st.day
+    if st.day != day:
+        for each file in liveFiles():
+            let stem = stemOf(file)
+            if not existsSync(rotatingPath(stem)):
+                renameSync(join(STATE_DIR, file), rotatingPath(stem))
+        sleepSync(SETTLE_MS)
+    let rotated = stemsWithRotating()
+    let feeds = {}
+    let finalize = []
+    for each stem in rotated:
+        let c = cursorOf(st, stem)
+        let got = readFrom(rotatingPath(stem), c.offset, true)
+        if got.lines.length > 0:
+            put(feeds, stem, { day: sealDay, lineFrom: c.line, lineTo: c.line + got.lines.length - 1, count: got.lines.length, root: merkleRoot(leavesOf(got.lines)) })
+        finalize.push({ stem: stem, day: sealDay })
+        put(st.feeds, stem, { offset: 0, line: 0 })
+    for each file in liveFiles():
+        let stem = stemOf(file)
+        if rotated.indexOf(stem) < 0:
+            let c = cursorOf(st, stem)
+            let got = readFrom(join(STATE_DIR, file), c.offset, false)
+            if got.lines.length > 0:
+                put(feeds, stem, { day: day, lineFrom: c.line, lineTo: c.line + got.lines.length - 1, count: got.lines.length, root: merkleRoot(leavesOf(got.lines)) })
+                put(st.feeds, stem, { offset: got.nextOffset, line: c.line + got.lines.length })
+    retryPending()
+    sealAndAnchor("ANCHOR", st.lastHour, feeds)
+    Object.assign(st, { lastHour: hour, day: day, finalize: finalize })
+    saveState(st)
+    finalizeRotations(st)
+    return true
+
+/// Seal rotated files into immutable gzip segments. Runs only after the
+/// receipt and reset cursors are persisted, so a crash here is resumed by
+/// boot() without re-reading or re-anchoring anything.
+to finalizeRotations(st):
+    let todo = st.finalize or []
+    if todo.length == 0:
+        return null
+    for each f in todo:
+        let p = rotatingPath(f.stem)
+        if existsSync(p):
+            let sealed = readFileSync(p, "utf8").split("\n").filter(isNonEmpty)
+            if sealed.length > 0:
+                writeSegment(f.stem, f.day, sealed)
+            unlinkSync(p)
+    Object.assign(st, { finalize: [] })
+    saveState(st)
+    return null
+
+// ── Entrypoint ──────────────────────────────────────────────────────────────
+to boot():
+    mkdirSync(ARCHIVE, { recursive: true })
+    let st = loadState()
+    if st == null:
+        let nowMs = Date.now()
+        set st to { version: 1, scheme: SCHEME, feeds: {}, lastHour: hourOf(nowMs), day: isoDayOf(nowMs), pending: [] }
+        show "[ARCHIVER] first boot — migrating legacy manifests"
+        migrateLegacy(st)
+        saveState(st)
+        removeLegacy()
+    else:
+        set pending to st.pending or []
+        show "[ARCHIVER] resumed — lastHour={st.lastHour} pending={pending.length}"
+        finalizeRotations(st)
+    return st
+
+let STATE = boot()
+set CURRENT to STATE
+
+to makeTick(st):
+    to run():
+        return cycle(st, Date.now())
+    to tick():
+        let r = attempt(run, "failed")
+        if r == "failed":
+            show "[ARCHIVER] cycle failed — will retry next tick"
+    return tick
+
+show "═══════════════════════════════════════════════════════════════"
+show " TRUTH Observatory — Archiver / TrustLayer Merkle Anchor"
+show " State: {STATE_DIR}  Scheme: {SCHEME}"
+show "═══════════════════════════════════════════════════════════════"
+let TICK = makeTick(STATE)
+TICK()
+setInterval(TICK, TICK_MS)

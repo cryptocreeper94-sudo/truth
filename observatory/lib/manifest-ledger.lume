@@ -1,0 +1,200 @@
+/// TRUTH Observatory — Manifest Ledger (shared read + hash primitives)
+/// DarkWave Studios LLC — Copyright 2026
+///
+/// Storage layout under STATE_DIR:
+///   <stem>-manifest.jsonl                  live, append-only, written by exactly one collector
+///   archive/<stem>/<YYYY-MM-DD>.<NN>.jsonl.gz  sealed daily segments (immutable)
+///   archive/anchors.jsonl                  Merkle anchor receipts (TrustLayer)
+///   archive/state.json                     archiver cursor state
+///
+/// Readers never parse whole files. readTail() reads the end of the live file
+/// and walks sealed segments backward only as far as needed.
+///
+/// DDA 42-Doctrine mapping:
+///   [14] Determinacy Engine  → identical bytes → identical leaves → identical roots
+///   [22] Continuity Layer    → live + sealed segments read as one continuous ledger
+///   [32] Integrity Layer     → sha256 leaves, obs-merkle-v1 roots
+///   [40] Non-Being Guard     → missing files read as empty, never as errors
+
+use { createHash } from "node:crypto"
+use { existsSync, statSync, openSync, readSync, closeSync, readFileSync, readdirSync } from "node:fs"
+use { gunzipSync } from "node:zlib"
+use { join } from "node:path"
+use { attempt, tryParse, iso } from "./lume-shim.mjs"
+
+let SEGMENT_CACHE_MAX = 24
+let MAX_SEGMENT_WALK = 400
+let cacheKeys = []
+let cacheVals = []
+
+// ── [32] Integrity — hashing ────────────────────────────────────────────────
+export to sha256Hex(s) -> createHash("sha256").update(s).digest("hex")
+
+/// obs-merkle-v1: leaf = sha256(line); parent = sha256(leftHex + rightHex);
+/// an odd node is paired with itself. Empty input → "".
+export to merkleRoot(leaves):
+    if leaves.length == 0:
+        return ""
+    let level = leaves
+    while level.length > 1:
+        let next = []
+        let i = 0
+        while i < level.length:
+            let left = level[i]
+            let right = left
+            if i + 1 < level.length:
+                set right to level[i + 1]
+            next.push(sha256Hex(left + right))
+            set i to i + 2
+        set level to next
+    return level[0]
+
+export to leavesOf(lines):
+    let out = []
+    for each line in lines:
+        out.push(sha256Hex(line))
+    return out
+
+// ── Paths ───────────────────────────────────────────────────────────────────
+export to archiveRoot(stateDir) -> join(stateDir, "archive")
+export to stemOf(file) -> file.replace("-manifest.jsonl", "")
+export to feedArchiveDir(stateDir, file) -> join(archiveRoot(stateDir), stemOf(file))
+
+to isSegment(name) -> name.endsWith(".jsonl.gz")
+to isNonEmpty(s) -> s.length > 0
+
+/// Sealed segment filenames for a feed, oldest first.
+export to segmentsFor(stateDir, file):
+    let dir = feedArchiveDir(stateDir, file)
+    if not existsSync(dir):
+        return []
+    let names = readdirSync(dir).filter(isSegment)
+    names.sort()
+    return names
+
+/// Day prefix of a segment filename: "2026-10-12.00.jsonl.gz" → "2026-10-12"
+export to segmentDay(name) -> name.slice(0, 10)
+
+// ── Low-level line reads ────────────────────────────────────────────────────
+to readRange(path, start, len):
+    let fd = openSync(path, "r")
+    let buf = Buffer.alloc(len)
+    let got = readSync(fd, buf, 0, len, start)
+    closeSync(fd)
+    return buf.subarray(0, got).toString("utf8")
+
+/// Last n non-empty lines of a plain file, reading only the tail.
+to tailLinesUnsafe(path, n):
+    if not existsSync(path):
+        return []
+    let size = statSync(path).size
+    if size == 0:
+        return []
+    let chunk = 262144
+    while true:
+        let len = Math.min(size, chunk)
+        let start = size - len
+        let parts = readRange(path, start, len).split("\n")
+        if start > 0:
+            parts.shift()
+        let lines = parts.filter(isNonEmpty)
+        if lines.length >= n or start == 0:
+            return lines.slice(Math.max(0, lines.length - n))
+        set chunk to chunk * 4
+
+to makeTailReader(path, n):
+    to run():
+        return tailLinesUnsafe(path, n)
+    return run
+
+export to tailLines(path, n) -> attempt(makeTailReader(path, n), [])
+
+to wholeLinesUnsafe(path):
+    if not existsSync(path):
+        return []
+    return readFileSync(path, "utf8").split("\n").filter(isNonEmpty)
+
+to makeWholeReader(path):
+    to run():
+        return wholeLinesUnsafe(path)
+    return run
+
+export to wholeLines(path) -> attempt(makeWholeReader(path), [])
+
+to segmentLinesUnsafe(path):
+    let idx = cacheKeys.indexOf(path)
+    if idx >= 0:
+        return cacheVals[idx]
+    let lines = gunzipSync(readFileSync(path)).toString("utf8").split("\n").filter(isNonEmpty)
+    cacheKeys.push(path)
+    cacheVals.push(lines)
+    if cacheKeys.length > SEGMENT_CACHE_MAX:
+        cacheKeys.shift()
+        cacheVals.shift()
+    return lines
+
+to makeSegmentReader(path):
+    to run():
+        return segmentLinesUnsafe(path)
+    return run
+
+/// All lines of a sealed segment (cached; segments are immutable).
+export to segmentLines(path) -> attempt(makeSegmentReader(path), [])
+
+// ── Entries ─────────────────────────────────────────────────────────────────
+export to parseLines(lines):
+    let out = []
+    for each line in lines:
+        let e = tryParse(line)
+        if e != null:
+            out.push(e)
+    return out
+
+/// Observation time of an entry in epoch ms (NaN if none).
+export to entryTime(e):
+    let ts = e.timestamp or e.retrievedAt or e.fetchedAt or e.collected_at or e.at or e.writtenAt
+    if ts == null:
+        return NaN
+    return Date.parse(ts)
+
+/// Last n raw lines across live file + sealed segments (chronological).
+export to readTailLines(stateDir, file, n):
+    let lines = tailLines(join(stateDir, file), n)
+    let segs = segmentsFor(stateDir, file)
+    let idx = segs.length - 1
+    let walked = 0
+    let dir = feedArchiveDir(stateDir, file)
+    while lines.length < n and idx >= 0 and walked < MAX_SEGMENT_WALK:
+        let seg = segmentLines(join(dir, segs[idx]))
+        let need = n - lines.length
+        set lines to seg.slice(Math.max(0, seg.length - need)).concat(lines)
+        set idx to idx - 1
+        set walked to walked + 1
+    return lines
+
+/// Last n parsed entries (drop-in for the old whole-file readManifest).
+export to readTail(stateDir, file, n) -> parseLines(readTailLines(stateDir, file, n))
+
+/// Entries observed within the last `hours` hours (chronological).
+export to readSince(stateDir, file, hours):
+    let cutoff = Date.now() - hours * 3600000
+    let cutoffDay = dayBefore(cutoff)
+    let lines = []
+    let segs = segmentsFor(stateDir, file)
+    let dir = feedArchiveDir(stateDir, file)
+    for each name in segs:
+        if segmentDay(name) >= cutoffDay:
+            set lines to lines.concat(segmentLines(join(dir, name)))
+    set lines to lines.concat(wholeLines(join(stateDir, file)))
+    let out = []
+    for each e in parseLines(lines):
+        let t = entryTime(e)
+        if t >= cutoff:
+            out.push(e)
+    return out
+
+/// "YYYY-MM-DD" (UTC) one day before the given epoch ms — a segment sealed on
+/// that day may still hold entries newer than the cutoff.
+to dayBefore(ms) -> isoDayOf(ms - 86400000)
+
+export to isoDayOf(ms) -> iso(ms).slice(0, 10)

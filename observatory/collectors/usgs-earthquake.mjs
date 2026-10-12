@@ -27,6 +27,7 @@ import { createHash } from 'crypto';
 import { mkdirSync, existsSync, readFileSync, writeFileSync, readdirSync, statSync, unlinkSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { readSince } from '../lib/manifest-ledger.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(__dirname, '..', '..');
@@ -86,13 +87,12 @@ function appendManifest(entry) {
   writeFileSync(manifestPath(), line, { flag: 'a' });
 }
 
+// Dedupe window: source listings/queries span at most one UTC day, so 48h of
+// ledger entries is sufficient and bounded (no whole-manifest read).
 function loadSeenEvents() {
-  const mp = manifestPath();
-  if (!existsSync(mp)) return new Set();
   const seen = new Set();
-  const lines = readFileSync(mp, 'utf8').split('\n').filter(Boolean);
-  for (const line of lines) {
-    try { const e = JSON.parse(line); if (e.eventId) seen.add(e.eventId); } catch {}
+  for (const e of readSince(STATE_DIR, 'seismic-manifest.jsonl', 48)) {
+    if (e.eventId) seen.add(e.eventId);
   }
   return seen;
 }

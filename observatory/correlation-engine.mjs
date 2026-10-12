@@ -8,6 +8,7 @@
  */
 
 import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { readSince } from './lib/manifest-ledger.mjs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -65,10 +66,10 @@ const FEED_REGISTRY = [
     metric: e => { if (e.type === 'OBSERVATION') return e.bytes || 1; return null; }, unit: 'bytes' },
 ];
 
+// Only the correlation window is needed (maxObservationAgeMs = 7 days); read
+// that window from the live manifest + sealed segments instead of all history.
 function readManifest(filename) {
-  const path = join(STATE_DIR, filename);
-  if (!existsSync(path)) return [];
-  try { return readFileSync(path, 'utf8').split('\n').filter(Boolean).map(l => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean); } catch { return []; }
+  return readSince(STATE_DIR, filename, CONFIG.maxObservationAgeMs / 3600000);
 }
 
 function extractTimeSeries(feed) {

@@ -23,6 +23,7 @@ import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { LumeV } from './lib/lume-v/index.js';
 import { anchorBrief, anchorLumeVCert } from './trustlayer-anchor.mjs';
+import { readTail } from './lib/manifest-ledger.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const STATE_DIR = process.env.STATE_DIR || join(__dirname, 'state');
@@ -75,16 +76,12 @@ const governor = new LumeV({
 
 // ── Read last 24h of manifest entries ───────────────────────
 function readRecentEntries(manifestFile, hours = 24) {
-  const path = join(STATE_DIR, manifestFile);
-  if (!existsSync(path)) return [];
-
   const cutoff = Date.now() - hours * 3600000;
-  const lines = readFileSync(path, 'utf8').trim().split('\n');
   const entries = [];
 
-  for (const line of lines.slice(-200)) { // last 200 entries max
+  // last 200 entries max (tail read across live manifest + sealed segments)
+  for (const entry of readTail(STATE_DIR, manifestFile, 200)) {
     try {
-      const entry = JSON.parse(line);
       const ts = new Date(entry.timestamp || entry.retrievedAt || entry.fetchedAt || entry.collected_at || entry.at || entry.writtenAt || 0).getTime();
       if (ts >= cutoff && entry.type !== 'RETENTION-PRUNE') {
         entries.push(entry);
