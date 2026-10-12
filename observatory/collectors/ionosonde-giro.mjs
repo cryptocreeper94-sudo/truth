@@ -79,13 +79,9 @@ const PRODUCTS = Object.freeze([
     description: 'SWPC 3-day forecast bulletin — geomagnetic activity, solar activity, ionospheric conditions',
     format: 'text',
   },
-  {
-    id: 'goes-euv',
-    name: 'GOES EUV Flux (ionization proxy)',
-    url: 'https://services.swpc.noaa.gov/json/goes/primary/xrays-1-day.json',
-    description: 'GOES X-ray/EUV flux — primary driver of dayside ionospheric ionization',
-    format: 'json',
-  },
+  // 'goes-euv' removed: it re-downloaded xrays-1-day.json, which the solar
+  // collector already archives as 'xray-flux'. Counting one file as two feeds
+  // produced self-correlation between the solar and ionosphere streams.
   {
     id: 'planetary-k',
     name: 'Planetary K-Index (Estimated)',

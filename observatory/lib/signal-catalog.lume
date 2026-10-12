@@ -1,0 +1,66 @@
+/// TRUTH Observatory — Signal catalog
+/// DarkWave Studios LLC — Copyright 2026
+///
+/// Every physical series the Signal Store keeps, with the plain-English
+/// meaning the correlation report uses. A series is only listed here if it
+/// is a real measured value (not a fetch size or file count).
+///
+/// res   — "1h" hourly, "3h" three-hourly, "1d" daily
+/// stat  — which statistic represents the series in analysis
+///         ("mean", "max", "min"); all three are stored for every row
+/// scope — "global" (planet-wide index) or "station" (has lat/lon)
+///
+/// (Lume 1.1 has no multi-line literals, so each entry is one statement.)
+///
+/// DDA 42-Doctrine mapping:
+///   [01] Identity Kernel   → one immutable id per physical quantity
+///   [09] Reference Engine  → source + method recorded for every series
+///   [12] Meaning Layer     → plain-English description used by reports
+
+use { put } from "./lume-shim.mjs"
+
+export let SERIES = {}
+put(SERIES, "kp", { name: "Planetary Kp index", unit: "Kp", res: "3h", stat: "max", scope: "global", since: "1932", source: "GFZ Potsdam (history) + NOAA SWPC (live)", plain: "how disturbed Earth's magnetic field is worldwide (0 calm to 9 extreme storm)" })
+put(SERIES, "dst", { name: "Dst ring-current index", unit: "nT", res: "1h", stat: "min", scope: "global", since: "1963", source: "NASA OMNI (history) + Kyoto WDC via NOAA SWPC (live)", plain: "geomagnetic storm strength; more negative means a stronger storm" })
+put(SERIES, "ae", { name: "Auroral electrojet (AE)", unit: "nT", res: "1h", stat: "max", scope: "global", since: "1963", source: "NASA OMNI", plain: "strength of electric currents in the auroral zone" })
+put(SERIES, "sw_speed", { name: "Solar wind speed", unit: "km/s", res: "1h", stat: "max", scope: "global", since: "1963", source: "NASA OMNI (history) + NOAA RTSW (live)", plain: "how fast the stream of particles from the Sun is moving past Earth" })
+put(SERIES, "sw_density", { name: "Solar wind density", unit: "p/cm3", res: "1h", stat: "max", scope: "global", since: "1963", source: "NASA OMNI (history) + NOAA RTSW (live)", plain: "how dense the solar wind is" })
+put(SERIES, "imf_bz", { name: "Interplanetary magnetic field Bz", unit: "nT", res: "1h", stat: "min", scope: "global", since: "1963", source: "NASA OMNI (history) + NOAA RTSW (live)", plain: "north-south direction of the Sun's magnetic field at Earth; strongly negative values let energy into Earth's field" })
+put(SERIES, "imf_bt", { name: "Interplanetary magnetic field strength", unit: "nT", res: "1h", stat: "max", scope: "global", since: "1963", source: "NASA OMNI (history) + NOAA RTSW (live)", plain: "total strength of the Sun's magnetic field at Earth" })
+put(SERIES, "proton10", { name: "Proton flux >=10 MeV", unit: "pfu", res: "1h", stat: "max", scope: "global", since: "1967", source: "NASA OMNI (history) + NOAA GOES (live)", plain: "high-energy particles from the Sun (radiation storms)" })
+put(SERIES, "xray_long", { name: "Solar X-ray flux 0.1-0.8 nm", unit: "W/m2", res: "1h", stat: "max", scope: "global", since: "live", source: "NOAA GOES XRS", plain: "solar flare brightness in X-rays" })
+put(SERIES, "sunspots", { name: "Daily sunspot number", unit: "count", res: "1d", stat: "mean", scope: "global", since: "1932", source: "GFZ Potsdam / SILSO", plain: "number of sunspots; tracks the 11-year solar cycle" })
+put(SERIES, "f107", { name: "Solar radio flux F10.7", unit: "sfu", res: "1d", stat: "mean", scope: "global", since: "1947", source: "GFZ Potsdam / DRAO Penticton", plain: "the Sun's radio brightness; a standard measure of solar activity" })
+put(SERIES, "goes_hp", { name: "GOES magnetometer Hp", unit: "nT", res: "1h", stat: "mean", scope: "global", since: "live", source: "NOAA GOES", plain: "magnetic field measured at geostationary orbit" })
+put(SERIES, "geomag_bou", { name: "Boulder magnetometer dX/dt", unit: "nT/min", res: "1h", stat: "max", scope: "station", lat: 40.137, lon: -105.237, since: "live", source: "USGS Geomagnetism Program", plain: "how fast the ground magnetic field changed at Boulder, Colorado" })
+put(SERIES, "geomag_frd", { name: "Fredericksburg magnetometer dX/dt", unit: "nT/min", res: "1h", stat: "max", scope: "station", lat: 38.205, lon: -77.373, since: "live", source: "USGS Geomagnetism Program", plain: "how fast the ground magnetic field changed at Fredericksburg, Virginia" })
+put(SERIES, "geomag_brw", { name: "Barrow magnetometer dX/dt", unit: "nT/min", res: "1h", stat: "max", scope: "station", lat: 71.323, lon: -156.616, since: "live", source: "USGS Geomagnetism Program", plain: "how fast the ground magnetic field changed at Utqiagvik (Barrow), Alaska" })
+put(SERIES, "geomag_hon", { name: "Honolulu magnetometer dX/dt", unit: "nT/min", res: "1h", stat: "max", scope: "station", lat: 21.316, lon: -158.0, since: "live", source: "USGS Geomagnetism Program", plain: "how fast the ground magnetic field changed at Honolulu, Hawaii" })
+put(SERIES, "wildfire_active", { name: "Active US wildfires", unit: "fires", res: "1d", stat: "mean", scope: "global", since: "2026-08", source: "NIFC / IRWIN", plain: "number of active wildfires tracked in the US" })
+put(SERIES, "wildfire_acres", { name: "US wildfire acres burning", unit: "acres", res: "1d", stat: "mean", scope: "global", since: "2026-08", source: "NIFC / IRWIN", plain: "total acres of active US wildfires" })
+put(SERIES, "volcano_elevated", { name: "Volcanoes at elevated alert", unit: "volcanoes", res: "1d", stat: "mean", scope: "global", since: "2026-09", source: "USGS Volcano Hazards Program", plain: "number of US-monitored volcanoes above normal alert level" })
+
+/// Discrete events (each has its own time and place).
+export let EVENT_KINDS = {}
+put(EVENT_KINDS, "quake", { name: "Earthquakes", since: "1973", source: "USGS ComCat (M4.5+ history, M2.5+ live)", plain: "earthquakes" })
+put(EVENT_KINDS, "flare", { name: "Solar flares", since: "live", source: "NOAA GOES XRS flare summary", plain: "solar flares" })
+put(EVENT_KINDS, "wildfire", { name: "Wildfire starts", since: "2026-08", source: "NIFC / IRWIN", plain: "wildfire ignitions" })
+put(EVENT_KINDS, "volcano", { name: "Volcano alert changes", since: "2026-09", source: "USGS Volcano Hazards Program", plain: "volcano alert-level changes" })
+
+/// Physically established links. The skeptic engine labels a correlation
+/// between these pairs "known physics" instead of "unexplained".
+export let KNOWN_LINKS = []
+KNOWN_LINKS.push({ a: "imf_bz", b: "kp", why: "a southward solar magnetic field drives geomagnetic storms" })
+KNOWN_LINKS.push({ a: "imf_bz", b: "dst", why: "a southward solar magnetic field drives the storm ring current" })
+KNOWN_LINKS.push({ a: "sw_speed", b: "kp", why: "fast solar wind drives geomagnetic activity" })
+KNOWN_LINKS.push({ a: "sw_speed", b: "dst", why: "fast solar wind drives the storm-time ring current" })
+KNOWN_LINKS.push({ a: "kp", b: "dst", why: "both measure the same geomagnetic storms" })
+KNOWN_LINKS.push({ a: "kp", b: "ae", why: "both measure geomagnetic activity" })
+KNOWN_LINKS.push({ a: "xray_long", b: "proton10", why: "large flares often come with solar particle events" })
+KNOWN_LINKS.push({ a: "sunspots", b: "f107", why: "both track the solar cycle" })
+KNOWN_LINKS.push({ a: "sunspots", b: "xray_long", why: "more sunspots means more flares" })
+KNOWN_LINKS.push({ a: "kp", b: "geomag_bou", why: "ground magnetometers record the same storms Kp summarizes" })
+KNOWN_LINKS.push({ a: "kp", b: "geomag_frd", why: "ground magnetometers record the same storms Kp summarizes" })
+KNOWN_LINKS.push({ a: "kp", b: "geomag_brw", why: "ground magnetometers record the same storms Kp summarizes" })
+KNOWN_LINKS.push({ a: "kp", b: "geomag_hon", why: "ground magnetometers record the same storms Kp summarizes" })
+KNOWN_LINKS.push({ a: "kp", b: "goes_hp", why: "storms compress and distort the field at geostationary orbit" })

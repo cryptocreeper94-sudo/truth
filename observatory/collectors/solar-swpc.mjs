@@ -69,16 +69,31 @@ const PRODUCTS = Object.freeze([
     description: 'Planetary Kp geomagnetic activity index — 1-minute estimated',
   },
   {
+    // The legacy products/solar-wind/*.json endpoints were retired (HTTP 404).
+    // RTSW carries the real L1 solar wind from DSCOVR/ACE/IMAP; records with
+    // active=true are the spacecraft SWPC currently uses operationally.
     id: 'solar-wind-mag',
-    name: 'GOES Electron Flux (solar wind proxy)',
-    url: 'https://services.swpc.noaa.gov/json/goes/primary/differential-electrons-1-day.json',
-    description: 'GOES differential electron flux — solar wind/magnetosphere coupling indicator',
+    name: 'Solar Wind Magnetic Field (RTSW 1-min)',
+    url: 'https://services.swpc.noaa.gov/json/rtsw/rtsw_mag_1m.json',
+    description: 'Interplanetary magnetic field Bt/Bx/By/Bz at L1 — DSCOVR/ACE/IMAP real-time solar wind',
   },
   {
     id: 'solar-wind-plasma',
-    name: 'GOES Proton Flux (high-energy proxy)',
-    url: 'https://services.swpc.noaa.gov/json/goes/primary/integral-protons-6-hour.json',
-    description: 'GOES high-energy proton flux 6-hour window — solar wind particle proxy',
+    name: 'Solar Wind Plasma (RTSW 1-min)',
+    url: 'https://services.swpc.noaa.gov/json/rtsw/rtsw_wind_1m.json',
+    description: 'Solar wind proton speed, density and temperature at L1 — DSCOVR/ACE/IMAP real-time solar wind',
+  },
+  {
+    id: 'electron-flux',
+    name: 'GOES Differential Electron Flux',
+    url: 'https://services.swpc.noaa.gov/json/goes/primary/differential-electrons-1-day.json',
+    description: 'GOES differential electron flux — radiation belt / magnetosphere indicator',
+  },
+  {
+    id: 'dst',
+    name: 'Kyoto Dst Index (real-time)',
+    url: 'https://services.swpc.noaa.gov/products/kyoto-dst.json',
+    description: 'Hourly Dst ring-current index — geomagnetic storm strength',
   },
   {
     id: 'flare-events',

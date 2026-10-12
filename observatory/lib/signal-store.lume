@@ -1,0 +1,296 @@
+/// TRUTH Observatory — Signal Store
+/// DarkWave Studios LLC — Copyright 2026
+///
+/// Compact, permanent time-series of real physical values.
+///
+/// Layout (under STATE_DIR/signals):
+///   series/<id>/<YYYY>.jsonl   one row per line: [key, mean, min, max, n]
+///                              key = "YYYY-MM-DDTHH" (hourly/3-hourly) or "YYYY-MM-DD" (daily)
+///   events/<kind>/<YYYY>.jsonl one event object per line, unique by id, with t (ISO UTC)
+///
+/// Rows are idempotent: writing the same hour twice replaces it, so the
+/// extractor can safely re-read overlapping source files.
+///
+/// DDA 42-Doctrine mapping:
+///   [04] Structure Engine   → fixed row shape, sorted year files
+///   [08] Temporal Engine    → UTC hour/day keys only
+///   [14] Determinacy Engine → same input rows produce byte-identical files
+///   [22] Continuity Layer   → atomic tmp+rename writes; no partial files
+///   [40] Non-Being Guard    → missing values are absent rows, never zeros
+
+use { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync, renameSync } from "node:fs"
+use { join } from "node:path"
+use { tryParse, put, iso } from "./lume-shim.mjs"
+
+export to signalsRoot(stateDir) -> join(stateDir, "signals")
+to seriesDir(stateDir, id) -> join(signalsRoot(stateDir), "series", id)
+to eventsDir(stateDir, kind) -> join(signalsRoot(stateDir), "events", kind)
+
+// ── [08] Keys ───────────────────────────────────────────────────────────────
+export to hourKey(ms) -> iso(ms).slice(0, 13)
+export to dayKey(ms) -> iso(ms).slice(0, 10)
+
+export to keyMs(k):
+    if k.length == 10:
+        return Date.parse(k + "T00:00:00Z")
+    return Date.parse(k + ":00:00Z")
+
+/// Parse a source timestamp; values without a zone are UTC.
+export to utcMs(s):
+    if s == null:
+        return NaN
+    let str = String(s).trim().replace(" ", "T")
+    if str.length == 10:
+        return Date.parse(str + "T00:00:00Z")
+    let hasZone = str.endsWith("Z") or str.indexOf("+", 10) > 0 or str.lastIndexOf("-") > 10
+    if hasZone:
+        return Date.parse(str)
+    return Date.parse(str + "Z")
+
+to yearOfMs(ms) -> Number(iso(ms).slice(0, 4))
+
+/// Round to 6 significant digits so files stay small and deterministic.
+export to tidy(v):
+    if not Number.isFinite(v):
+        return null
+    if v == 0:
+        return 0
+    return Number(v.toPrecision(6))
+
+to isNonEmpty(s) -> s.length > 0
+
+// ── Aggregation ─────────────────────────────────────────────────────────────
+/// points: [[ms, value], ...]  keyFn: ms -> key
+/// returns rows [key, mean, min, max, n] sorted by key (non-finite values skipped)
+export to aggregate(points, keyFn):
+    let acc = {}
+    for each p in points:
+        let v = p[1]
+        if v == null or not Number.isFinite(v):
+            continue
+        let k = keyFn(p[0])
+        let a = acc[k]
+        if a == null:
+            put(acc, k, { s: v, lo: v, hi: v, n: 1 })
+        else:
+            Object.assign(a, { s: a.s + v, lo: Math.min(a.lo, v), hi: Math.max(a.hi, v), n: a.n + 1 })
+    let keys = Object.keys(acc)
+    keys.sort()
+    let rows = []
+    for each k in keys:
+        let a = acc[k]
+        rows.push([k, tidy(a.s / a.n), tidy(a.lo), tidy(a.hi), a.n])
+    return rows
+
+// ── Series files ────────────────────────────────────────────────────────────
+to loadRows(path):
+    let rows = {}
+    if not existsSync(path):
+        return rows
+    for each line in readFileSync(path, "utf8").split("\n").filter(isNonEmpty):
+        let r = tryParse(line)
+        if r != null:
+            put(rows, r[0], r)
+    return rows
+
+to saveRows(path, rows):
+    let keys = Object.keys(rows)
+    keys.sort()
+    let out = []
+    for each k in keys:
+        out.push(JSON.stringify(rows[k]))
+    let tmp = path + ".tmp"
+    writeFileSync(tmp, out.join("\n") + "\n")
+    renameSync(tmp, path)
+
+to sameJson(a, b) -> JSON.stringify(a) == JSON.stringify(b)
+
+to groupByYear(items, yearFn):
+    let groups = {}
+    for each it in items:
+        let y = yearFn(it)
+        if groups[y] == null:
+            put(groups, y, [])
+        groups[y].push(it)
+    return groups
+
+to rowYear(r) -> r[0].slice(0, 4)
+
+/// Last occurrence wins when a batch repeats a key (e.g. a quake re-reported
+/// as USGS revises it), so a batch is applied exactly once.
+to lastByKey(items, keyFn):
+    let seen = {}
+    let order = []
+    for each it in items:
+        let k = keyFn(it)
+        if seen[k] == null:
+            order.push(k)
+        put(seen, k, it)
+    let out = []
+    for each k in order:
+        out.push(seen[k])
+    return out
+
+to rowKey(r) -> r[0]
+to eventKey(e) -> e.id
+
+/// Insert or replace rows. onlyMissing=true never overwrites an existing key
+/// (used by history backfill so live data always wins).
+/// Returns the number of rows written.
+export to upsertSeries(stateDir, id, rows, onlyMissing):
+    let dir = seriesDir(stateDir, id)
+    mkdirSync(dir, { recursive: true })
+    let byYear = groupByYear(lastByKey(rows, rowKey), rowYear)
+    let changed = 0
+    for each y in Object.keys(byYear):
+        let path = join(dir, y + ".jsonl")
+        let cur = loadRows(path)
+        let dirty = false
+        for each r in byYear[y]:
+            let old = cur[r[0]]
+            if old != null and onlyMissing:
+                continue
+            if old != null and sameJson(old, r):
+                continue
+            put(cur, r[0], r)
+            set dirty to true
+            set changed to changed + 1
+        if dirty:
+            saveRows(path, cur)
+    return changed
+
+/// Rows with fromMs <= time(key) <= toMs, sorted.
+export to readSeries(stateDir, id, fromMs, toMs):
+    let dir = seriesDir(stateDir, id)
+    let out = []
+    if not existsSync(dir):
+        return out
+    let y0 = yearOfMs(fromMs)
+    let y1 = yearOfMs(toMs)
+    let y = y0
+    while y <= y1:
+        let path = join(dir, String(y) + ".jsonl")
+        if existsSync(path):
+            for each line in readFileSync(path, "utf8").split("\n").filter(isNonEmpty):
+                let r = tryParse(line)
+                if r != null:
+                    let t = keyMs(r[0])
+                    if t >= fromMs and t <= toMs:
+                        out.push(r)
+        set y to y + 1
+    return out
+
+to isYearFile(name) -> name.endsWith(".jsonl") and name.length == 10
+
+/// { first, last, years } for a series, or null when empty.
+export to seriesExtent(stateDir, id):
+    let dir = seriesDir(stateDir, id)
+    if not existsSync(dir):
+        return null
+    let years = readdirSync(dir).filter(isYearFile)
+    if years.length == 0:
+        return null
+    years.sort()
+    let firstRows = Object.keys(loadRows(join(dir, years[0])))
+    let lastRows = Object.keys(loadRows(join(dir, years[years.length - 1])))
+    if firstRows.length == 0 or lastRows.length == 0:
+        return null
+    firstRows.sort()
+    lastRows.sort()
+    return { first: firstRows[0], last: lastRows[lastRows.length - 1], years: years.length }
+
+// ── Events ──────────────────────────────────────────────────────────────────
+to eventYear(e) -> String(e.t).slice(0, 4)
+
+to loadEvents(path):
+    let byId = {}
+    if not existsSync(path):
+        return byId
+    for each line in readFileSync(path, "utf8").split("\n").filter(isNonEmpty):
+        let e = tryParse(line)
+        if e != null:
+            put(byId, e.id, e)
+    return byId
+
+to saveEvents(path, byId):
+    let list_ = Object.values(byId)
+    list_.sort(byTime)
+    let out = []
+    for each e in list_:
+        out.push(JSON.stringify(e))
+    let tmp = path + ".tmp"
+    writeFileSync(tmp, out.join("\n") + "\n")
+    renameSync(tmp, path)
+
+to byTime(a, b):
+    if a.t < b.t:
+        return -1
+    if a.t > b.t:
+        return 1
+    if a.id < b.id:
+        return -1
+    if a.id > b.id:
+        return 1
+    return 0
+
+/// Insert or replace events by id (each must have id and ISO t).
+/// onlyMissing=true keeps existing records untouched.
+export to upsertEvents(stateDir, kind, events, onlyMissing):
+    let dir = eventsDir(stateDir, kind)
+    mkdirSync(dir, { recursive: true })
+    let byYear = groupByYear(lastByKey(events, eventKey), eventYear)
+    let changed = 0
+    for each y in Object.keys(byYear):
+        let path = join(dir, y + ".jsonl")
+        let cur = loadEvents(path)
+        let dirty = false
+        for each e in byYear[y]:
+            let old = cur[e.id]
+            if old != null and onlyMissing:
+                continue
+            if old != null and sameJson(old, e):
+                continue
+            put(cur, e.id, e)
+            set dirty to true
+            set changed to changed + 1
+        if dirty:
+            saveEvents(path, cur)
+    return changed
+
+/// Events with fromMs <= t <= toMs, sorted by time.
+export to readEvents(stateDir, kind, fromMs, toMs):
+    let dir = eventsDir(stateDir, kind)
+    let out = []
+    if not existsSync(dir):
+        return out
+    let y = yearOfMs(fromMs)
+    let y1 = yearOfMs(toMs)
+    while y <= y1:
+        let path = join(dir, String(y) + ".jsonl")
+        if existsSync(path):
+            for each line in readFileSync(path, "utf8").split("\n").filter(isNonEmpty):
+                let e = tryParse(line)
+                if e != null:
+                    let t = Date.parse(e.t)
+                    if t >= fromMs and t <= toMs:
+                        out.push(e)
+        set y to y + 1
+    out.sort(byTime)
+    return out
+
+/// { first, last, years } for an event kind, or null when empty.
+export to eventsExtent(stateDir, kind):
+    let dir = eventsDir(stateDir, kind)
+    if not existsSync(dir):
+        return null
+    let years = readdirSync(dir).filter(isYearFile)
+    if years.length == 0:
+        return null
+    years.sort()
+    let a = Object.values(loadEvents(join(dir, years[0])))
+    let b = Object.values(loadEvents(join(dir, years[years.length - 1])))
+    if a.length == 0 or b.length == 0:
+        return null
+    a.sort(byTime)
+    b.sort(byTime)
+    return { first: a[0].t, last: b[b.length - 1].t, years: years.length }

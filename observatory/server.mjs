@@ -21,6 +21,8 @@ import { fileURLToPath } from 'url';
 import { randomBytes, createHmac } from 'crypto';
 import { generateDailyBrief, getCurrentBrief } from './brief-generator.mjs';
 import { readTail, tailLines, parseLines, segmentsFor, segmentDay, segmentLines, feedArchiveDir, archiveRoot } from './lib/manifest-ledger.mjs';
+import { readSeries, readEvents, seriesExtent, eventsExtent } from './lib/signal-store.mjs';
+import { SERIES, EVENT_KINDS, KNOWN_LINKS } from './lib/signal-catalog.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const STATE_DIR = process.env.STATE_DIR || join(__dirname, 'state');
@@ -697,6 +699,38 @@ const server = createServer(async (req, res) => {
       count: receipts.length,
       receipts,
     });
+  }
+
+  // ── Signal Store (public) ─────────────────────────────────────
+  // Real physical measurements extracted by signal-extractor (plus public
+  // history back to 1932). Rows: [key, mean, min, max, n].
+  //   /api/signals                       → catalog with coverage
+  //   /api/signals/<id>?from=&to=         → series rows (ISO dates; span capped by resolution)
+  //   /api/signals/events/<kind>?from=&to=&minmag=
+  if (path === '/api/signals') {
+    const series = {};
+    for (const [id, def] of Object.entries(SERIES)) series[id] = { ...def, coverage: seriesExtent(STATE_DIR, id) };
+    const events = {};
+    for (const [kind, def] of Object.entries(EVENT_KINDS)) events[kind] = { ...def, coverage: eventsExtent(STATE_DIR, kind) };
+    return jsonResponse(res, 200, { rowFormat: ['key', 'mean', 'min', 'max', 'n'], series, events, knownLinks: KNOWN_LINKS });
+  }
+  if (path.startsWith('/api/signals/')) {
+    const parts = path.slice('/api/signals/'.length).split('/').filter(Boolean);
+    const toMs = Date.parse(url.searchParams.get('to') || '') || Date.now();
+    if (parts[0] === 'events' && parts[1] && EVENT_KINDS[parts[1]]) {
+      const maxSpan = 2 * 366 * 86400000;
+      const fromMs = Math.max(Date.parse(url.searchParams.get('from') || '') || toMs - 30 * 86400000, toMs - maxSpan);
+      const minmag = parseFloat(url.searchParams.get('minmag') || '');
+      let events = readEvents(STATE_DIR, parts[1], fromMs, toMs);
+      if (Number.isFinite(minmag)) events = events.filter(e => (e.mag ?? -Infinity) >= minmag);
+      return jsonResponse(res, 200, { kind: parts[1], from: new Date(fromMs).toISOString(), to: new Date(toMs).toISOString(), count: events.length, events: events.slice(0, 20000) });
+    }
+    const def = SERIES[parts[0]];
+    if (!def || parts.length !== 1) return jsonResponse(res, 404, { error: 'Unknown series', available: Object.keys(SERIES) });
+    const spanDays = { '1h': 2 * 366, '3h': 6 * 366, '1d': 100 * 366 }[def.res] || 366;
+    const fromMs = Math.max(Date.parse(url.searchParams.get('from') || '') || toMs - 7 * 86400000, toMs - spanDays * 86400000);
+    const rows = readSeries(STATE_DIR, parts[0], fromMs, toMs);
+    return jsonResponse(res, 200, { id: parts[0], ...def, from: new Date(fromMs).toISOString(), to: new Date(toMs).toISOString(), rowFormat: ['key', 'mean', 'min', 'max', 'n'], count: rows.length, rows });
   }
 
   // ── Sealed archive (premium) ────────────────────────────────────────

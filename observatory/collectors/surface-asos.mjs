@@ -46,14 +46,19 @@ const IDENTITY = Object.freeze({
 });
 
 const CONFIG = Object.freeze({
-  // NOAA Weather API — official, free, no API key, reliable
-  // Fetches latest observations from major US stations
-  apiUrl: 'https://api.weather.gov/stations?state=TN&limit=50',
-  observationsUrl: 'https://api.weather.gov/stations/{stationId}/observations/latest',
+  // IEM currents API accepts one network per request, so each US state's
+  // ASOS network is fetched in turn and combined into one raw snapshot.
+  // (Previously this fetched api.weather.gov's Tennessee *station list*,
+  // which carries no observations — hence `stations: 0` in the manifest.)
+  currentsUrl: 'https://mesonet.agron.iastate.edu/api/1/currents.json?network={network}',
+  networks: ['AK','AL','AR','AZ','CA','CO','CT','DE','FL','GA','HI','IA','ID','IL','IN','KS','KY','LA','MA','MD','ME','MI','MN','MO','MS','MT','NC','ND','NE','NH','NJ','NM','NV','NY','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VA','VT','WA','WI','WV','WY','PR'].map(s => `${s}_ASOS`),
+  // Fields kept per station (values unmodified from IEM).
+  fields: ['station','name','state','network','lat','lon','utc_valid','tmpf','dwpf','relh','sknt','drct','gust','alti','mslp','pres','vsby','phour','wxcodes'],
   intervalMs: parseInt(process.env.SURFACE_INTERVAL_MS || '900000', 10), // 15 min
   maxRetries: 3,
   retryDelayMs: 2000,
   timeoutMs: 30000,
+  delayBetweenNetworks: 250,
 });
 
 function manifestFilePath() {
@@ -112,14 +117,28 @@ async function runCycle() {
   const dateStr = `${now.getUTCFullYear()}-${(now.getUTCMonth()+1).toString().padStart(2,'0')}-${now.getUTCDate().toString().padStart(2,'0')}`;
   console.log(`\n[SURFACE] Cycle start — ${now.toISOString()}`);
 
-  const result = await fetchWithRetry(CONFIG.apiUrl);
+  const stations = [];
+  const failedNetworks = [];
+  for (const network of CONFIG.networks) {
+    const r = await fetchWithRetry(CONFIG.currentsUrl.replace('{network}', network));
+    if (!r.body || r.status === 'FETCH_ERROR') { failedNetworks.push(network); continue; }
+    try {
+      const rows = JSON.parse(r.body).data || [];
+      for (const row of rows) {
+        const kept = {};
+        for (const f of CONFIG.fields) kept[f] = row[f] ?? null;
+        stations.push(kept);
+      }
+    } catch { failedNetworks.push(network); }
+    await new Promise(res => setTimeout(res, CONFIG.delayBetweenNetworks));
+  }
 
-  if (!result.body || result.status === 'FETCH_ERROR') {
+  if (stations.length === 0) {
     appendManifest({
       type: 'DATA-GAP', source: IDENTITY.source, domain: IDENTITY.domain,
-      retrievedAt: now.toISOString(), reason: result.error || 'Empty response',
+      retrievedAt: now.toISOString(), reason: `No stations returned (${failedNetworks.length} networks failed)`,
     });
-    console.log(`  [GAP] IEM API returned no data: ${result.error || result.status}`);
+    console.log(`  [GAP] IEM returned no stations`);
     consecutiveFailures++;
     if (consecutiveFailures >= IDENTITY.maxConsecutiveFailures) {
       console.error(`  [COLLAPSE] ${consecutiveFailures} consecutive failures — halting collector`);
@@ -129,33 +148,30 @@ async function runCycle() {
   }
 
   consecutiveFailures = 0;
-
-  // Parse to count stations
-  let stationCount = 0;
-  try {
-    const data = JSON.parse(result.body);
-    stationCount = data.data ? data.data.length : 0;
-  } catch {}
+  const body = JSON.stringify({ source: 'IEM currents API', retrievedAt: now.toISOString(), networks: CONFIG.networks.length, failedNetworks, stations });
+  const hash = sha256(Buffer.from(body));
+  const stationCount = stations.length;
 
   // Save raw file
   const rawDir = join(RAW_DIR, dateStr);
   mkdirSync(rawDir, { recursive: true });
   const filename = `asos_${now.toISOString().replace(/[:.]/g, '-')}.json`;
   const rawPath = join(rawDir, filename);
-  writeFileSync(rawPath, result.body);
+  writeFileSync(rawPath, body);
 
   appendManifest({
     type: 'OBSERVATION',
     source: IDENTITY.source,
     domain: IDENTITY.domain,
     retrievedAt: now.toISOString(),
-    sha256: result.sha256,
+    sha256: hash,
     rawFile: rawPath,
     stations: stationCount,
-    bytes: result.body.length,
+    failedNetworks: failedNetworks.length,
+    bytes: body.length,
   });
 
-  console.log(`  [OK] ${stationCount} stations, ${result.body.length} bytes, SHA-256: ${result.sha256.slice(0, 16)}...`);
+  console.log(`  [OK] ${stationCount} stations (${failedNetworks.length} networks failed), ${body.length} bytes, SHA-256: ${hash.slice(0, 16)}...`);
 
   // Retention pruning
   pruneOldFiles(RAW_DIR, RETENTION_HOURS);

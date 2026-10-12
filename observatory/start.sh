@@ -64,6 +64,12 @@ run_collector() {
 run_collector "ARCHIVER"    "$SCRIPT_DIR/archiver.mjs"                         &
 sleep 2
 
+# ── Signal extractor (compiled from signal-extractor.lume) ──────────────────
+# Turns raw files into permanent physical series + events before raw pruning,
+# and loads public history (GFZ 1932+, OMNI 1963+, USGS M4.5+ 1973+) once.
+run_collector "SIGNALS"     "$SCRIPT_DIR/signal-extractor.mjs"                 &
+sleep 2
+
 # ── Launch collectors ────────────────────────────────────────────────────────
 # Stage 1 — Foundation (existing)
 run_collector "NEXRAD"      "$SCRIPT_DIR/collectors/nexrad.mjs"               &
