@@ -1,6 +1,6 @@
 // Truth Observatory — Service Worker
 // Caches shell assets for offline splash + fast reload
-const CACHE_NAME = 'observatory-v7';
+const CACHE_NAME = 'observatory-v8';
 const SHELL_ASSETS = [
   '/',
   '/landing.css',
@@ -28,16 +28,26 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
-  // Network-first for API calls, cache-first for static assets
-  if (event.request.url.includes('/api/')) {
+  const req = event.request;
+  if (req.method !== 'GET') return;
+  // API: network only, with an offline JSON fallback
+  if (req.url.includes('/api/')) {
     event.respondWith(
-      fetch(event.request).catch(() => new Response('{"offline":true}', {
+      fetch(req).catch(() => new Response('{"offline":true}', {
         headers: { 'Content-Type': 'application/json' }
       }))
     );
-  } else {
-    event.respondWith(
-      caches.match(event.request).then(cached => cached || fetch(event.request))
-    );
+    return;
   }
+  // Pages + assets: network-first so deploys show up immediately;
+  // fall back to the cached copy only when offline.
+  event.respondWith(
+    fetch(req).then(res => {
+      if (res && res.ok && new URL(req.url).origin === self.location.origin) {
+        const copy = res.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(req, copy)).catch(() => {});
+      }
+      return res;
+    }).catch(() => caches.match(req))
+  );
 });
