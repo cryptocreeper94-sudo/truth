@@ -23,11 +23,44 @@ import { generateDailyBrief, getCurrentBrief } from './brief-generator.mjs';
 import { readTail, tailLines, parseLines, segmentsFor, segmentDay, segmentLines, feedArchiveDir, archiveRoot } from './lib/manifest-ledger.mjs';
 import { readSeries, readEvents, seriesExtent, eventsExtent } from './lib/signal-store.mjs';
 import { SERIES, EVENT_KINDS, KNOWN_LINKS } from './lib/signal-catalog.mjs';
+import { buildNow, buildNear, readRawJson } from './lib/now-snapshot.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const STATE_DIR = process.env.STATE_DIR || join(__dirname, 'state');
+const RAW_DIR = process.env.RAW_DIR || join(STATE_DIR, 'raw');
 const SITE_DIR = join(__dirname, 'site');
 const PORT = parseInt(process.env.PORT || '3000', 10);
+
+// ── Free-preview caches (/api/now, /api/now/near) ─────────────────────────
+const nowCache = { at: 0, data: null };
+const nearCache = new Map();
+const zipCache = new Map();
+
+/** US ZIP → { lat, lon, label } via api.zippopotam.us (free, no key). */
+async function geocodeZip(zip) {
+  if (zipCache.has(zip)) return zipCache.get(zip);
+  try {
+    const ctl = new AbortController();
+    const timer = setTimeout(() => ctl.abort(), 5000);
+    const r = await fetch(`https://api.zippopotam.us/us/${zip}`, { signal: ctl.signal });
+    clearTimeout(timer);
+    if (!r.ok) { if (r.status === 404) zipCache.set(zip, null); return null; }
+    const j = await r.json();
+    const p = j.places && j.places[0];
+    if (!p) return null;
+    const place = {
+      lat: Math.round(parseFloat(p.latitude) * 100) / 100,
+      lon: Math.round(parseFloat(p.longitude) * 100) / 100,
+      label: `${p['place name']}, ${p['state abbreviation']} ${zip}`,
+    };
+    if (!Number.isFinite(place.lat) || !Number.isFinite(place.lon)) return null;
+    if (zipCache.size > 5000) zipCache.clear();
+    zipCache.set(zip, place);
+    return place;
+  } catch {
+    return null;
+  }
+}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Stripe & Database Configuration (dynamic imports — graceful degradation)
@@ -733,6 +766,44 @@ const server = createServer(async (req, res) => {
     return jsonResponse(res, 200, { id: parts[0], ...def, from: new Date(fromMs).toISOString(), to: new Date(toMs).toISOString(), rowFormat: ['key', 'mean', 'min', 'max', 'n'], count: rows.length, rows });
   }
 
+  // ── Right now (public, free preview) ────────────────────────────────────
+  // Plain-English readings built by lib/now-snapshot (deterministic templates).
+  //   /api/now                         → 4 global readings
+  //   /api/now/near?zip=37203          → 4 readings near a US ZIP code
+  //   /api/now/near?lat=..&lon=..      → same, by coordinates
+  if (path === '/api/now') {
+    const now = Date.now();
+    if (!nowCache.data || now - nowCache.at > 5 * 60000) {
+      nowCache.data = buildNow(STATE_DIR, now);
+      nowCache.at = now;
+    }
+    return jsonResponse(res, 200, nowCache.data);
+  }
+  if (path === '/api/now/near') {
+    const zip = (url.searchParams.get('zip') || '').trim();
+    let place = null;
+    if (zip) {
+      if (!/^\d{5}$/.test(zip)) return jsonResponse(res, 400, { error: 'Enter a 5-digit US ZIP code' });
+      place = await geocodeZip(zip);
+      if (!place) return jsonResponse(res, 404, { error: 'ZIP code not found' });
+    } else {
+      const lat = parseFloat(url.searchParams.get('lat'));
+      const lon = parseFloat(url.searchParams.get('lon'));
+      if (!Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180) {
+        return jsonResponse(res, 400, { error: 'Provide zip, or lat and lon' });
+      }
+      place = { lat: Math.round(lat * 100) / 100, lon: Math.round(lon * 100) / 100, label: 'Your location' };
+    }
+    const key = `${place.lat},${place.lon}`;
+    const now = Date.now();
+    const hit = nearCache.get(key);
+    if (hit && now - hit.at < 5 * 60000) return jsonResponse(res, 200, hit.data);
+    const data = buildNear(STATE_DIR, RAW_DIR, now, place.lat, place.lon, place.label);
+    if (nearCache.size > 2000) nearCache.clear();
+    nearCache.set(key, { at: now, data });
+    return jsonResponse(res, 200, data);
+  }
+
   // ── Sealed archive (premium) ────────────────────────────────────────
   // /api/archive/<feedId>        → available days
   // /api/archive/<feedId>/<day>  → that day's manifest lines (NDJSON)
@@ -890,23 +961,14 @@ const server = createServer(async (req, res) => {
   // ── Geo API: Surface Stations ───────────────────────────────────────
   if (path === '/api/geo/surface') {
     try {
-      const rawDir = join(STATE_DIR, 'raw', 'surface');
-      if (existsSync(rawDir)) {
-        const files = readdirSync(rawDir).filter(f => f.endsWith('.json')).sort().reverse();
-        if (files.length > 0) {
-          const data = JSON.parse(readFileSync(join(rawDir, files[0]), 'utf-8'));
-          const stations = (data.stations || data.features || []).slice(0, 100).map(s => {
-            const props = s.properties || s;
-            return {
-              id: props.station || props.id, name: props.name || props.station,
-              lat: s.geometry?.coordinates?.[1] || props.lat, lon: s.geometry?.coordinates?.[0] || props.lon,
-              temp: props.temp_f || props.temperature, wind_speed: props.wind_speed_kt || props.windSpeed,
-              wind_dir: props.wind_dir || props.windDirection, visibility: props.visibility_mi,
-              sky: props.sky_condition || props.weather,
-            };
-          }).filter(s => s.lat && s.lon);
-          return jsonResponse(res, 200, { timestamp: new Date().toISOString(), count: stations.length, stations });
-        }
+      const data = readRawJson(RAW_DIR, 'asos', Date.now());
+      if (data && Array.isArray(data.stations)) {
+        const stations = data.stations.slice(0, 100).map(s => ({
+          id: s.station, name: s.name || s.station, lat: s.lat, lon: s.lon,
+          temp: s.tmpf, wind_speed: s.sknt, wind_dir: s.drct, visibility: s.vsby,
+          sky: s.wxcodes || null,
+        })).filter(s => s.lat && s.lon);
+        return jsonResponse(res, 200, { timestamp: new Date().toISOString(), count: stations.length, stations });
       }
     } catch {}
     return jsonResponse(res, 200, { timestamp: new Date().toISOString(), count: 0, stations: [] });
@@ -915,14 +977,8 @@ const server = createServer(async (req, res) => {
   // ── Geo API: Wildfires ──────────────────────────────────────────────
   if (path === '/api/geo/wildfires') {
     try {
-      const rawDir = join(STATE_DIR, 'raw', 'wildfire');
-      if (existsSync(rawDir)) {
-        const files = readdirSync(rawDir).filter(f => f.endsWith('.json')).sort().reverse();
-        if (files.length > 0) {
-          const data = JSON.parse(readFileSync(join(rawDir, files[0]), 'utf-8'));
-          return jsonResponse(res, 200, { timestamp: new Date().toISOString(), count: (data.fires || []).length, fires: data.fires || [] });
-        }
-      }
+      const data = readRawJson(RAW_DIR, 'wildfire', Date.now());
+      if (data) return jsonResponse(res, 200, { timestamp: new Date().toISOString(), count: (data.fires || []).length, fires: data.fires || [] });
     } catch {}
     return jsonResponse(res, 200, { timestamp: new Date().toISOString(), count: 0, fires: [] });
   }
@@ -930,15 +986,11 @@ const server = createServer(async (req, res) => {
   // ── Geo API: Volcanoes ──────────────────────────────────────────────
   if (path === '/api/geo/volcanoes') {
     try {
-      const rawDir = join(STATE_DIR, 'raw', 'volcanic');
-      if (existsSync(rawDir)) {
-        const files = readdirSync(rawDir).filter(f => f.endsWith('.json')).sort().reverse();
-        if (files.length > 0) {
-          const data = JSON.parse(readFileSync(join(rawDir, files[0]), 'utf-8'));
-          // Only return elevated volcanoes for map markers (not all 160+)
-          const elevated = (data.volcanoes || []).filter(v => v.alertLevel && v.alertLevel !== 'NORMAL' && v.alertLevel !== 'UNASSIGNED');
-          return jsonResponse(res, 200, { timestamp: new Date().toISOString(), count: elevated.length, total: (data.volcanoes || []).length, volcanoes: elevated });
-        }
+      const data = readRawJson(RAW_DIR, 'volcanic', Date.now());
+      if (data) {
+        // Only return elevated volcanoes for map markers (not all 160+)
+        const elevated = (data.volcanoes || []).filter(v => v.alertLevel && v.alertLevel !== 'NORMAL' && v.alertLevel !== 'UNASSIGNED');
+        return jsonResponse(res, 200, { timestamp: new Date().toISOString(), count: elevated.length, total: (data.volcanoes || []).length, volcanoes: elevated });
       }
     } catch {}
     return jsonResponse(res, 200, { timestamp: new Date().toISOString(), count: 0, total: 0, volcanoes: [] });
@@ -969,6 +1021,7 @@ const server = createServer(async (req, res) => {
     '/about': '/about.html',
     '/explorer': '/explorer.html',
     '/stream': '/stream.html',
+    '/today': '/today.html',
   };
   let filePath = PAGE_ROUTES[path] || (path === '/' ? '/index.html' : path);
   const fullPath = join(SITE_DIR, filePath);

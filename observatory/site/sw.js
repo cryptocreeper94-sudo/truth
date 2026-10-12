@@ -1,6 +1,6 @@
 // Truth Observatory — Service Worker
 // Caches shell assets for offline splash + fast reload
-const CACHE_NAME = 'observatory-v8';
+const CACHE_NAME = 'observatory-v9';
 const SHELL_ASSETS = [
   '/',
   '/landing.css',
@@ -9,6 +9,11 @@ const SHELL_ASSETS = [
   '/app.js',
   '/cockpit',
   '/assets/icon-512.jpg',
+  '/today',
+  '/now.js',
+  '/now.css',
+  '/today.js',
+  '/home.js'
 ];
 
 self.addEventListener('install', event => {

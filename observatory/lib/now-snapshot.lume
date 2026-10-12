@@ -1,0 +1,420 @@
+/// TRUTH Observatory — "Right now" snapshot (free preview)
+/// DarkWave Studios LLC — Copyright 2026
+///
+/// Turns the signal store + newest raw files into a few plain-English
+/// readings anyone can understand, globally and near a given location.
+/// Every number shown comes straight from stored measurements; wording is
+/// fixed templates (no LLM), so the same data always yields the same text.
+///
+/// DDA 42-Doctrine mapping:
+///   [08] Temporal Engine    → all windows are explicit UTC ranges ending at nowMs
+///   [13] Constraint Engine  → fixed thresholds (NOAA G-scale, X-ray classes)
+///   [14] Determinacy Engine → identical inputs give identical sentences
+///   [26] Coherence Check    → "typical day" baselines come from our own history
+///   [40] Non-Being Guard    → missing data says "no recent reading", never zero
+
+use { readdirSync, readFileSync, statSync } from "node:fs"
+use { join } from "node:path"
+use { attempt, iso } from "./lume-shim.mjs"
+use { readSeries, readEvents } from "./signal-store.mjs"
+
+let HOUR = 3600000
+let DAY = 86400000
+
+// ── Raw file lookup ─────────────────────────────────────────────────────────
+// Collectors write to RAW_DIR and the archiver files them under RAW_DIR/<day>.
+to listDir(dir):
+    to go() -> readdirSync(dir)
+    return attempt(go, [])
+
+to mtimeOf(p):
+    to go() -> statSync(p).mtimeMs
+    return attempt(go, 0)
+
+export to newestRaw(rawDir, prefix, nowMs):
+    let dirs = [rawDir, join(rawDir, iso(nowMs).slice(0, 10)), join(rawDir, iso(nowMs - DAY).slice(0, 10))]
+    let best = null
+    let bestT = 0
+    for each d in dirs:
+        for each name in listDir(d):
+            let hit = name.startsWith(prefix + "_") or name.startsWith(prefix + "-")
+            if hit and name.endsWith(".json"):
+                let p = join(d, name)
+                let t = mtimeOf(p)
+                if t > bestT:
+                    set best to p
+                    set bestT to t
+    return best
+
+export to readRawJson(rawDir, prefix, nowMs):
+    let p = newestRaw(rawDir, prefix, nowMs)
+    if p == null:
+        return null
+    to go() -> JSON.parse(readFileSync(p, "utf8"))
+    return attempt(go, null)
+
+// ── Small helpers ───────────────────────────────────────────────────────────
+to fmt1(v) -> String(Math.round(v * 10) / 10)
+
+to colMax(rows, idx):
+    let m = null
+    for each r in rows:
+        let v = r[idx]
+        if v != null and (m == null or v > m):
+            set m to v
+    return m
+
+to toRad(d) -> d * Math.PI / 180
+
+export to distanceKm(lat1, lon1, lat2, lon2):
+    let dLat = toRad(lat2 - lat1)
+    let dLon = toRad(lon2 - lon1)
+    let s1 = Math.sin(dLat / 2)
+    let s2 = Math.sin(dLon / 2)
+    let a = s1 * s1 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * s2 * s2
+    return 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+
+to miles(km) -> Math.round(km * 0.621371)
+
+to milesText(km):
+    let mi = miles(km)
+    if mi < 1:
+        return "less than a mile"
+    else if mi == 1:
+        return "about 1 mile"
+    return "about " + String(mi) + " miles"
+
+to tile(id, title, tone, headline, detail, asOf):
+    return { id: id, title: title, tone: tone, headline: headline, detail: detail, asOf: asOf }
+
+to noReading(id, title):
+    return tile(id, title, "unknown", "No recent reading", "This feed has not reported in the last day.", null)
+
+to keyIso(k):
+    if k.length == 10:
+        return k + "T00:00:00Z"
+    return k + ":00:00Z"
+
+// ── [13] Geomagnetic storm words (NOAA G-scale from rounded Kp) ─────────────
+export to kpWords(kp):
+    let k = Math.round(kp)
+    if k >= 9:
+        return { tone: "alert", phrase: "in an extreme geomagnetic storm (G5)" }
+    else if k >= 8:
+        return { tone: "alert", phrase: "in a severe geomagnetic storm (G4)" }
+    else if k >= 7:
+        return { tone: "alert", phrase: "in a strong geomagnetic storm (G3)" }
+    else if k >= 6:
+        return { tone: "watch", phrase: "in a moderate geomagnetic storm (G2)" }
+    else if k >= 5:
+        return { tone: "watch", phrase: "in a minor geomagnetic storm (G1)" }
+    else if k >= 4:
+        return { tone: "watch", phrase: "unsettled" }
+    return { tone: "calm", phrase: "calm" }
+
+to magneticTile(stateDir, nowMs):
+    let title = "Earth's magnetic field"
+    let rows = readSeries(stateDir, "kp", nowMs - DAY, nowMs + HOUR)
+    if rows.length == 0:
+        return noReading("magnetic", title)
+    let last = rows[rows.length - 1]
+    let kp = last[3]
+    let peak = colMax(rows, 3)
+    let w = kpWords(kp)
+    let detail = "Kp " + fmt1(kp) + " on a 0 to 9 scale. Highest in the last 24 hours: " + fmt1(peak) + "."
+    let wind = readSeries(stateDir, "sw_speed", nowMs - 6 * HOUR, nowMs + HOUR)
+    if wind.length > 0:
+        let v = Math.round(wind[wind.length - 1][1])
+        set detail to detail + " Solar wind: " + String(v) + " km/s"
+        if v >= 600:
+            set detail to detail + " (fast)."
+        else if v >= 450:
+            set detail to detail + " (a little elevated)."
+        else:
+            set detail to detail + " (normal)."
+    if w.tone == "calm":
+        set detail to detail + " Nothing unusual for compasses, GPS, or radio."
+    else if w.tone == "watch":
+        set detail to detail + " Auroras may reach farther from the poles than usual."
+    else:
+        set detail to detail + " Auroras can be seen far from the poles; power grids and GPS may be affected."
+    return tile("magnetic", title, w.tone, "Earth's magnetic field is " + w.phrase, detail, keyIso(last[0]))
+
+// ── Solar X-ray flare classes ───────────────────────────────────────────────
+export to fluxToClass(f):
+    if f == null or not Number.isFinite(f) or f <= 0:
+        return null
+    let letter = "A"
+    let base = 0.00000001
+    if f >= 0.0001:
+        set letter to "X"
+        set base to 0.0001
+    else if f >= 0.00001:
+        set letter to "M"
+        set base to 0.00001
+    else if f >= 0.000001:
+        set letter to "C"
+        set base to 0.000001
+    else if f >= 0.0000001:
+        set letter to "B"
+        set base to 0.0000001
+    return letter + (Math.floor(f / base * 10 + 0.000001) / 10).toFixed(1)
+
+export to classToFlux(cls):
+    if cls == null or String(cls).length < 2:
+        return null
+    let s = String(cls).trim().toUpperCase()
+    let bases = { A: 0.00000001, B: 0.0000001, C: 0.000001, M: 0.00001, X: 0.0001 }
+    let base = bases[s.charAt(0)]
+    let n = parseFloat(s.slice(1))
+    if base == null or not Number.isFinite(n):
+        return null
+    return base * n
+
+to sunTile(stateDir, nowMs):
+    let title = "The sun"
+    let rows = readSeries(stateDir, "xray_long", nowMs - DAY, nowMs + HOUR)
+    let flares = readEvents(stateDir, "flare", nowMs - DAY, nowMs + HOUR)
+    let peak = colMax(rows, 3)
+    let asOf = null
+    if rows.length > 0:
+        set asOf to keyIso(rows[rows.length - 1][0])
+    for each fl in flares:
+        let ff = classToFlux(fl.cls)
+        if ff != null and (peak == null or ff > peak):
+            set peak to ff
+    if peak == null:
+        return noReading("sun", title)
+    let cls = fluxToClass(peak)
+    let letter = cls.charAt(0)
+    let head = "The sun is quiet"
+    let tone = "calm"
+    let plain = "Only background X-ray levels; no notable flares."
+    if letter == "X":
+        set head to "The sun produced a major flare"
+        set tone to "alert"
+        set plain to "X-class flares can black out radio on the sunlit side of Earth and are sometimes followed by a geomagnetic storm 1 to 3 days later."
+    else if letter == "M":
+        set head to "The sun produced a strong flare"
+        set tone to "watch"
+        set plain to "M-class flares can cause brief radio blackouts on the sunlit side of Earth."
+    else if letter == "C":
+        set head to "The sun is mildly active"
+        set plain to "C-class flares are common and have little effect on Earth."
+    let detail = "Strongest X-ray reading in the last 24 hours: " + cls + ". " + plain
+    return tile("sun", title, tone, head, detail, asOf)
+
+// ── [26] Earthquakes vs. our own 365-day baseline ───────────────────────────
+let baselineCache = { day: "", perDay: null }
+
+to quakeBaseline(stateDir, nowMs):
+    let today = iso(nowMs).slice(0, 10)
+    if baselineCache.day == today:
+        return baselineCache.perDay
+    let evs = readEvents(stateDir, "quake", nowMs - 365 * DAY, nowMs - DAY)
+    let n = 0
+    for each e in evs:
+        if e.mag != null and e.mag >= 4.5:
+            set n to n + 1
+    let perDay = null
+    if n > 0:
+        set perDay to Math.round(n / 364)
+    Object.assign(baselineCache, { day: today, perDay: perDay })
+    return perDay
+
+to quakeTile(stateDir, nowMs):
+    let title = "Earthquakes worldwide"
+    let evs = readEvents(stateDir, "quake", nowMs - DAY, nowMs + HOUR)
+    let n = 0
+    let big = null
+    for each e in evs:
+        if e.mag != null and e.mag >= 4.5:
+            set n to n + 1
+            if big == null or e.mag > big.mag:
+                set big to e
+    let base = quakeBaseline(stateDir, nowMs)
+    let typical = ""
+    if base != null:
+        set typical to " A typical day has about " + String(base) + "."
+    if big == null:
+        return tile("quakes", title, "calm", "No earthquakes of magnitude 4.5 or higher in the last 24 hours", "Smaller quakes happen constantly and are not counted here." + typical, null)
+    let tone = "calm"
+    if big.mag >= 7:
+        set tone to "alert"
+    else if big.mag >= 6:
+        set tone to "watch"
+    if base != null and n > base * 2:
+        set tone to "watch"
+    let where = ""
+    if big.place != null:
+        set where to " — " + big.place
+    let head = "Strongest in the last 24 hours: magnitude " + fmt1(big.mag) + where
+    let detail = String(n) + " earthquakes of magnitude 4.5 or higher worldwide in the last 24 hours." + typical
+    return tile("quakes", title, tone, head, detail, big.t)
+
+// ── Wildfires + volcanoes ───────────────────────────────────────────────────
+to firesTile(stateDir, nowMs):
+    let title = "Wildfires and volcanoes"
+    let fires = readSeries(stateDir, "wildfire_active", nowMs - 3 * DAY, nowMs + HOUR)
+    let acres = readSeries(stateDir, "wildfire_acres", nowMs - 3 * DAY, nowMs + HOUR)
+    let volc = readSeries(stateDir, "volcano_elevated", nowMs - 3 * DAY, nowMs + HOUR)
+    if fires.length == 0 and volc.length == 0:
+        return noReading("fires", title)
+    let head = ""
+    let asOf = null
+    if fires.length > 0:
+        let lastF = fires[fires.length - 1]
+        set head to String(Math.round(lastF[1])) + " active wildfires in the US"
+        set asOf to keyIso(lastF[0])
+    else:
+        set head to "No recent wildfire count"
+    let detail = ""
+    if acres.length > 0:
+        let a = Math.round(acres[acres.length - 1][1])
+        set detail to "About " + a.toLocaleString("en-US") + " acres burning in total. "
+    if volc.length > 0:
+        let v = Math.round(volc[volc.length - 1][1])
+        set detail to detail + "US volcanoes on elevated alert: " + String(v) + "."
+    return tile("fires", title, "calm", head, detail.trim(), asOf)
+
+export to buildNow(stateDir, nowMs):
+    let tiles = []
+    tiles.push(magneticTile(stateDir, nowMs))
+    tiles.push(sunTile(stateDir, nowMs))
+    tiles.push(quakeTile(stateDir, nowMs))
+    tiles.push(firesTile(stateDir, nowMs))
+    return { generatedAt: iso(nowMs), tiles: tiles }
+
+// ── Near a location ─────────────────────────────────────────────────────────
+to weatherTile(rawDir, nowMs, lat, lon):
+    let title = "Weather near you"
+    let j = readRawJson(rawDir, "asos", nowMs)
+    if j == null or j.stations == null:
+        return noReading("weather", title)
+    let best = null
+    let bestKm = 1000000000
+    for each s in j.stations:
+        if s.lat == null or s.lon == null or s.tmpf == null:
+            continue
+        let km = distanceKm(lat, lon, s.lat, s.lon)
+        if km < bestKm:
+            set best to s
+            set bestKm to km
+    if best == null or bestKm > 160:
+        return tile("weather", title, "unknown", "No weather station within 100 miles", "We use NOAA airport stations (ASOS); none reported close enough.", null)
+    let name = String(best.name or best.station)
+    let head = String(Math.round(best.tmpf)) + "°F at " + name
+    let detail = "Station " + best.station + ", " + milesText(bestKm) + " away."
+    if best.sknt != null:
+        set detail to detail + " Wind " + String(Math.round(best.sknt * 1.15078)) + " mph"
+        if best.gust != null:
+            set detail to detail + ", gusting " + String(Math.round(best.gust * 1.15078)) + " mph"
+        set detail to detail + "."
+    if best.relh != null:
+        set detail to detail + " Humidity " + String(Math.round(best.relh)) + "%."
+    if best.vsby != null:
+        set detail to detail + " Visibility " + fmt1(best.vsby) + " miles."
+    return tile("weather", title, "calm", head, detail, best.utc_valid or null)
+
+to quakesNearTile(stateDir, nowMs, lat, lon):
+    let title = "Earthquakes near you"
+    let evs = readEvents(stateDir, "quake", nowMs - 30 * DAY, nowMs + HOUR)
+    let n = 0
+    let big = null
+    let bigKm = 0
+    for each e in evs:
+        if e.lat == null or e.lon == null:
+            continue
+        let km = distanceKm(lat, lon, e.lat, e.lon)
+        if km <= 300:
+            set n to n + 1
+            if big == null or e.mag > big.mag:
+                set big to e
+                set bigKm to km
+    if big == null:
+        return tile("quakes-near", title, "calm", "No recorded earthquakes within 185 miles in the last 30 days", "Based on the USGS events we archive.", null)
+    let tone = "calm"
+    if big.mag >= 5:
+        set tone to "watch"
+    let head = String(n) + " within 185 miles in the last 30 days"
+    let detail = "Strongest: magnitude " + fmt1(big.mag) + ", " + milesText(bigKm) + " away"
+    if big.place != null:
+        set detail to detail + " (" + big.place + ")"
+    set detail to detail + ", on " + String(big.t).slice(0, 10) + "."
+    return tile("quakes-near", title, tone, head, detail, big.t)
+
+to firesNearTile(rawDir, nowMs, lat, lon):
+    let title = "Wildfires near you"
+    let j = readRawJson(rawDir, "wildfire", nowMs)
+    if j == null or j.fires == null:
+        return noReading("fires-near", title)
+    let n = 0
+    let near = null
+    let nearKm = 1000000000
+    for each f in j.fires:
+        if f.lat == null or f.lon == null:
+            continue
+        let km = distanceKm(lat, lon, f.lat, f.lon)
+        if km <= 160:
+            set n to n + 1
+        if km < nearKm:
+            set near to f
+            set nearKm to km
+    if n == 0:
+        let far = ""
+        if near != null:
+            set far to "The closest active fire is " + milesText(nearKm) + " away."
+        return tile("fires-near", title, "calm", "No active wildfires within 100 miles", far, null)
+    let acres = ""
+    if near.acres != null:
+        set acres to ", " + Math.round(near.acres).toLocaleString("en-US") + " acres"
+    let head = String(n) + " active wildfires within 100 miles"
+    let detail = "Closest: " + String(near.name or "unnamed fire") + acres + ", " + milesText(nearKm) + " away."
+    return tile("fires-near", title, "watch", head, detail, null)
+
+/// Geomagnetic latitude from a centered-dipole model (IGRF-14 pole for 2025:
+/// 80.8° N, 72.8° W). Auroras follow magnetic, not geographic, latitude.
+export to geomagLat(lat, lon):
+    let pLat = toRad(80.8)
+    let pLon = toRad(-72.8)
+    let a = toRad(lat)
+    let s = Math.sin(a) * Math.sin(pLat) + Math.cos(a) * Math.cos(pLat) * Math.cos(toRad(lon) - pLon)
+    return Math.asin(s) * 180 / Math.PI
+
+/// Rough view-line guide: the aurora is visible on the horizon down to about
+/// 63 - 2.4 * Kp degrees magnetic latitude (Kp 5 ≈ 51°, Kp 9 ≈ 41°), calibrated so\n/// the May and Oct 2024 storms (Kp 9 / 8.7) were visible from Tennessee, as observed.
+export to auroraKpNeeded(lat, lon):
+    let need = (63 - Math.abs(geomagLat(lat, lon))) / 2.4
+    if need < 0:
+        return 0
+    return Math.round(need * 10) / 10
+
+to auroraTile(stateDir, nowMs, lat, lon):
+    let title = "Aurora chance"
+    let rows = readSeries(stateDir, "kp", nowMs - DAY, nowMs + HOUR)
+    if rows.length == 0:
+        return noReading("aurora", title)
+    let peak = colMax(rows, 3)
+    let need = auroraKpNeeded(lat, lon)
+    if need > 9:
+        return tile("aurora", title, "calm", "Auroras are very rare this far from the magnetic pole", "Even the strongest storms (Kp 9) usually stay out of view here.", null)
+    let toward = "north"
+    if lat < 0:
+        set toward to "south"
+    let head = "Unlikely tonight"
+    let tone = "calm"
+    if peak >= need:
+        set head to "Possible — look " + toward + " after dark"
+        set tone to "watch"
+    else if peak >= need - 1:
+        set head to "A slight chance low on the " + toward + "ern horizon"
+    let detail = "Where you are, auroras usually need Kp " + fmt1(need) + " or higher. Highest in the last 24 hours: " + fmt1(peak) + ". This is a rough guide; clouds and city lights matter too."
+    return tile("aurora", title, tone, head, detail, keyIso(rows[rows.length - 1][0]))
+
+export to buildNear(stateDir, rawDir, nowMs, lat, lon, label):
+    let tiles = []
+    tiles.push(weatherTile(rawDir, nowMs, lat, lon))
+    tiles.push(auroraTile(stateDir, nowMs, lat, lon))
+    tiles.push(quakesNearTile(stateDir, nowMs, lat, lon))
+    tiles.push(firesNearTile(rawDir, nowMs, lat, lon))
+    return { generatedAt: iso(nowMs), place: { label: label, lat: lat, lon: lon }, tiles: tiles }

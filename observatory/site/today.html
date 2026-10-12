@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Today on Earth and in Space — Truth Observatory</title>
+  <meta name="description" content="A free, plain-English look at what Earth and the sun are doing right now: magnetic field, solar flares, earthquakes, wildfires, and conditions near your ZIP code. Updated continuously from public scientific sources.">
+  <meta property="og:title" content="Today on Earth and in Space — Truth Observatory">
+  <meta property="og:description" content="What the sun, Earth's magnetic field, earthquakes and wildfires are doing right now — and what it means near you. Free, in plain English.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://observatory.tlid.io/today">
+  <meta property="og:image" content="https://observatory.tlid.io/assets/hero-1.webp">
+  <meta name="theme-color" content="#05060a">
+  <link rel="canonical" href="https://observatory.tlid.io/today">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔭</text></svg>">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="stylesheet" href="landing.css">
+  <link rel="stylesheet" href="now.css">
+</head>
+<body>
+<script src="levels.js"></script>
+
+  <nav class="today-nav" aria-label="Page">
+    <button class="today-nav__back" id="today-back" type="button">&larr; Back</button>
+    <a class="today-nav__brand" href="/" id="today-home">Truth Observatory</a>
+    <span class="today-nav__spacer"></span>
+    <div class="level-switch" role="group" aria-label="Explanation level" id="level-switch">
+      <button type="button" data-level="observer" id="lv-observer">Plain</button>
+      <button type="button" data-level="analyst" id="lv-analyst">Detailed</button>
+      <button type="button" data-level="researcher" id="lv-researcher">Raw</button>
+    </div>
+    <button class="btn btn--gold" type="button" id="nav-subscribe" onclick="window.__subscribe()">Subscribe</button>
+  </nav>
+
+  <main class="today" id="today">
+
+    <header class="today-hero">
+      <p class="today-hero__date" id="today-date">Today</p>
+      <h1>What Earth and the sun are doing today</h1>
+      <p class="today-hero__sub" id="today-sub">A calm, plain-English look at the planet right now. No hype. Just what the instruments say.</p>
+      <div class="today-brief" id="today-brief" hidden>
+        <span class="today-brief__label">Today's summary</span>
+        <span id="today-brief-text"></span>
+      </div>
+    </header>
+
+    <!-- ── Right now, worldwide ─────────────────────────────── -->
+    <section class="today-section" id="sec-now" aria-labelledby="h-now">
+      <div class="today-section__head">
+        <p class="today-section__label"><span class="live-dot" style="display:inline-block;margin-right:8px;"></span>Live</p>
+        <h2 id="h-now">Right now, worldwide</h2>
+        <p class="today-section__why" id="why-now">Four things that can affect power, GPS, radio, flights and the sky above you.</p>
+      </div>
+      <div class="carousel-wrapper" id="now-carousel">
+        <div class="now-track" id="now-track">
+          <div class="now-skeleton"></div><div class="now-skeleton"></div><div class="now-skeleton"></div>
+        </div>
+        <div class="carousel-nav">
+          <button class="carousel-arrow carousel-arrow--prev" type="button" aria-label="Previous" id="now-prev">&#8592;</button>
+          <div class="carousel-dots"></div>
+          <button class="carousel-arrow carousel-arrow--next" type="button" aria-label="Next" id="now-next">&#8594;</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Near you ─────────────────────────────────────────── -->
+    <section class="today-section" id="sec-near" aria-labelledby="h-near">
+      <div class="today-section__head">
+        <p class="today-section__label">Local</p>
+        <h2 id="h-near">Near you</h2>
+        <p class="today-section__why">Enter a US ZIP code to see the nearest weather station, your aurora chances, and any earthquakes or wildfires close by. We remember it on this device only.</p>
+      </div>
+      <form class="zip-form" id="zip-form" autocomplete="off">
+        <label for="zip-input" class="sr-only" style="position:absolute;left:-9999px;">ZIP code</label>
+        <input class="zip-form__input" id="zip-input" name="zip" inputmode="numeric" pattern="[0-9]{5}" maxlength="5" placeholder="ZIP code" required>
+        <button class="btn btn--gold" type="submit" id="zip-go">Show my area</button>
+        <button class="btn btn--ghost" type="button" id="geo-go">📍 Use my location</button>
+        <p class="zip-form__msg" id="zip-msg" role="status"></p>
+      </form>
+      <p class="today-near__place" id="near-place"></p>
+      <div class="carousel-wrapper" id="near-carousel" hidden>
+        <div class="now-track" id="near-track"></div>
+        <div class="carousel-nav">
+          <button class="carousel-arrow carousel-arrow--prev" type="button" aria-label="Previous" id="near-prev">&#8592;</button>
+          <div class="carousel-dots"></div>
+          <button class="carousel-arrow carousel-arrow--next" type="button" aria-label="Next" id="near-next">&#8594;</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Magnetic field, 7 days ───────────────────────────── -->
+    <section class="today-section" id="sec-kp" aria-labelledby="h-kp">
+      <div class="today-section__head">
+        <p class="today-section__label">This week</p>
+        <h2 id="h-kp">Earth's magnetic field, last 7 days</h2>
+        <p class="today-section__why" id="why-kp"></p>
+      </div>
+      <div class="kp-chart" id="kp-chart">
+        <canvas id="kp-canvas" role="img" aria-label="Bar chart of the Kp index over the last 7 days"></canvas>
+        <div class="kp-chart__tip" id="kp-tip"></div>
+        <div class="kp-chart__legend">
+          <span><i style="background:#22c55e"></i>Calm (0–3)</span>
+          <span><i style="background:#d4a054"></i>Unsettled (4)</span>
+          <span><i style="background:#f97316"></i>Storm (5–6)</span>
+          <span><i style="background:#ef4444"></i>Strong storm (7+)</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ── Biggest earthquakes this week (cream) ──────────────── -->
+  <section class="today-cream" id="sec-quakes" aria-labelledby="h-quakes">
+    <div class="today-inner section--cream" style="background:none;padding:0;">
+      <div class="today-section__head">
+        <p class="today-section__label">This week</p>
+        <h2 id="h-quakes" style="font-size:clamp(1.3rem,3vw,1.75rem);font-weight:800;letter-spacing:-0.02em;margin-top:4px;">Biggest earthquakes worldwide</h2>
+        <p class="today-section__why" id="why-quakes"></p>
+      </div>
+      <div class="carousel-wrapper" id="quake-carousel">
+        <div class="now-track" id="quake-track"></div>
+        <div class="carousel-nav">
+          <button class="carousel-arrow carousel-arrow--prev" type="button" aria-label="Previous" id="quake-prev">&#8592;</button>
+          <div class="carousel-dots"></div>
+          <button class="carousel-arrow carousel-arrow--next" type="button" aria-label="Next" id="quake-next">&#8594;</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Go deeper (paywall at depth) ───────────────────────── -->
+  <section class="today deeper" id="sec-deeper" aria-labelledby="h-deeper">
+    <p class="today-section__label">For subscribers</p>
+    <h2 id="h-deeper">Want to know the moment something happens near you?</h2>
+    <p class="deeper__sub">Everything above is free. Subscribers get the full live cockpit and the complete record, with alerts and history on the way.</p>
+    <div class="carousel-wrapper" id="perk-carousel">
+      <div class="now-track" id="perk-track">
+        <article class="perk-card" id="perk-alerts">
+          <div class="perk-card__icon">✉️</div>
+          <span class="perk-card__soon">Coming soon</span>
+          <h3>Email alerts for your area</h3>
+          <p>A short email when a quake, wildfire, geomagnetic storm or aurora chance crosses a threshold near your ZIP. No spam, no daily noise.</p>
+        </article>
+        <article class="perk-card" id="perk-history">
+          <div class="perk-card__icon">📈</div>
+          <span class="perk-card__soon">Coming soon</span>
+          <h3>Is this normal? See the history</h3>
+          <p>Compare today with decades of records. Magnetic field back to 1932, earthquakes, solar flares and more.</p>
+        </article>
+        <article class="perk-card" id="perk-ask">
+          <div class="perk-card__icon">🔎</div>
+          <h3>Search the event record</h3>
+          <p>Filter every logged observation, deviation and data gap by stream and time. Useful for "what was going on when…" questions.</p>
+        </article>
+        <article class="perk-card" id="perk-cockpit">
+          <div class="perk-card__icon">🛰️</div>
+          <h3>The full live cockpit</h3>
+          <p>All 20 streams on one screen: radar, satellites, lightning, aircraft, the power grid, live map layers.</p>
+        </article>
+        <article class="perk-card" id="perk-data">
+          <div class="perk-card__icon">⬇️</div>
+          <h3>Download the data</h3>
+          <p>Export any series as CSV. Every record is hashed, so you can show it hasn't been changed.</p>
+        </article>
+      </div>
+      <div class="carousel-nav">
+        <button class="carousel-arrow carousel-arrow--prev" type="button" aria-label="Previous" id="perk-prev">&#8592;</button>
+        <div class="carousel-dots"></div>
+        <button class="carousel-arrow carousel-arrow--next" type="button" aria-label="Next" id="perk-next">&#8594;</button>
+      </div>
+    </div>
+    <p class="deeper__price"><strong>$4.99</strong>/month · cancel anytime</p>
+    <button class="btn btn--gold" type="button" id="deeper-subscribe" onclick="window.__subscribe()" style="padding:14px 32px;font-size:0.95rem;">Subscribe</button>
+    <p class="deeper__fine">Secure checkout by Stripe</p>
+  </section>
+
+  <footer class="today-footer">
+    <nav aria-label="Footer">
+      <a href="/" id="ft-home">Home</a>
+      <a href="/about#how-to-use" id="ft-how">How it works</a>
+      <a href="/about" id="ft-about">About</a>
+      <a href="/terms" id="ft-terms">Terms</a>
+      <a href="/privacy" id="ft-privacy">Privacy</a>
+    </nav>
+    <p style="margin-top:12px;">Data from NOAA, USGS, NIFC, GFZ Potsdam and other public sources. Observations, not predictions. Not safety advice.</p>
+    <p style="margin-top:6px;">&copy; 2026 DarkWave Studios LLC</p>
+  </footer>
+
+<script src="now.js"></script>
+<script src="today.js"></script>
+</body>
+</html>
