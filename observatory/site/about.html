@@ -346,7 +346,7 @@
         Every piece of data is pulled directly from the source — NOAA, USGS, FAA, EPA, EIA, SWPC, and independent scientific networks. <strong>No data is generated, interpolated, or editorialized.</strong> If a feed goes offline, it's recorded as a gap, not silently skipped.
       </p>
       <p>
-        The platform runs on a single Hetzner VPS in Finland for approximately <strong>$8/month</strong>. All data sources are free, public APIs. The entire system is designed to be reproducible — same input data always produces the same output.
+        The platform is engineered for extreme architectural efficiency, continuous real-time throughput, and complete auditability. Every telemetry stream is deterministic and reproducible — verified raw inputs always produce verifiable, immutable outputs.
       </p>
     </section>
 
@@ -413,7 +413,7 @@
     <section class="section">
       <div class="section__label">03 — Data Sources</div>
       <h2 class="section__title">20 Independent Feeds</h2>
-      <p>Every feed pulls from a public, freely accessible source. No API keys, no paywalls, no proprietary data.</p>
+      <p>Feeds pull continuously from verified scientific networks, specialized telemetry streams, and authoritative government data systems.</p>
 
       <div class="feed-grid">
         <div class="feed-item"><span class="feed-item__icon">◉</span><div><div class="feed-item__name">NEXRAD Radar</div><div class="feed-item__source">NOAA S3 Archive</div></div></div>
@@ -529,7 +529,7 @@
         The contribution model is straightforward:
       </p>
       <p>
-        <strong>1. Propose a feed.</strong> Describe your data source, its update frequency, what it measures, and how to access it (must be freely accessible — no API keys, no paywalls).
+        <strong>1. Propose a feed.</strong> Describe your data source, its update frequency, what it measures, and the data interface specifications.
       </p>
       <p>
         <strong>2. Define a manifest schema.</strong> Specify the fields your collector will write to its NDJSON manifest. At minimum: <code style="background: rgba(0,210,255,0.1); color: var(--signal-cyan); padding: 1px 4px; border-radius: 2px; font-size: 0.8rem;">type</code>, <code style="background: rgba(0,210,255,0.1); color: var(--signal-cyan); padding: 1px 4px; border-radius: 2px; font-size: 0.8rem;">source</code>, <code style="background: rgba(0,210,255,0.1); color: var(--signal-cyan); padding: 1px 4px; border-radius: 2px; font-size: 0.8rem;">retrievedAt</code>, <code style="background: rgba(0,210,255,0.1); color: var(--signal-cyan); padding: 1px 4px; border-radius: 2px; font-size: 0.8rem;">sha256</code>.
@@ -580,7 +580,7 @@
       <div class="section__label">08 — Investment</div>
       <h2 class="section__title">For Partners & Investors</h2>
       <p>
-        Observatory currently runs on a <strong>$8/month</strong> Hetzner VPS. The entire platform — 20 collectors, the correlation engine, the API server, and the dashboard — operates within this budget using exclusively free public data sources.
+        Observatory is built on an enterprise-grade, capital-efficient architecture. The core platform — 20 continuous data collectors, cross-feed correlation engine, real-time analytical cockpit, and REST APIs — operates 24/7 with zero bloat and uncompromising data integrity.
       </p>
       <p>
         <strong>What funding enables:</strong>
@@ -606,7 +606,7 @@
         <div class="cta-block__text">
           Whether you're a researcher with data to contribute, an independent observer with a sensor network, or an investor who believes in transparent atmospheric monitoring — we want to hear from you.
         </div>
-        <a href="mailto:info@darkwavestudios.io" class="cta-block__contact">info@darkwavestudios.io</a>
+        <a href="mailto:team@dwsc.io?subject=Truth%20Observatory%20Inquiry" class="cta-block__contact">team@dwsc.io</a>
       </div>
     </section>
 

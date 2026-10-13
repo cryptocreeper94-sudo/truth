@@ -122,7 +122,7 @@
           <a href="/today" class="hero__cta" id="hero-cta">SEE TODAY — FREE →</a>
           <button id="subscribe-cta" class="hero__cta hero__cta--outline" onclick="window.__subscribe()">🔒 SUBSCRIBE — $4.99/MO</button>
         </div>
-        <p class="hero__links"><a href="/about#how-to-use" class="hero__help" id="hero-help">New here? See how it works &rarr;</a><a href="/cockpit" class="hero__help" id="hero-cockpit">Subscriber? Enter the cockpit &rarr;</a></p>
+        <p class="hero__links"><a href="/about#how-to-use" class="hero__help" id="hero-help">New here? See how it works &rarr;</a><a href="#" onclick="window.openSignInModal(event); return false;" class="hero__help" id="hero-cockpit">Subscriber? Sign in &rarr;</a></p>
       </div>
     </section>
 
@@ -615,6 +615,33 @@
             <button onclick="__devBypassSubmit()" style="flex:1;padding:0.6rem;background:#d4a054;color:#0d0b09;border:none;border-radius:4px;cursor:pointer;font-family:inherit;font-size:0.7rem;font-weight:600;letter-spacing:0.1em;">ENTER</button>
             <button onclick="document.getElementById('dev-bypass-modal').style.display='none'" style="padding:0.6rem 1rem;background:transparent;border:1px solid #3a3530;color:#555;border-radius:4px;cursor:pointer;font-family:inherit;font-size:0.7rem;">×</button>
           </div>
+      <!-- Subscriber Sign-In Modal -->
+      <div id="signin-modal" style="display:none;position:fixed;inset:0;z-index:10001;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);align-items:center;justify-content:center;">
+        <div style="background:#0d0b09;border:1px solid #3a3530;border-radius:8px;padding:2rem;max-width:380px;width:90%;font-family:'JetBrains Mono',monospace;text-align:center;box-shadow:0 20px 40px rgba(0,0,0,0.8);">
+          <p style="color:#00d2ff;font-size:0.65rem;margin:0 0 0.5rem;letter-spacing:0.15em;text-transform:uppercase;">SUBSCRIBER ACCESS</p>
+          <h3 style="color:#d4dae3;font-size:1.1rem;margin:0 0 1rem;font-weight:600;">Sign In with Email</h3>
+          
+          <div id="signin-step-email">
+            <p style="color:#8b95a5;font-size:0.75rem;margin:0 0 1.2rem;line-height:1.5;">Enter the email used for your subscription. We'll send an access code and 1-click magic link.</p>
+            <input id="signin-email" type="email" placeholder="you@domain.com" style="width:100%;padding:0.75rem;background:#1a1714;border:1px solid #3a3530;border-radius:4px;color:#00d2ff;font-family:inherit;font-size:0.85rem;text-align:center;box-sizing:border-box;">
+            <p id="signin-error" style="color:#ff6b35;font-size:0.7rem;margin:0.6rem 0 0;display:none;line-height:1.4;"></p>
+            <div style="margin-top:1.2rem;display:flex;gap:0.5rem;">
+              <button id="signin-btn-send" onclick="__sendAccessCode()" style="flex:1;padding:0.75rem;background:#00d2ff;color:#0a0e14;border:none;border-radius:4px;cursor:pointer;font-family:inherit;font-size:0.75rem;font-weight:700;letter-spacing:0.05em;">SEND ACCESS CODE</button>
+              <button onclick="document.getElementById('signin-modal').style.display='none'" style="padding:0.75rem 1rem;background:transparent;border:1px solid #3a3530;color:#888;border-radius:4px;cursor:pointer;font-family:inherit;font-size:0.75rem;">✕</button>
+            </div>
+          </div>
+
+          <div id="signin-step-code" style="display:none;">
+            <p style="color:#8b95a5;font-size:0.75rem;margin:0 0 1.2rem;line-height:1.5;">We sent an access code to <strong id="signin-sent-to" style="color:#d4dae3;"></strong>. Enter the 6-digit code below or click the link in your email.</p>
+            <input id="signin-code" type="text" maxlength="6" placeholder="000000" style="width:100%;padding:0.75rem;background:#1a1714;border:1px solid #00d2ff;border-radius:4px;color:#00d2ff;font-family:inherit;font-size:1.2rem;text-align:center;box-sizing:border-box;letter-spacing:0.3em;font-weight:700;">
+            <p id="signin-code-error" style="color:#ff6b35;font-size:0.7rem;margin:0.6rem 0 0;display:none;"></p>
+            <div style="margin-top:1.2rem;display:flex;gap:0.5rem;">
+              <button id="signin-btn-verify" onclick="__verifyAccessCode()" style="flex:1;padding:0.75rem;background:#00d2ff;color:#0a0e14;border:none;border-radius:4px;cursor:pointer;font-family:inherit;font-size:0.75rem;font-weight:700;letter-spacing:0.05em;">VERIFY & ENTER</button>
+              <button onclick="document.getElementById('signin-modal').style.display='none'" style="padding:0.75rem 1rem;background:transparent;border:1px solid #3a3530;color:#888;border-radius:4px;cursor:pointer;font-family:inherit;font-size:0.75rem;">✕</button>
+            </div>
+            <p style="margin-top:1rem;margin-bottom:0;"><a href="#" onclick="__resetSignIn(); return false;" style="color:#666;font-size:0.65rem;text-decoration:underline;">Use different email</a></p>
+          </div>
+
         </div>
       </div>
     </footer>
@@ -628,21 +655,124 @@
   <script src="now.js"></script>
   <script src="home.js"></script>
   <script>
-    // Subscribe handler — direct Stripe Payment Link (no server needed)
+    // Subscribe handler — direct Stripe Payment Link
     window.__subscribe = function() {
       window.location.href = 'https://buy.stripe.com/bJe8wR4Zq2vM83Z3vTfEk00';
     };
+
+    // Subscriber Sign-in Modal & Auth logic
+    window.openSignInModal = function(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      const modal = document.getElementById('signin-modal');
+      if (modal) {
+        modal.style.display = 'flex';
+        __resetSignIn();
+        const input = document.getElementById('signin-email');
+        if (input) input.focus();
+      }
+    };
+
+    function __resetSignIn() {
+      document.getElementById('signin-step-email').style.display = 'block';
+      document.getElementById('signin-step-code').style.display = 'none';
+      document.getElementById('signin-error').style.display = 'none';
+      document.getElementById('signin-code-error').style.display = 'none';
+      const btn = document.getElementById('signin-btn-send');
+      if (btn) { btn.disabled = false; btn.textContent = 'SEND ACCESS CODE'; }
+    }
+
+    async function __sendAccessCode() {
+      const emailInput = document.getElementById('signin-email');
+      const err = document.getElementById('signin-error');
+      const btn = document.getElementById('signin-btn-send');
+      const email = (emailInput.value || '').trim();
+      err.style.display = 'none';
+
+      if (!email || !email.includes('@')) {
+        err.textContent = 'Please enter a valid email address.';
+        err.style.display = 'block';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'SENDING...';
+
+      try {
+        const res = await fetch('/api/auth/request-code', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          document.getElementById('signin-sent-to').textContent = email;
+          document.getElementById('signin-step-email').style.display = 'none';
+          document.getElementById('signin-step-code').style.display = 'block';
+          const codeInput = document.getElementById('signin-code');
+          if (codeInput) { codeInput.value = ''; codeInput.focus(); }
+        } else {
+          err.textContent = data.error || 'Failed to send code.';
+          err.style.display = 'block';
+          btn.disabled = false;
+          btn.textContent = 'SEND ACCESS CODE';
+        }
+      } catch (e) {
+        err.textContent = 'Network error. Please try again.';
+        err.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'SEND ACCESS CODE';
+      }
+    }
+
+    async function __verifyAccessCode() {
+      const email = document.getElementById('signin-sent-to').textContent;
+      const codeInput = document.getElementById('signin-code');
+      const err = document.getElementById('signin-code-error');
+      const btn = document.getElementById('signin-btn-verify');
+      const code = (codeInput.value || '').trim();
+      err.style.display = 'none';
+
+      if (!code || code.length < 4) {
+        err.textContent = 'Please enter your 6-digit code.';
+        err.style.display = 'block';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'VERIFYING...';
+
+      try {
+        const res = await fetch('/api/auth/verify-code', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, code })
+        });
+        const data = await res.json();
+        if (res.ok && data.redirect) {
+          window.location.href = data.redirect;
+        } else {
+          err.textContent = data.error || 'Invalid or expired code.';
+          err.style.display = 'block';
+          btn.disabled = false;
+          btn.textContent = 'VERIFY & ENTER';
+        }
+      } catch (e) {
+        err.textContent = 'Network error. Please try again.';
+        err.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'VERIFY & ENTER';
+      }
+    }
 
     // Handle redirect from protected pages
     (function() {
       const params = new URLSearchParams(window.location.search);
       if (params.get('upgrade') === '1') {
         const banner = document.createElement('div');
-        banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:linear-gradient(135deg,#d4a054,#e0b06a);color:#1a1714;text-align:center;padding:1rem;font-family:var(--font-mono);font-size:0.8rem;font-weight:600;letter-spacing:0.05em;cursor:pointer;';
-        banner.textContent = '\ud83d\udd12 This area requires a subscription. Click here to subscribe \u2014 $4.99/mo';
-        banner.onclick = window.__subscribe;
+        banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:linear-gradient(135deg,#d4a054,#e0b06a);color:#1a1714;text-align:center;padding:1rem;font-family:var(--font-mono);font-size:0.8rem;font-weight:600;letter-spacing:0.05em;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;';
+        banner.innerHTML = '<span>🔒 This area requires a subscription.</span> <a href="#" onclick="window.__subscribe(); return false;" style="color:#1a1714;text-decoration:underline;font-weight:700;">Subscribe — $4.99/mo</a> <span style="opacity:0.4;">|</span> <a href="#" onclick="window.openSignInModal(event); return false;" style="color:#1a1714;text-decoration:underline;font-weight:700;">Already subscribed? Sign in &rarr;</a> <button onclick="this.parentElement.remove()" style="background:transparent;border:none;font-weight:700;cursor:pointer;font-size:1rem;margin-left:12px;color:#1a1714;">✕</button>';
         document.body.prepend(banner);
-        setTimeout(() => banner.remove(), 10000);
+        setTimeout(() => banner.remove(), 25000);
       }
     })();
 

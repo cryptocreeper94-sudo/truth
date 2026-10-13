@@ -176,8 +176,54 @@ async function getSubscriberFromRequest(req) {
   } catch { return null; }
 }
 
+const SUBSCRIBER_WHITELIST = new Set([
+  'gladevillej@gmail.com',
+  'team@dwsc.io',
+  'jason@livfitoken.com'
+]);
+
+const AUTH_CODES = new Map(); // key: email, value: { code, token, expiresAt, subId }
+
+async function sendResendEmail({ to, subject, html, text }) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.warn('[AUTH] RESEND_API_KEY not configured. Skipping email to', to);
+    return false;
+  }
+  try {
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: 'Truth Observatory <access@observatory.tlid.io>',
+        to: [to],
+        subject,
+        html,
+        text,
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      console.error('[AUTH] Resend email failed:', data);
+      return false;
+    }
+    console.log('[AUTH] Access email sent to', to, data.id);
+    return true;
+  } catch (err) {
+    console.error('[AUTH] Resend network error:', err.message);
+    return false;
+  }
+}
+
 function isSubscribed(subscriber) {
-  return subscriber && (subscriber.status === 'active' || subscriber.status === 'trialing');
+  if (!subscriber) return false;
+  if (subscriber.email && SUBSCRIBER_WHITELIST.has(subscriber.email.toLowerCase().trim())) {
+    return true;
+  }
+  return subscriber.status === 'active' || subscriber.status === 'trialing';
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -560,7 +606,7 @@ const server = createServer(async (req, res) => {
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
     let event;
-    if (webhookSecret && sig) {
+    if (webhookSecret && sig && stripe) {
       try { event = stripe.webhooks.constructEvent(body, sig, webhookSecret); }
       catch (err) { console.error('[WEBHOOK] Signature failed:', err.message); return jsonResponse(res, 400, { error: 'Invalid signature' }); }
     } else {
@@ -570,6 +616,48 @@ const server = createServer(async (req, res) => {
 
     if (pool) {
       try {
+        if (event.type === 'checkout.session.completed') {
+          const session = event.data.object;
+          const email = (session.customer_details?.email || session.customer_email || '').toLowerCase().trim();
+          const customerId = session.customer;
+          const subscriptionId = typeof session.subscription === 'object' ? session.subscription?.id : session.subscription;
+          if (email) {
+            await pool.query(
+              `INSERT INTO subscribers (email, stripe_customer_id, stripe_subscription_id, status, updated_at)
+               VALUES ($1, $2, $3, 'active', NOW())
+               ON CONFLICT (email) DO UPDATE SET
+                 stripe_customer_id = COALESCE(EXCLUDED.stripe_customer_id, subscribers.stripe_customer_id),
+                 stripe_subscription_id = COALESCE(EXCLUDED.stripe_subscription_id, subscribers.stripe_subscription_id),
+                 status = 'active',
+                 updated_at = NOW()`,
+              [email, customerId, subscriptionId]
+            );
+            console.log(`[WEBHOOK] Checkout session completed for ${email} (${customerId})`);
+
+            // Send instant welcome email with magic link
+            const token = randomBytes(32).toString('hex');
+            const expiresAt = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
+            AUTH_CODES.set(email, { code: 'WELCOME', token, expiresAt });
+            const magicLink = `${SITE_URL}/api/auth/magic?token=${token}`;
+
+            await sendResendEmail({
+              to: email,
+              subject: 'Welcome to Truth Observatory — Access Your Cockpit',
+              text: `Thank you for subscribing to Truth Observatory!\n\nAccess your live telemetry cockpit here:\n${magicLink}\n\nYou can also sign in anytime using your email address.`,
+              html: `
+                <div style="font-family:'Courier New',Courier,monospace;background:#0a0e14;color:#d4dae3;padding:32px;border-radius:6px;max-width:520px;margin:0 auto;border:1px solid rgba(255,255,255,0.1);">
+                  <div style="font-size:11px;color:#00d2ff;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:8px;">Truth Observatory</div>
+                  <h2 style="color:#fff;margin-top:0;font-size:20px;letter-spacing:0.05em;">Welcome to Full Access</h2>
+                  <p style="color:#8b95a5;font-size:14px;line-height:1.6;">Your subscription is confirmed. You now have complete access to all 20 real-time streams, interactive layers, pattern detection, and verified data exports.</p>
+                  <div style="text-align:center;margin:28px 0;">
+                    <a href="${magicLink}" style="display:inline-block;background:#00d2ff;color:#0a0e14;padding:12px 32px;text-decoration:none;font-weight:700;font-size:13px;border-radius:3px;letter-spacing:0.05em;">ENTER THE COCKPIT &rarr;</a>
+                  </div>
+                  <p style="color:#4a5568;font-size:11px;margin-top:32px;line-height:1.5;">You can sign in on any device anytime by entering ${email} at the login prompt.</p>
+                </div>
+              `
+            });
+          }
+        }
         if (event.type === 'customer.subscription.updated' || event.type === 'customer.subscription.deleted') {
           const sub = event.data.object;
           const status = sub.status === 'active' || sub.status === 'trialing' ? 'active' : sub.status;
@@ -592,6 +680,167 @@ const server = createServer(async (req, res) => {
       } catch (err) { console.error('[WEBHOOK] DB error:', err.message); }
     }
     return jsonResponse(res, 200, { received: true });
+  }
+
+  // ── Subscriber Auth & Magic Link Routes ─────────────────────────────
+  if (path === '/api/auth/request-code' && req.method === 'POST') {
+    try {
+      const body = await readBody(req);
+      const { email: rawEmail } = JSON.parse(body);
+      const email = (rawEmail || '').toLowerCase().trim();
+      if (!email || !email.includes('@')) {
+        return jsonResponse(res, 400, { error: 'Please enter a valid email address.' });
+      }
+
+      let isAllowed = SUBSCRIBER_WHITELIST.has(email);
+      let subId = null;
+
+      if (pool) {
+        const result = await pool.query(
+          'SELECT id, status FROM subscribers WHERE LOWER(email) = $1',
+          [email]
+        );
+        if (result.rows.length > 0) {
+          subId = result.rows[0].id;
+          if (result.rows[0].status === 'active' || result.rows[0].status === 'trialing') {
+            isAllowed = true;
+          }
+        } else if (isAllowed) {
+          const inserted = await pool.query(
+            `INSERT INTO subscribers (email, stripe_customer_id, status, created_at, updated_at)
+             VALUES ($1, $2, 'active', NOW(), NOW())
+             ON CONFLICT (email) DO UPDATE SET status = 'active', updated_at = NOW()
+             RETURNING id`,
+            [email, `whitelist_${Buffer.from(email).toString('hex').slice(0, 16)}`]
+          );
+          subId = inserted.rows[0]?.id;
+        }
+      }
+
+      if (!isAllowed) {
+        return jsonResponse(res, 404, {
+          error: 'No active subscription found for this email. If you just subscribed, please allow a moment or contact team@dwsc.io.'
+        });
+      }
+
+      const code = String(Math.floor(100000 + Math.random() * 900000));
+      const token = randomBytes(32).toString('hex');
+      const expiresAt = Date.now() + 15 * 60 * 1000; // 15 mins
+
+      AUTH_CODES.set(email, { code, token, expiresAt, subId });
+
+      const magicLink = `${SITE_URL}/api/auth/magic?token=${token}`;
+
+      await sendResendEmail({
+        to: email,
+        subject: `Your Truth Observatory Access Code: ${code}`,
+        text: `Your Truth Observatory access code is: ${code}\n\nOr click here to access the Cockpit directly:\n${magicLink}\n\nThis link and code expire in 15 minutes.`,
+        html: `
+          <div style="font-family:'Courier New',Courier,monospace;background:#0a0e14;color:#d4dae3;padding:32px;border-radius:6px;max-width:520px;margin:0 auto;border:1px solid rgba(255,255,255,0.1);">
+            <div style="font-size:11px;color:#00d2ff;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:8px;">Truth Observatory</div>
+            <h2 style="color:#fff;margin-top:0;font-size:20px;letter-spacing:0.05em;">Your Access Code</h2>
+            <p style="color:#8b95a5;font-size:14px;line-height:1.6;">Use this code to sign in to the Cockpit on this device:</p>
+            <div style="background:#111820;border:1px solid #00d2ff;border-radius:4px;padding:16px;text-align:center;margin:24px 0;">
+              <span style="font-size:32px;font-weight:700;letter-spacing:8px;color:#00d2ff;">${code}</span>
+            </div>
+            <div style="text-align:center;margin:24px 0;">
+              <a href="${magicLink}" style="display:inline-block;background:#00d2ff;color:#0a0e14;padding:12px 28px;text-decoration:none;font-weight:700;font-size:13px;border-radius:3px;letter-spacing:0.05em;">INSTANT 1-CLICK SIGN IN &rarr;</a>
+            </div>
+            <p style="color:#4a5568;font-size:11px;margin-top:32px;line-height:1.5;">This link and code expire in 15 minutes. If you did not request this, you can safely ignore this email.</p>
+          </div>
+        `
+      });
+
+      return jsonResponse(res, 200, { ok: true, message: 'Access code sent to your email.' });
+    } catch (err) {
+      console.error('[AUTH] request-code error:', err.message);
+      return jsonResponse(res, 500, { error: 'Failed to process login request.' });
+    }
+  }
+
+  if (path === '/api/auth/verify-code' && req.method === 'POST') {
+    try {
+      const body = await readBody(req);
+      const { email: rawEmail, code } = JSON.parse(body);
+      const email = (rawEmail || '').toLowerCase().trim();
+      const record = AUTH_CODES.get(email);
+
+      if (!record || record.expiresAt < Date.now() || record.code !== String(code).trim()) {
+        return jsonResponse(res, 400, { error: 'Invalid or expired access code.' });
+      }
+
+      AUTH_CODES.delete(email);
+
+      let subId = record.subId;
+      if (!subId && pool) {
+        const sub = await pool.query('SELECT id FROM subscribers WHERE LOWER(email) = $1', [email]);
+        subId = sub.rows[0]?.id;
+      }
+
+      if (pool && subId) {
+        const sid = randomBytes(32).toString('hex');
+        await pool.query(
+          `INSERT INTO sessions (id, subscriber_id, expires_at) VALUES ($1, $2, NOW() + INTERVAL '90 days')`,
+          [sid, subId]
+        );
+        setSessionCookie(res, sid);
+      }
+
+      return jsonResponse(res, 200, { ok: true, redirect: '/cockpit' });
+    } catch (err) {
+      console.error('[AUTH] verify-code error:', err.message);
+      return jsonResponse(res, 500, { error: 'Verification failed.' });
+    }
+  }
+
+  if (path === '/api/auth/magic' && req.method === 'GET') {
+    const token = url.searchParams.get('token');
+    if (!token) return redirect(res, '/?error=invalid_token');
+
+    let matchedEmail = null;
+    let subId = null;
+    for (const [em, data] of AUTH_CODES.entries()) {
+      if (data.token === token && data.expiresAt > Date.now()) {
+        matchedEmail = em;
+        subId = data.subId;
+        AUTH_CODES.delete(em);
+        break;
+      }
+    }
+
+    if (!matchedEmail) return redirect(res, '/?error=expired_token');
+
+    if (!subId && pool) {
+      const sub = await pool.query('SELECT id FROM subscribers WHERE LOWER(email) = $1', [matchedEmail]);
+      subId = sub.rows[0]?.id;
+    }
+
+    if (pool && subId) {
+      const sid = randomBytes(32).toString('hex');
+      await pool.query(
+        `INSERT INTO sessions (id, subscriber_id, expires_at) VALUES ($1, $2, NOW() + INTERVAL '90 days')`,
+        [sid, subId]
+      );
+      setSessionCookie(res, sid);
+    }
+
+    return redirect(res, '/cockpit?welcome=1');
+  }
+
+  if (path === '/api/auth/claim-session' && req.method === 'GET') {
+    const sid = url.searchParams.get('sid');
+    if (!sid || !pool) return redirect(res, '/');
+    try {
+      const result = await pool.query(
+        `SELECT s.id FROM sessions s JOIN subscribers sub ON s.subscriber_id = sub.id WHERE s.id = $1 AND s.expires_at > NOW()`,
+        [sid]
+      );
+      if (result.rows.length > 0) {
+        setSessionCookie(res, sid);
+        return redirect(res, '/cockpit?welcome=1');
+      }
+    } catch {}
+    return redirect(res, '/');
   }
 
   if (path === '/api/account' && req.method === 'GET') {
