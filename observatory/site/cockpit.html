@@ -45,7 +45,7 @@
       <!-- Desktop-only inline buttons -->
       <button class="topbar__action-btn topbar__action-btn--desktop" onclick="document.getElementById('download-modal').style.display='flex'" title="Download CSV Report">⬇ EXPORT</button>
       <button class="topbar__action-btn topbar__action-btn--desktop" id="manage-sub-btn" onclick="document.getElementById('manage-sub-modal').style.display='flex'">ACCOUNT</button>
-      <a class="topbar__action-btn topbar__action-btn--desktop" href="/" style="text-decoration:none;">← BACK</a>
+      <a class="topbar__action-btn topbar__back-btn" href="/" style="text-decoration:none;" title="Back to Observatory Home">← HOME</a>
       <button class="topbar__action-btn topbar__action-btn--desktop level-toggle-btn" id="level-toggle-btn" title="Change how much detail you see" aria-haspopup="menu" aria-expanded="false">🟢 OBSERVER ▾</button>
       <span class="topbar__clock" id="utc-clock">00:00:00 UTC</span>
       <span class="topbar__pulse" id="global-pulse" data-info="stat-pulse" title="Data connection status"></span>
@@ -172,6 +172,7 @@
     <!-- LEFT: MAP PANEL -->
     <section class="cockpit__map" id="map-panel">
       <div class="panel-header">
+        <button class="panel-header__back-btn" onclick="Observatory.switchView('cockpit')" title="Return to Cockpit overview">← COCKPIT</button>
         <span class="panel-header__icon">&#9678;</span>
         <span class="panel-header__title" data-label-key="panel.map">GEOSPATIAL OVERLAY</span>
         <button class="refresh-btn" id="refresh-map" title="Refresh overlays">&#8635;</button>
@@ -201,6 +202,7 @@
     <!-- RIGHT: FEED CAROUSELS -->
     <section class="cockpit__feeds" id="feeds-panel">
       <div class="panel-header">
+        <button class="panel-header__back-btn" onclick="Observatory.switchView('cockpit')" title="Return to Cockpit overview">← COCKPIT</button>
         <span class="panel-header__icon">&#9635;</span>
         <span class="panel-header__title" data-label-key="panel.feeds">DATA STREAMS</span>
       </div>
@@ -232,6 +234,7 @@
     <!-- ATMOSCORE PANEL -->
     <section class="cockpit__atmoscore" id="atmoscore-panel">
       <div class="panel-header">
+        <button class="panel-header__back-btn" onclick="Observatory.switchView('cockpit')" title="Return to Cockpit overview">← COCKPIT</button>
         <span class="panel-header__icon" style="color: #1E6FA8">&#9673;</span>
         <span class="panel-header__title" data-label-key="panel.atmoscore">ATMOSCORE 4/42 STATE ENGINE</span>
         <span class="panel-header__badge" id="atmoscore-provenance"></span>
@@ -291,6 +294,7 @@
     <!-- BOTTOM: EVENT LEDGER -->
     <section class="cockpit__corr" id="ledger-panel">
       <div class="panel-header">
+        <button class="panel-header__back-btn" onclick="Observatory.switchView('cockpit')" title="Return to Cockpit overview">← COCKPIT</button>
         <span class="panel-header__icon">&#9638;</span>
         <span class="panel-header__title" data-label-key="panel.ledger">EVENT LEDGER</span>
         <button class="panel-header__info-btn" id="ledger-info-btn" title="About the Event Ledger">ⓘ</button>

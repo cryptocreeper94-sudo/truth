@@ -50,17 +50,33 @@ const AtmosCoreViz = {
 
   resize() {
     if (!this.canvas) return;
-    const dpr = window.devicePixelRatio || 1;
-    const rect = this.canvas.parentElement.getBoundingClientRect();
-    const size = Math.min(rect.width, rect.height);
+    const parent = this.canvas.parentElement;
+    if (!parent) return;
 
-    this.canvas.width = size * dpr;
-    this.canvas.height = size * dpr;
+    const cs = window.getComputedStyle(parent);
+    const padX = (parseFloat(cs.paddingLeft) || 0) + (parseFloat(cs.paddingRight) || 0);
+    const padY = (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0);
+    const availW = Math.max(120, (parent.clientWidth || parent.offsetWidth || 300) - padX);
+    const availH = Math.max(120, (parent.clientHeight || parent.offsetHeight || 300) - padY);
+    const size = Math.floor(Math.min(availW, availH));
+
+    if (size <= 0) return;
+
+    const dpr = window.devicePixelRatio || 1;
+    if (this._lastSize === size && this._lastDpr === dpr) {
+      this._render();
+      return;
+    }
+    this._lastSize = size;
+    this._lastDpr = dpr;
+
+    this.canvas.width = Math.floor(size * dpr);
+    this.canvas.height = Math.floor(size * dpr);
     this.canvas.style.width = size + 'px';
     this.canvas.style.height = size + 'px';
 
-    this.width = size * dpr;
-    this.height = size * dpr;
+    this.width = Math.floor(size * dpr);
+    this.height = Math.floor(size * dpr);
     this.centerX = this.width / 2;
     this.centerY = this.height / 2;
     this.radius = this.width * 0.38;
@@ -68,6 +84,7 @@ const AtmosCoreViz = {
     if (this.ctx) {
       this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
+    this._render();
   },
 
   // ═══════════════════════════════════════════════════════════════
@@ -78,8 +95,12 @@ const AtmosCoreViz = {
 
     this.targetValues = atmosCore.nodes.map(n => n.value);
 
-    // Animate toward target
-    if (!this.animFrame) this._animate();
+    // Animate toward target or render immediately
+    if (!this.animFrame) {
+      this._animate();
+    } else {
+      this._render();
+    }
   },
 
   _animate() {
@@ -108,6 +129,7 @@ const AtmosCoreViz = {
   // ═══════════════════════════════════════════════════════════════
   _render() {
     const ctx = this.ctx;
+    if (!ctx) return;
     const cx = this.centerX / (window.devicePixelRatio || 1);
     const cy = this.centerY / (window.devicePixelRatio || 1);
     const r = this.radius / (window.devicePixelRatio || 1);
@@ -136,14 +158,14 @@ const AtmosCoreViz = {
     // Outer ring track
     ctx.beginPath();
     ctx.arc(cx, cy, r, 0, Math.PI * 2);
-    ctx.strokeStyle = 'rgba(40, 40, 55, 0.4)';
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
     ctx.lineWidth = 1;
     ctx.stroke();
 
     // Inner ring track
     ctx.beginPath();
     ctx.arc(cx, cy, r * 0.5, 0, Math.PI * 2);
-    ctx.strokeStyle = 'rgba(40, 40, 55, 0.3)';
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
     ctx.lineWidth = 0.5;
     ctx.stroke();
 
@@ -154,7 +176,7 @@ const AtmosCoreViz = {
       ctx.beginPath();
       ctx.moveTo(cx + Math.cos(angle) * r * 0.4, cy + Math.sin(angle) * r * 0.4);
       ctx.lineTo(cx + Math.cos(angle) * (r + 10), cy + Math.sin(angle) * (r + 10));
-      ctx.strokeStyle = 'rgba(60, 60, 80, 0.3)';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
       ctx.lineWidth = 0.5;
       ctx.stroke();
     }
@@ -214,18 +236,18 @@ const AtmosCoreViz = {
   },
 
   _drawArcLabels(ctx, cx, cy, r) {
-    ctx.font = '600 8px "JetBrains Mono"';
+    ctx.font = '600 9px "JetBrains Mono", monospace';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
     for (const arc of this.arcs) {
       const midIndex = arc.start + arc.count / 2;
       const angle = (midIndex / 42) * Math.PI * 2 - Math.PI / 2;
-      const labelR = r + 22;
+      const labelR = r + 18;
       const x = cx + Math.cos(angle) * labelR;
       const y = cy + Math.sin(angle) * labelR;
 
-      ctx.fillStyle = this._withAlpha(arc.color, 0.6);
+      ctx.fillStyle = this._withAlpha(arc.color, 0.95);
       ctx.fillText(arc.label, x, y);
     }
   },

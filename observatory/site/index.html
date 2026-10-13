@@ -615,8 +615,11 @@
             <button onclick="__devBypassSubmit()" style="flex:1;padding:0.6rem;background:#d4a054;color:#0d0b09;border:none;border-radius:4px;cursor:pointer;font-family:inherit;font-size:0.7rem;font-weight:600;letter-spacing:0.1em;">ENTER</button>
             <button onclick="document.getElementById('dev-bypass-modal').style.display='none'" style="padding:0.6rem 1rem;background:transparent;border:1px solid #3a3530;color:#555;border-radius:4px;cursor:pointer;font-family:inherit;font-size:0.7rem;">×</button>
           </div>
+        </div>
+      </div>
+
       <!-- Subscriber Sign-In Modal -->
-      <div id="signin-modal" style="display:none;position:fixed;inset:0;z-index:10001;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);align-items:center;justify-content:center;">
+      <div id="signin-modal" onclick="if(event.target===this)this.style.display='none'" style="display:none;position:fixed;inset:0;z-index:10001;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);align-items:center;justify-content:center;">
         <div style="background:#0d0b09;border:1px solid #3a3530;border-radius:8px;padding:2rem;max-width:380px;width:90%;font-family:'JetBrains Mono',monospace;text-align:center;box-shadow:0 20px 40px rgba(0,0,0,0.8);">
           <p style="color:#00d2ff;font-size:0.65rem;margin:0 0 0.5rem;letter-spacing:0.15em;text-transform:uppercase;">SUBSCRIBER ACCESS</p>
           <h3 style="color:#d4dae3;font-size:1.1rem;margin:0 0 1rem;font-weight:600;">Sign In with Email</h3>
@@ -671,6 +674,13 @@
         if (input) input.focus();
       }
     };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const emailInput = document.getElementById('signin-email');
+      if (emailInput) emailInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') __sendAccessCode(); });
+      const codeInput = document.getElementById('signin-code');
+      if (codeInput) codeInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') __verifyAccessCode(); });
+    });
 
     function __resetSignIn() {
       document.getElementById('signin-step-email').style.display = 'block';

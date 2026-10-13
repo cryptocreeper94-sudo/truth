@@ -14,6 +14,11 @@
 
 const Observatory = {
 
+  switchView(viewName) {
+    const btn = document.querySelector(`.bottomnav__btn[data-view="${viewName}"]`);
+    if (btn) btn.click();
+  },
+
   // ── Feed Image Mapping ───────────────────────────────────────
   feedImages: {
     nexrad: 'assets/nexrad.jpg',
@@ -1625,7 +1630,8 @@ const Observatory = {
           setTimeout(() => {
             AtmosCoreViz.resize();
             AtmosCoreViz.update(AtmosCore);
-          }, 150);
+            if (typeof this.updateAtmosCoreUI === 'function') this.updateAtmosCoreUI();
+          }, 100);
         }
       });
     });
