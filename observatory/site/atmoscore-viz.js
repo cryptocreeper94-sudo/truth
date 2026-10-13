@@ -38,10 +38,11 @@ const AtmosCoreViz = {
     if (!this.canvas) return;
 
     this.ctx = this.canvas.getContext('2d');
-    this.resize();
+    // Value arrays must exist BEFORE resize(), because resize() renders.
     this.currentValues = new Array(42).fill(0);
     this.targetValues = new Array(42).fill(0);
     this.initialized = true;
+    this.resize();
 
     // Handle resize
     const ro = new ResizeObserver(() => this.resize());
@@ -128,8 +129,13 @@ const AtmosCoreViz = {
   // Render the polar ring
   // ═══════════════════════════════════════════════════════════════
   _render() {
+    try { this._renderInner(); }
+    catch (err) { console.warn('[AtmosCoreViz] render skipped:', err && err.message); }
+  },
+
+  _renderInner() {
     const ctx = this.ctx;
-    if (!ctx) return;
+    if (!ctx || !this.currentValues || !this.currentValues.length) return;
     const cx = this.centerX / (window.devicePixelRatio || 1);
     const cy = this.centerY / (window.devicePixelRatio || 1);
     const r = this.radius / (window.devicePixelRatio || 1);

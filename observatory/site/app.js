@@ -351,8 +351,27 @@ const Observatory = {
     dark:  'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
   },
   mapTileOpts: {
-    light: { maxZoom: 19, subdomains: 'abc' },
-    dark:  { maxZoom: 18 },
+    light: { maxZoom: 19, noWrap: true, subdomains: 'abc' },
+    dark:  { maxZoom: 18, noWrap: true },
+  },
+
+  // ── Single-world lock ─────────────────────────────────────────
+  // Without this, Leaflet repeats the planet horizontally when you
+  // zoom out. Clamp panning to one world and never allow a zoom
+  // level where the world is narrower than the container.
+  _lockWorld(map) {
+    const world = L.latLngBounds(L.latLng(-85.0511, -180), L.latLng(85.0511, 180));
+    map.setMaxBounds(world);
+    map.options.maxBoundsViscosity = 1.0;
+    const fit = () => {
+      const w = map.getContainer().clientWidth || 512;
+      const h = map.getContainer().clientHeight || 256;
+      const minZ = Math.max(1, Math.ceil(Math.log2(Math.max(w, h) / 256)));
+      map.setMinZoom(minZ);
+      if (map.getZoom() < minZ) map.setZoom(minZ);
+    };
+    fit();
+    map.on('resize', fit);
   },
 
   initMap() {
@@ -361,7 +380,9 @@ const Observatory = {
       zoom: 4,
       zoomControl: true,
       attributionControl: false,
+      worldCopyJump: false,
     });
+    this._lockWorld(this.map);
 
     // Base layer — swappable light/dark
     this.baseLayer = L.tileLayer(this.mapTiles[this.mapStyle],
@@ -375,26 +396,26 @@ const Observatory = {
 
     // GOES Visible
     this.mapLayers.satellite = L.tileLayer('https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/goes-vis-1km-900913/{z}/{x}/{y}.png', {
-      opacity: 0.4, maxZoom: 8,
+      opacity: 0.4, maxZoom: 8, noWrap: true,
     });
 
     // GOES Infrared — Iowa State tile cache
     this.mapLayers.infrared = L.tileLayer('https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/goes-east-ir-4km-900913/{z}/{x}/{y}.png', {
-      opacity: 0.5, maxZoom: 8,
+      opacity: 0.5, maxZoom: 8, noWrap: true,
     });
 
     // Water Vapor — Iowa State tile cache
     this.mapLayers.watervapor = L.tileLayer('https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/goes-east-wv-4km-900913/{z}/{x}/{y}.png', {
-      opacity: 0.5, maxZoom: 8,
+      opacity: 0.5, maxZoom: 8, noWrap: true,
     });
 
     // Precipitation — RainViewer (free, no API key)
-    this.mapLayers.precip = L.tileLayer('', { opacity: 0.5, maxZoom: 18 });
+    this.mapLayers.precip = L.tileLayer('', { opacity: 0.5, maxZoom: 18, noWrap: true });
     this._loadRainViewerTiles();
 
     // NASA FIRMS active fires (WMS)
     this.mapLayers.fire = L.tileLayer.wms('https://firms.modaps.eosdis.nasa.gov/mapserver/wms/fires/c6f75a0e97da205067925e1b3a2ee1df/', {
-      layers: 'fires_viirs_snpp', format: 'image/png', transparent: true, opacity: 0.7, maxZoom: 12,
+      layers: 'fires_viirs_snpp', format: 'image/png', transparent: true, opacity: 0.7, maxZoom: 12, noWrap: true,
     });
 
     // Heaters and Aircraft are marker-based layers (L.layerGroup)
@@ -407,7 +428,7 @@ const Observatory = {
     // State/country boundaries + labels overlay (always on over satellite imagery)
     // ESRI Reference overlay — guaranteed compatible with ESRI World Imagery base
     this.boundaryLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
-      maxZoom: 19, opacity: 0.9, pane: 'overlayPane',
+      maxZoom: 19, noWrap: true, opacity: 0.9, pane: 'overlayPane',
     }).addTo(this.map);
 
     // Default: show radar + heaters
@@ -431,7 +452,7 @@ const Observatory = {
       const latest = data.radar.past[data.radar.past.length - 1];
       if (latest) {
         const newLayer = L.tileLayer(`https://tilecache.rainviewer.com${latest.path}/512/{z}/{x}/{y}/2/1_1.png`, {
-          opacity: 0.5, maxZoom: 18,
+          opacity: 0.5, maxZoom: 18, noWrap: true,
         });
         // Swap into mapLayers
         const wasActive = this.map.hasLayer(this.mapLayers.precip);
@@ -1741,18 +1762,20 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
       doubleClickZoom: false,
       touchZoom: false,
       keyboard: false,
+      worldCopyJump: false,
     });
+    this._lockWorld(this.previewMap);
 
     L.tileLayer(this.mapTiles.dark, this.mapTileOpts.dark).addTo(this.previewMap);
 
     // State/country boundaries on preview map
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
-      maxZoom: 19, opacity: 0.9,
+      maxZoom: 19, noWrap: true, opacity: 0.9,
     }).addTo(this.previewMap);
 
     // Add radar overlay to preview
     this.previewRadar = L.tileLayer('https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913/{z}/{x}/{y}.png', {
-      opacity: 0.5, maxZoom: 8,
+      opacity: 0.5, maxZoom: 8, noWrap: true,
     }).addTo(this.previewMap);
 
     // Floating layers button on preview
@@ -1823,7 +1846,9 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
     this.fullscreenMap = L.map(container, {
       center, zoom,
       zoomControl: true,
+      worldCopyJump: false,
     });
+    this._lockWorld(this.fullscreenMap);
 
     this.fsBaseLayer = L.tileLayer(this.mapTiles[this.fsMapStyle],
       this.mapTileOpts[this.fsMapStyle]
@@ -1831,23 +1856,23 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
 
     // State/country boundaries overlay for fullscreen map
     this.fsBoundaryLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
-      maxZoom: 19, opacity: 0.9, pane: 'overlayPane',
+      maxZoom: 19, noWrap: true, opacity: 0.9, pane: 'overlayPane',
     }).addTo(this.fullscreenMap);
 
     // Build FS layers
     this.fsMapLayers.radar = L.tileLayer('https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913/{z}/{x}/{y}.png', {
-      opacity: 0.5, maxZoom: 8,
+      opacity: 0.5, maxZoom: 8, noWrap: true,
     });
     this.fsMapLayers.satellite = L.tileLayer('https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/goes-east-vis-1km-900913/{z}/{x}/{y}.png', {
-      opacity: 0.5, maxZoom: 8,
+      opacity: 0.5, maxZoom: 8, noWrap: true,
     });
     this.fsMapLayers.infrared = L.tileLayer('https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/goes-east-ir-4km-900913/{z}/{x}/{y}.png', {
-      opacity: 0.5, maxZoom: 8,
+      opacity: 0.5, maxZoom: 8, noWrap: true,
     });
     this.fsMapLayers.watervapor = L.tileLayer('https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/goes-east-wv-4km-900913/{z}/{x}/{y}.png', {
-      opacity: 0.5, maxZoom: 8,
+      opacity: 0.5, maxZoom: 8, noWrap: true,
     });
-    this.fsMapLayers.precip = L.tileLayer('', { opacity: 0.5, maxZoom: 18 });
+    this.fsMapLayers.precip = L.tileLayer('', { opacity: 0.5, maxZoom: 18, noWrap: true });
 
     // Default radar
     this.fsMapLayers.radar.addTo(this.fullscreenMap);
@@ -1916,7 +1941,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
       // Also update the precip layer for FS map
       if (this.animFrames.length > 0) {
         const latest = this.animFrames[this.animFrames.length - 1];
-        this.fsMapLayers.precip = L.tileLayer(latest.url, { opacity: 0.5, maxZoom: 18 });
+        this.fsMapLayers.precip = L.tileLayer(latest.url, { opacity: 0.5, maxZoom: 18, noWrap: true });
       }
 
       // ── Build animation dots (use RainViewer frame count as reference) ──
@@ -1967,7 +1992,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
     // ── Build animation layer stacks ──
     // Precip: use RainViewer frames (already loaded)
     this.animLayers = this.animFrames.map(f =>
-      L.tileLayer(f.url, { opacity: 0.5, maxZoom: 18 })
+      L.tileLayer(f.url, { opacity: 0.5, maxZoom: 18, noWrap: true })
     );
 
     // NEXRAD: use WMS-T frames synced to RainViewer timestamps
@@ -2189,7 +2214,8 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
     const badge = document.getElementById('ledger-count');
     if (!stream || !data) return;
 
-    badge.textContent = `${data.totalEvents} events`;
+    const n = data.totalEvents ?? (Array.isArray(data.events) ? data.events.length : (Array.isArray(data) ? data.length : 0));
+    badge.textContent = `${n} events`;
 
     if (!data.events || data.events.length === 0) {
       stream.innerHTML = '<div class="ledger-loading">No events in the last 24 hours. Collectors are gathering data.</div>';

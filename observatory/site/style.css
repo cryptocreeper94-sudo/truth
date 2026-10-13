@@ -1862,7 +1862,7 @@ body[data-level="analyst"] .layer-name-researcher { display: inline; }
   .cockpit[data-view="correlations"] .cockpit__atmoscore { display: none; }
   .cockpit[data-view="correlations"] .cockpit__resize-handle { display: none; }
 
-  .cockpit[data-view="map"] .cockpit__map { display: flex; grid-column: 1 / -1; }
+  .cockpit[data-view="map"] .cockpit__map { display: flex; grid-column: 1 / -1; grid-row: 1 / -1; min-height: 0; }
   .cockpit[data-view="map"] .cockpit__feeds { display: none; }
   .cockpit[data-view="map"] .cockpit__corr { display: none; }
   .cockpit[data-view="map"] .cockpit__resize-handle { display: none; }
