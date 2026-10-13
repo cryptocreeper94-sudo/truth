@@ -82,7 +82,7 @@ const Observatory = {
     },
     fire: {
       name: 'Active Fires',
-      info: { source: 'NASA FIRMS', what: 'Active fire/thermal hotspots detected by MODIS and VIIRS satellite instruments. Updated every 6 hours.', update: 'Every 6 hours', attribution: 'NASA FIRMS / MODIS / VIIRS' },
+      info: { source: 'NASA FIRMS via NASA GIBS', what: 'Fire and thermal hotspots detected worldwide by the VIIRS instruments on the NOAA-20 and Suomi NPP satellites (375 m resolution). Shows the most recent full day.', update: 'Daily', attribution: 'NASA FIRMS / GIBS / VIIRS' },
       legend: { type: 'dots', heading: 'ACTIVE FIRES (FIRMS)', items: [{ color: '#ff3b30', label: 'High Confidence' }, { color: '#ff9500', label: 'Nominal' }, { color: '#ffd60a', label: 'Low Confidence' }] },
     },
     heaters: {
@@ -414,9 +414,7 @@ const Observatory = {
     this._loadRainViewerTiles();
 
     // NASA FIRMS active fires (WMS)
-    this.mapLayers.fire = L.tileLayer.wms('https://firms.modaps.eosdis.nasa.gov/mapserver/wms/fires/c6f75a0e97da205067925e1b3a2ee1df/', {
-      layers: 'fires_viirs_snpp', format: 'image/png', transparent: true, opacity: 0.7, maxZoom: 12, noWrap: true,
-    });
+    this.mapLayers.fire = this._firmsLayer();
 
     // Heaters and Aircraft are marker-based layers (L.layerGroup)
     this.mapLayers.heaters = L.layerGroup();
@@ -442,6 +440,88 @@ const Observatory = {
 
     this.updateLayerCount();
     this.updateDynamicLegend();
+    this._initLayerTooltips();
+  },
+
+  // ── Satellite fire detections — NASA GIBS WMS (VIIRS 375m, no API key) ──
+  // The old FIRMS mapserver key was revoked and returned "MAP_KEY is invalid" tiles.
+  _firmsLayer() {
+    const day = new Date(Date.now() - 24 * 3600 * 1000).toISOString().slice(0, 10);
+    return L.tileLayer.wms('https://gibs.earthdata.nasa.gov/wms/epsg3857/best/wms.cgi', {
+      layers: 'VIIRS_NOAA20_Thermal_Anomalies_375m_All,VIIRS_SNPP_Thermal_Anomalies_375m_All',
+      format: 'image/png', transparent: true, opacity: 0.9, maxZoom: 12, noWrap: true,
+      TIME: day,
+    });
+  },
+
+  // ── Mirror a marker layer from the main map onto the fullscreen map ──
+  _mirrorToFs(name) {
+    const group = this.fsMapLayers && this.fsMapLayers[name];
+    const src = this.markers && this.markers[name];
+    if (!group || !src) return;
+    group.clearLayers();
+    src.forEach(m => {
+      const copy = L.circleMarker(m.getLatLng(), Object.assign({}, m.options));
+      const popup = m.getPopup && m.getPopup();
+      if (popup) copy.bindPopup(popup.getContent(), { className: 'obs-popup' });
+      group.addLayer(copy);
+    });
+  },
+
+  // ── Hover / focus / long-press explanations for every layer toggle ──
+  _initLayerTooltips() {
+    if (this._layerTipsBound) return;
+    this._layerTipsBound = true;
+    const tip = document.createElement('div');
+    tip.className = 'layer-tip';
+    tip.id = 'layer-tip';
+    tip.setAttribute('role', 'tooltip');
+    document.body.appendChild(tip);
+    let hideTimer = null;
+
+    const show = (label) => {
+      const input = label.querySelector('input[data-layer], input[data-fslayer]');
+      if (!input) return;
+      const key = input.dataset.layer || input.dataset.fslayer;
+      const def = this.layerDefs[key];
+      if (!def || !def.info) return;
+      clearTimeout(hideTimer);
+      tip.innerHTML =
+        `<div class="layer-tip__name">${def.name}</div>` +
+        `<div class="layer-tip__what">${def.info.what}</div>` +
+        `<div class="layer-tip__meta"><span>Source</span>${def.info.source}</div>` +
+        `<div class="layer-tip__meta"><span>Updates</span>${def.info.update}</div>` +
+        (key === 'aircraft' ? '<div class="layer-tip__note">Subscriber layer</div>' : '');
+      tip.classList.add('layer-tip--open');
+      const r = label.getBoundingClientRect();
+      const tw = tip.offsetWidth, th = tip.offsetHeight;
+      let left = Math.min(Math.max(8, r.left + r.width / 2 - tw / 2), window.innerWidth - tw - 8);
+      let top = r.bottom + 8;
+      if (top + th > window.innerHeight - 8) top = Math.max(8, r.top - th - 8);
+      tip.style.left = left + 'px';
+      tip.style.top = top + 'px';
+      input.setAttribute('aria-describedby', 'layer-tip');
+    };
+    const hide = (delay = 0) => {
+      clearTimeout(hideTimer);
+      hideTimer = setTimeout(() => tip.classList.remove('layer-tip--open'), delay);
+    };
+
+    document.querySelectorAll('.layer-toggle').forEach(label => {
+      if (!label.querySelector('input[data-layer], input[data-fslayer]')) return;
+      label.addEventListener('mouseenter', () => show(label));
+      label.addEventListener('mouseleave', () => hide(80));
+      label.addEventListener('focusin', () => show(label));
+      label.addEventListener('focusout', () => hide());
+      let press = null;
+      label.addEventListener('touchstart', () => {
+        press = setTimeout(() => { show(label); hide(3500); }, 450);
+      }, { passive: true });
+      label.addEventListener('touchend', () => clearTimeout(press));
+      label.addEventListener('touchmove', () => clearTimeout(press), { passive: true });
+    });
+    document.querySelectorAll('.layer-toggles, .map-fullscreen__toolbar').forEach(el =>
+      el.addEventListener('scroll', () => hide(), { passive: true }));
   },
 
   // ── RainViewer precipitation tiles ───────────────────────────
@@ -1382,6 +1462,7 @@ const Observatory = {
         this.mapLayers.heaters.addLayer(marker);
         this.markers.heaters.push(marker);
       });
+      this._mirrorToFs('heaters');
       this.updateLayerCount();
       this.updateDynamicLegend();
     } catch (e) { console.warn('[Observatory] Heater load failed:', e.message); }
@@ -1414,6 +1495,7 @@ const Observatory = {
         this.markers.aircraft.push(marker);
       });
       if (data.count > 0) console.log(`[Observatory] Plotted ${data.count} aircraft`);
+      this._mirrorToFs('aircraft');
       this.updateLayerCount();
       this.updateDynamicLegend();
     } catch (e) { console.warn('[Observatory] Aircraft load failed:', e.message); }
@@ -1449,6 +1531,7 @@ const Observatory = {
         this.markers.wildfires.push(marker);
       });
       if (data.count > 0) console.log(`[Observatory] Plotted ${data.count} wildfires`);
+      this._mirrorToFs('wildfires');
       this.updateLayerCount();
       this.updateDynamicLegend();
     } catch (e) { console.warn('[Observatory] Wildfire load failed:', e.message); }
@@ -1487,6 +1570,7 @@ const Observatory = {
         this.markers.volcanoes.push(marker);
       });
       if (data.count > 0) console.log(`[Observatory] Plotted ${data.count} elevated volcanoes (${data.total} monitored)`);
+      this._mirrorToFs('volcanoes');
       this.updateLayerCount();
       this.updateDynamicLegend();
     } catch (e) { console.warn('[Observatory] Volcano load failed:', e.message); }
@@ -1873,9 +1957,19 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
       opacity: 0.5, maxZoom: 8, noWrap: true,
     });
     this.fsMapLayers.precip = L.tileLayer('', { opacity: 0.5, maxZoom: 18, noWrap: true });
+    this.fsMapLayers.fire = this._firmsLayer();
 
-    // Default radar
-    this.fsMapLayers.radar.addTo(this.fullscreenMap);
+    // Marker layers mirror the main map's data
+    ['heaters', 'aircraft', 'wildfires', 'volcanoes'].forEach(k => {
+      this.fsMapLayers[k] = L.layerGroup();
+      this._mirrorToFs(k);
+    });
+
+    // Add whatever is checked in the toolbar (radar + research transmitters by default)
+    document.querySelectorAll('[data-fslayer]').forEach(cb => {
+      const layer = this.fsMapLayers[cb.dataset.fslayer];
+      if (cb.checked && layer) layer.addTo(this.fullscreenMap);
+    });
 
     // Wire FS layer toggles
     document.querySelectorAll('[data-fslayer]').forEach(cb => {
@@ -1941,7 +2035,10 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
       // Also update the precip layer for FS map
       if (this.animFrames.length > 0) {
         const latest = this.animFrames[this.animFrames.length - 1];
+        const wasOn = this.fullscreenMap && this.fullscreenMap.hasLayer(this.fsMapLayers.precip);
+        if (wasOn) this.fullscreenMap.removeLayer(this.fsMapLayers.precip);
         this.fsMapLayers.precip = L.tileLayer(latest.url, { opacity: 0.5, maxZoom: 18, noWrap: true });
+        if (wasOn) this.fsMapLayers.precip.addTo(this.fullscreenMap);
       }
 
       // ── Build animation dots (use RainViewer frame count as reference) ──
