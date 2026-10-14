@@ -2541,6 +2541,17 @@ body[data-level="researcher"] .feed-card__why { display: none !important; }
 }
 .ac-filter__row input { accent-color: #4ecbff; margin: 0; }
 .ac-filter__row--empty { opacity: 0.4; }
+.ac-filter__row--ground {
+  color: var(--brass, #c9a96e);
+  font-weight: 600;
+  padding: 4px 0 2px;
+}
+.ac-filter__row--ground input { accent-color: var(--brass, #c9a96e); }
+.ac-filter__divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 4px 0 3px;
+}
 .ac-filter__name { flex: 1; }
 .ac-filter__count { color: var(--text-dim, #888); font-variant-numeric: tabular-nums; }
 .ac-filter__actions { display: flex; gap: 6px; margin-top: 6px; }

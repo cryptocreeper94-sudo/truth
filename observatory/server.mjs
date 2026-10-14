@@ -1335,14 +1335,48 @@ const server = createServer(async (req, res) => {
           // Inferred class from transponder emitter category, callsign and type code.
           const CARGO = new Set(['FDX','UPS','GTI','ABX','ATN','CKS','PAC','CLX','GEC','BOX','DHK','BCS','CAO','CKK','ABW','NCA','MPH','AJT','SOO','KYE','WGN','CWC','DHX','TAY','LCO','QAC','MXY','RCH']);
           const AG = new Set(['AT3T','AT3P','AT4T','AT5T','AT5P','AT6T','AT6P','AT8T','AT02','S2R','S2RT','S2RS','S2RH','M18','M18T','PA25','PA36','G164','C188','T300','T301','T660','KRUK','PL12','A9','AGWG','TH20']);
+          const HELI_TYPES = new Set([
+            'R22','R44','R66','B06','B407','B412','B429','B206','B212','B505',
+            'EC20','EC30','EC35','EC45','EC55','H125','H130','H135','H145','H160','H175','H225',
+            'AS50','AS55','AS32','AS65','BK17','A109','A119','A139','A169','A189','AW19','AW39',
+            'S76','S92','UH60','UH1','CH47','MD50','MD52','MD60','HUCO','SKOR','EXPL','G2CA','B06T'
+          ]);
+          const BIZ_TYPES = new Set([
+            'C500','C510','C525','C550','C560','C56X','C650','C680','C700','C750',
+            'CL30','CL35','CL60','GL5T','GL7T','GLEX','GLF4','GLF5','GLF6','GA5C','GA6C',
+            'FA10','FA20','FA50','FA7X','FA8X','F900','F2TH',
+            'LJ31','LJ35','LJ40','LJ45','LJ60','LJ75',
+            'E50P','E55P','E545','E550','PRM1','HA4T','H25B','PC24','HDJT','EA50','PC12','BE20','B350','BE9L','BE10'
+          ]);
+          const AIRLINER_TYPES = new Set([
+            'A318','A319','A320','A321','A20N','A21N','A332','A333','A338','A339','A343','A346','A359','A35K','A388',
+            'B737','B738','B739','B38M','B39M','B744','B748','B752','B753','B762','B763','B764','B772','B773','B77L','B77W','B788','B789','B78X',
+            'E170','E175','E190','E195','E290','E295','CRJ1','CRJ2','CRJ7','CRJ9','CRJX','A220','BCS1','BCS3',
+            'AT43','AT45','AT72','AT76','DH8A','DH8B','DH8C','DH8D','SF34','SB20','B190','SW4','JS31','JS41'
+          ]);
+          const GA_TYPES = new Set([
+            'C150','C152','C172','C177','C182','C206','C208','C210','C310','C340','C414','C421',
+            'P28A','P28B','P28R','P28T','PA18','PA24','PA28','PA32','PA34','PA44','PA46',
+            'BE23','BE33','BE35','BE36','BE55','BE58','BE76','BE95',
+            'SR20','SR22','DA20','DA40','DA42','DA62','DV20','DR40','AA5','M20P','M20T','M20J',
+            'RV6','RV7','RV8','RV9','RV10','RV12','RV14','VANS','A210','CH7A','CH7B','CTLS','FDCT',
+            'SIRA','DIMO','ECHO','CRUZ','SVNH','NG5','TOBA','AAT3','PC6T','P208'
+          ]);
+          const GLIDER_TYPES = new Set(['GLID','DG10','DG50','DG80','DISC','VENT','LS4','LS8','ASW2','BALL']);
           const airlineCs = cs => /^[A-Z]{3}\d{1,4}[A-Z]{0,2}$/.test(cs);
           const classify = a => {
             const cat = a.category || '', cs = (a.flight || '').trim().toUpperCase(), t = (a.t || '').toUpperCase();
             if ((a.dbFlags || 0) & 1) return 'military';
             if (cat === 'B6') return 'drone';
-            if (cat === 'B1' || cat === 'B2' || cat === 'B4') return 'glider';
-            if (cat === 'A7') return 'helicopter';
+            if (cat === 'B1' || cat === 'B2' || cat === 'B4' || GLIDER_TYPES.has(t)) return 'glider';
+            if (cat === 'A7' || HELI_TYPES.has(t)) return 'helicopter';
             if (AG.has(t)) return 'agricultural';
+            if (BIZ_TYPES.has(t)) return 'business';
+            if (GA_TYPES.has(t)) return 'private';
+            if (AIRLINER_TYPES.has(t)) {
+              if (CARGO.has(cs.slice(0, 3))) return 'cargo';
+              return 'airline';
+            }
             if (airlineCs(cs)) {
               if (CARGO.has(cs.slice(0, 3))) return 'cargo';
               if (cat === 'A2') return 'business';
@@ -1351,10 +1385,10 @@ const server = createServer(async (req, res) => {
             }
             if (cat === 'A2') return 'business';
             if (cat === 'A1') return 'private';
-            if (cat === 'A3' || cat === 'A4' || cat === 'A5') return cs ? 'airline' : 'unknown';
+            if (cat === 'A3' || cat === 'A4' || cat === 'A5') return 'airline';
             return 'unknown';
           };
-          const aircraft = data.ac.slice(0, 20000).filter(a => a.lat != null && a.lon != null && !String(a.category || '').startsWith('C')).map(a => {
+          const aircraft = data.ac.slice(0, 20000).filter(a => a.lat != null && a.lon != null && !String(a.category || '').startsWith('C') && a.t !== 'TWR' && a.t !== 'GND').map(a => {
             const ground = a.alt_baro === 'ground';
             return {
               hex: a.hex, flight: (a.flight || '').trim(), reg: a.r || null,

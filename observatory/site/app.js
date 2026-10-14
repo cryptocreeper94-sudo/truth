@@ -1673,8 +1673,11 @@ const Observatory = {
     if (!this._acFilterState) {
       let saved = null;
       try { saved = JSON.parse(localStorage.getItem('obs-ac-filter') || 'null'); } catch {}
-      this._acFilterState = {};
+      this._acFilterState = {
+        includeGround: false, // Default: hide grounded planes to remove airport globs
+      };
       this.AIRCRAFT_CLASSES.forEach(([k]) => { this._acFilterState[k] = saved && k in saved ? !!saved[k] : true; });
+      if (saved && 'includeGround' in saved) this._acFilterState.includeGround = !!saved.includeGround;
     }
     return this._acFilterState;
   },
@@ -1695,17 +1698,28 @@ const Observatory = {
         el.innerHTML = `
           <button class="ac-filter__head" type="button" aria-expanded="true">✈ AIRCRAFT TYPES <span class="ac-filter__total"></span><span class="ac-filter__caret">▾</span></button>
           <div class="ac-filter__body">
+            <label class="ac-filter__row ac-filter__row--ground">
+              <input type="checkbox" data-ac-ground>
+              <span class="ac-filter__name">Include Ground Traffic</span>
+              <span class="ac-filter__count" data-ac-count="ground">0</span>
+            </label>
+            <div class="ac-filter__divider"></div>
             ${self.AIRCRAFT_CLASSES.map(([k, label]) => `
               <label class="ac-filter__row"><input type="checkbox" data-ac-class="${k}">
                 <span class="ac-filter__name">${label}</span><span class="ac-filter__count" data-ac-count="${k}">0</span></label>`).join('')}
             <div class="ac-filter__actions"><button type="button" data-ac-all="1">All</button><button type="button" data-ac-all="0">None</button></div>
-            <div class="ac-filter__note">Types are inferred from transponder category, callsign and aircraft model. Some aircraft may be misclassified.</div>
+            <div class="ac-filter__note">Grounded planes hidden by default to declutter airports. Check to include surface taxiway traffic.</div>
           </div>`;
         el.querySelector('.ac-filter__head').addEventListener('click', () => {
           el.classList.toggle('ac-filter--collapsed');
           el.querySelector('.ac-filter__head').setAttribute('aria-expanded', !el.classList.contains('ac-filter--collapsed'));
         });
         el.addEventListener('change', e => {
+          if (e.target.dataset && e.target.dataset.acGround !== undefined) {
+            self._acFilter().includeGround = e.target.checked;
+            self._applyAircraftFilter();
+            return;
+          }
           const k = e.target.dataset && e.target.dataset.acClass;
           if (!k) return;
           self._acFilter()[k] = e.target.checked;
@@ -1729,12 +1743,24 @@ const Observatory = {
   _syncAircraftFilterUI() {
     const f = this._acFilter();
     const counts = {};
-    (this._acData || []).forEach(a => { counts[a.cls || 'unknown'] = (counts[a.cls || 'unknown'] || 0) + 1; });
+    let groundCount = 0;
+    (this._acData || []).forEach(a => {
+      if (a.ground) groundCount++;
+      counts[a.cls || 'unknown'] = (counts[a.cls || 'unknown'] || 0) + 1;
+    });
     let shown = 0;
-    Object.keys(f).forEach(k => { if (f[k]) shown += counts[k] || 0; });
+    (this._acData || []).forEach(a => {
+      const want = !!f[a.cls || 'unknown'] && (f.includeGround || !a.ground);
+      if (want) shown++;
+    });
     document.querySelectorAll('.ac-filter').forEach(el => {
+      const gcb = el.querySelector('[data-ac-ground]');
+      if (gcb) gcb.checked = !!f.includeGround;
+      const gcnt = el.querySelector('[data-ac-count="ground"]');
+      if (gcnt) gcnt.textContent = groundCount.toLocaleString();
+
       el.querySelectorAll('[data-ac-class]').forEach(cb => { cb.checked = !!f[cb.dataset.acClass]; });
-      el.querySelectorAll('[data-ac-count]').forEach(c => { c.textContent = (counts[c.dataset.acCount] || 0).toLocaleString(); });
+      el.querySelectorAll('[data-ac-count]:not([data-ac-count="ground"])').forEach(c => { c.textContent = (counts[c.dataset.acCount] || 0).toLocaleString(); });
       el.querySelectorAll('[data-ac-class]').forEach(cb => cb.closest('label').classList.toggle('ac-filter__row--empty', !counts[cb.dataset.acClass]));
       const tot = el.querySelector('.ac-filter__total');
       if (tot) tot.textContent = `${shown.toLocaleString()} / ${(this._acData || []).length.toLocaleString()}`;
@@ -1746,7 +1772,7 @@ const Observatory = {
     const f = this._acFilter();
     const group = this.mapLayers.aircraft;
     (this.markers.aircraft || []).forEach(m => {
-      const want = !!f[m.options.cls || 'unknown'];
+      const want = !!f[m.options.cls || 'unknown'] && (f.includeGround || !m.options.ground);
       const has = group.hasLayer(m);
       if (want && !has) group.addLayer(m);
       else if (!want && has) group.removeLayer(m);
@@ -1782,7 +1808,8 @@ const Observatory = {
           return `<b>${a.flight || a.reg || a.hex.toUpperCase()}</b> · ${alt} · ${a.speed != null ? a.speed + ' kts' : '—'} · ${a.heading != null ? this._compass(a.heading) : ''}`;
         }, { direction: 'top', offset: [0, -6], className: 'aircraft-tip' });
         marker.bindPopup(() => this._aircraftPopup(a, color), { className: 'obs-popup', maxWidth: 300 });
-        if (acFilter[a.cls || 'unknown']) this.mapLayers.aircraft.addLayer(marker);
+        const want = !!acFilter[a.cls || 'unknown'] && (acFilter.includeGround || !a.ground);
+        if (want) this.mapLayers.aircraft.addLayer(marker);
         this.markers.aircraft.push(marker);
       });
       if (data.count > 0) console.log(`[Observatory] Plotted ${data.count} aircraft (${data.source || 'ADS-B'})`);
