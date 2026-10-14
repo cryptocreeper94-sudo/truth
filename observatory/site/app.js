@@ -527,22 +527,22 @@ const Observatory = {
 
     // NOAA Radar
     this.mapLayers.radar = L.tileLayer.wms('https://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0q.cgi', {
-      layers: 'nexrad-n0q-900913', format: 'image/png', transparent: true, opacity: 0.6,
+      layers: 'nexrad-n0q-900913', format: 'image/png', transparent: true, opacity: 0.6, maxNativeZoom: 8, maxZoom: 19,
     });
 
     // GOES Visible
     this.mapLayers.satellite = L.tileLayer('https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/goes-vis-1km-900913/{z}/{x}/{y}.png', {
-      opacity: 0.4, maxZoom: 8, noWrap: true,
+      opacity: 0.4, maxNativeZoom: 8, maxZoom: 19, noWrap: true,
     });
 
     // GOES Infrared — Iowa State tile cache
     this.mapLayers.infrared = L.tileLayer('https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/goes-east-ir-4km-900913/{z}/{x}/{y}.png', {
-      opacity: 0.5, maxZoom: 8, noWrap: true,
+      opacity: 0.5, maxNativeZoom: 8, maxZoom: 19, noWrap: true,
     });
 
     // Water Vapor — Iowa State tile cache
     this.mapLayers.watervapor = L.tileLayer('https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/goes-east-wv-4km-900913/{z}/{x}/{y}.png', {
-      opacity: 0.5, maxZoom: 8, noWrap: true,
+      opacity: 0.5, maxNativeZoom: 8, maxZoom: 19, noWrap: true,
     });
 
     // Precipitation — RainViewer (free, no API key)
@@ -911,21 +911,27 @@ const Observatory = {
     }
   },
 
-  // ── RainViewer precipitation tiles ───────────────────────────
+  // ── RainViewer radar & precipitation tiles ───────────────────────────
   async _loadRainViewerTiles() {
     try {
       const res = await fetch('https://api.rainviewer.com/public/weather-maps.json');
       const data = await res.json();
-      const latest = data.radar.past[data.radar.past.length - 1];
+      const host = data.host || 'https://tilecache.rainviewer.com';
+      const latest = data.radar?.past?.[data.radar.past.length - 1];
       if (latest) {
-        const newLayer = L.tileLayer(`https://tilecache.rainviewer.com${latest.path}/512/{z}/{x}/{y}/2/1_1.png`, {
-          opacity: 0.5, maxZoom: 18, noWrap: true,
-        });
-        // Swap into mapLayers
-        const wasActive = this.map.hasLayer(this.mapLayers.precip);
-        if (wasActive) this.map.removeLayer(this.mapLayers.precip);
-        this.mapLayers.precip = newLayer;
-        if (wasActive) newLayer.addTo(this.map);
+        const radarTileUrl = `${host}${latest.path}/256/{z}/{x}/{y}/2/1_1.png`;
+
+        // Update static radar on main map with high-res tiles up to zoom 18
+        const wasMainRadar = this.map && this.map.hasLayer(this.mapLayers.radar);
+        if (wasMainRadar) this.map.removeLayer(this.mapLayers.radar);
+        this.mapLayers.radar = L.tileLayer(radarTileUrl, { opacity: 0.6, maxZoom: 18, noWrap: true });
+        if (wasMainRadar) this.mapLayers.radar.addTo(this.map);
+
+        // Update static precip on main map
+        const wasMainPrecip = this.map && this.map.hasLayer(this.mapLayers.precip);
+        if (wasMainPrecip) this.map.removeLayer(this.mapLayers.precip);
+        this.mapLayers.precip = L.tileLayer(radarTileUrl, { opacity: 0.5, maxZoom: 18, noWrap: true });
+        if (wasMainPrecip) this.mapLayers.precip.addTo(this.map);
       }
     } catch (e) {
       console.warn('[Observatory] RainViewer load failed:', e.message);
@@ -976,8 +982,7 @@ const Observatory = {
     for (const [key, def] of Object.entries(this.layerDefs)) {
       const isLayerOnMap = layersMap[key] && mapInstance.hasLayer(layersMap[key]);
       const isAnimOnMap = this.animActive && (
-        (key === 'radar' && this.animNexradLayers && this.animNexradLayers.length > 0) ||
-        (key === 'precip' && this.animLayers && this.animLayers.length > 0)
+        ((key === 'radar' || key === 'precip') && this.animLayers && this.animLayers.length > 0)
       );
 
       if (!isLayerOnMap && !isAnimOnMap) continue;
@@ -2766,7 +2771,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
 
     // Add radar overlay to preview
     this.previewRadar = L.tileLayer('https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913/{z}/{x}/{y}.png', {
-      opacity: 0.5, maxZoom: 8, noWrap: true,
+      opacity: 0.5, maxNativeZoom: 8, maxZoom: 19, noWrap: true,
     }).addTo(this.previewMap);
 
     // Floating layers button on preview
@@ -2867,16 +2872,16 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
 
     // Build FS layers
     this.fsMapLayers.radar = L.tileLayer('https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913/{z}/{x}/{y}.png', {
-      opacity: 0.5, maxZoom: 8, noWrap: true,
+      opacity: 0.6, maxNativeZoom: 8, maxZoom: 19, noWrap: true,
     });
     this.fsMapLayers.satellite = L.tileLayer('https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/goes-east-vis-1km-900913/{z}/{x}/{y}.png', {
-      opacity: 0.5, maxZoom: 8, noWrap: true,
+      opacity: 0.5, maxNativeZoom: 8, maxZoom: 19, noWrap: true,
     });
     this.fsMapLayers.infrared = L.tileLayer('https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/goes-east-ir-4km-900913/{z}/{x}/{y}.png', {
-      opacity: 0.5, maxZoom: 8, noWrap: true,
+      opacity: 0.5, maxNativeZoom: 8, maxZoom: 19, noWrap: true,
     });
     this.fsMapLayers.watervapor = L.tileLayer('https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/goes-east-wv-4km-900913/{z}/{x}/{y}.png', {
-      opacity: 0.5, maxZoom: 8, noWrap: true,
+      opacity: 0.5, maxNativeZoom: 8, maxZoom: 19, noWrap: true,
     });
     this.fsMapLayers.precip = L.tileLayer('', { opacity: 0.5, maxZoom: 18, noWrap: true });
     this.fsMapLayers.fire = this._firmsLayer();
@@ -2981,50 +2986,52 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
 
   async _loadAnimationFrames() {
     try {
-      // ── Generate shared timeline: 24 frames at 5-min intervals (2 hours) ──
-      const now = new Date();
-      const frameCount = 24;
-      const intervalMs = 5 * 60 * 1000; // 5 minutes
-      this.animTimestamps = [];
-      for (let i = frameCount - 1; i >= 0; i--) {
-        const t = new Date(now.getTime() - i * intervalMs);
-        // Round down to nearest 5 min
-        t.setMinutes(Math.floor(t.getMinutes() / 5) * 5, 0, 0);
-        this.animTimestamps.push(t);
-      }
-
-      // ── RainViewer frames (precip) ──
+      // ── RainViewer radar frames (global high-resolution radar composite) ──
       const res = await fetch('https://api.rainviewer.com/public/weather-maps.json');
       const data = await res.json();
-      this.animFrames = data.radar.past.map(f => ({
+      const host = data.host || 'https://tilecache.rainviewer.com';
+
+      // Past radar frames (typically past 2 hours in 10-min increments)
+      const pastFrames = data.radar?.past || [];
+      this.animFrames = pastFrames.map(f => ({
         path: f.path,
         time: new Date(f.time * 1000),
-        url: `https://tilecache.rainviewer.com${f.path}/512/{z}/{x}/{y}/2/1_1.png`,
+        url: `${host}${f.path}/256/{z}/{x}/{y}/2/1_1.png`,
       }));
 
-      // Also update the precip layer for FS map
+      // Update both radar and precip static layers on fullscreen map to latest high-res frame
       if (this.animFrames.length > 0) {
         const latest = this.animFrames[this.animFrames.length - 1];
-        const wasOn = this.fullscreenMap && this.fullscreenMap.hasLayer(this.fsMapLayers.precip);
-        if (wasOn) this.fullscreenMap.removeLayer(this.fsMapLayers.precip);
-        this.fsMapLayers.precip = L.tileLayer(latest.url, { opacity: 0.5, maxZoom: 18, noWrap: true });
-        if (wasOn) this.fsMapLayers.precip.addTo(this.fullscreenMap);
+        const updateLayer = (key, opacity) => {
+          const wasOn = this.fullscreenMap && this.fullscreenMap.hasLayer(this.fsMapLayers[key]);
+          if (wasOn) this.fullscreenMap.removeLayer(this.fsMapLayers[key]);
+          this.fsMapLayers[key] = L.tileLayer(latest.url, {
+            opacity,
+            maxZoom: 18,
+            noWrap: true,
+          });
+          if (wasOn) this.fsMapLayers[key].addTo(this.fullscreenMap);
+        };
+        updateLayer('radar', 0.6);
+        updateLayer('precip', 0.5);
       }
 
-      // ── Build animation dots (use RainViewer frame count as reference) ──
+      // ── Build animation dots ──
       const track = document.getElementById('anim-track');
-      track.innerHTML = '';
-      this.animFrames.forEach((_, i) => {
-        const dot = document.createElement('span');
-        dot.className = 'anim-bar__dot' + (i === this.animFrames.length - 1 ? ' anim-bar__dot--active' : '');
-        track.appendChild(dot);
-      });
+      if (track) {
+        track.innerHTML = '';
+        this.animFrames.forEach((_, i) => {
+          const dot = document.createElement('span');
+          dot.className = 'anim-bar__dot' + (i === this.animFrames.length - 1 ? ' anim-bar__dot--active' : '');
+          track.appendChild(dot);
+        });
+      }
     } catch (e) {
       console.warn('[Observatory] Animation frame load failed:', e.message);
     }
   },
 
-  // ── Build a NEXRAD WMS-T layer for a given timestamp ──────────
+  // ── Build a NEXRAD WMS-T layer for a given timestamp (fallback) ──────────
   _nexradFrameForTime(timestamp) {
     const iso = timestamp.toISOString().replace('.000Z', 'Z');
     return L.tileLayer.wms('https://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0q-t.cgi', {
@@ -3032,12 +3039,14 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
       format: 'image/png',
       transparent: true,
       opacity: 0.6,
+      maxNativeZoom: 8,
+      maxZoom: 19,
       time: iso,
     });
   },
 
-  // Preload every frame (all layers sit on the map at opacity 0), then flip
-  // opacity between frames. No add/remove per tick → no blank flashes.
+  // Preload every radar frame at opacity 0, then smoothly flip opacity
+  // between frames. High-res CDN tiles support zooming from level 0 to 18!
   startAnimation() {
     if (this.animFrames.length === 0 || !this.fullscreenMap) return;
     const map = this.fullscreenMap;
@@ -3045,54 +3054,57 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
     this.animIndex = this.animFrames.length - 1;
 
     const btn = document.getElementById('anim-toggle');
-    btn.classList.add('map-fullscreen__anim-btn--active');
-    btn.textContent = '■ STOP';
+    if (btn) {
+      btn.classList.add('map-fullscreen__anim-btn--active');
+      btn.textContent = '■ STOP';
+    }
 
     const hasRadar = map.hasLayer(this.fsMapLayers.radar);
     const hasPrecip = map.hasLayer(this.fsMapLayers.precip);
-    // Animate what the user is looking at; if neither is on, animate radar.
-    const doRadar = hasRadar || !hasPrecip;
-    const doPrecip = hasPrecip;
 
-    // Hide the static versions while the loop runs; restore them on stop.
+    // Hide static versions while the loop runs; restore on stop
     this._animRestore = [];
     if (hasRadar) { map.removeLayer(this.fsMapLayers.radar); this._animRestore.push(this.fsMapLayers.radar); }
     if (hasPrecip) { map.removeLayer(this.fsMapLayers.precip); this._animRestore.push(this.fsMapLayers.precip); }
 
     const mk = (layer) => { layer.setOpacity(0); layer.addTo(map); return layer; };
-    this.animLayers = doPrecip ? this.animFrames.map(f => mk(L.tileLayer(f.url, { opacity: 0, maxZoom: 18, noWrap: true, keepBuffer: 4 }))) : [];
-    this.animNexradLayers = doRadar ? this.animFrames.map(f => {
-      const l = this._nexradFrameForTime(f.time);
-      l.options.noWrap = true; l.options.keepBuffer = 4;
-      return mk(l);
-    }) : [];
+    this.animLayers = this.animFrames.map(f => mk(L.tileLayer(f.url, {
+      opacity: 0,
+      maxZoom: 18,
+      noWrap: true,
+      keepBuffer: 6
+    })));
 
-    const all = [...this.animLayers, ...this.animNexradLayers];
     this.updateDynamicLegend();
     const label = document.getElementById('anim-label');
     let loaded = 0;
     const onLoad = () => {
       loaded++;
-      if (label && this.animActive && !this.animInterval) label.textContent = `LOADING ${Math.min(loaded, all.length)}/${all.length}`;
+      if (label && this.animActive && !this.animInterval) {
+        label.textContent = `LOADING ${Math.min(loaded, this.animLayers.length)}/${this.animLayers.length}`;
+      }
     };
-    all.forEach(l => l.once('load', onLoad));
-    if (label) { label.textContent = `LOADING 0/${all.length}`; label.style.color = 'var(--brass)'; }
+    this.animLayers.forEach(l => l.once('load', onLoad));
+    if (label) {
+      label.textContent = `LOADING 0/${this.animLayers.length}`;
+      label.style.color = 'var(--brass)';
+    }
 
     const show = (i) => {
       const prev = this._animShown;
-      if (this.animLayers[i]) this.animLayers[i].setOpacity(0.55);
-      if (this.animNexradLayers[i]) this.animNexradLayers[i].setOpacity(0.6);
-      if (prev != null && prev !== i) {
-        if (this.animLayers[prev]) this.animLayers[prev].setOpacity(0);
-        if (this.animNexradLayers[prev]) this.animNexradLayers[prev].setOpacity(0);
+      if (this.animLayers[i]) this.animLayers[i].setOpacity(0.65);
+      if (prev != null && prev !== i && this.animLayers[prev]) {
+        this.animLayers[prev].setOpacity(0);
       }
       this._animShown = i;
       const frame = this.animFrames[i];
-      const mins = Math.round((Date.now() - frame.time.getTime()) / 60000);
-      const last = i === this.animFrames.length - 1;
-      if (label) {
-        label.textContent = last || mins <= 0 ? 'LIVE' : `-${mins}m`;
-        label.style.color = last ? 'var(--signal-live)' : 'var(--brass)';
+      if (frame) {
+        const mins = Math.round((Date.now() - frame.time.getTime()) / 60000);
+        const last = i === this.animFrames.length - 1;
+        if (label) {
+          label.textContent = last || mins <= 0 ? 'LIVE' : `-${mins}m`;
+          label.style.color = last ? 'var(--signal-live)' : 'var(--brass)';
+        }
       }
       document.querySelectorAll('.anim-bar__dot').forEach((d, k) => d.classList.toggle('anim-bar__dot--active', k === i));
     };
@@ -3100,7 +3112,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
     this._animShown = null;
     show(this.animIndex);
 
-    // Start cycling when every frame has loaded (or after 10 s, whichever first)
+    // Start cycling when frames load or after 3s timeout
     const begin = () => {
       if (!this.animActive || this.animInterval) return;
       clearTimeout(this._animWait);
@@ -3108,18 +3120,18 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
       this.animIndex = 0;
       show(0);
       this.animInterval = setInterval(() => {
-        // linger on the live frame so the loop reads clearly
+        // Linger on live frame for 2 ticks (1.2s) so the latest scan reads clearly
         if (this.animIndex === this.animFrames.length - 1 && hold < 2) { hold++; return; }
         hold = 0;
         this.animIndex = (this.animIndex + 1) % this.animFrames.length;
         show(this.animIndex);
-      }, 650);
+      }, 600);
     };
-    this._animWait = setTimeout(begin, 10000);
+    this._animWait = setTimeout(begin, 3000);
     const check = setInterval(() => {
       if (!this.animActive) return clearInterval(check);
-      if (loaded >= all.length) { clearInterval(check); begin(); }
-    }, 200);
+      if (loaded >= Math.min(4, this.animLayers.length)) { clearInterval(check); begin(); }
+    }, 150);
   },
 
   stopAnimation() {
@@ -3135,7 +3147,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
       btn.textContent = '▶ LOOP';
     }
 
-    // Remove all precip anim layers
+    // Remove all animation tile layers
     this.animLayers.forEach(l => {
       if (this.fullscreenMap && this.fullscreenMap.hasLayer(l)) {
         this.fullscreenMap.removeLayer(l);
@@ -3143,17 +3155,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
     });
     this.animLayers = [];
 
-    // Remove all NEXRAD anim layers
-    if (this.animNexradLayers) {
-      this.animNexradLayers.forEach(l => {
-        if (this.fullscreenMap && this.fullscreenMap.hasLayer(l)) {
-          this.fullscreenMap.removeLayer(l);
-        }
-      });
-      this.animNexradLayers = [];
-    }
-
-    // Restore the static layers that were visible before the loop started
+    // Restore static radar/precip layers
     (this._animRestore || []).forEach(l => {
       if (this.fullscreenMap && !this.fullscreenMap.hasLayer(l)) l.addTo(this.fullscreenMap);
     });
