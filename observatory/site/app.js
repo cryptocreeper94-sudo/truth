@@ -146,6 +146,7 @@ const Observatory = {
     { id: 'sondrestrom', name: 'Sondrestrom', lat: 67.0, lon: -50.95, location: 'Kangerlussuaq, Greenland', status: 'active', power: '1.2 MW', frequency: '1290 MHz' },
     { id: 'arecibo', name: 'Arecibo', lat: 18.34, lon: -66.75, location: 'Arecibo, Puerto Rico', status: 'decommissioned', power: 'N/A', frequency: 'N/A' },
   ],
+  elevatedVolcanoes: [],
   refreshInterval: 60000,
   _alertLayersActive: [],  // tracks which layers were auto-activated by alerts
 
@@ -596,6 +597,7 @@ const Observatory = {
       delete opts.renderer;
       if (name === 'aircraft' || name === 'glm') opts.renderer = this._fsAircraftRenderer || (this._fsAircraftRenderer = L.canvas({ padding: 0.3, tolerance: 3 }));
       const copy = new m.constructor(m.getLatLng(), opts);
+      if (m._volcanoId) copy._volcanoId = m._volcanoId;
       const popup = m.getPopup && m.getPopup();
       if (popup) copy.bindPopup(popup.getContent(), Object.assign({ className: 'obs-popup', maxWidth: 260, autoPanPadding: [20, 20] }, popup.options || {}));
       const tip = m.getTooltip && m.getTooltip();
@@ -662,6 +664,49 @@ const Observatory = {
           `<div class="layer-tip__name">${def.name}</div>` +
           `<div class="layer-tip__what">${def.info.what}</div>` +
           rosterHtml;
+      } else if (key === 'volcanoes') {
+        const volcanoes = this.elevatedVolcanoes || [];
+        const count = volcanoes.length;
+        const colorMap = { WARNING: '#f44336', WATCH: '#ff9800', ADVISORY: '#ffeb3b' };
+
+        let rosterHtml = `
+          <div class="layer-tip__roster-title">
+            <span>ACTIVE VOLCANO WARNINGS & WATCHES</span>
+            <span class="layer-tip__roster-count">${count} ELEVATED</span>
+          </div>
+          <div class="layer-tip__facilities">
+        `;
+
+        if (volcanoes.length === 0) {
+          rosterHtml += `<div class="layer-tip__empty">No active volcano warnings or elevated watches currently reported. All 160+ monitored US volcanoes are at NORMAL background levels.</div>`;
+        } else {
+          volcanoes.forEach(v => {
+            const color = colorMap[v.alertLevel] || '#e040fb';
+            rosterHtml += `
+              <div class="layer-tip__facility is-active" data-jump-volcano="${v.id}" style="--jump-accent:${color};">
+                <span class="facility-pip" style="background:${color};box-shadow:0 0 7px ${color};border-color:${color}" title="${v.alertLevel}"></span>
+                <div class="facility-body">
+                  <div class="facility-head">
+                    <span class="facility-name">${v.name}</span>
+                    <span class="facility-loc">${v.region}</span>
+                  </div>
+                  <div class="facility-meta">
+                    <span style="color:${color};font-weight:700;">${v.alertLevel} · ${v.colorCode}</span>
+                    <span> · ${v.threatLevel || 'Elevated Threat'}</span>
+                  </div>
+                </div>
+                <button class="facility-jump" type="button" title="View ${v.name} on map">JUMP ↗</button>
+              </div>
+            `;
+          });
+        }
+
+        rosterHtml += `</div><div class="layer-tip__hint">Click any volcano to fly directly to it on the map</div>`;
+
+        tip.innerHTML =
+          `<div class="layer-tip__name">${def.name}</div>` +
+          `<div class="layer-tip__what">${def.info.what}</div>` +
+          rosterHtml;
       } else {
         tip.innerHTML =
           `<div class="layer-tip__name">${def.name}</div>` +
@@ -691,11 +736,19 @@ const Observatory = {
     tip.addEventListener('mouseenter', () => clearTimeout(hideTimer));
     tip.addEventListener('mouseleave', () => hide(120));
     tip.addEventListener('click', (e) => {
-      const row = e.target.closest('[data-jump-heater]');
-      if (row) {
-        const id = row.dataset.jumpHeater;
+      const rowHeater = e.target.closest('[data-jump-heater]');
+      if (rowHeater) {
+        const id = rowHeater.dataset.jumpHeater;
         this.jumpToHeater(id);
         hide(0);
+        return;
+      }
+      const rowVolcano = e.target.closest('[data-jump-volcano]');
+      if (rowVolcano) {
+        const id = rowVolcano.dataset.jumpVolcano;
+        this.jumpToVolcano(id);
+        hide(0);
+        return;
       }
     });
 
@@ -761,6 +814,59 @@ const Observatory = {
       }
       if (marker) marker.openPopup();
     }, 1150);
+
+    // If on mobile/tablet cockpit, scroll map into view
+    if (!isFs && window.innerWidth < 1024) {
+      const mapEl = document.getElementById('map');
+      if (mapEl) mapEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  },
+
+  // ── Jump to Elevated Volcano on Map ──────────────────────────
+  jumpToVolcano(id) {
+    const volcano = (this.elevatedVolcanoes || []).find(v => v.id === id);
+    if (!volcano) return;
+
+    // Detect if fullscreen map is currently open
+    const fsContainer = document.getElementById('map-fullscreen');
+    const isFs = fsContainer && fsContainer.classList.contains('map-fullscreen--open');
+    const targetMap = isFs ? this.fullscreenMap : this.map;
+    const targetLayers = isFs ? this.fsMapLayers : this.mapLayers;
+
+    if (!targetMap) return;
+
+    // Ensure volcanoes layer is active on the map
+    if (targetLayers && targetLayers.volcanoes && !targetMap.hasLayer(targetLayers.volcanoes)) {
+      targetLayers.volcanoes.addTo(targetMap);
+      const cbSelector = isFs ? 'input[data-fslayer="volcanoes"]' : 'input[data-layer="volcanoes"]';
+      const cb = document.querySelector(cbSelector);
+      if (cb) cb.checked = true;
+      this.updateLayerCount();
+      this.updateDynamicLegend();
+    }
+
+    // Smoothly fly to volcano location
+    targetMap.flyTo([volcano.lat, volcano.lon], 7, {
+      duration: 1.2,
+      easeLinearity: 0.25,
+    });
+
+    // Open volcano popup once map arrives
+    setTimeout(() => {
+      let marker = null;
+      if (isFs && this.fsMapLayers?.volcanoes?.eachLayer) {
+        this.fsMapLayers.volcanoes.eachLayer(l => {
+          if (!marker && l.getLatLng && l.getPopup && Math.abs(l.getLatLng().lat - volcano.lat) < 0.05 && Math.abs(l.getLatLng().lng - volcano.lon) < 0.05) {
+            marker = l;
+          }
+        });
+      } else {
+        marker = (this.markers.volcanoes || []).find(l => 
+          l.getLatLng && l.getPopup && Math.abs(l.getLatLng().lat - volcano.lat) < 0.05 && Math.abs(l.getLatLng().lng - volcano.lon) < 0.05
+        );
+      }
+      if (marker) marker.openPopup();
+    }, 1250);
 
     // If on mobile/tablet cockpit, scroll map into view
     if (!isFs && window.innerWidth < 1024) {
@@ -935,20 +1041,63 @@ const Observatory = {
       });
 
       bodyHtml += `</div><div class="layer-tip__hint">Click any site to fly directly to it on the map</div>`;
+    } else if (layerKey === 'volcanoes') {
+      const volcanoes = this.elevatedVolcanoes || [];
+      const count = volcanoes.length;
+      const colorMap = { WARNING: '#f44336', WATCH: '#ff9800', ADVISORY: '#ffeb3b' };
+
+      bodyHtml += `
+        <div class="layer-tip__roster-title" style="margin-top:12px;">
+          <span>ACTIVE VOLCANO WARNINGS & WATCHES</span>
+          <span class="layer-tip__roster-count">${count} ELEVATED</span>
+        </div>
+        <div class="layer-tip__facilities" style="max-height: 200px;">
+      `;
+
+      if (volcanoes.length === 0) {
+        bodyHtml += `<div class="layer-tip__empty">No active volcano warnings or elevated watches currently reported. All 160+ monitored US volcanoes are at NORMAL background levels.</div>`;
+      } else {
+        volcanoes.forEach(v => {
+          const color = colorMap[v.alertLevel] || '#e040fb';
+          bodyHtml += `
+            <div class="layer-tip__facility is-active" data-jump-volcano="${v.id}" style="--jump-accent:${color};">
+              <span class="facility-pip" style="background:${color};box-shadow:0 0 7px ${color};border-color:${color}" title="${v.alertLevel}"></span>
+              <div class="facility-body">
+                <div class="facility-head">
+                  <span class="facility-name">${v.name}</span>
+                  <span class="facility-loc">${v.region}</span>
+                </div>
+                <div class="facility-meta">
+                  <span style="color:${color};font-weight:700;">${v.alertLevel} · ${v.colorCode}</span>
+                  <span> · ${v.threatLevel || 'Elevated Threat'}</span>
+                </div>
+              </div>
+              <button class="facility-jump" type="button" title="View ${v.name} on map">JUMP ↗</button>
+            </div>
+          `;
+        });
+      }
+
+      bodyHtml += `</div><div class="layer-tip__hint">Click any volcano to fly directly to it on the map</div>`;
     }
 
     const bodyEl = document.getElementById('legend-info-body');
     bodyEl.innerHTML = bodyHtml;
 
-    if (layerKey === 'heaters') {
-      bodyEl.onclick = (e) => {
-        const row = e.target.closest('[data-jump-heater]');
-        if (row) {
-          overlay.classList.remove('legend-info-overlay--open');
-          this.jumpToHeater(row.dataset.jumpHeater);
-        }
-      };
-    }
+    bodyEl.onclick = (e) => {
+      const rowHeater = e.target.closest('[data-jump-heater]');
+      if (rowHeater) {
+        overlay.classList.remove('legend-info-overlay--open');
+        this.jumpToHeater(rowHeater.dataset.jumpHeater);
+        return;
+      }
+      const rowVolcano = e.target.closest('[data-jump-volcano]');
+      if (rowVolcano) {
+        overlay.classList.remove('legend-info-overlay--open');
+        this.jumpToVolcano(rowVolcano.dataset.jumpVolcano);
+        return;
+      }
+    };
 
     overlay.classList.add('legend-info-overlay--open');
   },
@@ -2194,22 +2343,31 @@ const Observatory = {
     try {
       const res = await fetch('/api/geo/volcanoes');
       const data = await res.json();
-      const count = data.count != null ? data.count : (data.volcanoes || []).length;
+      const rawList = data.volcanoes || [];
+      const severityOrder = { WARNING: 3, WATCH: 2, ADVISORY: 1 };
+      this.elevatedVolcanoes = rawList.map(v => ({
+        ...v,
+        id: v.id || v.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+      })).sort((a, b) => (severityOrder[b.alertLevel] || 0) - (severityOrder[a.alertLevel] || 0));
+
+      const count = this.elevatedVolcanoes.length;
       this.updateLayerChipBadge('volcanoes', this._formatBadgeNumber(count));
       this.markers.volcanoes.forEach(m => this.mapLayers.volcanoes.removeLayer(m));
       this.markers.volcanoes = [];
-      (data.volcanoes || []).forEach(v => {
+      this.elevatedVolcanoes.forEach(v => {
         if (!v.lat || !v.lon) return;
         const colorMap = { WARNING: '#f44336', WATCH: '#ff9800', ADVISORY: '#ffeb3b' };
         const color = colorMap[v.alertLevel] || '#e040fb';
         const marker = L.circleMarker([v.lat, v.lon], {
           radius: 9, color, fillColor: color, fillOpacity: 0.35, weight: 2,
         });
+        marker._volcanoId = v.id;
         // Triangle-like outer marker for visibility (non-interactive so clicks pass to marker)
         const ring = L.circleMarker([v.lat, v.lon], {
           radius: 16, color, fillColor: 'transparent', fillOpacity: 0, weight: 1, opacity: 0.5,
           interactive: false,
         });
+        ring._volcanoId = v.id;
         marker.bindPopup(`
           <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#e8e8f0;background:#0a0a0e;padding:10px;border:1px solid ${color}33;border-radius:2px;min-width:180px;max-width:250px;word-break:break-word;line-height:1.4;">
             <div style="color:${color};font-weight:700;font-size:13px;margin-bottom:4px;">🌋 ${v.name}</div>
