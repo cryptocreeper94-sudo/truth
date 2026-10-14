@@ -128,6 +128,19 @@ const Observatory = {
         { color: '#06b6d4', label: 'M2.5–2.9 · Minor' },
       ] },
     },
+    warnings: {
+      name: 'NWS Weather Warnings',
+      info: { source: 'NOAA National Weather Service (NWS)', what: 'Real-time Doppler radar polygons and hazardous weather warnings including Tornadoes, Severe Thunderstorms, Flash Floods, Hurricanes, High Winds, Winter Storms, and Fire Weather across the United States.', update: 'Every 60 seconds', attribution: 'NOAA / NWS' },
+      legend: { type: 'dots', heading: 'NWS ACTIVE WARNINGS', items: [
+        { color: '#ff1438', label: 'Tornado Warning / Watch' },
+        { color: '#ffa500', label: 'Severe Thunderstorm' },
+        { color: '#d946ef', label: 'Hurricane / Tropical' },
+        { color: '#00ff66', label: 'Flash Flood / Flood' },
+        { color: '#00e5ff', label: 'High Wind / Gale' },
+        { color: '#60a5fa', label: 'Winter / Freeze' },
+        { color: '#ff5722', label: 'Fire Weather / Red Flag' },
+      ] },
+    },
   },
 
   // ── State ────────────────────────────────────────────────────
@@ -135,7 +148,7 @@ const Observatory = {
   correlations: [],
   map: null,
   mapLayers: {},
-  markers: { earthquakes: [], lightning: [], heaters: [], aircraft: [], fire: [], wildfires: [], volcanoes: [], glm: [] },
+  markers: { earthquakes: [], lightning: [], heaters: [], aircraft: [], fire: [], wildfires: [], volcanoes: [], glm: [], warnings: [] },
   heaterFacilities: [
     { id: 'haarp', name: 'HAARP', lat: 62.39, lon: -145.15, location: 'Gakona, Alaska', status: 'active', power: '3.6 MW ERP', frequency: '2.8–10 MHz' },
     { id: 'eiscat', name: 'EISCAT', lat: 69.58, lon: 19.23, location: 'Tromsø, Norway', status: 'active', power: '1.2 GW ERP', frequency: '224–931 MHz' },
@@ -202,6 +215,7 @@ const Observatory = {
     this.initLedger();
     this.initTopbarDrawer();
     this.initWelcome();
+    this.initWeatherModals();
 
     // Initialize AtmosCore engine
     AtmosCore.init();
@@ -547,6 +561,8 @@ const Observatory = {
     this.mapLayers.glm = L.layerGroup();
     this.mapLayers.earthquakes = L.layerGroup();
     this.mapLayers.earthquakes.addTo(this.map);
+    this.mapLayers.warnings = L.layerGroup();
+    this.mapLayers.warnings.addTo(this.map);
 
     // Create labelsPane for boundaries and reference tiles (above base tiles, below vectors, pointer-events: none)
     if (!this.map.getPane('labelsPane')) {
@@ -574,6 +590,8 @@ const Observatory = {
     this.loadVolcanoMarkers();
     this.loadLightningMarkers();
     setInterval(() => this.loadLightningMarkers(), 5 * 60 * 1000);
+    this.loadWeatherWarnings();
+    setInterval(() => this.loadWeatherWarnings(), 60 * 1000);
 
     this.updateLayerCount();
     this.updateDynamicLegend();
@@ -2791,6 +2809,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
       ['heaters', 'aircraft', 'wildfires', 'volcanoes', 'glm', 'earthquakes'].forEach(k => {
         this._mirrorToFs(k);
       });
+      this.renderWeatherWarningLayers();
     }
     this._syncLayersToFullscreen();
 
@@ -2867,6 +2886,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
       this.fsMapLayers[k] = L.layerGroup();
       this._mirrorToFs(k);
     });
+    this.fsMapLayers.warnings = L.layerGroup();
     this._ensureAircraftFilter(this.fullscreenMap, this.fsMapLayers.aircraft);
 
     // Add whatever is checked in the toolbar (radar + research transmitters by default)
@@ -2907,7 +2927,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
   // ── Sync layers between Main Map and Fullscreen Map ──────────
   _syncLayersToFullscreen() {
     if (!this.fullscreenMap || !this.fsMapLayers || !this.map) return;
-    const keys = ['radar', 'satellite', 'infrared', 'watervapor', 'precip', 'fire', 'heaters', 'aircraft', 'glm', 'wildfires', 'volcanoes', 'earthquakes'];
+    const keys = ['radar', 'satellite', 'infrared', 'watervapor', 'precip', 'fire', 'heaters', 'aircraft', 'glm', 'wildfires', 'volcanoes', 'earthquakes', 'warnings'];
     keys.forEach(k => {
       const isMainActive = this.mapLayers[k] && this.map.hasLayer(this.mapLayers[k]);
       const cb = document.querySelector(`input[data-fslayer="${k}"]`);
@@ -2926,7 +2946,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
 
   _syncLayersFromFullscreen() {
     if (!this.fullscreenMap || !this.fsMapLayers || !this.map) return;
-    const keys = ['radar', 'satellite', 'infrared', 'watervapor', 'precip', 'fire', 'heaters', 'aircraft', 'glm', 'wildfires', 'volcanoes', 'earthquakes'];
+    const keys = ['radar', 'satellite', 'infrared', 'watervapor', 'precip', 'fire', 'heaters', 'aircraft', 'glm', 'wildfires', 'volcanoes', 'earthquakes', 'warnings'];
     keys.forEach(k => {
       const fsLayer = this.fsMapLayers[k];
       const isFsActive = (fsLayer && this.fullscreenMap.hasLayer(fsLayer)) ||
@@ -3169,6 +3189,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
       if (saved.zip) zipInput.value = saved.zip;
       status.textContent = saved.label || `${saved.lat.toFixed(2)}, ${saved.lng.toFixed(2)}`;
       geoBtn.classList.add('location-bar__geo--active');
+      this.checkLocationWeatherAlerts(saved.lat, saved.lng, saved.zip);
     }
 
     // Geolocation button
@@ -3212,7 +3233,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
 
   _applyLocation() {
     if (!this.userLocation) return;
-    const { lat, lng } = this.userLocation;
+    const { lat, lng, zip } = this.userLocation;
 
     // Center preview map
     if (this.previewMap) this.previewMap.setView([lat, lng], 8);
@@ -3222,6 +3243,9 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
 
     // Center desktop map
     if (this.map) this.map.setView([lat, lng], 7);
+
+    // Check point weather alerts
+    this.checkLocationWeatherAlerts(lat, lng, zip);
   },
 
   _getSavedLocation() {
@@ -3391,6 +3415,450 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
     }
 
     overlay.classList.add('corr-detail-overlay--open');
+  },
+
+  // ═══════════════════════════════════════════════════════════════
+  // NWS WEATHER WARNINGS & TACTICAL METEOROLOGY ENGINE
+  // ═══════════════════════════════════════════════════════════════
+  _weatherGeoJsonData: null,
+  _activePointAlerts: [],
+  _lastChimedAlertId: null,
+
+  getWeatherSettings() {
+    try {
+      const saved = localStorage.getItem('observatory_weather_settings');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
+    return {
+      enabled: true,
+      audioChime: false,
+      minSeverity: 'all',
+      categories: {
+        tornado: true,
+        severe_storm: true,
+        tropical: true,
+        flood: true,
+        wind: true,
+        winter: true,
+        fire: true,
+        other: true
+      }
+    };
+  },
+
+  saveWeatherSettings(settings) {
+    try {
+      localStorage.setItem('observatory_weather_settings', JSON.stringify(settings));
+    } catch (e) {}
+  },
+
+  playWeatherAlertChime(severity) {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const now = ctx.currentTime;
+
+      // Two-tone warning alert (Emergency Action Notification / Weather wire chime)
+      const osc1 = ctx.createOscillator();
+      const osc2 = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      const isExtreme = severity === 'Extreme';
+      const freq1 = isExtreme ? 853 : 660;
+      const freq2 = isExtreme ? 960 : 880;
+
+      osc1.type = 'sine';
+      osc2.type = 'sine';
+      osc1.frequency.setValueAtTime(freq1, now);
+      osc2.frequency.setValueAtTime(freq2, now);
+
+      gain.gain.setValueAtTime(0, now);
+      gain.gain.linearRampToValueAtTime(0.18, now + 0.05);
+      gain.gain.setValueAtTime(0.18, now + 0.45);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.85);
+
+      osc1.connect(gain);
+      osc2.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc1.start(now);
+      osc2.start(now);
+      osc1.stop(now + 0.9);
+      osc2.stop(now + 0.9);
+    } catch (e) {
+      console.warn('Audio chime playback blocked or unsupported:', e);
+    }
+  },
+
+  getWarningColor(cat) {
+    switch (cat) {
+      case 'tornado': return '#ff1438';
+      case 'severe_storm': return '#ffa500';
+      case 'tropical': return '#d946ef';
+      case 'flood': return '#00ff66';
+      case 'wind': return '#00e5ff';
+      case 'winter': return '#60a5fa';
+      case 'fire': return '#ff5722';
+      default: return '#ffd60a';
+    }
+  },
+
+  async loadWeatherWarnings() {
+    try {
+      const res = await fetch('/api/geo/warnings');
+      if (!res.ok) return;
+      const data = await res.json();
+      this._weatherGeoJsonData = data;
+
+      const badgeEls = document.querySelectorAll('[data-layer-badge="warnings"]');
+      const count = data.count || (data.features ? data.features.length : 0);
+      badgeEls.forEach(b => {
+        b.textContent = count > 0 ? count : '0';
+        if (data.summary?.byCategory?.tornado > 0) {
+          b.classList.add('chip-badge--alert');
+        } else {
+          b.classList.remove('chip-badge--alert');
+        }
+      });
+
+      this.renderWeatherWarningLayers();
+    } catch (err) {
+      console.error('[Observatory] Failed to load weather warnings:', err);
+    }
+  },
+
+  renderWeatherWarningLayers() {
+    if (!this._weatherGeoJsonData) return;
+    const settings = this.getWeatherSettings();
+
+    if (this.mapLayers.warnings) this.mapLayers.warnings.clearLayers();
+    if (this.fsMapLayers && this.fsMapLayers.warnings) this.fsMapLayers.warnings.clearLayers();
+
+    const allowedCats = settings.categories || {};
+    const minSev = settings.minSeverity || 'all';
+
+    const sevOrder = { 'minor': 1, 'moderate': 2, 'severe': 3, 'extreme': 4, 'unknown': 0 };
+    const minRank = minSev === 'extreme' ? 4 : (minSev === 'severe' ? 3 : (minSev === 'moderate' ? 2 : 0));
+
+    const filteredFeatures = (this._weatherGeoJsonData.features || []).filter(f => {
+      const cat = f.properties?.observatoryCategory || 'other';
+      if (allowedCats[cat] === false) return false;
+      const sev = (f.properties?.severity || 'unknown').toLowerCase();
+      const rank = sevOrder[sev] !== undefined ? sevOrder[sev] : 1;
+      if (rank < minRank) return false;
+      return true;
+    });
+
+    const self = this;
+    const createGeoJsonLayer = (targetMap) => {
+      return L.geoJSON({ type: 'FeatureCollection', features: filteredFeatures }, {
+        style: (feature) => {
+          const cat = feature.properties?.observatoryCategory || 'other';
+          const sev = feature.properties?.severity || 'Moderate';
+          const color = self.getWarningColor(cat);
+          let weight = 2.2;
+          let fillOpacity = 0.22;
+          if (sev === 'Extreme') { weight = 3.2; fillOpacity = 0.36; }
+          else if (sev === 'Severe') { weight = 2.6; fillOpacity = 0.28; }
+
+          return {
+            color,
+            fillColor: color,
+            fillOpacity,
+            weight,
+            opacity: 0.9,
+            className: `nws-warning-polygon nws-cat-${cat} nws-sev-${sev.toLowerCase()}`
+          };
+        },
+        onEachFeature: (feature, layer) => {
+          const p = feature.properties || {};
+          const cat = p.observatoryCategory || 'other';
+          const icon = cat === 'tornado' ? '🌪️' : (cat === 'severe_storm' ? '⛈️' : (cat === 'flood' ? '🌊' : (cat === 'wind' ? '💨' : (cat === 'winter' ? '❄️' : (cat === 'fire' ? '🔥' : '⚠️')))));
+
+          let tooltipText = `${icon} <strong>${p.event}</strong>`;
+          if (p.areaDesc) tooltipText += `<br><span style="color:#aaa;font-size:0.6rem;">${p.areaDesc.slice(0, 45)}</span>`;
+          if (p.expires) {
+            const exp = new Date(p.expires);
+            const mins = Math.max(0, Math.round((exp - Date.now()) / 60000));
+            tooltipText += ` <span style="color:#f59e0b;">(${mins}m left)</span>`;
+          }
+
+          layer.bindTooltip(tooltipText, {
+            className: 'nws-warning-tooltip',
+            sticky: true,
+            direction: 'top',
+            offset: [0, -10]
+          });
+
+          layer.on('click', () => {
+            self.openWeatherAdvisoryModal(p, feature.geometry);
+          });
+        }
+      });
+    };
+
+    if (this.mapLayers.warnings) {
+      const mainGeo = createGeoJsonLayer(this.map);
+      this.mapLayers.warnings.addLayer(mainGeo);
+    }
+
+    if (this.fsMapLayers && this.fsMapLayers.warnings) {
+      const fsGeo = createGeoJsonLayer(this.fullscreenMap);
+      this.fsMapLayers.warnings.addLayer(fsGeo);
+    }
+  },
+
+  async checkLocationWeatherAlerts(lat, lng, zip) {
+    const pill = document.getElementById('weather-alert-pill');
+    const textEl = document.getElementById('weather-alert-text');
+    if (!pill || !textEl) return;
+
+    try {
+      let url = `/api/weather/alerts?`;
+      if (!isNaN(lat) && !isNaN(lng)) {
+        url += `lat=${lat.toFixed(4)}&lng=${lng.toFixed(4)}`;
+      } else if (zip) {
+        url += `zip=${zip}`;
+      } else {
+        return;
+      }
+
+      pill.style.display = 'inline-flex';
+      textEl.textContent = 'CHECKING WEATHER ALERTS...';
+
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('Alert fetch failed');
+      const data = await res.json();
+      const alerts = data.alerts || [];
+      this._activePointAlerts = alerts;
+
+      if (alerts.length > 0) {
+        pill.classList.remove('is-safe');
+        const count = alerts.length;
+        const highest = alerts[0];
+        const eventNames = alerts.slice(0, 2).map(a => a.event).join(', ');
+        const extra = alerts.length > 2 ? ` +${alerts.length - 2}` : '';
+        textEl.textContent = `🔴 ${count} ACTIVE WARNING${count > 1 ? 'S' : ''}: ${eventNames}${extra}`;
+        pill.title = 'Click to open detailed emergency advisory';
+
+        // Check if audio enabled and new alert detected
+        const settings = this.getWeatherSettings();
+        if (settings.audioChime && highest && highest.id !== this._lastChimedAlertId) {
+          this._lastChimedAlertId = highest.id;
+          this.playWeatherAlertChime(highest.severity);
+        }
+      } else {
+        pill.classList.add('is-safe');
+        textEl.textContent = '🟢 WEATHER CLEAR — NO ACTIVE WARNINGS';
+        pill.title = 'No active NWS warnings for this coordinate';
+      }
+    } catch (e) {
+      console.warn('[Observatory] Weather alerts point check failed:', e);
+      pill.style.display = 'none';
+    }
+  },
+
+  openWeatherAdvisoryModal(alertData, geometry) {
+    const modal = document.getElementById('weather-advisory-modal');
+    if (!modal) return;
+
+    const p = alertData || {};
+    const badge = document.getElementById('advisory-badge');
+    const title = document.getElementById('advisory-title');
+    const headline = document.getElementById('advisory-headline');
+    const sender = document.getElementById('advisory-sender');
+    const sevUrg = document.getElementById('advisory-severity-urgency');
+    const expires = document.getElementById('advisory-expires');
+    const detection = document.getElementById('advisory-detection');
+    const threatsSec = document.getElementById('advisory-threats-section');
+    const threatsGrid = document.getElementById('advisory-threats-grid');
+    const instSec = document.getElementById('advisory-instruction-section');
+    const instBox = document.getElementById('advisory-instruction');
+    const descBox = document.getElementById('advisory-description');
+    const areasBox = document.getElementById('advisory-areas');
+    const centerBtn = document.getElementById('advisory-center-btn');
+
+    const sev = p.severity || 'Moderate';
+    badge.className = `weather-modal__badge weather-modal__badge--${sev.toLowerCase()}`;
+    badge.textContent = sev;
+
+    title.textContent = p.event || 'METEOROLOGICAL ADVISORY';
+    headline.textContent = p.headline || p.event || 'No headline available';
+    sender.textContent = p.senderName || 'National Weather Service';
+    sevUrg.textContent = `${p.severity || 'Standard'} / ${p.urgency || 'Immediate'}`;
+
+    if (p.expires) {
+      const exp = new Date(p.expires);
+      const diffMs = exp - Date.now();
+      if (diffMs > 0) {
+        const hours = Math.floor(diffMs / 3600000);
+        const mins = Math.floor((diffMs % 3600000) / 60000);
+        expires.textContent = hours > 0 ? `${hours}h ${mins}m (${exp.toLocaleTimeString()})` : `${mins} min (${exp.toLocaleTimeString()})`;
+      } else {
+        expires.textContent = 'Expired';
+      }
+    } else {
+      expires.textContent = 'Until further notice';
+    }
+
+    const params = p.parameters || p.parametersFormatted || {};
+    detection.textContent = params.tornadoDetection || (params.hail ? 'RADAR / SPOTTER' : 'RADAR ANALYSIS');
+
+    // Threat parameters
+    const threatItems = [];
+    if (params.motion) threatItems.push({ label: 'STORM MOTION', val: params.motion });
+    if (params.hail) threatItems.push({ label: 'MAX HAIL SIZE', val: `${params.hail} in` });
+    if (params.wind) threatItems.push({ label: 'WIND THREAT', val: `${params.wind} mph` });
+    if (params.tornadoDetection) threatItems.push({ label: 'TORNADO MODE', val: params.tornadoDetection });
+
+    if (threatItems.length > 0) {
+      threatsSec.style.display = 'flex';
+      threatsGrid.innerHTML = threatItems.map(t => `
+        <div class="weather-modal__meta-item">
+          <small>${t.label}</small>
+          <strong>${t.val}</strong>
+        </div>
+      `).join('');
+    } else {
+      threatsSec.style.display = 'none';
+    }
+
+    // Emergency instructions
+    if (p.instruction) {
+      instSec.style.display = 'flex';
+      instBox.textContent = p.instruction;
+    } else {
+      instSec.style.display = 'none';
+    }
+
+    descBox.textContent = p.description || 'No detailed meteorological narrative provided.';
+    areasBox.textContent = p.areaDesc || 'Designated warning zone';
+
+    centerBtn.onclick = () => {
+      modal.style.display = 'none';
+      if (geometry && geometry.coordinates) {
+        try {
+          const lGeo = L.geoJSON(geometry);
+          const bounds = lGeo.getBounds();
+          if (this.fullscreenMap && document.getElementById('map-fullscreen').classList.contains('map-fullscreen--open')) {
+            this.fullscreenMap.fitBounds(bounds, { padding: [50, 50] });
+          } else if (this.map) {
+            this.map.fitBounds(bounds, { padding: [50, 50] });
+          }
+        } catch (e) {}
+      }
+    };
+
+    modal.style.display = 'flex';
+  },
+
+  initWeatherModals() {
+    // Advisory modal close
+    const advModal = document.getElementById('weather-advisory-modal');
+    const advClose = document.getElementById('advisory-close');
+    const advDismiss = document.getElementById('advisory-dismiss-btn');
+    if (advClose) advClose.addEventListener('click', () => { advModal.style.display = 'none'; });
+    if (advDismiss) advDismiss.addEventListener('click', () => { advModal.style.display = 'none'; });
+    if (advModal) advModal.addEventListener('click', (e) => {
+      if (e.target === advModal) advModal.style.display = 'none';
+    });
+
+    // Alert pill click
+    const pill = document.getElementById('weather-alert-pill');
+    if (pill) {
+      pill.addEventListener('click', () => {
+        if (this._activePointAlerts && this._activePointAlerts.length > 0) {
+          this.openWeatherAdvisoryModal(this._activePointAlerts[0]);
+        } else {
+          this.openWeatherFilterModal();
+        }
+      });
+    }
+
+    // Filter modal triggers
+    const filterModal = document.getElementById('weather-filter-modal');
+    const triggers = ['bar-warning-filters-btn', 'layer-warning-filters-btn', 'fs-warning-filters-btn'];
+    triggers.forEach(id => {
+      const btn = document.getElementById(id);
+      if (btn) btn.addEventListener('click', () => this.openWeatherFilterModal());
+    });
+
+    const filterClose = document.getElementById('filter-modal-close');
+    if (filterClose) filterClose.addEventListener('click', () => { filterModal.style.display = 'none'; });
+    if (filterModal) filterModal.addEventListener('click', (e) => {
+      if (e.target === filterModal) filterModal.style.display = 'none';
+    });
+
+    // Test chime button
+    const testChimeBtn = document.getElementById('test-chime-btn');
+    if (testChimeBtn) {
+      testChimeBtn.addEventListener('click', () => {
+        this.playWeatherAlertChime('Extreme');
+      });
+    }
+
+    // Save & Reset buttons in filter modal
+    const saveBtn = document.getElementById('wf-save-btn');
+    const resetBtn = document.getElementById('wf-reset-btn');
+
+    if (saveBtn) {
+      saveBtn.addEventListener('click', () => {
+        const audio = document.getElementById('weather-audio-toggle')?.checked || false;
+        const categories = {};
+        document.querySelectorAll('#weather-filter-modal [data-cat]').forEach(cb => {
+          categories[cb.dataset.cat] = cb.checked;
+        });
+        const sevRadio = document.querySelector('input[name="wf-severity"]:checked');
+        const minSeverity = sevRadio ? sevRadio.value : 'all';
+
+        const newSettings = {
+          enabled: true,
+          audioChime: audio,
+          minSeverity,
+          categories
+        };
+
+        this.saveWeatherSettings(newSettings);
+        filterModal.style.display = 'none';
+        this.renderWeatherWarningLayers();
+      });
+    }
+
+    if (resetBtn) {
+      resetBtn.addEventListener('click', () => {
+        const defaults = {
+          enabled: true,
+          audioChime: false,
+          minSeverity: 'all',
+          categories: { tornado: true, severe_storm: true, tropical: true, flood: true, wind: true, winter: true, fire: true, other: true }
+        };
+        this.saveWeatherSettings(defaults);
+        this.populateWeatherFilterModal();
+      });
+    }
+  },
+
+  openWeatherFilterModal() {
+    const modal = document.getElementById('weather-filter-modal');
+    if (!modal) return;
+    this.populateWeatherFilterModal();
+    modal.style.display = 'flex';
+  },
+
+  populateWeatherFilterModal() {
+    const settings = this.getWeatherSettings();
+    const audioToggle = document.getElementById('weather-audio-toggle');
+    if (audioToggle) audioToggle.checked = !!settings.audioChime;
+
+    document.querySelectorAll('#weather-filter-modal [data-cat]').forEach(cb => {
+      const cat = cb.dataset.cat;
+      cb.checked = settings.categories && settings.categories[cat] !== false;
+    });
+
+    const minSev = settings.minSeverity || 'all';
+    const rad = document.querySelector(`input[name="wf-severity"][value="${minSev}"]`);
+    if (rad) rad.checked = true;
   },
 };
 

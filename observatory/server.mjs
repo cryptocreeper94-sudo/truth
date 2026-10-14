@@ -1046,6 +1046,160 @@ function simpleHash(str) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// NWS Weather Warnings Engine (National Doppler Polygons & Point Alerts)
+// ═══════════════════════════════════════════════════════════════════════════
+function classifyAlert(event) {
+  const ev = (event || '').toLowerCase();
+  if (ev.includes('tornado')) return 'tornado';
+  if (ev.includes('severe thunderstorm') || ev.includes('special weather statement') || ev.includes('convective')) return 'severe_storm';
+  if (ev.includes('hurricane') || ev.includes('tropical') || ev.includes('storm surge') || ev.includes('typhoon')) return 'tropical';
+  if (ev.includes('flood')) return 'flood';
+  if (ev.includes('wind') || ev.includes('gale') || ev.includes('storm warning')) return 'wind';
+  if (ev.includes('winter') || ev.includes('blizzard') || ev.includes('ice') || ev.includes('freeze') || ev.includes('frost') || ev.includes('snow') || ev.includes('cold') || ev.includes('chill')) return 'winter';
+  if (ev.includes('fire') || ev.includes('red flag')) return 'fire';
+  return 'other';
+}
+
+let nwsWarningsCache = {
+  timestamp: 0,
+  data: null,
+  summary: null,
+};
+
+async function fetchNWSAlerts() {
+  const now = Date.now();
+  if (nwsWarningsCache.data && (now - nwsWarningsCache.timestamp) < 60000) {
+    return nwsWarningsCache;
+  }
+
+  try {
+    const res = await fetch('https://api.weather.gov/alerts/active?status=actual&message_type=alert', {
+      headers: { 'User-Agent': 'TruthObservatory/1.0 (contact@darkwavestudios.io)' },
+      signal: AbortSignal.timeout(10000)
+    });
+    if (!res.ok) throw new Error(`NWS HTTP ${res.status}`);
+    const raw = await res.json();
+    const summary = {
+      total: raw.features.length,
+      polygonCount: 0,
+      byCategory: { tornado: 0, severe_storm: 0, tropical: 0, flood: 0, wind: 0, winter: 0, fire: 0, other: 0 },
+      bySeverity: { Extreme: 0, Severe: 0, Moderate: 0, Minor: 0, Unknown: 0 },
+      updatedAt: new Date().toISOString()
+    };
+
+    const polygonFeatures = [];
+    const highPriorityAlerts = [];
+
+    for (const f of raw.features) {
+      const cat = classifyAlert(f.properties?.event);
+      summary.byCategory[cat] = (summary.byCategory[cat] || 0) + 1;
+      const sev = f.properties?.severity || 'Unknown';
+      summary.bySeverity[sev] = (summary.bySeverity[sev] || 0) + 1;
+
+      if (f.geometry && (f.geometry.type === 'Polygon' || f.geometry.type === 'MultiPolygon')) {
+        f.properties.observatoryCategory = cat;
+        f.properties.parametersFormatted = {
+          motion: f.properties.parameters?.eventMotionDescription?.[0] || null,
+          hail: f.properties.parameters?.maxHailSize?.[0] || null,
+          wind: f.properties.parameters?.maxWindGust?.[0] || f.properties.parameters?.windThreat?.[0] || null,
+          tornadoDetection: f.properties.parameters?.tornadoDetection?.[0] || null
+        };
+        polygonFeatures.push(f);
+      }
+
+      if (sev === 'Extreme' || (sev === 'Severe' && (cat === 'tornado' || cat === 'severe_storm' || cat === 'tropical' || cat === 'flood'))) {
+        highPriorityAlerts.push({
+          id: f.properties?.id || f.id,
+          event: f.properties?.event,
+          category: cat,
+          severity: sev,
+          areaDesc: f.properties?.areaDesc,
+          headline: f.properties?.headline,
+          expires: f.properties?.expires
+        });
+      }
+    }
+
+    summary.polygonCount = polygonFeatures.length;
+    summary.highPriorityCount = highPriorityAlerts.length;
+
+    nwsWarningsCache = {
+      timestamp: now,
+      summary,
+      data: {
+        type: 'FeatureCollection',
+        timestamp: new Date().toISOString(),
+        summary,
+        count: polygonFeatures.length,
+        highPriorityAlerts: highPriorityAlerts.slice(0, 20),
+        features: polygonFeatures
+      }
+    };
+    return nwsWarningsCache;
+  } catch (err) {
+    console.error('[NWS] Warning fetch error:', err.message);
+    if (nwsWarningsCache.data) return nwsWarningsCache;
+    return {
+      timestamp: now,
+      summary: { total: 0, polygonCount: 0, byCategory: {}, bySeverity: {}, updatedAt: new Date().toISOString() },
+      data: { type: 'FeatureCollection', timestamp: new Date().toISOString(), count: 0, summary: {}, features: [] }
+    };
+  }
+}
+
+const pointAlertsCache = new Map();
+
+async function fetchPointAlerts(lat, lng) {
+  const key = `${lat.toFixed(3)},${lng.toFixed(3)}`;
+  const cached = pointAlertsCache.get(key);
+  const now = Date.now();
+  if (cached && (now - cached.timestamp) < 60000) {
+    return cached.alerts;
+  }
+
+  try {
+    const res = await fetch(`https://api.weather.gov/alerts/active?point=${lat.toFixed(4)},${lng.toFixed(4)}`, {
+      headers: { 'User-Agent': 'TruthObservatory/1.0 (contact@darkwavestudios.io)' },
+      signal: AbortSignal.timeout(8000)
+    });
+    if (!res.ok) throw new Error(`NWS Point HTTP ${res.status}`);
+    const data = await res.json();
+    const alerts = (data.features || []).map(f => ({
+      id: f.properties?.id || f.id,
+      event: f.properties?.event,
+      category: classifyAlert(f.properties?.event),
+      headline: f.properties?.headline || f.properties?.event,
+      severity: f.properties?.severity || 'Unknown',
+      urgency: f.properties?.urgency || 'Unknown',
+      certainty: f.properties?.certainty || 'Unknown',
+      areaDesc: f.properties?.areaDesc || '',
+      description: f.properties?.description || '',
+      instruction: f.properties?.instruction || '',
+      onset: f.properties?.onset,
+      expires: f.properties?.expires,
+      ends: f.properties?.ends,
+      senderName: f.properties?.senderName,
+      parameters: {
+        motion: f.properties?.parameters?.eventMotionDescription?.[0] || null,
+        hail: f.properties?.parameters?.maxHailSize?.[0] || null,
+        wind: f.properties?.parameters?.maxWindGust?.[0] || f.properties?.parameters?.windThreat?.[0] || null,
+        tornadoDetection: f.properties?.parameters?.tornadoDetection?.[0] || null
+      }
+    }));
+
+    pointAlertsCache.set(key, { timestamp: now, alerts });
+    if (pointAlertsCache.size > 200) {
+      const oldestKey = pointAlertsCache.keys().next().value;
+      pointAlertsCache.delete(oldestKey);
+    }
+    return alerts;
+  } catch (err) {
+    console.error(`[NWS] Point alerts error for ${key}:`, err.message);
+    return cached ? cached.alerts : [];
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // HTTP Server
 // ═══════════════════════════════════════════════════════════════════════════
 const server = createServer(async (req, res) => {
@@ -1847,6 +2001,48 @@ const server = createServer(async (req, res) => {
       }
     } catch {}
     return jsonResponse(res, 200, { timestamp: new Date().toISOString(), count: 0, total: 0, volcanoes: [] });
+  }
+
+  // ── Geo API: Weather Warnings (NWS) ─────────────────────────────────
+  if (path === '/api/geo/warnings') {
+    const cache = await fetchNWSAlerts();
+    return jsonResponse(res, 200, cache.data || { type: 'FeatureCollection', count: 0, summary: {}, features: [] });
+  }
+
+  // ── Weather Alerts Point API (by lat/lng or zip) ─────────────────────
+  if (path === '/api/weather/alerts') {
+    const pParam = url.searchParams.get('point');
+    let lat = parseFloat(url.searchParams.get('lat') || (pParam ? pParam.split(',')[0] : NaN));
+    let lng = parseFloat(url.searchParams.get('lng') || url.searchParams.get('lon') || (pParam ? pParam.split(',')[1] : NaN));
+    const zip = url.searchParams.get('zip');
+
+    if (isNaN(lat) && isNaN(lng) && zip && /^\d{5}$/.test(zip)) {
+      try {
+        const nomRes = await fetch(`https://nominatim.openstreetmap.org/search?postalcode=${zip}&country=US&format=json&limit=1`, {
+          headers: { 'User-Agent': 'TruthObservatory/1.0' }
+        });
+        if (nomRes.ok) {
+          const nomData = await nomRes.json();
+          if (nomData.length > 0) {
+            lat = parseFloat(nomData[0].lat);
+            lng = parseFloat(nomData[0].lon);
+          }
+        }
+      } catch {}
+    }
+
+    const cache = await fetchNWSAlerts();
+    let pointAlerts = [];
+    if (!isNaN(lat) && !isNaN(lng)) {
+      pointAlerts = await fetchPointAlerts(lat, lng);
+    }
+    return jsonResponse(res, 200, {
+      timestamp: new Date().toISOString(),
+      location: (!isNaN(lat) && !isNaN(lng)) ? { lat, lng, zip: zip || null } : null,
+      alerts: pointAlerts,
+      count: pointAlerts.length,
+      nationalSummary: cache.summary
+    });
   }
 
   // ── Protected Page Routes ───────────────────────────────────────────

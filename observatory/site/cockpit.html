@@ -131,12 +131,23 @@
     </div>
   </div>
 
-  <!-- ═══ LOCATION BAR (mobile) ═══ -->
+  <!-- ═══ GEOSPATIAL TELEMETRY & WARNING BAR ═══ -->
   <div class="location-bar" id="location-bar">
-    <button class="location-bar__geo" id="geo-btn" title="Use my location">&#9673;</button>
-    <input class="location-bar__input" id="zip-input" type="text" placeholder="ZIP CODE" maxlength="5" inputmode="numeric">
-    <button class="location-bar__set" id="zip-set">SET</button>
-    <span class="location-bar__status" id="location-status"></span>
+    <div class="location-bar__coords-group">
+      <button class="location-bar__geo" id="geo-btn" title="Use my GPS location">&#9673; GPS</button>
+      <input class="location-bar__input" id="zip-input" type="text" placeholder="ZIP" maxlength="5" inputmode="numeric">
+      <button class="location-bar__set" id="zip-set">SET</button>
+      <span class="location-bar__status" id="location-status">NO LOCATION SET</span>
+    </div>
+    <div class="location-bar__alert-pill" id="weather-alert-pill" style="display:none;" title="Click to view full meteorological advisory">
+      <span class="alert-pill__icon">⚠️</span>
+      <span class="alert-pill__text" id="weather-alert-text">CHECKING WARNINGS...</span>
+    </div>
+    <div class="location-bar__actions">
+      <button class="warning-settings-trigger" id="bar-warning-filters-btn" title="Configure Weather Warning Filters & Audio">
+        <span>⚠️</span> FILTERS & AUDIO
+      </button>
+    </div>
   </div>
 
   <!-- ═══ FULLSCREEN MAP OVERLAY ═══ -->
@@ -162,10 +173,12 @@
         <span class="fs-cluster__divider"></span>
         <div class="fs-cluster">
           <span class="fs-cluster__label">HAZARDS</span>
+          <label class="layer-toggle" data-accent="red"><input type="checkbox" data-fslayer="warnings" checked> Warnings <span class="chip-badge chip-badge--alert" data-layer-badge="warnings">—</span></label>
           <label class="layer-toggle" data-accent="yellow"><input type="checkbox" data-fslayer="earthquakes" checked> Quakes <span class="chip-badge" data-layer-badge="earthquakes">—</span></label>
           <label class="layer-toggle" data-accent="orange"><input type="checkbox" data-fslayer="fire"> Fires</label>
           <label class="layer-toggle" data-accent="red"><input type="checkbox" data-fslayer="wildfires"> US Fires <span class="chip-badge" data-layer-badge="wildfires">—</span></label>
           <label class="layer-toggle" data-accent="purple"><input type="checkbox" data-fslayer="volcanoes"> Volcanoes <span class="chip-badge" data-layer-badge="volcanoes">—</span></label>
+          <button class="layer-action-pill" id="fs-warning-filters-btn" title="Configure Weather Warning Filters & Audio">⚙️</button>
         </div>
       </div>
       <div class="map-fullscreen__actions">
@@ -215,12 +228,14 @@
           </div>
         </div>
         <div class="layer-group">
-          <span class="layer-group__title">HAZARDS & ACTIVITY</span>
+          <span class="layer-group__title">HAZARDS & WARNINGS</span>
           <div class="layer-group__items">
+            <label class="layer-toggle" data-accent="red"><input type="checkbox" data-layer="warnings" checked> <span class="layer-name-researcher">Warnings</span><span class="layer-name-observer">Warnings</span> <span class="chip-badge chip-badge--alert" data-layer-badge="warnings">—</span></label>
             <label class="layer-toggle" data-accent="yellow"><input type="checkbox" data-layer="earthquakes" checked> <span class="layer-name-researcher">Quakes</span><span class="layer-name-observer">Quakes</span> <span class="chip-badge" data-layer-badge="earthquakes">—</span></label>
             <label class="layer-toggle" data-accent="orange"><input type="checkbox" data-layer="fire"> <span class="layer-name-researcher">Fires</span><span class="layer-name-observer">Fires</span></label>
             <label class="layer-toggle" data-accent="red"><input type="checkbox" data-layer="wildfires"> <span class="layer-name-researcher">US Wildfires</span><span class="layer-name-observer">US Wildfires</span> <span class="chip-badge" data-layer-badge="wildfires">—</span></label>
             <label class="layer-toggle" data-accent="purple"><input type="checkbox" data-layer="volcanoes"> <span class="layer-name-researcher">Volcanoes</span><span class="layer-name-observer">Volcanoes</span> <span class="chip-badge" data-layer-badge="volcanoes">—</span></label>
+            <button class="layer-action-pill" id="layer-warning-filters-btn" title="Configure Weather Warning Filters & Audio">⚙️ FILTERS</button>
           </div>
         </div>
         <div class="layer-group layer-group--actions">
@@ -522,7 +537,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="atmoscore.js"></script>
   <script src="atmoscore-viz.js"></script>
-  <script src="app.js?v=20261014-allmeasures"></script>
+  <script src="app.js?v=20261014-weatherwarnings"></script>
   <script>
     // CSV Export
     async function __exportData() {
@@ -737,6 +752,146 @@
       <span class="level-menu__dot" style="background:#ff5252;"></span>
       <span class="level-menu__text"><strong>Researcher</strong><small>Raw data, provenance, full detail.</small></span>
     </button>
+  <!-- ═══ WEATHER ADVISORY MODAL ═══ -->
+  <div class="weather-modal" id="weather-advisory-modal" style="display:none;" role="dialog" aria-modal="true">
+    <div class="weather-modal__dialog">
+      <div class="weather-modal__header">
+        <div class="weather-modal__header-title">
+          <span class="weather-modal__badge weather-modal__badge--extreme" id="advisory-badge">SEVERE</span>
+          <span class="weather-modal__title" id="advisory-title">METEOROLOGICAL ADVISORY</span>
+        </div>
+        <button class="weather-modal__close" id="advisory-close" title="Close advisory">&times;</button>
+      </div>
+      <div class="weather-modal__body">
+        <div class="weather-modal__section">
+          <span class="weather-modal__label">HEADLINE</span>
+          <div class="weather-modal__headline" id="advisory-headline">—</div>
+        </div>
+        <div class="weather-modal__meta-grid">
+          <div class="weather-modal__meta-item">
+            <small>ISSUING OFFICE</small>
+            <strong id="advisory-sender">—</strong>
+          </div>
+          <div class="weather-modal__meta-item">
+            <small>SEVERITY & URGENCY</small>
+            <strong id="advisory-severity-urgency">—</strong>
+          </div>
+          <div class="weather-modal__meta-item">
+            <small>EXPIRES IN</small>
+            <strong id="advisory-expires">—</strong>
+          </div>
+          <div class="weather-modal__meta-item">
+            <small>RADAR / DETECTION</small>
+            <strong id="advisory-detection">—</strong>
+          </div>
+        </div>
+        <div class="weather-modal__section" id="advisory-threats-section" style="display:none;">
+          <span class="weather-modal__label">RADAR THREAT PARAMETERS</span>
+          <div class="weather-modal__meta-grid" id="advisory-threats-grid"></div>
+        </div>
+        <div class="weather-modal__section" id="advisory-instruction-section" style="display:none;">
+          <span class="weather-modal__label">EMERGENCY ACTION DIRECTIVE</span>
+          <div class="weather-modal__instruction-box" id="advisory-instruction"></div>
+        </div>
+        <div class="weather-modal__section">
+          <span class="weather-modal__label">NWS METEOROLOGICAL DISCUSSION</span>
+          <div class="weather-modal__text-box" id="advisory-description">—</div>
+        </div>
+        <div class="weather-modal__section">
+          <span class="weather-modal__label">AFFECTED REGION / COUNTIES</span>
+          <p style="font-size:0.68rem;color:#888;line-height:1.4;" id="advisory-areas">—</p>
+        </div>
+      </div>
+      <div class="weather-modal__footer">
+        <button class="weather-modal__btn" id="advisory-center-btn">📍 CENTER ON MAP</button>
+        <button class="weather-modal__btn weather-modal__btn--primary" id="advisory-dismiss-btn">CLOSE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ WEATHER WARNING FILTER & AUDIO SETTINGS MODAL ═══ -->
+  <div class="weather-modal" id="weather-filter-modal" style="display:none;" role="dialog" aria-modal="true">
+    <div class="weather-modal__dialog">
+      <div class="weather-modal__header">
+        <div class="weather-modal__header-title">
+          <span class="weather-modal__badge" style="background:var(--brass);color:#000;">METEOROLOGY</span>
+          <span class="weather-modal__title">WARNING FILTERS & AUDIO ALERTS</span>
+        </div>
+        <button class="weather-modal__close" id="filter-modal-close" title="Close dialog">&times;</button>
+      </div>
+      <div class="weather-modal__body">
+        <div class="weather-audio-box">
+          <div>
+            <strong style="font-size:0.78rem;color:#fff;">🔊 Synthesized Web Audio Chimes</strong>
+            <p>Play emergency dual-tone alert chimes when active severe or extreme weather warnings impact your coordinates.</p>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <button class="weather-modal__btn" id="test-chime-btn" title="Test audio tone" style="padding:4px 8px;font-size:0.62rem;">TEST 🔊</button>
+            <input type="checkbox" id="weather-audio-toggle" style="width:18px;height:18px;cursor:pointer;accent-color:var(--brass);">
+          </div>
+        </div>
+
+        <div class="weather-modal__section">
+          <span class="weather-modal__label">ACTIVE WARNING CATEGORIES</span>
+          <div class="weather-filter-grid">
+            <div class="weather-filter-card">
+              <label for="wf-tornado"><span class="weather-filter-swatch" style="background:#ff1438;"></span> 🌪️ Tornado (TOR / TOA)</label>
+              <input type="checkbox" id="wf-tornado" data-cat="tornado" checked>
+            </div>
+            <div class="weather-filter-card">
+              <label for="wf-severe_storm"><span class="weather-filter-swatch" style="background:#ffa500;"></span> ⛈️ Severe Thunderstorm (SVR)</label>
+              <input type="checkbox" id="wf-severe_storm" data-cat="severe_storm" checked>
+            </div>
+            <div class="weather-filter-card">
+              <label for="wf-tropical"><span class="weather-filter-swatch" style="background:#d946ef;"></span> 🌀 Hurricane / Tropical (HU / TR)</label>
+              <input type="checkbox" id="wf-tropical" data-cat="tropical" checked>
+            </div>
+            <div class="weather-filter-card">
+              <label for="wf-flood"><span class="weather-filter-swatch" style="background:#00ff66;"></span> 🌊 Flash Flood / Flood (FFW / FL)</label>
+              <input type="checkbox" id="wf-flood" data-cat="flood" checked>
+            </div>
+            <div class="weather-filter-card">
+              <label for="wf-wind"><span class="weather-filter-swatch" style="background:#00e5ff;"></span> 💨 High Wind & Gale (HWW / GL)</label>
+              <input type="checkbox" id="wf-wind" data-cat="wind" checked>
+            </div>
+            <div class="weather-filter-card">
+              <label for="wf-winter"><span class="weather-filter-swatch" style="background:#60a5fa;"></span> ❄️ Winter Storm & Freeze (WSW / FZ)</label>
+              <input type="checkbox" id="wf-winter" data-cat="winter" checked>
+            </div>
+            <div class="weather-filter-card">
+              <label for="wf-fire"><span class="weather-filter-swatch" style="background:#ff5722;"></span> 🔥 Fire Weather & Red Flag (RFW)</label>
+              <input type="checkbox" id="wf-fire" data-cat="fire" checked>
+            </div>
+            <div class="weather-filter-card">
+              <label for="wf-other"><span class="weather-filter-swatch" style="background:#ffd60a;"></span> ⚠️ Other Advisories & Marine</label>
+              <input type="checkbox" id="wf-other" data-cat="other" checked>
+            </div>
+          </div>
+        </div>
+
+        <div class="weather-modal__section">
+          <span class="weather-modal__label">MINIMUM SEVERITY THRESHOLD</span>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;padding:8px 0;">
+            <label style="font-size:0.72rem;color:#ccc;display:flex;align-items:center;gap:6px;cursor:pointer;">
+              <input type="radio" name="wf-severity" value="all" checked style="accent-color:var(--brass);"> All Warnings
+            </label>
+            <label style="font-size:0.72rem;color:#ffd60a;display:flex;align-items:center;gap:6px;cursor:pointer;">
+              <input type="radio" name="wf-severity" value="moderate" style="accent-color:var(--brass);"> Moderate+
+            </label>
+            <label style="font-size:0.72rem;color:#ff9800;display:flex;align-items:center;gap:6px;cursor:pointer;">
+              <input type="radio" name="wf-severity" value="severe" style="accent-color:var(--brass);"> Severe+
+            </label>
+            <label style="font-size:0.72rem;color:#ff1438;display:flex;align-items:center;gap:6px;cursor:pointer;">
+              <input type="radio" name="wf-severity" value="extreme" style="accent-color:var(--brass);"> Extreme Only
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="weather-modal__footer">
+        <button class="weather-modal__btn" id="wf-reset-btn">RESET DEFAULTS</button>
+        <button class="weather-modal__btn weather-modal__btn--primary" id="wf-save-btn">APPLY & SAVE</button>
+      </div>
+    </div>
   </div>
 </body>
 </html>
