@@ -136,6 +136,16 @@ const Observatory = {
   map: null,
   mapLayers: {},
   markers: { earthquakes: [], lightning: [], heaters: [], aircraft: [], fire: [], wildfires: [], volcanoes: [], glm: [] },
+  heaterFacilities: [
+    { id: 'haarp', name: 'HAARP', lat: 62.39, lon: -145.15, location: 'Gakona, Alaska', status: 'active', power: '3.6 MW ERP', frequency: '2.8–10 MHz' },
+    { id: 'eiscat', name: 'EISCAT', lat: 69.58, lon: 19.23, location: 'Tromsø, Norway', status: 'active', power: '1.2 GW ERP', frequency: '224–931 MHz' },
+    { id: 'eiscat-3d', name: 'EISCAT 3D', lat: 69.34, lon: 20.31, location: 'Skibotn, Norway', status: 'active', power: 'Phased Array', frequency: '233 MHz' },
+    { id: 'sura', name: 'Sura', lat: 56.15, lon: 46.10, location: 'Vasilsursk, Russia', status: 'active', power: '190 MW ERP', frequency: '4.5–9.3 MHz' },
+    { id: 'jicamarca', name: 'Jicamarca', lat: -11.95, lon: -76.87, location: 'Lima, Peru', status: 'active', power: '6 MW', frequency: '49.92 MHz' },
+    { id: 'mu-radar', name: 'MU Radar', lat: 34.85, lon: 136.10, location: 'Shigaraki, Japan', status: 'active', power: '1 MW', frequency: '46.5 MHz' },
+    { id: 'sondrestrom', name: 'Sondrestrom', lat: 67.0, lon: -50.95, location: 'Kangerlussuaq, Greenland', status: 'active', power: '1.2 MW', frequency: '1290 MHz' },
+    { id: 'arecibo', name: 'Arecibo', lat: 18.34, lon: -66.75, location: 'Arecibo, Puerto Rico', status: 'decommissioned', power: 'N/A', frequency: 'N/A' },
+  ],
   refreshInterval: 60000,
   _alertLayersActive: [],  // tracks which layers were auto-activated by alerts
 
@@ -610,12 +620,55 @@ const Observatory = {
       const def = this.layerDefs[key];
       if (!def || !def.info) return;
       clearTimeout(hideTimer);
-      tip.innerHTML =
-        `<div class="layer-tip__name">${def.name}</div>` +
-        `<div class="layer-tip__what">${def.info.what}</div>` +
-        `<div class="layer-tip__meta"><span>Source</span>${def.info.source}</div>` +
-        `<div class="layer-tip__meta"><span>Updates</span>${def.info.update}</div>` +
-        (key === 'aircraft' ? '<div class="layer-tip__note">Subscriber layer</div>' : '');
+
+      if (key === 'heaters') {
+        const facilities = this.heaterFacilities || [];
+        const activeCount = facilities.filter(h => h.status !== 'decommissioned').length;
+        const totalCount = facilities.length;
+
+        let rosterHtml = `
+          <div class="layer-tip__roster-title">
+            <span>GLOBAL RESEARCH SITES</span>
+            <span class="layer-tip__roster-count">${activeCount}/${totalCount} ACTIVE</span>
+          </div>
+          <div class="layer-tip__facilities">
+        `;
+
+        facilities.forEach(h => {
+          const isActive = h.status !== 'decommissioned';
+          rosterHtml += `
+            <div class="layer-tip__facility ${isActive ? 'is-active' : 'is-decom'}" data-jump-heater="${h.id}">
+              <span class="facility-pip ${isActive ? 'facility-pip--active' : 'facility-pip--decom'}" title="${isActive ? 'Active facility' : 'Decommissioned'}"></span>
+              <div class="facility-body">
+                <div class="facility-head">
+                  <span class="facility-name">${h.name}</span>
+                  <span class="facility-loc">${h.location}</span>
+                </div>
+                <div class="facility-meta">
+                  <span>${h.power}</span>
+                  ${h.frequency && h.frequency !== 'N/A' ? `<span> · ${h.frequency}</span>` : ''}
+                </div>
+              </div>
+              <button class="facility-jump" type="button" title="View ${h.name} on map">JUMP ↗</button>
+            </div>
+          `;
+        });
+
+        rosterHtml += `</div><div class="layer-tip__hint">Click any site to fly directly to it on the map</div>`;
+
+        tip.innerHTML =
+          `<div class="layer-tip__name">${def.name}</div>` +
+          `<div class="layer-tip__what">${def.info.what}</div>` +
+          rosterHtml;
+      } else {
+        tip.innerHTML =
+          `<div class="layer-tip__name">${def.name}</div>` +
+          `<div class="layer-tip__what">${def.info.what}</div>` +
+          `<div class="layer-tip__meta"><span>Source</span>${def.info.source}</div>` +
+          `<div class="layer-tip__meta"><span>Updates</span>${def.info.update}</div>` +
+          (key === 'aircraft' ? '<div class="layer-tip__note">Subscriber layer</div>' : '');
+      }
+
       tip.classList.add('layer-tip--open');
       const r = label.getBoundingClientRect();
       const tw = tip.offsetWidth, th = tip.offsetHeight;
@@ -626,26 +679,92 @@ const Observatory = {
       tip.style.top = top + 'px';
       input.setAttribute('aria-describedby', 'layer-tip');
     };
+
     const hide = (delay = 0) => {
       clearTimeout(hideTimer);
       hideTimer = setTimeout(() => tip.classList.remove('layer-tip--open'), delay);
     };
 
+    // Keep tip open when cursor moves from button into the tip body
+    tip.addEventListener('mouseenter', () => clearTimeout(hideTimer));
+    tip.addEventListener('mouseleave', () => hide(120));
+    tip.addEventListener('click', (e) => {
+      const row = e.target.closest('[data-jump-heater]');
+      if (row) {
+        const id = row.dataset.jumpHeater;
+        this.jumpToHeater(id);
+        hide(0);
+      }
+    });
+
     document.querySelectorAll('.layer-toggle').forEach(label => {
       if (!label.querySelector('input[data-layer], input[data-fslayer]')) return;
       label.addEventListener('mouseenter', () => show(label));
-      label.addEventListener('mouseleave', () => hide(80));
+      label.addEventListener('mouseleave', () => hide(180));
       label.addEventListener('focusin', () => show(label));
       label.addEventListener('focusout', () => hide());
       let press = null;
       label.addEventListener('touchstart', () => {
-        press = setTimeout(() => { show(label); hide(3500); }, 450);
+        press = setTimeout(() => { show(label); hide(5000); }, 350);
       }, { passive: true });
       label.addEventListener('touchend', () => clearTimeout(press));
       label.addEventListener('touchmove', () => clearTimeout(press), { passive: true });
     });
     document.querySelectorAll('.layer-toggles, .map-fullscreen__toolbar').forEach(el =>
       el.addEventListener('scroll', () => hide(), { passive: true }));
+  },
+
+  // ── Jump to Heater Facility on Map ──────────────────────────
+  jumpToHeater(id) {
+    const facility = (this.heaterFacilities || []).find(h => h.id === id);
+    if (!facility) return;
+
+    // Detect if fullscreen map is currently open
+    const fsContainer = document.getElementById('map-fullscreen');
+    const isFs = fsContainer && fsContainer.classList.contains('map-fullscreen--open');
+    const targetMap = isFs ? this.fullscreenMap : this.map;
+    const targetLayers = isFs ? this.fsMapLayers : this.mapLayers;
+
+    if (!targetMap) return;
+
+    // Ensure heaters layer is active on the map
+    if (targetLayers && targetLayers.heaters && !targetMap.hasLayer(targetLayers.heaters)) {
+      targetLayers.heaters.addTo(targetMap);
+      const cbSelector = isFs ? 'input[data-fslayer="heaters"]' : 'input[data-layer="heaters"]';
+      const cb = document.querySelector(cbSelector);
+      if (cb) cb.checked = true;
+      this.updateLayerCount();
+      this.updateDynamicLegend();
+    }
+
+    // Smoothly fly to facility location
+    targetMap.flyTo([facility.lat, facility.lon], 6, {
+      duration: 1.1,
+      easeLinearity: 0.25,
+    });
+
+    // Open facility popup once map arrives
+    setTimeout(() => {
+      let marker = null;
+      if (isFs && this.fsMapLayers?.heaters?.eachLayer) {
+        this.fsMapLayers.heaters.eachLayer(l => {
+          if (!marker && l.getLatLng && l.getPopup && Math.abs(l.getLatLng().lat - facility.lat) < 0.05 && Math.abs(l.getLatLng().lng - facility.lon) < 0.05) {
+            marker = l;
+          }
+        });
+      } else {
+        marker = (this.markers.heaters || []).find(l => 
+          l.getLatLng && l.getPopup && Math.abs(l.getLatLng().lat - facility.lat) < 0.05 && Math.abs(l.getLatLng().lng - facility.lon) < 0.05
+        );
+      }
+      if (marker) marker.openPopup();
+    }, 1150);
+
+    // If on mobile/tablet cockpit, scroll map into view
+    if (!isFs && window.innerWidth < 1024) {
+      const mapEl = document.getElementById('map');
+      if (mapEl) mapEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
   },
 
   // ── RainViewer precipitation tiles ───────────────────────────
@@ -758,13 +877,64 @@ const Observatory = {
 
     const overlay = document.getElementById('legend-info-overlay');
     document.getElementById('legend-info-title').textContent = def.name;
-    document.getElementById('legend-info-body').innerHTML = `
+
+    let bodyHtml = `
       <div class="info-row"><strong>Source</strong><span>${def.info.source}</span></div>
       <div class="info-row"><strong>What it shows</strong></div>
       <p style="margin: 4px 0 8px; color: var(--text-secondary)">${def.info.what}</p>
       <div class="info-row"><strong>Update freq</strong><span>${def.info.update}</span></div>
       <div class="info-row"><strong>Attribution</strong><span>${def.info.attribution}</span></div>
     `;
+
+    if (layerKey === 'heaters') {
+      const facilities = this.heaterFacilities || [];
+      const activeCount = facilities.filter(h => h.status !== 'decommissioned').length;
+      const totalCount = facilities.length;
+
+      bodyHtml += `
+        <div class="layer-tip__roster-title" style="margin-top:12px;">
+          <span>GLOBAL RESEARCH SITES</span>
+          <span class="layer-tip__roster-count">${activeCount}/${totalCount} ACTIVE</span>
+        </div>
+        <div class="layer-tip__facilities" style="max-height: 200px;">
+      `;
+
+      facilities.forEach(h => {
+        const isActive = h.status !== 'decommissioned';
+        bodyHtml += `
+          <div class="layer-tip__facility ${isActive ? 'is-active' : 'is-decom'}" data-jump-heater="${h.id}">
+            <span class="facility-pip ${isActive ? 'facility-pip--active' : 'facility-pip--decom'}" title="${isActive ? 'Active facility' : 'Decommissioned'}"></span>
+            <div class="facility-body">
+              <div class="facility-head">
+                <span class="facility-name">${h.name}</span>
+                <span class="facility-loc">${h.location}</span>
+              </div>
+              <div class="facility-meta">
+                <span>${h.power}</span>
+                ${h.frequency && h.frequency !== 'N/A' ? `<span> · ${h.frequency}</span>` : ''}
+              </div>
+            </div>
+            <button class="facility-jump" type="button" title="View ${h.name} on map">JUMP ↗</button>
+          </div>
+        `;
+      });
+
+      bodyHtml += `</div><div class="layer-tip__hint">Click any site to fly directly to it on the map</div>`;
+    }
+
+    const bodyEl = document.getElementById('legend-info-body');
+    bodyEl.innerHTML = bodyHtml;
+
+    if (layerKey === 'heaters') {
+      bodyEl.onclick = (e) => {
+        const row = e.target.closest('[data-jump-heater]');
+        if (row) {
+          overlay.classList.remove('legend-info-overlay--open');
+          this.jumpToHeater(row.dataset.jumpHeater);
+        }
+      };
+    }
+
     overlay.classList.add('legend-info-overlay--open');
   },
 
@@ -1630,9 +1800,19 @@ const Observatory = {
     try {
       const res = await fetch('/api/geo/heaters');
       const data = await res.json();
+      if (data && Array.isArray(data.heaters) && data.heaters.length > 0) {
+        this.heaterFacilities = data.heaters;
+      }
+
+      const activeCount = (this.heaterFacilities || []).filter(h => h.status !== 'decommissioned').length;
+      const totalCount = (this.heaterFacilities || []).length;
+      document.querySelectorAll('.heater-active-badge').forEach(b => {
+        b.textContent = `${activeCount}/${totalCount}`;
+      });
+
       this.markers.heaters.forEach(m => this.mapLayers.heaters.removeLayer(m));
       this.markers.heaters = [];
-      (data.heaters || []).forEach(h => {
+      (this.heaterFacilities || []).forEach(h => {
         const color = h.status === 'decommissioned' ? '#666' : '#ff4ecf';
         const marker = L.circleMarker([h.lat, h.lon], {
           radius: 8, color: color, fillColor: color, fillOpacity: 0.3, weight: 2,
