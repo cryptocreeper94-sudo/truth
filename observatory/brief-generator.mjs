@@ -39,24 +39,24 @@ const IDENTITY = Object.freeze({
 
 // ── Feed manifest files ─────────────────────────────────────
 const FEED_MANIFESTS = [
-  { id: 'nexrad',      manifest: 'nexrad-manifest.jsonl',      name: 'NEXRAD Radar' },
-  { id: 'goes',        manifest: 'goes-manifest.jsonl',        name: 'GOES Satellite' },
-  { id: 'earthquake',  manifest: 'earthquake-manifest.jsonl',  name: 'Earthquake Monitor' },
-  { id: 'solar',       manifest: 'solar-manifest.jsonl',       name: 'Solar Activity' },
-  { id: 'geomag',      manifest: 'geomag-manifest.jsonl',      name: 'Geomagnetic Index' },
-  { id: 'lightning',   manifest: 'lightning-manifest.jsonl',    name: 'Lightning Detection' },
-  { id: 'surface',     manifest: 'surface-manifest.jsonl',     name: 'Surface Stations' },
-  { id: 'ionosonde',   manifest: 'ionosonde-manifest.jsonl',   name: 'Ionospheric Monitor' },
-  { id: 'schumann',    manifest: 'schumann-manifest.jsonl',    name: 'Schumann Resonance' },
-  { id: 'grid',        manifest: 'grid-manifest.jsonl',        name: 'Power Grid' },
-  { id: 'aircraft',    manifest: 'aircraft-manifest.jsonl',    name: 'Aircraft Tracking' },
-  { id: 'notam',       manifest: 'notam-manifest.jsonl',       name: 'NOTAMs' },
-  { id: 'heater',      manifest: 'heater-manifest.jsonl',      name: 'Ionospheric Heaters' },
-  { id: 'celltower',   manifest: 'celltower-manifest.jsonl',   name: 'Cell Towers' },
-  { id: 'metals',      manifest: 'metals-manifest.jsonl',      name: 'Heavy Metals' },
-  { id: 'ecology',     manifest: 'ecology-manifest.jsonl',     name: 'Pollinator Ecology' },
-  { id: 'deposition',  manifest: 'deposition-manifest.jsonl',  name: 'Wet Deposition' },
-  { id: 'wildfire',    manifest: 'wildfire-manifest.jsonl',     name: 'Wildfires' },
+  { id: 'nexrad',      manifest: 'nexrad-manifest.jsonl',       name: 'NEXRAD Radar' },
+  { id: 'goes',        manifest: 'goes-manifest.jsonl',         name: 'GOES Satellite' },
+  { id: 'earthquake',  manifest: 'seismic-manifest.jsonl',      name: 'USGS Seismic' },
+  { id: 'solar',       manifest: 'solar-manifest.jsonl',        name: 'Solar / SWPC' },
+  { id: 'geomag',      manifest: 'geomagnetic-manifest.jsonl',  name: 'Geomagnetic' },
+  { id: 'lightning',   manifest: 'lightning-manifest.jsonl',    name: 'GLM Lightning' },
+  { id: 'surface',     manifest: 'surface-manifest.jsonl',      name: 'Surface Stations' },
+  { id: 'ionosonde',   manifest: 'ionosphere-manifest.jsonl',   name: 'Ionospheric TEC' },
+  { id: 'schumann',    manifest: 'schumann-manifest.jsonl',     name: 'Schumann Resonance' },
+  { id: 'grid',        manifest: 'grid-manifest.jsonl',         name: 'EIA Power Grid' },
+  { id: 'aircraft',    manifest: 'aircraft-manifest.jsonl',     name: 'ADS-B Aircraft' },
+  { id: 'notam',       manifest: 'notam-manifest.jsonl',        name: 'Flight Restrictions' },
+  { id: 'heater',      manifest: 'heater-manifest.jsonl',       name: 'Iono. Heaters' },
+  { id: 'celltower',   manifest: 'celltower-manifest.jsonl',    name: 'Cell Towers' },
+  { id: 'metals',      manifest: 'trace-metals-manifest.jsonl', name: 'Trace Metals' },
+  { id: 'ecology',     manifest: 'ecology-manifest.jsonl',      name: 'Pollinator Ecology' },
+  { id: 'deposition',  manifest: 'deposition-manifest.jsonl',   name: 'Atmo. Deposition' },
+  { id: 'wildfire',    manifest: 'wildfire-manifest.jsonl',     name: 'Wildfires (NIFC)' },
   { id: 'volcanic',    manifest: 'volcanic-manifest.jsonl',     name: 'Volcanic Activity' },
 ];
 
@@ -113,8 +113,8 @@ function buildDataSnapshot() {
         lastUpdate: latest.timestamp || latest.retrievedAt || latest.fetchedAt || latest.at || latest.writtenAt,
         // Extract key data points
         ...(latest.totalResults ? { totalResults: latest.totalResults } : {}),
-        ...(latest.magnitude ? { magnitude: latest.magnitude } : {}),
-        ...(latest.kpIndex ? { kpIndex: latest.kpIndex } : {}),
+        ...((latest.magnitude != null || latest.mag != null) ? { magnitude: latest.magnitude ?? latest.mag } : {}),
+        ...((latest.kpIndex != null || latest.kp != null) ? { kpIndex: latest.kpIndex ?? latest.kp } : {}),
         ...(latest.xrayFlux ? { xrayFlux: latest.xrayFlux } : {}),
         ...(latest.strikeCount ? { strikeCount: latest.strikeCount } : {}),
         ...(latest.alertLevel ? { alertLevel: latest.alertLevel } : {}),
@@ -178,7 +178,7 @@ async function generateBriefText(dataSnapshot, level = 'observer') {
 // ── Template fallback (deterministic, no AI) ────────────────
 function generateTemplateBrief(dataSnapshot) {
   const { snapshot, activeFeeds, totalEntries } = dataSnapshot;
-  const parts = [`${activeFeeds} of 20 feeds reported ${totalEntries} observations in the last 24 hours.`];
+  const parts = [`${activeFeeds} of ${FEED_MANIFESTS.length} feeds reported ${totalEntries} observations in the last 24 hours.`];
 
   // Highlight notable conditions
   if (snapshot.earthquake?.entries > 15) parts.push(`Elevated seismic activity: ${snapshot.earthquake.entries} events recorded.`);

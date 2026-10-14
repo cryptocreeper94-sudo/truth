@@ -865,12 +865,12 @@ const Observatory = {
   updateTopbar(data) {
     const liveEl = document.getElementById('stat-live');
     const live = data.live || 0;
-    liveEl.textContent = `${live}/${data.total || 20}`;
+    liveEl.textContent = `${live}/${data.total || 19}`;
     liveEl.style.color = live === data.total ? 'var(--signal-live)' :
                          live > 0 ? 'var(--signal-stale)' : 'var(--signal-offline)';
     // Update mobile summary card
     const sf = document.getElementById('summary-feeds');
-    if (sf) { sf.textContent = `${live}/${data.total || 20}`; sf.style.color = liveEl.style.color; }
+    if (sf) { sf.textContent = `${live}/${data.total || 19}`; sf.style.color = liveEl.style.color; }
   },
 
   // ── Update AtmosCore UI ──────────────────────────────────────
