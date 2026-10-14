@@ -2268,81 +2268,97 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
     });
   },
 
+  // Preload every frame (all layers sit on the map at opacity 0), then flip
+  // opacity between frames. No add/remove per tick → no blank flashes.
   startAnimation() {
-    if (this.animFrames.length === 0) return;
+    if (this.animFrames.length === 0 || !this.fullscreenMap) return;
+    const map = this.fullscreenMap;
     this.animActive = true;
-    this.animIndex = 0;
+    this.animIndex = this.animFrames.length - 1;
 
     const btn = document.getElementById('anim-toggle');
     btn.classList.add('map-fullscreen__anim-btn--active');
-    btn.textContent = '⏸ LOOP';
+    btn.textContent = '■ STOP';
 
-    // ── Determine which layers to animate ──
-    // Check which FS layers are currently active
-    const hasRadar = this.fullscreenMap.hasLayer(this.fsMapLayers.radar);
-    const hasSatellite = this.fullscreenMap.hasLayer(this.fsMapLayers.satellite);
-    const hasInfrared = this.fullscreenMap.hasLayer(this.fsMapLayers.infrared);
-    const hasWV = this.fullscreenMap.hasLayer(this.fsMapLayers.watervapor);
-    const hasPrecip = this.fullscreenMap.hasLayer(this.fsMapLayers.precip);
+    const hasRadar = map.hasLayer(this.fsMapLayers.radar);
+    const hasPrecip = map.hasLayer(this.fsMapLayers.precip);
+    // Animate what the user is looking at; if neither is on, animate radar.
+    const doRadar = hasRadar || !hasPrecip;
+    const doPrecip = hasPrecip;
 
-    // Remove static layers that will be animated
-    if (hasRadar) this.fullscreenMap.removeLayer(this.fsMapLayers.radar);
+    // Hide the static versions while the loop runs; restore them on stop.
+    this._animRestore = [];
+    if (hasRadar) { map.removeLayer(this.fsMapLayers.radar); this._animRestore.push(this.fsMapLayers.radar); }
+    if (hasPrecip) { map.removeLayer(this.fsMapLayers.precip); this._animRestore.push(this.fsMapLayers.precip); }
 
-    // ── Build animation layer stacks ──
-    // Precip: use RainViewer frames (already loaded)
-    this.animLayers = this.animFrames.map(f =>
-      L.tileLayer(f.url, { opacity: 0.5, maxZoom: 18, noWrap: true })
-    );
+    const mk = (layer) => { layer.setOpacity(0); layer.addTo(map); return layer; };
+    this.animLayers = doPrecip ? this.animFrames.map(f => mk(L.tileLayer(f.url, { opacity: 0, maxZoom: 18, noWrap: true, keepBuffer: 4 }))) : [];
+    this.animNexradLayers = doRadar ? this.animFrames.map(f => {
+      const l = this._nexradFrameForTime(f.time);
+      l.options.noWrap = true; l.options.keepBuffer = 4;
+      return mk(l);
+    }) : [];
 
-    // NEXRAD: use WMS-T frames synced to RainViewer timestamps
-    this.animNexradLayers = [];
-    if (hasRadar) {
-      this.animNexradLayers = this.animFrames.map(f =>
-        this._nexradFrameForTime(f.time)
-      );
-    }
+    const all = [...this.animLayers, ...this.animNexradLayers];
+    const label = document.getElementById('anim-label');
+    let loaded = 0;
+    const onLoad = () => {
+      loaded++;
+      if (label && this.animActive && !this.animInterval) label.textContent = `LOADING ${Math.min(loaded, all.length)}/${all.length}`;
+    };
+    all.forEach(l => l.once('load', onLoad));
+    if (label) { label.textContent = `LOADING 0/${all.length}`; label.style.color = 'var(--brass)'; }
 
-    // Show first frame of each active animated layer
-    this.animLayers[0].addTo(this.fullscreenMap);
-    if (this.animNexradLayers.length > 0) {
-      this.animNexradLayers[0].addTo(this.fullscreenMap);
-    }
-
-    this.animInterval = setInterval(() => {
-      // Remove current frame layers
-      if (this.animLayers[this.animIndex]) {
-        this.fullscreenMap.removeLayer(this.animLayers[this.animIndex]);
+    const show = (i) => {
+      const prev = this._animShown;
+      if (this.animLayers[i]) this.animLayers[i].setOpacity(0.55);
+      if (this.animNexradLayers[i]) this.animNexradLayers[i].setOpacity(0.6);
+      if (prev != null && prev !== i) {
+        if (this.animLayers[prev]) this.animLayers[prev].setOpacity(0);
+        if (this.animNexradLayers[prev]) this.animNexradLayers[prev].setOpacity(0);
       }
-      if (this.animNexradLayers[this.animIndex]) {
-        this.fullscreenMap.removeLayer(this.animNexradLayers[this.animIndex]);
-      }
-
-      // Advance
-      this.animIndex = (this.animIndex + 1) % this.animFrames.length;
-
-      // Add next frame layers
-      this.animLayers[this.animIndex].addTo(this.fullscreenMap);
-      if (this.animNexradLayers[this.animIndex]) {
-        this.animNexradLayers[this.animIndex].addTo(this.fullscreenMap);
-      }
-
-      // Update label
-      const frame = this.animFrames[this.animIndex];
-      const label = document.getElementById('anim-label');
+      this._animShown = i;
+      const frame = this.animFrames[i];
       const mins = Math.round((Date.now() - frame.time.getTime()) / 60000);
-      label.textContent = mins <= 0 ? 'LIVE' : `-${mins}m`;
-      label.style.color = this.animIndex === this.animFrames.length - 1 ? 'var(--signal-live)' : 'var(--brass)';
+      const last = i === this.animFrames.length - 1;
+      if (label) {
+        label.textContent = last || mins <= 0 ? 'LIVE' : `-${mins}m`;
+        label.style.color = last ? 'var(--signal-live)' : 'var(--brass)';
+      }
+      document.querySelectorAll('.anim-bar__dot').forEach((d, k) => d.classList.toggle('anim-bar__dot--active', k === i));
+    };
 
-      // Update dots
-      document.querySelectorAll('.anim-bar__dot').forEach((d, i) => {
-        d.classList.toggle('anim-bar__dot--active', i === this.animIndex);
-      });
-    }, 800);
+    this._animShown = null;
+    show(this.animIndex);
+
+    // Start cycling when every frame has loaded (or after 10 s, whichever first)
+    const begin = () => {
+      if (!this.animActive || this.animInterval) return;
+      clearTimeout(this._animWait);
+      let hold = 0;
+      this.animIndex = 0;
+      show(0);
+      this.animInterval = setInterval(() => {
+        // linger on the live frame so the loop reads clearly
+        if (this.animIndex === this.animFrames.length - 1 && hold < 2) { hold++; return; }
+        hold = 0;
+        this.animIndex = (this.animIndex + 1) % this.animFrames.length;
+        show(this.animIndex);
+      }, 650);
+    };
+    this._animWait = setTimeout(begin, 10000);
+    const check = setInterval(() => {
+      if (!this.animActive) return clearInterval(check);
+      if (loaded >= all.length) { clearInterval(check); begin(); }
+    }, 200);
   },
 
   stopAnimation() {
     this.animActive = false;
     clearInterval(this.animInterval);
+    this.animInterval = null;
+    clearTimeout(this._animWait);
+    this._animShown = null;
 
     const btn = document.getElementById('anim-toggle');
     if (btn) {
@@ -2368,10 +2384,11 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
       this.animNexradLayers = [];
     }
 
-    // Re-add static layers
-    if (this.fullscreenMap && !this.fullscreenMap.hasLayer(this.fsMapLayers.radar)) {
-      this.fsMapLayers.radar.addTo(this.fullscreenMap);
-    }
+    // Restore the static layers that were visible before the loop started
+    (this._animRestore || []).forEach(l => {
+      if (this.fullscreenMap && !this.fullscreenMap.hasLayer(l)) l.addTo(this.fullscreenMap);
+    });
+    this._animRestore = [];
 
     // Reset label
     const label = document.getElementById('anim-label');
