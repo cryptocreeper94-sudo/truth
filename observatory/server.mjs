@@ -25,6 +25,7 @@ import { readTail, tailLines, parseLines, segmentsFor, segmentDay, segmentLines,
 import { readSeries, readEvents, seriesExtent, eventsExtent } from './lib/signal-store.mjs';
 import { SERIES, EVENT_KINDS, KNOWN_LINKS } from './lib/signal-catalog.mjs';
 import { buildNow, buildNear, readRawJson } from './lib/now-snapshot.mjs';
+import { resolveLocalStation } from './lib/local-stations.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const STATE_DIR = process.env.STATE_DIR || join(__dirname, 'state');
@@ -2036,6 +2037,32 @@ const server = createServer(async (req, res) => {
       alerts: pointAlerts,
       count: pointAlerts.length,
       nationalSummary: cache.summary
+    });
+  }
+
+  // ── Local Weather & Broadcast Station API (by lat/lng or zip) ─────
+  if (path === '/api/weather/local-station') {
+    let lat = parseFloat(url.searchParams.get('lat') || NaN);
+    let lon = parseFloat(url.searchParams.get('lon') || url.searchParams.get('lng') || NaN);
+    const zip = url.searchParams.get('zip');
+
+    if (isNaN(lat) && isNaN(lon) && zip && /^\d{5}$/.test(zip)) {
+      const geo = await geocodeZip(zip);
+      if (geo) {
+        lat = geo.lat;
+        lon = geo.lon;
+      }
+    }
+
+    if (isNaN(lat) || isNaN(lon)) {
+      return jsonResponse(res, 400, { error: 'Missing coordinates or zip parameter' });
+    }
+
+    const station = await resolveLocalStation(lat, lon);
+    return jsonResponse(res, 200, {
+      timestamp: new Date().toISOString(),
+      location: { lat, lon, zip: zip || null },
+      station
     });
   }
 

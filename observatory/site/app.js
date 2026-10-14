@@ -3192,6 +3192,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
       status.textContent = saved.label || `${saved.lat.toFixed(2)}, ${saved.lng.toFixed(2)}`;
       geoBtn.classList.add('location-bar__geo--active');
       this.checkLocationWeatherAlerts(saved.lat, saved.lng, saved.zip);
+      this.fetchLocalStation(saved.lat, saved.lng, saved.zip);
     }
 
     // Geolocation button
@@ -3204,6 +3205,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
           this._applyLocation();
           status.textContent = `GPS: ${this.userLocation.lat.toFixed(2)}, ${this.userLocation.lng.toFixed(2)}`;
           geoBtn.classList.add('location-bar__geo--active');
+          this.fetchLocalStation(pos.coords.latitude, pos.coords.longitude, null);
         },
         () => { status.textContent = 'LOCATION DENIED'; },
         { enableHighAccuracy: false, timeout: 10000 }
@@ -3215,16 +3217,29 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
       const zip = zipInput.value.trim();
       if (!/^\d{5}$/.test(zip)) { status.textContent = 'INVALID ZIP'; return; }
       status.textContent = 'LOOKING UP...';
-      // Use a free geocoding approach: Nominatim (OpenStreetMap)
-      fetch(`https://nominatim.openstreetmap.org/search?postalcode=${zip}&country=US&format=json&limit=1`)
+      fetch(`/api/weather/local-station?zip=${zip}`)
         .then(r => r.json())
         .then(data => {
-          if (data.length === 0) { status.textContent = 'ZIP NOT FOUND'; return; }
-          this.userLocation = { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon), zip, label: zip };
+          if (!data.location) { status.textContent = 'ZIP NOT FOUND'; return; }
+          const s = data.station || {};
+          this.localStation = s;
+          this.userLocation = {
+            lat: data.location.lat,
+            lng: data.location.lon,
+            zip,
+            label: s.city && s.state ? `${s.city}, ${s.state}` : zip
+          };
           this._saveLocation(this.userLocation);
           this._applyLocation();
-          status.textContent = `ZIP ${zip}: ${data[0].display_name.split(',').slice(0, 2).join(',')}`;
+          status.textContent = `ZIP ${zip}: ${this.userLocation.label}`;
           geoBtn.classList.add('location-bar__geo--active');
+
+          const btn = document.getElementById('local-station-btn');
+          const label = document.getElementById('local-station-label');
+          if (btn && label && s.wfo) {
+            label.textContent = `${s.wfo} • ${s.city || s.market.split('/')[0].trim()}`;
+            btn.style.display = 'inline-flex';
+          }
         })
         .catch(() => { status.textContent = 'LOOKUP FAILED'; });
     };
@@ -3617,6 +3632,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
     if (!pill || !textEl) return;
 
     try {
+      this.fetchLocalStation(lat, lng, zip);
       let url = `/api/weather/alerts?`;
       if (!isNaN(lat) && !isNaN(lng)) {
         url += `lat=${lat.toFixed(4)}&lng=${lng.toFixed(4)}`;
@@ -3752,10 +3768,102 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
       }
     };
 
+    const streamBtn = document.getElementById('advisory-stream-btn');
+    if (streamBtn) {
+      if (this.localStation && this.localStation.broadcasts && this.localStation.broadcasts.length > 0) {
+        const topBroadcast = this.localStation.broadcasts[0];
+        streamBtn.style.display = 'inline-block';
+        streamBtn.href = topBroadcast.url;
+        streamBtn.textContent = `🔴 WATCH LIVE BROADCAST (${topBroadcast.name.split(' ')[0]}) ↗`;
+      } else {
+        streamBtn.style.display = 'none';
+      }
+    }
+
+    modal.style.display = 'flex';
+  },
+
+  async fetchLocalStation(lat, lng, zip) {
+    const btn = document.getElementById('local-station-btn');
+    const label = document.getElementById('local-station-label');
+    if (!btn || !label) return;
+
+    try {
+      let q = '';
+      if (!isNaN(lat) && !isNaN(lng)) q = `lat=${lat.toFixed(4)}&lon=${lng.toFixed(4)}`;
+      else if (zip) q = `zip=${zip}`;
+      else return;
+
+      const res = await fetch(`/api/weather/local-station?${q}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      if (!data.station) return;
+      this.localStation = data.station;
+
+      label.textContent = `${this.localStation.wfo} • ${this.localStation.city || this.localStation.market.split('/')[0].trim()}`;
+      btn.style.display = 'inline-flex';
+    } catch (e) {
+      console.warn('[Observatory] Local station fetch failed:', e);
+    }
+  },
+
+  openLocalStationModal() {
+    const modal = document.getElementById('local-station-modal');
+    if (!modal || !this.localStation) return;
+
+    const s = this.localStation;
+    const wfoEl = document.getElementById('station-modal-wfo');
+    const marketEl = document.getElementById('station-modal-market');
+    const portalLink = document.getElementById('station-link-portal');
+    const afdLink = document.getElementById('station-link-afd');
+    const radarLink = document.getElementById('station-link-radar');
+    const hourlyLink = document.getElementById('station-link-hourly');
+    const listEl = document.getElementById('station-broadcasts-list');
+
+    if (wfoEl) wfoEl.textContent = `${s.wfoName} (${s.wfo}) — Radar ${s.radarStation || 'N/A'}`;
+    if (marketEl) marketEl.textContent = `📍 Designated Market: ${s.market}`;
+
+    if (portalLink && s.links?.wfoPortal) portalLink.href = s.links.wfoPortal;
+    if (afdLink && s.links?.forecastDiscussion) afdLink.href = s.links.forecastDiscussion;
+    if (radarLink && s.links?.radarStream) radarLink.href = s.links.radarStream;
+    if (hourlyLink && s.links?.hourlyForecast) hourlyLink.href = s.links.hourlyForecast;
+
+    if (listEl) {
+      if (s.broadcasts && s.broadcasts.length > 0) {
+        listEl.innerHTML = s.broadcasts.map(b => `
+          <a href="${b.url}" target="_blank" rel="noopener" class="station-broadcast-card">
+            <div class="station-broadcast-card__left">
+              <span class="station-broadcast-card__name">${b.name}</span>
+              <span class="station-broadcast-card__net">${b.network || 'LIVE'} • ${b.city || 'LOCAL'}</span>
+            </div>
+            <span class="station-broadcast-card__live">🔴 WATCH ↗</span>
+          </a>
+        `).join('');
+      } else {
+        listEl.innerHTML = `
+          <p style="font-size:0.7rem;color:#888;">No explicit broadcast streams listed. Use official NWS portal above.</p>
+        `;
+      }
+    }
+
     modal.style.display = 'flex';
   },
 
   initWeatherModals() {
+    // Local Station modal triggers
+    const stnBtn = document.getElementById('local-station-btn');
+    if (stnBtn) {
+      stnBtn.addEventListener('click', () => this.openLocalStationModal());
+    }
+    const stnModal = document.getElementById('local-station-modal');
+    const stnClose = document.getElementById('station-modal-close');
+    const stnDismiss = document.getElementById('station-modal-dismiss');
+    if (stnClose) stnClose.addEventListener('click', () => { if (stnModal) stnModal.style.display = 'none'; });
+    if (stnDismiss) stnDismiss.addEventListener('click', () => { if (stnModal) stnModal.style.display = 'none'; });
+    if (stnModal) stnModal.addEventListener('click', (e) => {
+      if (e.target === stnModal) stnModal.style.display = 'none';
+    });
+
     // Advisory modal close
     const advModal = document.getElementById('weather-advisory-modal');
     const advClose = document.getElementById('advisory-close');

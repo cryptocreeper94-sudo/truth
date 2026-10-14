@@ -139,6 +139,10 @@
       <button class="location-bar__set" id="zip-set">SET</button>
       <span class="location-bar__status" id="location-status">NO LOCATION SET</span>
     </div>
+    <button class="location-bar__station-btn" id="local-station-btn" style="display:none;" title="Click to view local NWS station & broadcast livestreams">
+      <span class="station-btn__icon">📡</span>
+      <span class="station-btn__label" id="local-station-label">LOCAL STATION</span>
+    </button>
     <div class="location-bar__alert-pill" id="weather-alert-pill" style="display:none;" title="Click to view full meteorological advisory">
       <span class="alert-pill__icon">⚠️</span>
       <span class="alert-pill__text" id="weather-alert-text">CHECKING WARNINGS...</span>
@@ -537,7 +541,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="atmoscore.js"></script>
   <script src="atmoscore-viz.js"></script>
-  <script src="app.js?v=20261014-radarzoom"></script>
+  <script src="app.js?v=20261014-localbroadcast"></script>
   <script>
     // CSV Export
     async function __exportData() {
@@ -803,6 +807,7 @@
         </div>
       </div>
       <div class="weather-modal__footer">
+        <a class="weather-modal__btn weather-modal__btn--live-stream" id="advisory-stream-btn" href="#" target="_blank" rel="noopener" style="display:none;background:rgba(255,20,56,0.18);border-color:#ff1438;color:#ff4466;font-weight:700;text-decoration:none;">🔴 WATCH LIVE BROADCAST ↗</a>
         <button class="weather-modal__btn" id="advisory-center-btn">📍 CENTER ON MAP</button>
         <button class="weather-modal__btn weather-modal__btn--primary" id="advisory-dismiss-btn">CLOSE</button>
       </div>
@@ -890,6 +895,73 @@
       <div class="weather-modal__footer">
         <button class="weather-modal__btn" id="wf-reset-btn">RESET DEFAULTS</button>
         <button class="weather-modal__btn weather-modal__btn--primary" id="wf-save-btn">APPLY & SAVE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ LOCAL STATION & EMERGENCY BROADCAST MODAL ═══ -->
+  <div class="weather-modal" id="local-station-modal" style="display:none;" role="dialog" aria-modal="true">
+    <div class="weather-modal__dialog" style="max-width: 680px;">
+      <div class="weather-modal__header">
+        <div class="weather-modal__header-title">
+          <span class="weather-modal__badge" style="background:#00e5ff;color:#000;">STATION INTEL</span>
+          <span class="weather-modal__title" id="station-modal-wfo">NWS FORECAST OFFICE & BROADCASTS</span>
+        </div>
+        <button class="weather-modal__close" id="station-modal-close" title="Close dialog">&times;</button>
+      </div>
+      <div class="weather-modal__body">
+        <div class="station-modal__meta" id="station-modal-market" style="font-size:0.85rem;color:var(--brass);font-weight:700;margin-bottom:12px;letter-spacing:0.04em;">
+          —
+        </div>
+
+        <div class="weather-modal__section">
+          <span class="weather-modal__label">OFFICIAL NOAA / NWS OPERATIONAL FEEDS</span>
+          <div class="station-links-grid">
+            <a id="station-link-portal" href="#" target="_blank" rel="noopener" class="station-link-item">
+              <span class="station-link-item__icon">🏛️</span>
+              <div class="station-link-item__text">
+                <strong>NWS Station Portal</strong>
+                <small>Official office dashboard & forecasts</small>
+              </div>
+              <span class="station-link-item__ext">↗</span>
+            </a>
+            <a id="station-link-afd" href="#" target="_blank" rel="noopener" class="station-link-item station-link-item--accent">
+              <span class="station-link-item__icon">📝</span>
+              <div class="station-link-item__text">
+                <strong>Area Forecast Discussion (AFD)</strong>
+                <small>Raw technical notes written by on-duty meteorologists</small>
+              </div>
+              <span class="station-link-item__ext">↗</span>
+            </a>
+            <a id="station-link-radar" href="#" target="_blank" rel="noopener" class="station-link-item">
+              <span class="station-link-item__icon">📡</span>
+              <div class="station-link-item__text">
+                <strong>NEXRAD Station Radar</strong>
+                <small>Direct high-res single-site radar stream</small>
+              </div>
+              <span class="station-link-item__ext">↗</span>
+            </a>
+            <a id="station-link-hourly" href="#" target="_blank" rel="noopener" class="station-link-item">
+              <span class="station-link-item__icon">📈</span>
+              <div class="station-link-item__text">
+                <strong>Hourly Graph & Soundings</strong>
+                <small>Hour-by-hour temperature, dewpoint & winds</small>
+              </div>
+              <span class="station-link-item__ext">↗</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="weather-modal__section">
+          <span class="weather-modal__label">LOCAL DESIGNATED MARKET BROADCAST LIVESTREAMS</span>
+          <p style="font-size:0.68rem;color:#888;margin-bottom:10px;">Immediate live television coverage during severe meteorological events:</p>
+          <div class="station-broadcasts-grid" id="station-broadcasts-list">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </div>
+      <div class="weather-modal__footer">
+        <button class="weather-modal__btn weather-modal__btn--primary" id="station-modal-dismiss">CLOSE</button>
       </div>
     </div>
   </div>
