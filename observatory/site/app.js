@@ -548,10 +548,17 @@ const Observatory = {
     this.mapLayers.earthquakes = L.layerGroup();
     this.mapLayers.earthquakes.addTo(this.map);
 
+    // Create labelsPane for boundaries and reference tiles (above base tiles, below vectors, pointer-events: none)
+    if (!this.map.getPane('labelsPane')) {
+      const p = this.map.createPane('labelsPane');
+      p.style.zIndex = '350';
+      p.style.pointerEvents = 'none';
+    }
+
     // State/country boundaries + labels overlay (always on over satellite imagery)
     // ESRI Reference overlay — guaranteed compatible with ESRI World Imagery base
     this.boundaryLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
-      maxZoom: 19, noWrap: true, opacity: 0.9, pane: 'overlayPane',
+      maxZoom: 19, noWrap: true, opacity: 0.9, pane: 'labelsPane',
     }).addTo(this.map);
 
     // Default: show radar + heaters
@@ -595,13 +602,24 @@ const Observatory = {
       if (name === 'aircraft' && srcGroup && !srcGroup.hasLayer(m)) return;
       const opts = Object.assign({}, m.options);
       delete opts.renderer;
-      if (name === 'aircraft' || name === 'glm') opts.renderer = this._fsAircraftRenderer || (this._fsAircraftRenderer = L.canvas({ padding: 0.3, tolerance: 3 }));
+      if (name === 'aircraft' || name === 'glm') {
+        opts.renderer = this._fsAircraftRenderer || (this._fsAircraftRenderer = L.canvas({ padding: 0.3, tolerance: 3 }));
+      }
       const copy = new m.constructor(m.getLatLng(), opts);
       if (m._volcanoId) copy._volcanoId = m._volcanoId;
       const popup = m.getPopup && m.getPopup();
-      if (popup) copy.bindPopup(popup.getContent(), Object.assign({ className: 'obs-popup', maxWidth: 260, autoPanPadding: [20, 20] }, popup.options || {}));
+      if (popup) {
+        const content = typeof popup.getContent === 'function' ? popup.getContent() : popup._content;
+        copy.bindPopup(content, Object.assign({ className: 'obs-popup', maxWidth: 260, autoPanPadding: [20, 20] }, popup.options || {}));
+        copy.on('click', () => {
+          copy.openPopup();
+        });
+      }
       const tip = m.getTooltip && m.getTooltip();
-      if (tip) copy.bindTooltip(tip.getContent(), { direction: 'top', offset: [0, -6], className: tip.options.className });
+      if (tip) {
+        const tipContent = typeof tip.getContent === 'function' ? tip.getContent() : tip._content;
+        copy.bindTooltip(tipContent, { direction: 'top', offset: [0, -6], className: tip.options.className });
+      }
       group.addLayer(copy);
     });
   },
@@ -1940,8 +1958,9 @@ const Observatory = {
           const mag = f.properties.mag;
           const color = mag >= 5 ? '#ff3b30' : mag >= 4 ? '#ff9500' : mag >= 3 ? '#ffd60a' : '#06b6d4';
           const marker = L.circleMarker([lat, lng], {
-            radius: Math.max(4, mag * 3),
+            radius: Math.max(5, mag * 3),
             color: color, fillColor: color, fillOpacity: 0.35, weight: 1.5,
+            pane: 'markerPane',
           });
           marker.bindPopup(`
             <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #e8e8f0; background: #0a0a0e; padding: 8px; border: 1px solid #2a2a38; border-radius: 2px; min-width: 180px; max-width: 250px; word-break: break-word;">
@@ -1983,11 +2002,13 @@ const Observatory = {
         const color = h.status === 'decommissioned' ? '#666' : '#ff4ecf';
         const marker = L.circleMarker([h.lat, h.lon], {
           radius: 8, color: color, fillColor: color, fillOpacity: 0.3, weight: 2,
+          pane: 'markerPane',
         });
-        // Outer pulsing ring for active facilities (non-interactive so clicks pass through)
+        // Outer pulsing ring for active facilities (in markerPane, non-interactive so clicks pass through to marker)
         if (h.status !== 'decommissioned') {
           const ring = L.circleMarker([h.lat, h.lon], {
             radius: 16, color: '#ff4ecf', fillColor: 'transparent', fillOpacity: 0, weight: 1, opacity: 0.4,
+            pane: 'markerPane',
             interactive: false,
           });
           this.mapLayers.heaters.addLayer(ring);
@@ -2278,9 +2299,10 @@ const Observatory = {
         if (!f.lat || !f.lon) return;
         const acres = f.acres || 0;
         const color = acres > 10000 ? '#ff5722' : acres > 1000 ? '#ff9800' : '#ffc107';
-        const radius = Math.min(12, Math.max(4, Math.log10(acres + 1) * 3));
+        const radius = Math.min(12, Math.max(5, Math.log10(acres + 1) * 3));
         const marker = L.circleMarker([f.lat, f.lon], {
           radius, color, fillColor: color, fillOpacity: 0.35, weight: 2,
+          pane: 'markerPane',
         });
         marker.bindPopup(`
           <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#e8e8f0;background:#0a0a0e;padding:10px;border:1px solid #ff572233;border-radius:2px;min-width:180px;max-width:250px;word-break:break-word;">
@@ -2360,11 +2382,13 @@ const Observatory = {
         const color = colorMap[v.alertLevel] || '#e040fb';
         const marker = L.circleMarker([v.lat, v.lon], {
           radius: 9, color, fillColor: color, fillOpacity: 0.35, weight: 2,
+          pane: 'markerPane',
         });
         marker._volcanoId = v.id;
-        // Triangle-like outer marker for visibility (non-interactive so clicks pass to marker)
+        // Triangle-like outer marker for visibility (in markerPane, non-interactive so clicks pass to marker)
         const ring = L.circleMarker([v.lat, v.lon], {
           radius: 16, color, fillColor: 'transparent', fillOpacity: 0, weight: 1, opacity: 0.5,
+          pane: 'markerPane',
           interactive: false,
         });
         ring._volcanoId = v.id;
@@ -2714,6 +2738,9 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
       this._initFullscreenMap();
     } else {
       this.fullscreenMap.invalidateSize();
+      ['heaters', 'aircraft', 'wildfires', 'volcanoes', 'glm', 'earthquakes'].forEach(k => {
+        this._mirrorToFs(k);
+      });
     }
     this._syncLayersToFullscreen();
 
@@ -2746,7 +2773,6 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
 
     this.fullscreenMap = L.map(container, {
       center, zoom,
-      preferCanvas: true,
       zoomControl: false,
       worldCopyJump: false,
     });
@@ -2754,13 +2780,20 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
     this._lockWorld(this.fullscreenMap);
     this._setupPopupClamping(this.fullscreenMap);
 
+    // Create labelsPane for boundaries and reference tiles so they never block vector markers
+    if (!this.fullscreenMap.getPane('labelsPane')) {
+      const p = this.fullscreenMap.createPane('labelsPane');
+      p.style.zIndex = '350';
+      p.style.pointerEvents = 'none';
+    }
+
     this.fsBaseLayer = L.tileLayer(this.mapTiles[this.fsMapStyle],
       this.mapTileOpts[this.fsMapStyle]
     ).addTo(this.fullscreenMap);
 
     // State/country boundaries overlay for fullscreen map
     this.fsBoundaryLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
-      maxZoom: 19, noWrap: true, opacity: 0.9, pane: 'overlayPane',
+      maxZoom: 19, noWrap: true, opacity: 0.9, pane: 'labelsPane',
     }).addTo(this.fullscreenMap);
 
     // Build FS layers
