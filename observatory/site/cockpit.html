@@ -144,17 +144,28 @@
     <div class="map-fullscreen__toolbar">
       <button class="map-fullscreen__close" id="map-fullscreen-close">&#10005; CLOSE</button>
       <div class="map-fullscreen__toggles" id="fullscreen-layer-toggles">
-        <label class="layer-toggle"><input type="checkbox" data-fslayer="radar" checked> Weather Radar</label>
-        <label class="layer-toggle"><input type="checkbox" data-fslayer="satellite"> Visible Satellite</label>
-        <label class="layer-toggle"><input type="checkbox" data-fslayer="infrared"> Infrared Satellite</label>
-        <label class="layer-toggle"><input type="checkbox" data-fslayer="watervapor"> Water Vapor</label>
-        <label class="layer-toggle"><input type="checkbox" data-fslayer="precip"> Precipitation</label>
-        <label class="layer-toggle" style="color:#ff6b6b;"><input type="checkbox" data-fslayer="fire"> 🔥 Satellite Fire Detections</label>
-        <label class="layer-toggle" style="color:#ff4ecf;"><input type="checkbox" data-fslayer="heaters" checked> ⚡ Research Transmitters</label>
-        <label class="layer-toggle" style="color:#4ecbff;"><input type="checkbox" data-fslayer="aircraft"> ✈ Aircraft (Live)</label>
-          <label class="layer-toggle" style="color:#ffe066;"><input type="checkbox" data-fslayer="glm"> ⚡ Lightning (last 15 min)</label>
-        <label class="layer-toggle" style="color:#ff5722;"><input type="checkbox" data-fslayer="wildfires"> 💥 Wildfires</label>
-        <label class="layer-toggle" style="color:#e040fb;"><input type="checkbox" data-fslayer="volcanoes"> 🌋 Volcanoes</label>
+        <div class="fs-cluster">
+          <span class="fs-cluster__label">SAT</span>
+          <label class="layer-toggle" data-accent="gold"><input type="checkbox" data-fslayer="radar" checked> Radar</label>
+          <label class="layer-toggle" data-accent="cyan"><input type="checkbox" data-fslayer="satellite"> Vis Sat</label>
+          <label class="layer-toggle" data-accent="cyan"><input type="checkbox" data-fslayer="infrared"> Infrared</label>
+          <label class="layer-toggle" data-accent="blue"><input type="checkbox" data-fslayer="watervapor"> Vapor</label>
+          <label class="layer-toggle" data-accent="blue"><input type="checkbox" data-fslayer="precip"> Precip</label>
+        </div>
+        <span class="fs-cluster__divider"></span>
+        <div class="fs-cluster">
+          <span class="fs-cluster__label">LIVE</span>
+          <label class="layer-toggle" data-accent="magenta"><input type="checkbox" data-fslayer="heaters" checked> Heaters</label>
+          <label class="layer-toggle" data-accent="cyan"><input type="checkbox" data-fslayer="aircraft"> Aircraft</label>
+          <label class="layer-toggle" data-accent="yellow"><input type="checkbox" data-fslayer="glm"> Lightning</label>
+        </div>
+        <span class="fs-cluster__divider"></span>
+        <div class="fs-cluster">
+          <span class="fs-cluster__label">HAZARDS</span>
+          <label class="layer-toggle" data-accent="orange"><input type="checkbox" data-fslayer="fire"> Fires</label>
+          <label class="layer-toggle" data-accent="red"><input type="checkbox" data-fslayer="wildfires"> Wildfires</label>
+          <label class="layer-toggle" data-accent="purple"><input type="checkbox" data-fslayer="volcanoes"> Volcanoes</label>
+        </div>
       </div>
       <button class="map-fullscreen__anim-btn" id="anim-toggle" title="Toggle animation loop">▶ LOOP</button>
       <button class="map-fullscreen__anim-btn" id="fullscreen-style-toggle" title="Toggle light/dark map">☀ LIGHT</button>
@@ -185,31 +196,31 @@
         <div class="layer-group">
           <span class="layer-group__title">SATELLITE & ATMOSPHERE</span>
           <div class="layer-group__items">
-            <label class="layer-toggle"><input type="checkbox" data-layer="radar" checked> <span class="layer-name-researcher">Radar Reflectivity</span><span class="layer-name-observer">Weather Radar</span></label>
-            <label class="layer-toggle"><input type="checkbox" data-layer="satellite"> <span class="layer-name-researcher">Visible Satellite</span><span class="layer-name-observer">Satellite</span></label>
-            <label class="layer-toggle"><input type="checkbox" data-layer="infrared"> <span class="layer-name-researcher">Infrared Satellite</span><span class="layer-name-observer">Infrared</span></label>
-            <label class="layer-toggle"><input type="checkbox" data-layer="watervapor"> <span class="layer-name-researcher">Water Vapor</span><span class="layer-name-observer">Moisture</span></label>
-            <label class="layer-toggle"><input type="checkbox" data-layer="precip"> <span class="layer-name-researcher">Precipitation</span><span class="layer-name-observer">Rain</span></label>
+            <label class="layer-toggle" data-accent="gold"><input type="checkbox" data-layer="radar" checked> <span class="layer-name-researcher">Radar</span><span class="layer-name-observer">Radar</span></label>
+            <label class="layer-toggle" data-accent="cyan"><input type="checkbox" data-layer="satellite"> <span class="layer-name-researcher">Vis Sat</span><span class="layer-name-observer">Vis Sat</span></label>
+            <label class="layer-toggle" data-accent="cyan"><input type="checkbox" data-layer="infrared"> <span class="layer-name-researcher">Infrared</span><span class="layer-name-observer">Infrared</span></label>
+            <label class="layer-toggle" data-accent="blue"><input type="checkbox" data-layer="watervapor"> <span class="layer-name-researcher">Vapor</span><span class="layer-name-observer">Moisture</span></label>
+            <label class="layer-toggle" data-accent="blue"><input type="checkbox" data-layer="precip"> <span class="layer-name-researcher">Precip</span><span class="layer-name-observer">Rain</span></label>
           </div>
         </div>
         <div class="layer-group">
           <span class="layer-group__title">TRANSPONDERS & SENSORS</span>
           <div class="layer-group__items">
-            <label class="layer-toggle" style="color:#ff4ecf;"><input type="checkbox" data-layer="heaters" checked> <span class="layer-name-researcher">⚡ Ionospheric Heaters</span><span class="layer-name-observer">⚡ Research Transmitters</span></label>
-            <label class="layer-toggle" style="color:#4ecbff;"><input type="checkbox" data-layer="aircraft"> ✈ Aircraft (Live)</label>
-            <label class="layer-toggle" style="color:#ffe066;"><input type="checkbox" data-layer="glm"> ⚡ Lightning (last 15 min)</label>
+            <label class="layer-toggle" data-accent="magenta"><input type="checkbox" data-layer="heaters" checked> <span class="layer-name-researcher">Heaters</span><span class="layer-name-observer">Transmitters</span></label>
+            <label class="layer-toggle" data-accent="cyan"><input type="checkbox" data-layer="aircraft"> <span class="layer-name-researcher">Aircraft</span><span class="layer-name-observer">Aircraft</span></label>
+            <label class="layer-toggle" data-accent="yellow"><input type="checkbox" data-layer="glm"> <span class="layer-name-researcher">Lightning</span><span class="layer-name-observer">Lightning</span></label>
           </div>
         </div>
         <div class="layer-group">
           <span class="layer-group__title">HAZARDS & ACTIVITY</span>
           <div class="layer-group__items">
-            <label class="layer-toggle" style="color:#ff6b6b;"><input type="checkbox" data-layer="fire"> 🔥 Satellite Fire Detections</label>
-            <label class="layer-toggle" style="color:#ff5722;"><input type="checkbox" data-layer="wildfires"> 💥 Wildfires</label>
-            <label class="layer-toggle" style="color:#e040fb;"><input type="checkbox" data-layer="volcanoes"> 🌋 Volcanoes</label>
+            <label class="layer-toggle" data-accent="orange"><input type="checkbox" data-layer="fire"> <span class="layer-name-researcher">Fires</span><span class="layer-name-observer">Fires</span></label>
+            <label class="layer-toggle" data-accent="red"><input type="checkbox" data-layer="wildfires"> <span class="layer-name-researcher">Wildfires</span><span class="layer-name-observer">Wildfires</span></label>
+            <label class="layer-toggle" data-accent="purple"><input type="checkbox" data-layer="volcanoes"> <span class="layer-name-researcher">Volcanoes</span><span class="layer-name-observer">Volcanoes</span></label>
           </div>
         </div>
         <div class="layer-group layer-group--actions">
-          <span class="layer-group__hint">Click ⚡ LAYERS to close drawer</span>
+          <span class="layer-group__hint">TAP ⚡ LAYERS TO CLOSE</span>
           <button class="layer-toggle layer-toggle--style" id="map-style-toggle" title="Toggle light/dark map">🌙 DARK</button>
         </div>
       </div>

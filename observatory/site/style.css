@@ -453,17 +453,17 @@ body::after {
   50% { box-shadow: 0 0 12px 4px rgba(212, 160, 84, 0.3); }
 }
 
-/* ═══ LAYER TOGGLES (Accordion Dropdown) ═════════════════════════ */
+/* ═══ LAYER TOGGLES (Brutalist Tech Chip Matrix) ═══════════════ */
 .layer-toggles {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 10px 14px;
-  background: rgba(10, 10, 15, 0.96);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border-active, rgba(201, 169, 110, 0.4));
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+  gap: 10px;
+  padding: 12px 14px;
+  background: rgba(8, 8, 12, 0.98);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border-active, rgba(201, 169, 110, 0.35));
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
   font-family: var(--font-mono);
   overflow-y: auto;
   max-height: 420px;
@@ -493,68 +493,129 @@ body::after {
 .layer-group {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 6px;
 }
 .layer-group__title {
-  font-size: 0.5rem;
-  letter-spacing: 0.14em;
+  font-size: 0.48rem;
+  letter-spacing: 0.16em;
   font-weight: 700;
   color: var(--brass, #c9a96e);
   text-transform: uppercase;
   opacity: 0.85;
 }
 .layer-group__items {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 6px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+@media (max-width: 360px) {
+  .layer-group__items {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.layer-group__items .layer-toggle {
+  width: 100%;
+  justify-content: flex-start;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 .layer-group--actions {
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  padding-top: 4px;
+  padding-top: 6px;
   margin-top: 2px;
   border-top: 1px solid rgba(255, 255, 255, 0.07);
 }
 .layer-group__hint {
-  font-size: 0.5rem;
+  font-size: 0.48rem;
   color: var(--text-dim, #777);
-  letter-spacing: 0.06em;
+  letter-spacing: 0.1em;
 }
 
+/* ═══ BRUTALIST TECH CHIPS & LED DIODE PIP SYSTEM ══════════════ */
 .layer-toggle {
-  font-size: 0.56rem;
-  color: var(--text-secondary, #b8b8c4);
+  --chip-accent: var(--brass, #c9a96e);
+  font-family: var(--font-mono);
+  font-size: 0.53rem;
+  font-weight: 600;
   letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-dim, #7e7e90);
   cursor: pointer;
   white-space: nowrap;
-  padding: 3px 8px;
-  border: 1px solid var(--border-dim, rgba(255, 255, 255, 0.12));
+  padding: 0 8px;
+  height: 26px;
+  box-sizing: border-box;
+  border: 1px solid rgba(255, 255, 255, 0.09);
   border-radius: 2px;
-  background: rgba(255, 255, 255, 0.03);
-  transition: all 0.2s ease;
+  background: rgba(14, 14, 20, 0.85);
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   user-select: none;
 }
+
+/* Accent Palette */
+.layer-toggle[data-accent="gold"] { --chip-accent: #c9a96e; }
+.layer-toggle[data-accent="cyan"] { --chip-accent: #4ecbff; }
+.layer-toggle[data-accent="blue"] { --chip-accent: #3b82f6; }
+.layer-toggle[data-accent="magenta"] { --chip-accent: #ff4ecf; }
+.layer-toggle[data-accent="yellow"] { --chip-accent: #ffd60a; }
+.layer-toggle[data-accent="orange"] { --chip-accent: #ff9500; }
+.layer-toggle[data-accent="red"] { --chip-accent: #ff3b30; }
+.layer-toggle[data-accent="purple"] { --chip-accent: #c084fc; }
+
+/* The Hardware LED Diode Pip */
+.layer-toggle::before {
+  content: '';
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: transparent;
+  flex-shrink: 0;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 .layer-toggle:hover {
   color: var(--text-primary, #ffffff);
-  border-color: rgba(201, 169, 110, 0.4);
-  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.25);
+  background: rgba(25, 25, 35, 0.95);
 }
+
 .layer-toggle:has(input:checked) {
-  color: var(--brass, #c9a96e);
-  border-color: var(--border-active, rgba(201, 169, 110, 0.6));
-  background: rgba(201, 169, 110, 0.12);
-  box-shadow: 0 0 8px rgba(201, 169, 110, 0.15);
+  color: var(--chip-accent);
+  border-color: var(--chip-accent);
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
 }
-.layer-toggle input { width: 0; height: 0; opacity: 0; position: absolute; }
+
+.layer-toggle:has(input:checked)::before {
+  background: var(--chip-accent);
+  border-color: var(--chip-accent);
+  box-shadow: 0 0 7px var(--chip-accent);
+}
+
+.layer-toggle input {
+  width: 0;
+  height: 0;
+  opacity: 0;
+  position: absolute;
+  pointer-events: none;
+}
+
 .layer-toggle--style {
   color: var(--brass);
-  border-color: var(--border-active);
-  background: var(--brass-dim);
+  border-color: rgba(201, 169, 110, 0.35);
+  background: rgba(201, 169, 110, 0.08);
   margin-left: auto;
+}
+.layer-toggle--style:hover {
+  border-color: var(--brass);
+  background: rgba(201, 169, 110, 0.18);
 }
 
 /* Level-aware layer names */
@@ -1742,13 +1803,14 @@ body[data-level="analyst"] .layer-name-researcher { display: inline; }
 .map-fullscreen__toolbar {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
-  padding: var(--space-sm) var(--space-md);
-  background: var(--bg-primary);
+  gap: 10px;
+  padding: 6px 14px;
+  background: rgba(8, 8, 12, 0.98);
   border-bottom: 1px solid var(--border-dim);
   overflow-x: auto;
   scrollbar-width: none;
   flex-shrink: 0;
+  white-space: nowrap;
 }
 .map-fullscreen__toolbar::-webkit-scrollbar { display: none; }
 
@@ -1770,12 +1832,42 @@ body[data-level="analyst"] .layer-name-researcher { display: inline; }
 
 .map-fullscreen__toggles {
   display: flex;
-  gap: 2px;
+  align-items: center;
+  gap: 8px;
   flex-shrink: 0;
 }
+
+.fs-cluster {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.02);
+  padding: 2px 5px;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+.fs-cluster__label {
+  font-family: var(--font-mono);
+  font-size: 0.44rem;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  color: var(--brass, #c9a96e);
+  opacity: 0.75;
+  padding-right: 3px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+.fs-cluster__divider {
+  width: 1px;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.12);
+  flex-shrink: 0;
+  margin: 0 2px;
+}
+
 @media (min-width: 900px) {
-  .map-fullscreen__toolbar { overflow-x: visible; }
-  .map-fullscreen__toggles { flex-wrap: wrap; flex-shrink: 1; row-gap: 4px; }
+  .map-fullscreen__toolbar { overflow-x: auto; }
+  .map-fullscreen__toggles { flex-wrap: nowrap; flex-shrink: 0; }
 }
 
 /* Layer explanation tooltip (shared by main + fullscreen toggles) */
