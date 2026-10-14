@@ -92,7 +92,7 @@ const Observatory = {
     },
     aircraft: {
       name: 'ADS-B Aircraft',
-      info: { source: 'ADS-B Exchange via RapidAPI', what: 'Live aircraft transponder positions within 500nm of CONUS center. Shows flight, altitude, speed, and heading.', update: 'Every 5 minutes', attribution: 'ADS-B Exchange' },
+      info: { source: 'ADS-B Exchange + adsb.lol receiver networks', what: 'Live aircraft transponder (ADS-B) positions across the lower 48 states. Click a dot for flight, altitude, speed, and heading.', update: 'Every 5 minutes', attribution: 'ADS-B Exchange / adsb.lol (ODbL)' },
       legend: { type: 'dots', heading: 'AIRCRAFT (ADS-B)', items: [{ color: '#4ecbff', label: 'Tracked Aircraft' }] },
     },
     wildfires: {
@@ -435,6 +435,7 @@ const Observatory = {
     // Load geo marker data
     this.loadHeaterMarkers();
     this.loadAircraftMarkers();
+    setInterval(() => this.loadAircraftMarkers(), 5 * 60 * 1000);
     this.loadWildfireMarkers();
     this.loadVolcanoMarkers();
 
@@ -461,7 +462,9 @@ const Observatory = {
     if (!group || !src) return;
     group.clearLayers();
     src.forEach(m => {
-      const copy = L.circleMarker(m.getLatLng(), Object.assign({}, m.options));
+      const opts = Object.assign({}, m.options);
+      delete opts.renderer;
+      const copy = L.circleMarker(m.getLatLng(), opts);
       const popup = m.getPopup && m.getPopup();
       if (popup) copy.bindPopup(popup.getContent(), { className: 'obs-popup' });
       group.addLayer(copy);
@@ -1472,13 +1475,14 @@ const Observatory = {
   async loadAircraftMarkers() {
     try {
       const res = await fetch('/api/geo/aircraft');
-      if (res.status === 401) return; // Not subscribed
+      if (res.status === 401) { console.warn('[Observatory] Aircraft layer: not signed in as a subscriber'); return; }
       const data = await res.json();
       this.markers.aircraft.forEach(m => this.mapLayers.aircraft.removeLayer(m));
       this.markers.aircraft = [];
       (data.aircraft || []).forEach(a => {
         const marker = L.circleMarker([a.lat, a.lon], {
           radius: 3, color: '#4ecbff', fillColor: '#4ecbff', fillOpacity: 0.6, weight: 1,
+          renderer: this._aircraftRenderer || (this._aircraftRenderer = L.canvas({ padding: 0.3 })),
         });
         const alt = a.alt ? `${Math.round(a.alt).toLocaleString()} ft` : 'N/A';
         const spd = a.speed ? `${Math.round(a.speed)} kts` : 'N/A';
@@ -1929,6 +1933,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
 
     this.fullscreenMap = L.map(container, {
       center, zoom,
+      preferCanvas: true,
       zoomControl: true,
       worldCopyJump: false,
     });

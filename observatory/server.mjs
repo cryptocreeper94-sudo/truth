@@ -1188,23 +1188,21 @@ const server = createServer(async (req, res) => {
       const subscriber = await getSubscriberFromRequest(req);
       if (!isSubscribed(subscriber)) return jsonResponse(res, 401, { error: 'Subscription required' });
     }
-    // Read latest aircraft data from raw files
-    const rawDir = join(STATE_DIR, 'raw', 'aircraft');
+    // Read latest aircraft snapshot (collector writes RAW_DIR/<date>/adsb_*.json)
     try {
-      if (existsSync(rawDir)) {
-        const files = readdirSync(rawDir).filter(f => f.endsWith('.json')).sort().reverse();
-        if (files.length > 0) {
-          const data = JSON.parse(readFileSync(join(rawDir, files[0]), 'utf-8'));
-          const aircraft = (data.ac || []).slice(0, 200).map(a => ({
+      {
+        const data = readRawJson(RAW_DIR, 'adsb', Date.now());
+        if (data && Array.isArray(data.ac)) {
+          const aircraft = data.ac.slice(0, 5000).map(a => ({
             hex: a.hex, flight: (a.flight || '').trim(), lat: a.lat, lon: a.lon,
             alt: a.alt_baro || a.alt_geom, speed: a.gs, heading: a.track,
             type: a.t, squawk: a.squawk, category: a.category,
           })).filter(a => a.lat && a.lon);
-          return jsonResponse(res, 200, { timestamp: new Date().toISOString(), count: aircraft.length, aircraft });
+          return jsonResponse(res, 200, { timestamp: new Date().toISOString(), source: data.source || 'ADS-B Exchange', count: aircraft.length, aircraft });
         }
       }
     } catch {}
-    return jsonResponse(res, 200, { timestamp: new Date().toISOString(), count: 0, aircraft: [], message: 'No aircraft data available. Ensure ADSB_API_KEY is set.' });
+    return jsonResponse(res, 200, { timestamp: new Date().toISOString(), count: 0, aircraft: [], message: 'No aircraft snapshot yet. The collector refreshes every 5 minutes.' });
   }
 
   // ── Geo API: Surface Stations ───────────────────────────────────────
