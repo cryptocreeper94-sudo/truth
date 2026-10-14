@@ -391,10 +391,11 @@ const Observatory = {
     this.map = L.map('map', {
       center: [39.5, -98.35],
       zoom: 4,
-      zoomControl: true,
+      zoomControl: false,
       attributionControl: false,
       worldCopyJump: false,
     });
+    L.control.zoom({ position: 'bottomright' }).addTo(this.map);
     this._lockWorld(this.map);
 
     // Base layer — swappable light/dark
@@ -598,7 +599,13 @@ const Observatory = {
     let hasActive = false;
 
     for (const [key, def] of Object.entries(this.layerDefs)) {
-      if (!layersMap[key] || !mapInstance.hasLayer(layersMap[key])) continue;
+      const isLayerOnMap = layersMap[key] && mapInstance.hasLayer(layersMap[key]);
+      const isAnimOnMap = this.animActive && (
+        (key === 'radar' && this.animNexradLayers && this.animNexradLayers.length > 0) ||
+        (key === 'precip' && this.animLayers && this.animLayers.length > 0)
+      );
+
+      if (!isLayerOnMap && !isAnimOnMap) continue;
       hasActive = true;
       const leg = def.legend;
 
@@ -2212,8 +2219,8 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
       this._initFullscreenMap();
     } else {
       this.fullscreenMap.invalidateSize();
-      this.updateDynamicLegend();
     }
+    this._syncLayersToFullscreen();
 
     // Try to lock landscape
     try {
@@ -2224,6 +2231,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
   },
 
   closeFullscreenMap() {
+    this._syncLayersFromFullscreen();
     document.getElementById('map-fullscreen').classList.remove('map-fullscreen--open');
     this.stopAnimation();
 
@@ -2244,9 +2252,10 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
     this.fullscreenMap = L.map(container, {
       center, zoom,
       preferCanvas: true,
-      zoomControl: true,
+      zoomControl: false,
       worldCopyJump: false,
     });
+    L.control.zoom({ position: 'bottomright' }).addTo(this.fullscreenMap);
     this._lockWorld(this.fullscreenMap);
 
     this.fsBaseLayer = L.tileLayer(this.mapTiles[this.fsMapStyle],
@@ -2298,8 +2307,8 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
       });
     });
 
-    // Initial fullscreen legend render
-    this.updateDynamicLegend();
+    // Sync active layers from the main cockpit map
+    this._syncLayersToFullscreen();
 
     // Close button
     document.getElementById('map-fullscreen-close').addEventListener('click', () => this.closeFullscreenMap());
@@ -2314,6 +2323,48 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
     this._loadAnimationFrames();
 
     setTimeout(() => this.fullscreenMap.invalidateSize(), 200);
+  },
+
+  // ── Sync layers between Main Map and Fullscreen Map ──────────
+  _syncLayersToFullscreen() {
+    if (!this.fullscreenMap || !this.fsMapLayers || !this.map) return;
+    const keys = ['radar', 'satellite', 'infrared', 'watervapor', 'precip', 'fire', 'heaters', 'aircraft', 'glm', 'wildfires', 'volcanoes'];
+    keys.forEach(k => {
+      const isMainActive = this.mapLayers[k] && this.map.hasLayer(this.mapLayers[k]);
+      const cb = document.querySelector(`input[data-fslayer="${k}"]`);
+      if (cb) cb.checked = !!isMainActive;
+      const fsLayer = this.fsMapLayers[k];
+      if (fsLayer) {
+        if (isMainActive && !this.fullscreenMap.hasLayer(fsLayer)) {
+          fsLayer.addTo(this.fullscreenMap);
+        } else if (!isMainActive && this.fullscreenMap.hasLayer(fsLayer)) {
+          this.fullscreenMap.removeLayer(fsLayer);
+        }
+      }
+    });
+    this.updateDynamicLegend();
+  },
+
+  _syncLayersFromFullscreen() {
+    if (!this.fullscreenMap || !this.fsMapLayers || !this.map) return;
+    const keys = ['radar', 'satellite', 'infrared', 'watervapor', 'precip', 'fire', 'heaters', 'aircraft', 'glm', 'wildfires', 'volcanoes'];
+    keys.forEach(k => {
+      const fsLayer = this.fsMapLayers[k];
+      const isFsActive = (fsLayer && this.fullscreenMap.hasLayer(fsLayer)) ||
+                         (document.querySelector(`input[data-fslayer="${k}"]`)?.checked);
+      const cb = document.querySelector(`input[data-layer="${k}"]`);
+      if (cb) cb.checked = !!isFsActive;
+      const mainLayer = this.mapLayers[k];
+      if (mainLayer) {
+        if (isFsActive && !this.map.hasLayer(mainLayer)) {
+          mainLayer.addTo(this.map);
+        } else if (!isFsActive && this.map.hasLayer(mainLayer)) {
+          this.map.removeLayer(mainLayer);
+        }
+      }
+    });
+    this.updateLayerCount();
+    this.updateDynamicLegend();
   },
 
   // ── Toggle Fullscreen Map Style ──────────────────────────────
@@ -2418,6 +2469,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
     }) : [];
 
     const all = [...this.animLayers, ...this.animNexradLayers];
+    this.updateDynamicLegend();
     const label = document.getElementById('anim-label');
     let loaded = 0;
     const onLoad = () => {
@@ -2507,6 +2559,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
       if (this.fullscreenMap && !this.fullscreenMap.hasLayer(l)) l.addTo(this.fullscreenMap);
     });
     this._animRestore = [];
+    this.updateDynamicLegend();
 
     // Reset label
     const label = document.getElementById('anim-label');
