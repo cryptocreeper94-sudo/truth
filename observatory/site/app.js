@@ -380,12 +380,14 @@ const Observatory = {
 
   // ── Single-world lock ─────────────────────────────────────────
   // Without this, Leaflet repeats the planet horizontally when you
-  // zoom out. Clamp panning to one world and never allow a zoom
-  // level where the world is narrower than the container.
+  // zoom out. Allow slight horizontal breathing room (-195 to 195) so
+  // Alaska/Aleutians and the Pacific date-line can center comfortably
+  // without hard wall collisions, and never allow a zoom level where
+  // the world is narrower than the container.
   _lockWorld(map) {
-    const world = L.latLngBounds(L.latLng(-85.0511, -180), L.latLng(85.0511, 180));
+    const world = L.latLngBounds(L.latLng(-85.0511, -195), L.latLng(85.0511, 195));
     map.setMaxBounds(world);
-    map.options.maxBoundsViscosity = 1.0;
+    map.options.maxBoundsViscosity = 0.85;
     const fit = () => {
       const w = map.getContainer().clientWidth || 512;
       const h = map.getContainer().clientHeight || 256;
@@ -395,6 +397,90 @@ const Observatory = {
     };
     fit();
     map.on('resize', fit);
+  },
+
+  // ── Edge-Aware Popup Clamping ─────────────────────────────────
+  // Ensures any popup opened near container boundaries (e.g. Alaska/
+  // Aleutian volcanoes at longitude -176° or markers near top/right edges)
+  // dynamically shifts into view without overflowing off-screen.
+  // The popup tip pointer is counter-shifted so it stays accurately
+  // targeted on the marker coordinate.
+  _setupPopupClamping(map) {
+    if (!map || map._popupClampingSetup) return;
+    map._popupClampingSetup = true;
+
+    const clamp = () => {
+      const container = map.getContainer();
+      if (!container) return;
+      const popups = container.querySelectorAll('.leaflet-popup');
+      if (!popups.length) return;
+
+      const mapRect = container.getBoundingClientRect();
+      const PAD = 14;
+
+      popups.forEach(popupEl => {
+        const curShiftX = parseFloat(popupEl.dataset.shiftX || '0');
+        const curShiftY = parseFloat(popupEl.dataset.shiftY || '0');
+        const popRect = popupEl.getBoundingClientRect();
+
+        // Calculate natural rect without current margin offsets
+        const natLeft = popRect.left - curShiftX;
+        const natRight = popRect.right - curShiftX;
+        const natTop = popRect.top - curShiftY;
+
+        let shiftX = 0;
+        let shiftY = 0;
+
+        // Clamp horizontal
+        if (natLeft < mapRect.left + PAD) {
+          shiftX = (mapRect.left + PAD) - natLeft;
+        } else if (natRight > mapRect.right - PAD) {
+          shiftX = (mapRect.right - PAD) - natRight;
+        }
+
+        // Clamp vertical (if popup overflows top of map)
+        if (natTop < mapRect.top + PAD) {
+          shiftY = (mapRect.top + PAD) - natTop;
+        }
+
+        popupEl.dataset.shiftX = shiftX;
+        popupEl.dataset.shiftY = shiftY;
+        popupEl.style.marginLeft = Math.round(shiftX) ? `${Math.round(shiftX)}px` : '';
+        popupEl.style.marginTop = Math.round(shiftY) ? `${Math.round(shiftY)}px` : '';
+
+        // Counter-shift tip so it continues pointing at the marker coordinates
+        const tip = popupEl.querySelector('.leaflet-popup-tip-container');
+        if (tip) {
+          if (shiftX !== 0) {
+            const maxTipShift = Math.max(0, (popRect.width / 2) - 22);
+            const tipShift = Math.max(-maxTipShift, Math.min(maxTipShift, -shiftX));
+            tip.style.transform = `translateX(${Math.round(tipShift)}px)`;
+          } else {
+            tip.style.transform = '';
+          }
+        }
+      });
+    };
+
+    map.on('popupopen', () => {
+      clamp();
+      requestAnimationFrame(clamp);
+      setTimeout(clamp, 40);
+      setTimeout(clamp, 180);
+    });
+    map.on('move', clamp);
+    map.on('resize', clamp);
+    map.on('popupclose', (e) => {
+      const el = e.popup && e.popup.getElement && e.popup.getElement();
+      if (el) {
+        el.dataset.shiftX = 0;
+        el.dataset.shiftY = 0;
+        el.style.marginLeft = '';
+        el.style.marginTop = '';
+        const tip = el.querySelector('.leaflet-popup-tip-container');
+        if (tip) tip.style.transform = '';
+      }
+    });
   },
 
   initMap() {
@@ -407,6 +493,7 @@ const Observatory = {
     });
     L.control.zoom({ position: 'bottomright' }).addTo(this.map);
     this._lockWorld(this.map);
+    this._setupPopupClamping(this.map);
 
     // Base layer — swappable light/dark
     this.baseLayer = L.tileLayer(this.mapTiles[this.mapStyle],
@@ -498,7 +585,7 @@ const Observatory = {
       if (name === 'aircraft' || name === 'glm') opts.renderer = this._fsAircraftRenderer || (this._fsAircraftRenderer = L.canvas({ padding: 0.3, tolerance: 3 }));
       const copy = new m.constructor(m.getLatLng(), opts);
       const popup = m.getPopup && m.getPopup();
-      if (popup) copy.bindPopup(popup.getContent(), Object.assign({ className: 'obs-popup' }, popup.options && popup.options.maxWidth ? { maxWidth: popup.options.maxWidth } : {}));
+      if (popup) copy.bindPopup(popup.getContent(), Object.assign({ className: 'obs-popup', maxWidth: 260, autoPanPadding: [20, 20] }, popup.options || {}));
       const tip = m.getTooltip && m.getTooltip();
       if (tip) copy.bindTooltip(tip.getContent(), { direction: 'top', offset: [0, -6], className: tip.options.className });
       group.addLayer(copy);
@@ -1521,12 +1608,12 @@ const Observatory = {
             color: color, fillColor: color, fillOpacity: 0.35, weight: 1.5,
           });
           marker.bindPopup(`
-            <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #e8e8f0; background: #0a0a0e; padding: 8px; border: 1px solid #2a2a38; border-radius: 2px; min-width: 180px;">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #e8e8f0; background: #0a0a0e; padding: 8px; border: 1px solid #2a2a38; border-radius: 2px; min-width: 180px; max-width: 250px; word-break: break-word;">
               <div style="color: ${color}; font-weight: 700; font-size: 14px; margin-bottom: 4px;">M${mag.toFixed(1)}</div>
               <div style="color: #8888a0; margin-bottom: 2px;">${f.properties.place}</div>
               <div style="color: #555568; font-size: 9px;">${new Date(f.properties.time).toISOString().slice(0, 19)} UTC</div>
             </div>
-          `, { className: 'obs-popup' });
+          `, { className: 'obs-popup', maxWidth: 260, autoPanPadding: [20, 20] });
           if (this.mapLayers.earthquakes) this.mapLayers.earthquakes.addLayer(marker);
           this.markers.earthquakes.push(marker);
         });
@@ -1550,23 +1637,24 @@ const Observatory = {
         const marker = L.circleMarker([h.lat, h.lon], {
           radius: 8, color: color, fillColor: color, fillOpacity: 0.3, weight: 2,
         });
-        // Outer pulsing ring for active facilities
+        // Outer pulsing ring for active facilities (non-interactive so clicks pass through)
         if (h.status !== 'decommissioned') {
           const ring = L.circleMarker([h.lat, h.lon], {
             radius: 16, color: '#ff4ecf', fillColor: 'transparent', fillOpacity: 0, weight: 1, opacity: 0.4,
+            interactive: false,
           });
           this.mapLayers.heaters.addLayer(ring);
           this.markers.heaters.push(ring);
         }
         marker.bindPopup(`
-          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#e8e8f0;background:#0a0a0e;padding:10px;border:1px solid #ff4ecf33;border-radius:2px;min-width:180px;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#e8e8f0;background:#0a0a0e;padding:10px;border:1px solid #ff4ecf33;border-radius:2px;min-width:180px;max-width:250px;word-break:break-word;">
             <div style="color:#ff4ecf;font-weight:700;font-size:13px;margin-bottom:4px;">⚡ ${h.name}</div>
             <div style="color:#aaa;margin-bottom:2px;">${h.location}</div>
             <div style="color:#888;font-size:9px;">Power: ${h.power}</div>
             <div style="color:#888;font-size:9px;">Freq: ${h.frequency}</div>
             <div style="color:#555;font-size:9px;margin-top:4px;">${h.status.toUpperCase()}</div>
           </div>
-        `, { className: 'obs-popup' });
+        `, { className: 'obs-popup', maxWidth: 260, autoPanPadding: [20, 20] });
         this.mapLayers.heaters.addLayer(marker);
         this.markers.heaters.push(marker);
       });
@@ -1807,7 +1895,7 @@ const Observatory = {
           const alt = a.ground ? 'ground' : (a.alt != null ? a.alt.toLocaleString() + ' ft' : '—');
           return `<b>${a.flight || a.reg || a.hex.toUpperCase()}</b> · ${alt} · ${a.speed != null ? a.speed + ' kts' : '—'} · ${a.heading != null ? this._compass(a.heading) : ''}`;
         }, { direction: 'top', offset: [0, -6], className: 'aircraft-tip' });
-        marker.bindPopup(() => this._aircraftPopup(a, color), { className: 'obs-popup', maxWidth: 300 });
+        marker.bindPopup(() => this._aircraftPopup(a, color), { className: 'obs-popup', maxWidth: 300, autoPanPadding: [20, 20] });
         const want = !!acFilter[a.cls || 'unknown'] && (acFilter.includeGround || !a.ground);
         if (want) this.mapLayers.aircraft.addLayer(marker);
         this.markers.aircraft.push(marker);
@@ -1837,7 +1925,7 @@ const Observatory = {
           radius, color, fillColor: color, fillOpacity: 0.35, weight: 2,
         });
         marker.bindPopup(`
-          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#e8e8f0;background:#0a0a0e;padding:10px;border:1px solid #ff572233;border-radius:2px;min-width:180px;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#e8e8f0;background:#0a0a0e;padding:10px;border:1px solid #ff572233;border-radius:2px;min-width:180px;max-width:250px;word-break:break-word;">
             <div style="color:#ff5722;font-weight:700;font-size:13px;margin-bottom:4px;">🔥 ${f.name}</div>
             <div style="color:#aaa;margin-bottom:2px;">${f.state || 'Unknown location'}</div>
             <div style="color:#888;font-size:9px;">Acres: ${acres.toLocaleString()}</div>
@@ -1846,7 +1934,7 @@ const Observatory = {
             ${f.personnel ? '<div style="color:#555;font-size:9px;">Personnel: ' + f.personnel.toLocaleString() + '</div>' : ''}
             ${f.residences_destroyed ? '<div style="color:#f44;font-size:9px;">Residences Destroyed: ' + f.residences_destroyed + '</div>' : ''}
           </div>
-        `, { className: 'obs-popup' });
+        `, { className: 'obs-popup', maxWidth: 260, autoPanPadding: [20, 20] });
         this.mapLayers.wildfires.addLayer(marker);
         this.markers.wildfires.push(marker);
       });
@@ -1898,19 +1986,20 @@ const Observatory = {
         const marker = L.circleMarker([v.lat, v.lon], {
           radius: 9, color, fillColor: color, fillOpacity: 0.35, weight: 2,
         });
-        // Triangle-like outer marker for visibility
+        // Triangle-like outer marker for visibility (non-interactive so clicks pass to marker)
         const ring = L.circleMarker([v.lat, v.lon], {
           radius: 16, color, fillColor: 'transparent', fillOpacity: 0, weight: 1, opacity: 0.5,
+          interactive: false,
         });
         marker.bindPopup(`
-          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#e8e8f0;background:#0a0a0e;padding:10px;border:1px solid ${color}33;border-radius:2px;min-width:180px;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#e8e8f0;background:#0a0a0e;padding:10px;border:1px solid ${color}33;border-radius:2px;min-width:180px;max-width:250px;word-break:break-word;line-height:1.4;">
             <div style="color:${color};font-weight:700;font-size:13px;margin-bottom:4px;">🌋 ${v.name}</div>
             <div style="color:#aaa;margin-bottom:2px;">${v.region || ''}</div>
             <div style="color:#888;font-size:9px;">Alert: ${v.alertLevel} / ${v.colorCode}</div>
             <div style="color:#888;font-size:9px;">Threat: ${v.threatLevel || 'Unknown'}</div>
-            ${v.synopsis ? '<div style="color:#aaa;font-size:9px;margin-top:4px;border-top:1px solid #333;padding-top:4px;">' + v.synopsis + '</div>' : ''}
+            ${v.synopsis ? '<div style="color:#aaa;font-size:9px;margin-top:4px;border-top:1px solid #333;padding-top:4px;line-height:1.35;">' + v.synopsis + '</div>' : ''}
           </div>
-        `, { className: 'obs-popup' });
+        `, { className: 'obs-popup', maxWidth: 260, autoPanPadding: [20, 20] });
         this.mapLayers.volcanoes.addLayer(ring);
         this.mapLayers.volcanoes.addLayer(marker);
         this.markers.volcanoes.push(ring);
@@ -2283,6 +2372,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
     });
     L.control.zoom({ position: 'bottomright' }).addTo(this.fullscreenMap);
     this._lockWorld(this.fullscreenMap);
+    this._setupPopupClamping(this.fullscreenMap);
 
     this.fsBaseLayer = L.tileLayer(this.mapTiles[this.fsMapStyle],
       this.mapTileOpts[this.fsMapStyle]
