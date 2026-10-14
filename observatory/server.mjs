@@ -304,12 +304,124 @@ function readManifest(filename, limit = 100) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// Feed measures — what each feed card charts. A feed only gets a "measure" if
+// it has a REAL physical/observed quantity with units. Everything else gets an
+// honest "collection health" chart (successful vs failed pulls), never a fake
+// activity line. [09] Reference Engine · [14] Determinacy · [40] Non-Being Guard
+// ═══════════════════════════════════════════════════════════════════════════
+const entryTs = e => new Date(e.timestamp || e.retrievedAt || e.fetchedAt || e.collected_at || e.at || e.writtenAt || 0).getTime();
+const isGap = e => /GAP|FATAL|ERROR|FAIL/i.test(String(e.type || '')) || e.status === 'FETCH_ERROR';
+const fmtN = v => (v == null ? '—' : Math.abs(v) >= 1000 ? Math.round(v).toLocaleString('en-US') : String(Math.round(v * 10) / 10));
+
+const FEED_MEASURES = {
+  geomag: { series: 'kp', label: 'Planetary Kp index', unit: 'Kp', min: 0, max: 9,
+    cond: v => v >= 7 ? [`SEVERE GEOMAGNETIC STORM · KP ${fmtN(v)}`, 'alert'] : v >= 5 ? [`GEOMAGNETIC STORM · KP ${fmtN(v)}`, 'warn'] : v >= 4 ? [`ACTIVE · KP ${fmtN(v)}`, 'watch'] : [`QUIET · KP ${fmtN(v)}`, 'ok'] },
+  solar: { series: 'sw_speed', label: 'Solar wind speed', unit: 'km/s',
+    cond: v => v >= 700 ? [`VERY FAST SOLAR WIND · ${fmtN(v)} KM/S`, 'warn'] : v >= 500 ? [`ELEVATED SOLAR WIND · ${fmtN(v)} KM/S`, 'watch'] : [`NOMINAL SOLAR WIND · ${fmtN(v)} KM/S`, 'ok'] },
+  wildfire: { series: 'wildfire_active', label: 'Active US wildfires', unit: 'fires', latestField: 'activeFires',
+    cond: (v, last) => [`${fmtN(v)} ACTIVE · ${fmtN(last && last.totalAcres)} ACRES`, 'info'] },
+  volcanic: { series: 'volcano_elevated', label: 'US volcanoes above normal alert', unit: 'volcanoes', latestField: 'elevatedCount',
+    cond: (v, last) => [`${fmtN(v)} ELEVATED OF ${fmtN(last && last.totalMonitored)} MONITORED`, v > 0 ? 'watch' : 'ok'] },
+  aircraft: { manifestField: 'aircraft', label: 'Aircraft tracked worldwide', unit: 'aircraft',
+    cond: v => [`${fmtN(v)} AIRCRAFT TRACKED`, 'info'] },
+  surface: { manifestField: 'stations', label: 'Weather stations reporting', unit: 'stations',
+    cond: v => [`${fmtN(v)} STATIONS REPORTING`, 'info'] },
+  earthquake: { events: 'quake', label: 'Earthquakes per hour (M2.5+)', unit: 'quakes' },
+};
+
+function seriesPoints(id, now) {
+  const def = SERIES[id];
+  if (!def) return null;
+  const span = def.res === '1d' ? 30 * 86400000 : def.res === '3h' ? 72 * 3600000 : 24 * 3600000;
+  const rows = readSeries(STATE_DIR, id, now - span, now) || [];
+  const idx = { mean: 1, min: 2, max: 3 }[def.stat] || 1;
+  const keyToMs = k => Date.parse(k.length === 10 ? k + 'T00:00:00Z' : k + ':00:00Z');
+  return { res: def.res, source: def.source, points: rows.map(r => [keyToMs(r[0]), typeof r[idx] === 'number' ? r[idx] : null]).filter(p => Number.isFinite(p[0])) };
+}
+
+function buildMeasure(feed, dataEntries, now) {
+  const m = FEED_MEASURES[feed.id];
+  if (!m) return null;
+  let points = [], res = '1h', source = null, window = '24h';
+  if (m.series) {
+    const sp = seriesPoints(m.series, now);
+    if (sp) { points = sp.points; res = sp.res; source = sp.source; window = res === '1d' ? '30d' : res === '3h' ? '72h' : '24h'; }
+  } else if (m.manifestField) {
+    for (let h = 23; h >= 0; h--) {
+      const start = now - (h + 1) * 3600000, end = now - h * 3600000;
+      const vals = dataEntries.filter(e => { const t = entryTs(e); return t >= start && t < end && typeof e[m.manifestField] === 'number'; }).map(e => e[m.manifestField]);
+      points.push([end, vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null]);
+    }
+  } else if (m.events) {
+    const evs = readEvents(STATE_DIR, m.events, now - 24 * 3600000, now) || [];
+    const maxMag = [];
+    for (let h = 23; h >= 0; h--) {
+      const start = now - (h + 1) * 3600000, end = now - h * 3600000;
+      const inBin = evs.filter(e => { const t = Date.parse(e.t); return t >= start && t < end; });
+      points.push([end, inBin.length]);
+      maxMag.push(inBin.reduce((a, e) => Math.max(a, e.mag ?? -Infinity), -Infinity));
+    }
+    const total = evs.length;
+    const largest = evs.reduce((a, e) => (e.mag != null && (!a || e.mag > a.mag) ? e : a), null);
+    const lm = largest ? largest.mag : null;
+    const cond = lm == null ? ['NO QUAKES M2.5+ IN 24H', 'ok']
+      : lm >= 7 ? [`MAJOR QUAKE · M${lm.toFixed(1)}`, 'alert']
+      : lm >= 6 ? [`STRONG QUAKE · M${lm.toFixed(1)}`, 'warn']
+      : lm >= 5 ? [`${total} QUAKES · LARGEST M${lm.toFixed(1)}`, 'watch']
+      : [`${total} QUAKES · LARGEST M${lm.toFixed(1)}`, 'ok'];
+    return {
+      kind: 'measure', label: m.label, unit: m.unit, res: '1h', window: '24h', source: 'USGS Earthquake Hazards Program',
+      points, current: points.length ? points[points.length - 1][1] : null, total,
+      largest: largest ? { mag: lm, place: largest.place, t: largest.t } : null,
+      condition: { text: cond[0], level: cond[1] },
+    };
+  }
+  const vals = points.map(p => p[1]).filter(v => v != null);
+  const lastEntry = [...dataEntries].reverse().find(e => !isGap(e)) || null;
+  let current = vals.length ? vals[vals.length - 1] : null;
+  if (m.latestField && lastEntry && typeof lastEntry[m.latestField] === 'number') current = lastEntry[m.latestField];
+  if (current == null && m.manifestField && lastEntry && typeof lastEntry[m.manifestField] === 'number') current = lastEntry[m.manifestField];
+  if (current == null && !vals.length) return null; // nothing real to show → health chart instead
+  const cond = m.cond(current, lastEntry);
+  return {
+    kind: 'measure', label: m.label, unit: m.unit, res, window, source,
+    points, current,
+    min: vals.length ? Math.min(...vals) : null, max: vals.length ? Math.max(...vals) : null,
+    scaleMin: m.min ?? null, scaleMax: m.max ?? null,
+    condition: { text: cond[0], level: cond[1] },
+  };
+}
+
+function buildHealth(feed, entries, now) {
+  const slow = feed.interval >= 43200000;
+  const bins = slow ? 14 : 24, size = slow ? 86400000 : 3600000;
+  const ok = [], gap = [];
+  for (let i = bins - 1; i >= 0; i--) {
+    const start = now - (i + 1) * size, end = now - i * size;
+    let o = 0, g = 0;
+    for (const e of entries) {
+      if (e.type === 'RETENTION-PRUNE') continue;
+      const t = entryTs(e);
+      if (t >= start && t < end) { if (isGap(e)) g++; else o++; }
+    }
+    ok.push(o); gap.push(g);
+  }
+  const recent = entries.filter(e => e.type !== 'RETENTION-PRUNE').slice(-6);
+  const recentGaps = recent.filter(isGap).length;
+  const okTotal = ok.reduce((a, b) => a + b, 0), gapTotal = gap.reduce((a, b) => a + b, 0);
+  const condition = recent.length && recentGaps === recent.length ? { text: 'SOURCE FAILING', level: 'warn' }
+    : recentGaps > 0 ? { text: 'PARTIAL · SOME SOURCES FAILING', level: 'watch' }
+    : { text: 'COLLECTING', level: 'info' };
+  return { kind: 'health', window: slow ? '14d' : '24h', binLabel: slow ? 'day' : 'hour', ok, gap, okTotal, gapTotal, condition };
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // Feed Status — computes live/stale/offline status for each feed
 // ═══════════════════════════════════════════════════════════════════════════
 function getFeedStatus(feed) {
   const entries = readManifest(feed.manifest, 500);
   const total = entries.length;
-  if (total === 0) return { ...feed, status: 'offline', entries: 0, last: null, sparkline: [] };
+  if (total === 0) return { ...feed, status: 'offline', entries: 0, last: null, sparkline: [], health: null, measure: null, condition: { text: 'NO DATA', level: 'offline' } };
 
   const dataEntries = entries.filter(e => e.type !== "RETENTION-PRUNE");
   const last = dataEntries.length > 0 ? dataEntries[dataEntries.length - 1] : entries[entries.length - 1];
@@ -357,6 +469,14 @@ function getFeedStatus(feed) {
     }
   }
 
+  // Real measurement when one exists; otherwise honest collection health.
+  let measure = null;
+  try { measure = buildMeasure(feed, dataEntries, now); } catch (e) { measure = null; }
+  const health = buildHealth(feed, entries, now);
+  const condition = status === 'stale'
+    ? { text: 'STALE · NO RECENT DATA', level: 'warn' }
+    : (measure ? measure.condition : health.condition);
+
   return {
     id: feed.id,
     name: feed.name,
@@ -366,7 +486,12 @@ function getFeedStatus(feed) {
     entries: total,
     last: lastTs,
     ageMs: age,
-    sparkline,
+    // Card sparkline: the real measure if we have one, else successful pulls
+    sparkline: measure ? measure.points.map(p => (p[1] == null ? 0 : p[1])) : health.ok,
+    sparklineKind: measure ? 'measure' : 'health',
+    measure,
+    health,
+    condition,
   };
 }
 

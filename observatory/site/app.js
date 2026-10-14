@@ -698,6 +698,7 @@ const Observatory = {
   // ── Is Feed Elevated? ──────────────────────────────────────
   _isElevated(feed) {
     if (!feed || feed.status === 'offline') return false;
+    if (feed.condition && feed.condition.level) return ['watch', 'warn', 'alert'].includes(feed.condition.level) && !/FAILING|STALE/.test(feed.condition.text || '');
     const rate = feed.sparkline ? feed.sparkline[feed.sparkline.length - 1] || 0 : 0;
     const avg = feed.sparkline ? feed.sparkline.reduce((a, b) => a + b, 0) / (feed.sparkline.length || 1) : 0;
     switch (feed.id) {
@@ -1057,8 +1058,13 @@ const Observatory = {
   },
 
   // ── Condition Text (all 20 feeds) ───────────────────────────
+  _levelColor(level) {
+    return ({ ok: 'var(--signal-live)', info: 'var(--brass)', watch: 'var(--signal-yellow)', warn: 'var(--signal-stale)', alert: 'var(--signal-offline)', offline: 'var(--signal-offline)' })[level] || 'var(--text-secondary)';
+  },
+
   getConditionText(feed) {
     if (feed.status === 'offline') return { text: 'NO DATA', color: 'var(--signal-offline)' };
+    if (feed.condition && feed.condition.text) return { text: feed.condition.text, color: this._levelColor(feed.condition.level) };
 
     const rate = feed.sparkline ? feed.sparkline[feed.sparkline.length - 1] || 0 : 0;
     const avg = feed.sparkline ? feed.sparkline.reduce((a, b) => a + b, 0) / (feed.sparkline.length || 1) : 0;
@@ -1192,80 +1198,141 @@ const Observatory = {
     }
   },
 
-  // ── Draw Large Sparkline (modal) ─────────────────────────────
-  drawSparklineLarge(data, status) {
-    const canvas = document.getElementById('modal-sparkline');
-    if (!canvas || !data?.length) return;
-
-    // Responsive: size canvas pixels to container width
-    const container = canvas.parentElement;
-    const dpr = window.devicePixelRatio || 1;
-    const displayW = container.clientWidth - 32; // account for padding
-    const displayH = 120;
-    canvas.width = displayW * dpr;
-    canvas.height = displayH * dpr;
-    canvas.style.width = displayW + 'px';
-    canvas.style.height = displayH + 'px';
-
-    const ctx = canvas.getContext('2d');
-    ctx.scale(dpr, dpr);
-    const w = displayW;
-    const h = displayH;
-    const max = Math.max(...data, 1);
-    const step = w / (data.length - 1 || 1);
-
-    ctx.clearRect(0, 0, w, h);
-
-    // Grid
-    ctx.strokeStyle = 'rgba(30, 30, 40, 0.8)';
-    ctx.lineWidth = 0.5;
-    for (let i = 1; i < 4; i++) {
-      ctx.beginPath();
-      ctx.moveTo(0, (h / 4) * i);
-      ctx.lineTo(w, (h / 4) * i);
-      ctx.stroke();
-    }
-
-    const color = status === 'live' ? '0, 255, 136' :
-                  status === 'stale' ? '255, 149, 0' : '255, 59, 48';
-
-    const gradient = ctx.createLinearGradient(0, 0, 0, h);
-    gradient.addColorStop(0, `rgba(${color}, 0.2)`);
-    gradient.addColorStop(1, `rgba(${color}, 0.02)`);
-
-    ctx.beginPath();
-    ctx.moveTo(0, h);
-    data.forEach((v, i) => ctx.lineTo(i * step, h - (v / max) * (h - 4)));
-    ctx.lineTo(w, h);
-    ctx.closePath();
-    ctx.fillStyle = gradient;
-    ctx.fill();
-
-    ctx.beginPath();
-    data.forEach((v, i) => {
-      const x = i * step;
-      const y = h - (v / max) * (h - 4);
-      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-    });
-    ctx.strokeStyle = `rgba(${color}, 0.8)`;
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    data.forEach((v, i) => {
-      const x = i * step;
-      const y = h - (v / max) * (h - 4);
-      ctx.beginPath();
-      ctx.arc(x, y, 2.5, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(${color}, 0.5)`;
-      ctx.fill();
-    });
-
-    ctx.fillStyle = 'rgba(136, 136, 160, 0.5)';
-    ctx.font = '9px JetBrains Mono';
-    for (let i = 0; i < data.length; i += 6) {
-      ctx.fillText(`-${data.length - i}h`, i * step, h - 2);
-    }
+  // ── Feed detail chart (modal) ────────────────────────────────
+  // Real measurement → labelled line chart with a value axis and units.
+  // No measurement → "collection health": successful vs failed pulls per bin.
+  _niceTicks(lo, hi, count = 4) {
+    if (!(hi > lo)) { hi = lo + 1; }
+    const raw = (hi - lo) / count;
+    const mag = Math.pow(10, Math.floor(Math.log10(raw)));
+    const step = [1, 2, 2.5, 5, 10].map(m => m * mag).find(st => st >= raw) || raw;
+    const start = Math.floor(lo / step) * step, end = Math.ceil(hi / step) * step;
+    const ticks = [];
+    for (let v = start; v <= end + step / 2; v += step) ticks.push(+v.toFixed(10));
+    return ticks;
   },
+
+  _fmtVal(v) {
+    if (v == null || !isFinite(v)) return '—';
+    const av = Math.abs(v);
+    if (av >= 1e6) return (v / 1e6).toFixed(1) + 'M';
+    if (av >= 1e4) return Math.round(v / 1e3) + 'k';
+    if (av >= 1000) return Math.round(v).toLocaleString();
+    if (av > 0 && av < 0.01) return v.toExponential(1);
+    return String(Math.round(v * 10) / 10);
+  },
+
+  drawFeedChart(feed) {
+    const canvas = document.getElementById('modal-sparkline');
+    if (!canvas) return;
+    const box = canvas.parentElement;
+    const label = box.querySelector('.modal__sparkline-label');
+    let stats = box.querySelector('.modal__chart-stats');
+    if (!stats) { stats = document.createElement('div'); stats.className = 'modal__chart-stats'; box.appendChild(stats); }
+
+    const m = feed.measure, hlt = feed.health;
+    const dpr = window.devicePixelRatio || 1;
+    const W = Math.max(240, box.clientWidth - 32), H = 170;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    const padL = 46, padR = 10, padT = 10, padB = 22;
+    const pw = W - padL - padR, ph = H - padT - padB;
+    ctx.font = '9px "JetBrains Mono", monospace';
+
+    const axis = (ticks, lo, hi, unitLabel) => {
+      ctx.strokeStyle = 'rgba(255,255,255,0.06)'; ctx.fillStyle = 'rgba(160,160,180,0.75)'; ctx.lineWidth = 1;
+      ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+      ticks.forEach(t => {
+        const y = padT + ph - ((t - lo) / (hi - lo)) * ph;
+        ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(W - padR, y); ctx.stroke();
+        ctx.fillText(this._fmtVal(t), padL - 6, y);
+      });
+      ctx.save(); ctx.translate(10, padT + ph / 2); ctx.rotate(-Math.PI / 2);
+      ctx.textAlign = 'center'; ctx.fillStyle = 'rgba(160,160,180,0.55)'; ctx.fillText(unitLabel, 0, 0); ctx.restore();
+    };
+    const timeAxis = (t0, t1, isDays) => {
+      ctx.fillStyle = 'rgba(160,160,180,0.65)'; ctx.textBaseline = 'top';
+      const n = 4;
+      for (let i = 0; i <= n; i++) {
+        const t = t0 + (t1 - t0) * (i / n);
+        const x = padL + pw * (i / n);
+        const d = new Date(t);
+        const txt = isDays ? `${d.getUTCMonth() + 1}/${d.getUTCDate()}` : `${String(d.getUTCHours()).padStart(2, '0')}:00`;
+        ctx.textAlign = i === 0 ? 'left' : i === n ? 'right' : 'center';
+        ctx.fillText(txt, x, padT + ph + 6);
+      }
+    };
+
+    if (m && m.points && m.points.length) {
+      const pts = m.points;
+      const vals = pts.map(p => p[1]).filter(v => v != null);
+      let lo = m.scaleMin != null ? m.scaleMin : Math.min(0, ...vals);
+      let hi = m.scaleMax != null ? m.scaleMax : Math.max(...vals, 1);
+      if (m.scaleMin == null && Math.min(...vals) > 0 && Math.min(...vals) > hi * 0.5) lo = Math.min(...vals) * 0.9; // zoom in on narrow ranges (e.g. solar wind)
+      const ticks = this._niceTicks(lo, hi);
+      lo = ticks[0]; hi = ticks[ticks.length - 1];
+      const t0 = pts[0][0], t1 = pts[pts.length - 1][0];
+      const X = t => padL + (t1 > t0 ? ((t - t0) / (t1 - t0)) * pw : pw);
+      const Y = v => padT + ph - ((v - lo) / (hi - lo)) * ph;
+      axis(ticks, lo, hi, m.unit);
+      timeAxis(t0, t1, m.res === '1d');
+
+      const isCount = m.unit === 'quakes';
+      if (isCount) {
+        const bw = Math.max(2, pw / pts.length - 2);
+        pts.forEach(p => { if (!p[1]) return; ctx.fillStyle = 'rgba(0,255,136,0.55)'; ctx.fillRect(X(p[0]) - bw / 2, Y(p[1]), bw, padT + ph - Y(p[1])); });
+      } else {
+        ctx.strokeStyle = 'rgba(0,255,136,0.9)'; ctx.lineWidth = 2; ctx.beginPath();
+        let pen = false;
+        pts.forEach(p => { if (p[1] == null) { pen = false; return; } const x = X(p[0]), y = Y(p[1]); pen ? ctx.lineTo(x, y) : ctx.moveTo(x, y); pen = true; });
+        ctx.stroke();
+        ctx.fillStyle = 'rgba(0,255,136,0.85)';
+        pts.forEach(p => { if (p[1] == null) return; ctx.beginPath(); ctx.arc(X(p[0]), Y(p[1]), 2, 0, Math.PI * 2); ctx.fill(); });
+      }
+      const span = m.window === '30d' ? 'LAST 30 DAYS' : m.window === '72h' ? 'LAST 72 HOURS' : 'LAST 24 HOURS';
+      if (label) label.textContent = `${m.label.toUpperCase()} · ${span} (UTC)`;
+      const extra = m.largest ? `<div><span>Largest</span>M${m.largest.mag.toFixed(1)}${m.largest.place ? ' · ' + m.largest.place : ''}</div>` : '';
+      stats.innerHTML = `
+        <div><span>Now</span>${this._fmtVal(m.current)} ${m.unit}</div>
+        ${m.total != null ? `<div><span>24h total</span>${m.total} ${m.unit}</div>` : `<div><span>Low</span>${this._fmtVal(m.min)} ${m.unit}</div><div><span>High</span>${this._fmtVal(m.max)} ${m.unit}</div>`}
+        ${extra}
+        ${m.source ? `<div class="modal__chart-src"><span>Source</span>${m.source}</div>` : ''}`;
+      return;
+    }
+
+    if (hlt) {
+      const n = hlt.ok.length;
+      const maxV = Math.max(1, ...hlt.ok.map((o, i) => o + hlt.gap[i]));
+      const ticks = this._niceTicks(0, maxV);
+      const hi = ticks[ticks.length - 1];
+      axis(ticks, 0, hi, `pulls / ${hlt.binLabel}`);
+      const now = Date.now(), size = hlt.binLabel === 'day' ? 86400000 : 3600000;
+      timeAxis(now - n * size, now, hlt.binLabel === 'day');
+      const bw = Math.max(2, pw / n - 2);
+      for (let i = 0; i < n; i++) {
+        const x = padL + (i + 0.5) * (pw / n) - bw / 2;
+        const okH = (hlt.ok[i] / hi) * ph, gapH = (hlt.gap[i] / hi) * ph;
+        ctx.fillStyle = 'rgba(0,255,136,0.55)'; ctx.fillRect(x, padT + ph - okH, bw, okH);
+        ctx.fillStyle = 'rgba(255,149,0,0.75)'; ctx.fillRect(x, padT + ph - okH - gapH, bw, gapH);
+      }
+      if (label) label.textContent = `COLLECTION HEALTH · ${hlt.window === '14d' ? 'LAST 14 DAYS' : 'LAST 24 HOURS'} (UTC)`;
+      const pct = hlt.okTotal + hlt.gapTotal ? Math.round((hlt.okTotal / (hlt.okTotal + hlt.gapTotal)) * 100) : 0;
+      stats.innerHTML = `
+        <div><span style="color:#00ff88;">Successful</span>${hlt.okTotal}</div>
+        <div><span style="color:#ff9500;">Failed</span>${hlt.gapTotal}</div>
+        <div><span>Success rate</span>${pct}%</div>
+        <div class="modal__chart-src">This feed stores images or files, not a single number, so this chart shows whether the source is delivering, not a physical reading.</div>`;
+      return;
+    }
+    if (label) label.textContent = 'NO DATA YET';
+    stats.innerHTML = '';
+  },
+
+  // Back-compat for any older callers
+  drawSparklineLarge() { if (this._currentModalFeed) this.drawFeedChart(this._currentModalFeed); },
 
   // ── Open Detail Modal ────────────────────────────────────────
   async openDetail(feed) {
@@ -1322,10 +1389,9 @@ const Observatory = {
       ${whyHtml}
     `;
 
-    this.drawSparklineLarge(feed.sparkline, feed.status);
-
     // Store current feed for share button
     this._currentModalFeed = feed;
+    this.drawFeedChart(feed);
 
     try {
       const res = await fetch(`/api/feed/${feed.id}?limit=50`);

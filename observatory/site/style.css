@@ -2371,3 +2371,14 @@ body[data-level="researcher"] .feed-card__why { display: none !important; }
 .ac-filter__actions button:hover { border-color: #4ecbff; color: #4ecbff; }
 .ac-filter__note { margin-top: 6px; font-size: 0.5rem; line-height: 1.5; color: var(--text-dim, #777); }
 @media (max-width: 768px) { .ac-filter { min-width: 0; max-width: 200px; } .ac-filter__note { display: none; } }
+
+/* ═══ Feed detail chart readings ═══ */
+.modal__chart-stats {
+  display: flex; flex-wrap: wrap; gap: 6px 18px;
+  margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border-dim, rgba(255,255,255,0.08));
+  font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-primary, #e8e8f0);
+}
+.modal__chart-stats span {
+  display: block; font-size: 0.5rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim, #888); margin-bottom: 2px;
+}
+.modal__chart-src { flex-basis: 100%; font-size: 0.6rem; color: var(--text-secondary, #aaa); line-height: 1.5; }
