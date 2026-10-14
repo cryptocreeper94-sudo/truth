@@ -81,9 +81,9 @@ const Observatory = {
       legend: { type: 'gradient', heading: 'PRECIPITATION', colors: ['transparent','#00ccff','#0066ff','#00ff00','#ffff00','#ff0000'], labels: ['None','Light','Mod','Heavy'] },
     },
     fire: {
-      name: 'Active Fires',
-      info: { source: 'NASA FIRMS via NASA GIBS', what: 'Fire and thermal hotspots detected worldwide by the VIIRS instruments on the NOAA-20 and Suomi NPP satellites (375 m resolution). Shows the most recent full day.', update: 'Daily', attribution: 'NASA FIRMS / GIBS / VIIRS' },
-      legend: { type: 'dots', heading: 'ACTIVE FIRES (FIRMS)', items: [{ color: '#ff3b30', label: 'High Confidence' }, { color: '#ff9500', label: 'Nominal' }, { color: '#ffd60a', label: 'Low Confidence' }] },
+      name: 'Active Fires (Global VIIRS)',
+      info: { source: 'NASA FIRMS via NASA GIBS', what: 'Fire and thermal hotspots detected worldwide (including Canada, Mexico, US, and globally) by the VIIRS instruments on the NOAA-20 and Suomi NPP satellites (375 m resolution). Shows the most recent full day.', update: 'Daily', attribution: 'NASA FIRMS / GIBS / VIIRS' },
+      legend: { type: 'dots', heading: 'ACTIVE FIRES (GLOBAL VIIRS)', items: [{ color: '#ff3b30', label: 'High Confidence' }, { color: '#ff9500', label: 'Nominal' }, { color: '#ffd60a', label: 'Low Confidence' }] },
     },
     heaters: {
       name: 'Ionospheric Heaters',
@@ -109,9 +109,9 @@ const Observatory = {
       legend: { type: 'dots', heading: 'LIGHTNING FLASHES (GOES GLM)', items: [{ color: '#fff200', label: 'Under 5 min ago' }, { color: '#ffa500', label: '5 – 10 min ago' }, { color: '#ff5a36', label: '10 – 15 min ago' }] },
     },
     wildfires: {
-      name: 'Active Wildfires',
-      info: { source: 'NIFC / IRWIN via ESRI ArcGIS', what: 'Active wildfire incidents across the US from the National Interagency Fire Center. Shows fire name, acreage, containment, and cause.', update: 'Every 30 minutes', attribution: 'NIFC / IRWIN' },
-      legend: { type: 'dots', heading: 'WILDFIRES (NIFC)', items: [{ color: '#ff5722', label: '>10,000 acres' }, { color: '#ff9800', label: '1,000-10,000' }, { color: '#ffc107', label: '<1,000 acres' }] },
+      name: 'US Wildfires (NIFC)',
+      info: { source: 'NIFC / IRWIN via ESRI ArcGIS', what: 'Active wildfire incidents across the United States from the National Interagency Fire Center (uncontained incidents, acreage, personnel, and containment). For Canadian and Mexican fire hotspots, toggle the satellite Fires (VIIRS) layer.', update: 'Every 30 minutes', attribution: 'NIFC / IRWIN' },
+      legend: { type: 'dots', heading: 'US WILDFIRES (NIFC)', items: [{ color: '#ff5722', label: '>10,000 acres' }, { color: '#ff9800', label: '1,000-10,000' }, { color: '#ffc107', label: '<1,000 acres' }] },
     },
     volcanoes: {
       name: 'Volcanic Activity',
@@ -558,6 +558,8 @@ const Observatory = {
 
     // Load geo marker data
     this.loadHeaterMarkers();
+    this.updateMapOverlays();
+    setInterval(() => this.updateMapOverlays(), 5 * 60 * 1000);
     this.loadAircraftMarkers();
     setInterval(() => this.loadAircraftMarkers(), 5 * 60 * 1000);
     this.loadWildfireMarkers();
@@ -794,6 +796,19 @@ const Observatory = {
       if (this.map.hasLayer(layer)) count++;
     });
     document.getElementById('map-layers').textContent = `${count + 1} layers active`;
+  },
+
+  _formatBadgeNumber(n) {
+    if (n == null || isNaN(n)) return '—';
+    if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
+    return String(n);
+  },
+
+  updateLayerChipBadge(layerKey, text) {
+    const badges = document.querySelectorAll(`[data-layer-badge="${layerKey}"]`);
+    badges.forEach(b => {
+      b.textContent = text;
+    });
   },
 
   // ── Toggle Map Style (light/dark) ───────────────────────────
@@ -1769,6 +1784,8 @@ const Observatory = {
       const res = await fetch('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson');
       const data = await res.json();
       if (data?.features) {
+        const count = (data.metadata && typeof data.metadata.count === 'number') ? data.metadata.count : data.features.length;
+        this.updateLayerChipBadge('earthquakes', this._formatBadgeNumber(count));
         data.features.slice(0, 80).forEach(f => {
           const [lng, lat] = f.geometry.coordinates;
           const mag = f.properties.mag;
@@ -1806,6 +1823,7 @@ const Observatory = {
 
       const activeCount = (this.heaterFacilities || []).filter(h => h.status !== 'decommissioned').length;
       const totalCount = (this.heaterFacilities || []).length;
+      this.updateLayerChipBadge('heaters', `${activeCount}/${totalCount}`);
       document.querySelectorAll('.heater-active-badge').forEach(b => {
         b.textContent = `${activeCount}/${totalCount}`;
       });
@@ -2052,8 +2070,14 @@ const Observatory = {
   async loadAircraftMarkers() {
     try {
       const res = await fetch('/api/geo/aircraft');
-      if (res.status === 401) { console.warn('[Observatory] Aircraft layer: not signed in as a subscriber'); return; }
+      if (res.status === 401) {
+        this.updateLayerChipBadge('aircraft', 'PRO');
+        console.warn('[Observatory] Aircraft layer: not signed in as a subscriber');
+        return;
+      }
       const data = await res.json();
+      const count = data.count != null ? data.count : (data.aircraft || []).length;
+      this.updateLayerChipBadge('aircraft', this._formatBadgeNumber(count));
       this.markers.aircraft.forEach(m => this.mapLayers.aircraft.removeLayer(m));
       this.markers.aircraft = [];
       this._acData = data.aircraft || [];
@@ -2086,7 +2110,10 @@ const Observatory = {
       this._syncAircraftFilterUI();
       this.updateLayerCount();
       this.updateDynamicLegend();
-    } catch (e) { console.warn('[Observatory] Aircraft load failed:', e.message); }
+    } catch (e) {
+      this.updateLayerChipBadge('aircraft', '—');
+      console.warn('[Observatory] Aircraft load failed:', e.message);
+    }
   },
 
   // ── Wildfire Markers ────────────────────────────────────────
@@ -2094,6 +2121,8 @@ const Observatory = {
     try {
       const res = await fetch('/api/geo/wildfires');
       const data = await res.json();
+      const count = data.count != null ? data.count : (data.fires || []).length;
+      this.updateLayerChipBadge('wildfires', this._formatBadgeNumber(count));
       this.markers.wildfires.forEach(m => this.mapLayers.wildfires.removeLayer(m));
       this.markers.wildfires = [];
       (data.fires || []).forEach(f => {
@@ -2122,7 +2151,10 @@ const Observatory = {
       this._mirrorToFs('wildfires');
       this.updateLayerCount();
       this.updateDynamicLegend();
-    } catch (e) { console.warn('[Observatory] Wildfire load failed:', e.message); }
+    } catch (e) {
+      this.updateLayerChipBadge('wildfires', '—');
+      console.warn('[Observatory] Wildfire load failed:', e.message);
+    }
   },
 
   // ── Lightning flashes (GOES GLM, last 15 min) ───────────────
@@ -2130,6 +2162,8 @@ const Observatory = {
     try {
       const res = await fetch('/api/geo/lightning');
       const data = await res.json();
+      const count = data.count != null ? data.count : (data.flashes || []).length;
+      this.updateLayerChipBadge('glm', this._formatBadgeNumber(count));
       this.markers.glm.forEach(m => this.mapLayers.glm.removeLayer(m));
       this.markers.glm = [];
       const renderer = this._glmRenderer || (this._glmRenderer = L.canvas({ padding: 0.3 }));
@@ -2149,7 +2183,10 @@ const Observatory = {
       this._mirrorToFs('glm');
       this.updateLayerCount();
       this.updateDynamicLegend();
-    } catch (e) { console.warn('[Observatory] Lightning load failed:', e.message); }
+    } catch (e) {
+      this.updateLayerChipBadge('glm', '—');
+      console.warn('[Observatory] Lightning load failed:', e.message);
+    }
   },
 
   // ── Volcano Markers ─────────────────────────────────────────
@@ -2157,6 +2194,8 @@ const Observatory = {
     try {
       const res = await fetch('/api/geo/volcanoes');
       const data = await res.json();
+      const count = data.count != null ? data.count : (data.volcanoes || []).length;
+      this.updateLayerChipBadge('volcanoes', this._formatBadgeNumber(count));
       this.markers.volcanoes.forEach(m => this.mapLayers.volcanoes.removeLayer(m));
       this.markers.volcanoes = [];
       (data.volcanoes || []).forEach(v => {
@@ -2189,7 +2228,10 @@ const Observatory = {
       this._mirrorToFs('volcanoes');
       this.updateLayerCount();
       this.updateDynamicLegend();
-    } catch (e) { console.warn('[Observatory] Volcano load failed:', e.message); }
+    } catch (e) {
+      this.updateLayerChipBadge('volcanoes', '—');
+      console.warn('[Observatory] Volcano load failed:', e.message);
+    }
   },
 
   // ── Bind Events ──────────────────────────────────────────────
