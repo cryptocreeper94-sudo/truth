@@ -334,6 +334,8 @@ const FEED_MEASURES = {
       const top = Object.entries(bt).sort((a, b) => b[1] - a[1]).slice(0, 2).map(([k, n]) => `${n} ${k}`).join(' · ');
       return [`${fmtN(v)} ACTIVE FLIGHT RESTRICTIONS${top ? ' · ' + top : ''}`, 'info'];
     } },
+  grid: { series: 'grid_demand_us', label: 'US Lower 48 electricity demand', unit: 'MW', latestField: 'usDemandMW',
+    cond: v => [`${fmtN(v)} MW · US LOWER 48 DEMAND`, 'info'] },
 };
 
 function seriesPoints(id, now) {
@@ -384,7 +386,10 @@ function buildMeasure(feed, dataEntries, now) {
     };
   }
   const vals = points.map(p => p[1]).filter(v => v != null);
-  const lastEntry = [...dataEntries].reverse().find(e => !isGap(e)) || null;
+  const fieldKey = m.latestField || m.manifestField;
+  const lastEntry = (fieldKey ? [...dataEntries].reverse().find(e => !isGap(e) && typeof e[fieldKey] === 'number') : null)
+    || [...dataEntries].reverse().find(e => !isGap(e))
+    || null;
   let current = vals.length ? vals[vals.length - 1] : null;
   if (m.latestField && lastEntry && typeof lastEntry[m.latestField] === 'number') current = lastEntry[m.latestField];
   if (current == null && m.manifestField && lastEntry && typeof lastEntry[m.manifestField] === 'number') current = lastEntry[m.manifestField];

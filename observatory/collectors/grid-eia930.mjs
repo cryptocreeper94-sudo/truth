@@ -227,11 +227,20 @@ async function collectDataset(dataset, dateStr, now) {
   const filename = `${dataset.id}-${now.toISOString().replace(/[:.]/g, '-')}.json`;
   writeFileSync(join(datasetDir, filename), result.body);
 
-  // Parse to extract record count
+  // Parse to extract record count and US48 Lower 48 demand
   let recordCount = 0;
+  let usDemandMW = null;
   try {
     const parsed = JSON.parse(result.body);
-    recordCount = parsed?.response?.data?.length || 0;
+    const data = parsed?.response?.data || [];
+    recordCount = data.length;
+    if (dataset.id === 'demand') {
+      const us48 = data.find(r => r.respondent === 'US48' && r.type === 'D' && r.value != null);
+      if (us48) {
+        const val = parseFloat(us48.value);
+        if (Number.isFinite(val)) usDemandMW = val;
+      }
+    }
   } catch {}
 
   appendManifest({
@@ -247,6 +256,7 @@ async function collectDataset(dataset, dateStr, now) {
     bytes: Buffer.byteLength(result.body),
     httpStatus: result.status,
     recordCount,
+    usDemandMW,
     doctrineNode: '[32] Integrity Layer',
   });
 

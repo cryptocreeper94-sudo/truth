@@ -87,12 +87,24 @@ function appendManifest(entry) {
   writeFileSync(manifestPath(), line, { flag: 'a' });
 }
 
-// Dedupe window: source listings/queries span at most one UTC day, so 48h of
-// ledger entries is sufficient and bounded (no whole-manifest read).
+// Dedupe window: 48h of ledger entries is sufficient and bounded.
+// Returns Map of id -> { eventId, updatedTime, magnitude }. All aliases in e.ids are indexed.
 function loadSeenEvents() {
-  const seen = new Set();
+  const seen = new Map();
   for (const e of readSince(STATE_DIR, 'seismic-manifest.jsonl', 48)) {
-    if (e.eventId) seen.add(e.eventId);
+    if (e.eventId) {
+      const rec = {
+        eventId: e.eventId,
+        updatedTime: e.updatedTime || null,
+        magnitude: typeof e.magnitude === 'number' ? e.magnitude : null,
+      };
+      seen.set(e.eventId, rec);
+      if (typeof e.ids === 'string') {
+        for (const alias of e.ids.split(',')) {
+          if (alias.trim()) seen.set(alias.trim(), rec);
+        }
+      }
+    }
   }
   return seen;
 }
@@ -104,12 +116,21 @@ function utcDateStr(d = new Date()) {
   return `${d.getUTCFullYear()}-${(d.getUTCMonth() + 1).toString().padStart(2, '0')}-${d.getUTCDate().toString().padStart(2, '0')}`;
 }
 
+let lastQueryTime = null;
+
 function buildQueryUrl(now = new Date()) {
-  const start = new Date(now.getTime() - CONFIG.lookbackMinutes * 60000);
+  // Query events with origin within 48h so revisions to recent events are included
+  const originStart = new Date(now.getTime() - 48 * 3600000);
+  // On startup (first cycle), look for any updates in the last 48h to pick up recent ComCat revisions.
+  // On subsequent cycles, look for updates since last query with 60s overlap buffer.
+  const updatedCutoff = lastQueryTime
+    ? new Date(lastQueryTime - 60000)
+    : new Date(now.getTime() - 48 * 3600000);
+
   const params = new URLSearchParams({
     format: 'geojson',
-    starttime: start.toISOString(),
-    endtime: now.toISOString(),
+    starttime: originStart.toISOString(),
+    updatedafter: updatedCutoff.toISOString(),
     minmagnitude: CONFIG.minMagnitude.toString(),
     limit: CONFIG.maxEvents.toString(),
     orderby: 'time',
@@ -184,6 +205,9 @@ async function runCycle() {
 
   const queryUrl = buildQueryUrl(now);
   const result = await fetchWithRetry(queryUrl);
+  if (result && result.body && result.status !== 'FETCH_ERROR') {
+    lastQueryTime = now.getTime();
+  }
 
   if (!result.body || result.status === 'FETCH_ERROR') {
     // [40] Non-Being Guard — gap recorded
@@ -247,19 +271,41 @@ async function runCycle() {
 
   // Process individual events
   let newEvents = 0;
+  let updatedEvents = 0;
   for (const feature of features) {
     const props = feature.properties || {};
-    const eventId = feature.id || props.code || props.ids;
+    const eventId = feature.id || props.code;
 
-    if (!eventId || seen.has(eventId)) continue;
-    seen.add(eventId);
-    newEvents++;
+    if (!eventId) continue;
+
+    const curUpdated = props.updated ? new Date(props.updated).toISOString() : null;
+    const curMag = typeof props.mag === 'number' ? props.mag : null;
+
+    // Check if seen before under canonical ID or any alias
+    const prev = seen.get(eventId) || (props.ids ? props.ids.split(',').map(id => seen.get(id.trim())).find(Boolean) : null);
+    if (prev) {
+      if (prev.updatedTime === curUpdated && prev.magnitude === curMag) {
+        continue;
+      }
+      updatedEvents++;
+    } else {
+      newEvents++;
+    }
+
+    const rec = { eventId, updatedTime: curUpdated, magnitude: curMag };
+    seen.set(eventId, rec);
+    if (typeof props.ids === 'string') {
+      for (const alias of props.ids.split(',')) {
+        if (alias.trim()) seen.set(alias.trim(), rec);
+      }
+    }
 
     const [lon, lat, depthKm] = feature.geometry?.coordinates || [null, null, null];
 
     appendManifest({
       type: 'EARTHQUAKE-EVENT',
       eventId,
+      ids: props.ids || null,
       source: IDENTITY.source,
       domain: IDENTITY.domain,
       // Core seismic parameters
@@ -267,7 +313,7 @@ async function runCycle() {
       magnitudeType: props.magType,
       place: props.place,
       originTime: props.time ? new Date(props.time).toISOString() : null,
-      updatedTime: props.updated ? new Date(props.updated).toISOString() : null,
+      updatedTime: curUpdated,
       latitude: lat,
       longitude: lon,
       depthKm,
@@ -292,7 +338,7 @@ async function runCycle() {
     });
   }
 
-  console.log(`[SEISMIC] Cycle complete — ${features.length} events in window, ${newEvents} new`);
+  console.log(`[SEISMIC] Cycle complete — ${features.length} events in window, ${newEvents} new, ${updatedEvents} updated`);
   consecutiveFailures = 0;
   pruneOldFiles(RAW_DIR, RETENTION_HOURS);
 }

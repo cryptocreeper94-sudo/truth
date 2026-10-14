@@ -265,6 +265,22 @@ PRODUCTS.push({ prefix: "usgs-hon", parse: makeGeomagParser("geomag_hon") })
 PRODUCTS.push({ prefix: "flare-events", parse: parseFlares })
 PRODUCTS.push({ prefix: "wildfire", parse: parseWildfireRaw })
 PRODUCTS.push({ prefix: "volcanic", parse: parseVolcanicRaw })
+to parseDemand(j, nowMs):
+    if j == null or j.response == null or not Array.isArray(j.response.data):
+        return 0
+    let pts = []
+    for each r in j.response.data:
+        if r.respondent == "US48" and r.type == "D" and r.value != null:
+            let period = String(r.period)
+            let tStr = period + ":00:00Z"
+            if period.length != 13:
+                set tStr to period
+            let t = Date.parse(tStr)
+            let v = num(r.value)
+            if not Number.isNaN(t) and not Number.isNaN(v):
+                pts.push([t, v])
+    return upsertSeries(STATE_DIR, "grid_demand_us", aggregate(pts, hourKey), false)
+PRODUCTS.push({ prefix: "demand", parse: parseDemand })
 
 // ── Manifest-derived signals (survive raw pruning) ──────────────────────────
 to quakeOf(e):
@@ -485,7 +501,7 @@ to backfillQuakeYear(y):
         if h1 == null or h2 == null:
             return -1
         set evs to h1.concat(h2)
-    return upsertEvents(STATE_DIR, "quake", evs, true)
+    return upsertEvents(STATE_DIR, "quake", evs, y < thisYear)
 
 to backfillQuakes(st):
     let done = st.backfill.quakeYears or {}

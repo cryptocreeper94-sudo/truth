@@ -317,6 +317,24 @@ PRODUCTS.push({ prefix: "usgs-hon", parse: makeGeomagParser("geomag_hon") });
 PRODUCTS.push({ prefix: "flare-events", parse: parseFlares });
 PRODUCTS.push({ prefix: "wildfire", parse: parseWildfireRaw });
 PRODUCTS.push({ prefix: "volcanic", parse: parseVolcanicRaw });
+function parseDemand(j, nowMs) {
+  if (((j == null) || (j.response == null)) || !Array.isArray(j.response.data)) {
+    return 0;
+  }
+  let pts = [];
+  for (const r of j.response.data) {
+    if ((((r.respondent == "US48") && (r.type == "D")) && (r.value != null))) {
+      let period = String(r.period);
+      let t = Date.parse(period.length == 13 ? (period + ":00:00Z") : period);
+      let v = num(r.value);
+      if ((!Number.isNaN(t) && !Number.isNaN(v))) {
+        pts.push([t, v]);
+      }
+    }
+  }
+  return upsertSeries(STATE_DIR, "grid_demand_us", aggregate(pts, hourKey), false);
+}
+PRODUCTS.push({ prefix: "demand", parse: parseDemand });
 // ── Manifest-derived signals (survive raw pruning) ──────────────────────────
 function quakeOf(e) {
   let t = Date.parse(e.originTime);
@@ -583,7 +601,7 @@ function backfillQuakeYear(y) {
     }
     evs = h1.concat(h2);
   }
-  return upsertEvents(STATE_DIR, "quake", evs, true);
+  return upsertEvents(STATE_DIR, "quake", evs, (y < thisYear));
 }
 function backfillQuakes(st) {
   let done = (st.backfill.quakeYears || {  });
