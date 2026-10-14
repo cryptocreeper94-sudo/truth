@@ -3,9 +3,10 @@
  * TRUTH Observatory — FAA NOTAM & Cloud Seeding Permit Collector
  * DarkWave Studios LLC — Copyright 2026
  *
- * Fetches active NOTAMs from the FAA NOTAM API and scrapes known
- * state-level weather modification permit databases.
- * FAA API is public (requires free registration for key).
+ * Fetches active FAA Temporary Flight Restrictions (TFRs) from the public
+ * tfr.faa.gov list (no key needed), optionally the full FAA NOTAM API when a
+ * FAA_API_KEY is configured, and snapshots state weather modification
+ * (cloud seeding) permit pages.
  *
  * DDA 42-Doctrine module mapping:
  *   [01] Identity Kernel    → COLLECTOR_IDENTITY
@@ -16,9 +17,11 @@
  *   [40] Non-Being Guard    → Missing data recorded as gap
  *
  * Sources:
- *   - FAA NOTAM Search: https://notams.aim.faa.gov/notamSearch/
- *   - Texas WM permits: https://www.tdlr.texas.gov/weather/weathermod.htm
- *   - Colorado WM: https://dnr.colorado.gov/divisions/water/weather-modification
+ *   - FAA TFR list: https://tfr.faa.gov/tfrapi/exportTfrList (public JSON)
+ *   - FAA NOTAM API (optional, FAA_API_KEY)
+ *   - Texas WM program: https://www.tdlr.texas.gov/weather/weathermod.htm
+ *   - North Dakota Atmospheric Resource Board: https://www.swc.nd.gov/arb/
+ *   (Colorado DNR blocks automated requests with HTTP 403, so it is not polled.)
  */
 
 import { createHash } from 'crypto';
@@ -33,10 +36,10 @@ const RAW_DIR = process.env.RAW_DIR || join(REPO_ROOT, 'observatory', 'raw', 'no
 
 const IDENTITY = Object.freeze({
   name: 'observatory-notam-collector',
-  version: '1.0.0',
+  version: '1.1.0',
   author: 'Andrews, Ronald Jason — DarkWave Studios LLC',
   architecture: 'DDA 42-Doctrine / Deterministic Dissolution Ladder',
-  source: 'FAA NOTAM Search + State Weather Modification Permits',
+  source: 'FAA Temporary Flight Restrictions + State Weather Modification Programs',
   domain: 'infrastructure-airspace',
   dataType: 'notams-and-permits',
   maxConsecutiveFailures: 5,
@@ -46,11 +49,11 @@ const CONFIG = Object.freeze({
   // FAA NOTAM API — fetches TFRs and active NOTAMs for key FIRs
   notamUrl: 'https://external-api.faa.gov/notamapi/v1/notams?responseFormat=geoJSON&notamType=N&classification=DOM&sortBy=effectiveStartDate&sortOrder=DESC&pageSize=100',
   notamApiKey: process.env.FAA_API_KEY || '',
+  tfrUrl: 'https://tfr.faa.gov/tfrapi/exportTfrList',
   // State weather modification permit pages (public HTML)
   permitUrls: [
-    { state: 'TX', url: 'https://www.tdlr.texas.gov/weather/wmlicensees.htm' },
-    { state: 'CO', url: 'https://dnr.colorado.gov/divisions/water/weather-modification' },
-    { state: 'ND', url: 'https://www.swc.nd.gov/arb/atmospherics/' },
+    { state: 'TX', url: 'https://www.tdlr.texas.gov/weather/weathermod.htm' },
+    { state: 'ND', url: 'https://www.swc.nd.gov/arb/' },
   ],
   intervalMs: parseInt(process.env.NOTAM_INTERVAL_MS || '3600000', 10), // 1 hour
   maxRetries: 3,
@@ -97,7 +100,31 @@ async function runCycle() {
 
   let anySuccess = false;
 
-  // 1. FAA NOTAMs
+  // 0. FAA Temporary Flight Restrictions (public, no key)
+  {
+    const result = await safeFetch(CONFIG.tfrUrl);
+    let list = null;
+    if (result.ok) { try { list = JSON.parse(result.body); } catch {} }
+    if (Array.isArray(list)) {
+      const filename = `tfr_${now.toISOString().replace(/[:.]/g, '-')}.json`;
+      writeFileSync(join(rawDir, filename), result.body);
+      const byType = {};
+      const byState = {};
+      for (const t of list) {
+        const ty = String(t.type || 'OTHER').toUpperCase();
+        byType[ty] = (byType[ty] || 0) + 1;
+        if (t.state) byState[t.state] = (byState[t.state] || 0) + 1;
+      }
+      appendManifest({ type: 'OBSERVATION', source: 'FAA TFR List', domain: IDENTITY.domain, retrievedAt: now.toISOString(), sha256: result.sha256, tfrs: list.length, byType, byState, records: list.length, bytes: result.body.length, rawFile: filename });
+      console.log(`  [TFR] ${list.length} active flight restrictions`);
+      anySuccess = true;
+    } else {
+      appendManifest({ type: 'DATA-GAP', source: 'FAA TFR List', domain: IDENTITY.domain, retrievedAt: now.toISOString(), reason: result.ok ? 'Unparseable TFR list' : result.error });
+      console.log(`  [TFR GAP] ${result.ok ? 'unparseable' : result.error}`);
+    }
+  }
+
+  // 1. FAA NOTAMs (full API, optional)
   if (CONFIG.notamApiKey) {
     const result = await safeFetch(CONFIG.notamUrl, { 'client_id': CONFIG.notamApiKey });
     if (result.ok) {
@@ -113,7 +140,7 @@ async function runCycle() {
       console.log(`  [NOTAM GAP] ${result.error}`);
     }
   } else {
-    console.log('  [NOTAM] FAA_API_KEY not set — skipping NOTAM fetch');
+    console.log('  [NOTAM] FAA_API_KEY not set — full NOTAM API skipped (TFR list still collected)');
   }
 
   // 2. State weather modification permit pages

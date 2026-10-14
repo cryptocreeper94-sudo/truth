@@ -7,11 +7,20 @@
  * Uses the same public S3 bucket infrastructure as the existing GOES collector,
  * but targets the GLM lightning detection products specifically.
  *
+ * v1.1: every downloaded LCFA file is now opened (pure-JS HDF5 reader) and the
+ * real flash count + flash centroids are extracted. This feeds:
+ *   - the permanent hourly series `glm_flash_rate` (flashes per minute)
+ *   - STATE_DIR/lightning-recent.json (flash points from the last 15 minutes)
+ * GOES-East and GOES-West overlap over the Americas, so each flash is assigned
+ * to ONE satellite by longitude (east of 106.2°W → GOES-East, west of it →
+ * GOES-West) to avoid double counting.
+ *
  * DDA 42-Doctrine module mapping:
  *   [01] Identity Kernel    → COLLECTOR_IDENTITY: immutable cert for this collector
  *   [02] Boundary Engine    → Only GOES GLM source; never writes outside raw/lightning/
  *   [08] Temporal Engine    → Every file timestamped UTC from satellite observation time
  *   [14] Determinacy Engine → SHA-256 hash of every file + retrieval manifest
+ *   [16] Domain Mapper      → Longitude split assigns each flash to exactly one satellite
  *   [32] Integrity Layer    → Raw NetCDF files preserved as-is; no modification after download
  *   [33] Alignment Layer    → Rate-limited fetch; configurable product set
  *   [35] Collapse Detection → Consecutive failure counter; halts collector after threshold
@@ -28,10 +37,12 @@
  */
 
 import { createHash } from 'crypto';
-import { mkdirSync, existsSync, readFileSync, writeFileSync, readdirSync, statSync, unlinkSync } from 'fs';
+import { mkdirSync, existsSync, readFileSync, writeFileSync, renameSync, readdirSync, statSync, unlinkSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import * as hdf5 from 'jsfive';
 import { readSince } from '../lib/manifest-ledger.mjs';
+import { upsertSeries, hourKey, tidy } from '../lib/signal-store.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(__dirname, '..', '..');
@@ -43,7 +54,7 @@ const RAW_DIR = process.env.RAW_DIR || join(REPO_ROOT, 'observatory', 'raw', 'li
 // ═══════════════════════════════════════════════════════════════════════════════
 const IDENTITY = Object.freeze({
   name: 'observatory-goes-glm-lightning-collector',
-  version: '1.0.0',
+  version: '1.1.0',
   author: 'Andrews, Ronald Jason — DarkWave Studios LLC',
   architecture: 'DDA 42-Doctrine / Deterministic Dissolution Ladder',
   source: 'NOAA GOES GLM (Geostationary Lightning Mapper)',
@@ -65,20 +76,29 @@ const CONFIG = Object.freeze({
       name: 'GOES-19 (East)',
       bucket: 'https://noaa-goes19.s3.amazonaws.com',
       product: 'GLM-L2-LCFA',
+      // Flashes assigned to this satellite: 106.2°W eastward to 60°E
+      owns: lon => lon >= -106.2 && lon <= 60,
     },
     {
       id: 'goes18',
       name: 'GOES-18 (West)',
       bucket: 'https://noaa-goes18.s3.amazonaws.com',
       product: 'GLM-L2-LCFA',
+      // Flashes west of 106.2°W, including across the dateline
+      owns: lon => lon < -106.2 || lon > 60,
     },
   ],
 
-  // GLM produces files every 20 seconds; we sample the last N minutes
+  // GLM produces a file every 20 seconds (15 per 5-minute cycle)
   lookbackMinutes: parseInt(process.env.GLM_LOOKBACK || '15', 10),
 
-  // Max files per satellite per cycle
-  maxFilesPerSat: 10,
+  // Max files per satellite per cycle (15 = every file at a 5-minute cadence)
+  maxFilesPerSat: 15,
+
+  // Rolling windows for derived outputs
+  recentFlashMinutes: 15,
+  maxRecentFlashes: 30000,
+  sampleHours: 48,
 
   maxRetries: 3,
   retryDelayMs: 2000,
@@ -127,6 +147,21 @@ function dateStr(d = new Date()) {
   return `${p.yyyy}-${p.mm}-${p.dd}`;
 }
 
+// GOES filename stamp: sYYYYJJJHHMMSSt (t = tenths of a second)
+function stampMs(stamp) {
+  const m = /^(\d{4})(\d{3})(\d{2})(\d{2})(\d{2})(\d)$/.exec(stamp || '');
+  if (!m) return NaN;
+  const [, y, j, h, mi, s, t] = m.map(Number);
+  return Date.UTC(y, 0, 1) + (j - 1) * 86400000 + h * 3600000 + mi * 60000 + s * 1000 + t * 100;
+}
+
+function fileWindow(filename) {
+  const s = /_s(\d{14})_/.exec(filename), e = /_e(\d{14})_/.exec(filename);
+  const startMs = stampMs(s && s[1]), endMs = stampMs(e && e[1]);
+  const durSec = Number.isFinite(startMs) && Number.isFinite(endMs) && endMs > startMs ? (endMs - startMs) / 1000 : 20;
+  return { startMs, durSec };
+}
+
 // ═══════════════════════════════════════════════════════════════════════════════
 // [32] INTEGRITY LAYER — SHA-256 hash + download
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -155,11 +190,35 @@ async function downloadFile(url, destPath, retries = CONFIG.maxRetries) {
       mkdirSync(dirname(destPath), { recursive: true });
       writeFileSync(destPath, buf);
 
-      return { status: res.status, sha256, bytes: buf.length };
+      return { status: res.status, sha256, bytes: buf.length, buf };
     } catch (err) {
       if (attempt === retries) return { status: 'FETCH_ERROR', error: err.message, sha256: null, bytes: 0 };
       await new Promise(r => setTimeout(r, CONFIG.retryDelayMs * attempt));
     }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// [16] DOMAIN MAPPER — Extract flashes from an LCFA NetCDF-4 (HDF5) file
+// ═══════════════════════════════════════════════════════════════════════════════
+function extractFlashes(buf, filename, satellite) {
+  try {
+    const ab = buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength);
+    const f = new hdf5.File(ab, filename);
+    const latDs = f.get('flash_lat'), lonDs = f.get('flash_lon');
+    if (!latDs || !lonDs) return null;
+    const lat = latDs.value, lon = lonDs.value;
+    const total = Math.min(lat.length, lon.length);
+    const points = [];
+    for (let i = 0; i < total; i++) {
+      const la = lat[i], lo = lon[i];
+      if (!Number.isFinite(la) || !Number.isFinite(lo)) continue;
+      if (!satellite.owns(lo)) continue;
+      points.push([Math.round(la * 100) / 100, Math.round(lo * 100) / 100]);
+    }
+    return { total, points };
+  } catch (err) {
+    return { error: err.message };
   }
 }
 
@@ -169,7 +228,8 @@ async function downloadFile(url, destPath, retries = CONFIG.maxRetries) {
 async function listGLMFiles(satellite, date = new Date()) {
   const { yyyy, doy, hh } = utcParts(date);
   const prefix = `${satellite.product}/${yyyy}/${doy}/${hh}/`;
-  const listUrl = `${satellite.bucket}?list-type=2&prefix=${prefix}&max-keys=100`;
+  // One hour holds ~180 files, so a single 1000-key page covers it.
+  const listUrl = `${satellite.bucket}?list-type=2&prefix=${prefix}&max-keys=1000`;
 
   try {
     const controller = new AbortController();
@@ -185,18 +245,77 @@ async function listGLMFiles(satellite, date = new Date()) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// [22] CONTINUITY LAYER — rolling derived state (flash samples + recent points)
+// ═══════════════════════════════════════════════════════════════════════════════
+const DERIVED_PATH = () => join(STATE_DIR, 'lightning-recent.json');
+
+function loadDerived() {
+  try {
+    const d = JSON.parse(readFileSync(DERIVED_PATH(), 'utf8'));
+    return { samples: Array.isArray(d.samples) ? d.samples : [], flashes: Array.isArray(d.flashes) ? d.flashes : [] };
+  } catch {
+    return { samples: [], flashes: [] };
+  }
+}
+
+function saveDerived(d, nowMs) {
+  const sampleCut = nowMs - CONFIG.sampleHours * 3600000;
+  const flashCut = nowMs - CONFIG.recentFlashMinutes * 60000;
+  d.samples = d.samples.filter(s => s[0] >= sampleCut);
+  d.flashes = d.flashes.filter(p => p[0] >= flashCut);
+  if (d.flashes.length > CONFIG.maxRecentFlashes) {
+    d.flashes.sort((a, b) => a[0] - b[0]);
+    d.flashes = d.flashes.slice(-CONFIG.maxRecentFlashes);
+  }
+  const out = {
+    updatedAt: new Date(nowMs).toISOString(),
+    windowMinutes: CONFIG.recentFlashMinutes,
+    split: 'Each flash is counted once: GOES-East east of 106.2°W, GOES-West west of it.',
+    // samples: [fileStartMs, satelliteId, assignedFlashes, durationSec]
+    samples: d.samples,
+    // flashes: [fileStartMs, lat, lon, satelliteId]
+    flashes: d.flashes,
+  };
+  const tmp = DERIVED_PATH() + '.tmp';
+  writeFileSync(tmp, JSON.stringify(out));
+  renameSync(tmp, DERIVED_PATH());
+}
+
+// Hourly flash rate: per satellite mean flashes/min over that hour's sampled
+// files, then summed across satellites (their regions do not overlap).
+function writeRateSeries(samples) {
+  const byHour = {};
+  for (const [ms, sat, n, dur] of samples) {
+    if (!Number.isFinite(ms) || !(dur > 0)) continue;
+    const k = hourKey(ms);
+    const h = byHour[k] || (byHour[k] = {});
+    const s = h[sat] || (h[sat] = []);
+    s.push((n / dur) * 60);
+  }
+  const rows = [];
+  for (const k of Object.keys(byHour).sort()) {
+    let mean = 0, lo = 0, hi = 0, n = 0;
+    for (const rates of Object.values(byHour[k])) {
+      mean += rates.reduce((a, b) => a + b, 0) / rates.length;
+      lo += Math.min(...rates);
+      hi += Math.max(...rates);
+      n += rates.length;
+    }
+    rows.push([k, tidy(mean), tidy(lo), tidy(hi), n]);
+  }
+  if (rows.length) upsertSeries(STATE_DIR, 'glm_flash_rate', rows, false);
+  return rows.length ? rows[rows.length - 1] : null;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // [03] DIFFERENTIATION — Collect one satellite's GLM data
 // ═══════════════════════════════════════════════════════════════════════════════
-async function collectSatellite(satellite, seen, now) {
+async function collectSatellite(satellite, seen, now, derived) {
   console.log(`  [→] ${satellite.name}`);
 
-  let files = await listGLMFiles(satellite, now);
-
-  // Try previous hour if current hour is empty
-  if (files.length === 0) {
-    const prevHour = new Date(now.getTime() - 3600000);
-    files = await listGLMFiles(satellite, prevHour);
-  }
+  // Current hour plus the previous one, so files near the hour boundary are not missed
+  const prevHour = new Date(now.getTime() - 3600000);
+  const files = [...await listGLMFiles(satellite, prevHour), ...await listGLMFiles(satellite, now)];
 
   if (files.length === 0) {
     appendManifest({
@@ -212,8 +331,12 @@ async function collectSatellite(satellite, seen, now) {
     return { satellite: satellite.id, downloaded: 0, gaps: 1, errors: 0 };
   }
 
-  // Filter to unseen files, take most recent N
-  const newFiles = files.filter(k => !seen.has(k.split('/').pop())).slice(-CONFIG.maxFilesPerSat);
+  // Filter to unseen files inside the lookback window, take most recent N
+  const cutoff = now.getTime() - CONFIG.lookbackMinutes * 60000;
+  const newFiles = files
+    .filter(k => !seen.has(k.split('/').pop()))
+    .filter(k => { const w = fileWindow(k.split('/').pop()); return !Number.isFinite(w.startMs) || w.startMs >= cutoff; })
+    .slice(-CONFIG.maxFilesPerSat);
 
   let downloaded = 0, errors = 0;
   const ds = dateStr(now);
@@ -233,6 +356,13 @@ async function collectSatellite(satellite, seen, now) {
     if (result.status === 200 && result.sha256) {
       seen.add(filename);
       downloaded++;
+      const { startMs, durSec } = fileWindow(filename);
+      const fx = extractFlashes(result.buf, filename, satellite);
+      const flashes = fx && !fx.error ? fx.points.length : null;
+      if (flashes != null && Number.isFinite(startMs)) {
+        derived.samples.push([startMs, satellite.id, flashes, durSec]);
+        for (const [la, lo] of fx.points) derived.flashes.push([startMs, la, lo, satellite.id]);
+      }
       appendManifest({
         type: 'GLM-FILE',
         satellite: satellite.id,
@@ -242,14 +372,20 @@ async function collectSatellite(satellite, seen, now) {
         sourceUrl: fileUrl,
         localPath: `observatory/raw/lightning/${ds}/${satellite.id}/${filename}`,
         retrievedAt: now.toISOString(),
+        observedAt: Number.isFinite(startMs) ? new Date(startMs).toISOString() : null,
+        durationSec: durSec,
         sha256: result.sha256,
         bytes: result.bytes,
         httpStatus: result.status,
+        flashes,                                   // flashes in this satellite's assigned region
+        flashesInFile: fx && !fx.error ? fx.total : null,
+        flashesPerMin: flashes != null ? tidy((flashes / durSec) * 60) : null,
+        parseError: fx && fx.error ? fx.error : undefined,
         source: IDENTITY.source,
         domain: IDENTITY.domain,
         doctrineNode: '[32] Integrity Layer',
       });
-      console.log(`    [OK] ${satellite.id}/${filename} — ${(result.bytes / 1024).toFixed(1)} KB — sha256:${result.sha256.slice(0, 12)}…`);
+      console.log(`    [OK] ${satellite.id}/${filename} — ${(result.bytes / 1024).toFixed(1)} KB — ${flashes ?? '?'} flashes — sha256:${result.sha256.slice(0, 12)}…`);
     } else if (result.status === 404) {
       // Not an error — file may have been pruned from S3
     } else {
@@ -283,7 +419,7 @@ function pruneOldFiles(rootDir, retentionHours) {
     for (const e of entries) {
       const p = join(dir, e.name);
       if (e.isDirectory()) walk(p);
-      else {
+      else if (/\.nc$/.test(e.name)) {
         try {
           if (statSync(p).mtimeMs < cutoff) { unlinkSync(p); pruned++; }
         } catch {}
@@ -311,13 +447,22 @@ async function runCycle() {
   console.log(`\n[LIGHTNING] Cycle start — ${now.toISOString()}`);
 
   const seen = loadSeenFiles();
+  const derived = loadDerived();
   let totalDownloaded = 0, totalGaps = 0, totalErrors = 0;
 
   for (const sat of CONFIG.satellites) {
-    const result = await collectSatellite(sat, seen, now);
+    const result = await collectSatellite(sat, seen, now, derived);
     totalDownloaded += result.downloaded;
     totalGaps += result.gaps;
     totalErrors += result.errors;
+  }
+
+  try {
+    saveDerived(derived, Date.now());
+    const last = writeRateSeries(derived.samples);
+    if (last) console.log(`  [RATE] ${last[0]}Z — ${last[1]} flashes/min (${last[4]} files)`);
+  } catch (err) {
+    console.log(`  [RATE] derived write failed: ${err.message}`);
   }
 
   console.log(`[LIGHTNING] Cycle complete — downloaded: ${totalDownloaded}, gaps: ${totalGaps}, errors: ${totalErrors}`);
@@ -356,7 +501,7 @@ process.on('unhandledRejection', (reason) => {
 const INTERVAL_MS = parseInt(process.env.LIGHTNING_INTERVAL_MS || '300000', 10); // 5 min default
 
 console.log('═══════════════════════════════════════════════════════════════');
-console.log(' TRUTH Observatory — GOES GLM Lightning Collector v1.0.0');
+console.log(` TRUTH Observatory — GOES GLM Lightning Collector v${IDENTITY.version}`);
 console.log(` Architecture: ${IDENTITY.architecture}`);
 console.log(` Satellites: ${CONFIG.satellites.map(s => s.name).join(', ')}`);
 console.log(` Interval: ${INTERVAL_MS / 1000}s`);

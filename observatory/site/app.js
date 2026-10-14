@@ -103,6 +103,11 @@ const Observatory = {
         { color: '#ff3b3b', label: 'Emergency squawk' },
       ] },
     },
+    glm: {
+      name: 'Lightning (last 15 min)',
+      info: { source: 'NOAA GOES-19 (East) and GOES-18 (West) Geostationary Lightning Mapper', what: 'Every lightning flash the GOES satellites detected in the last 15 minutes across the Americas, the Atlantic and the eastern Pacific. Brighter dots are more recent. Where the two satellites overlap, each flash is counted only once.', update: 'Every 5 minutes', attribution: 'NOAA GOES GLM' },
+      legend: { type: 'dots', heading: 'LIGHTNING FLASHES (GOES GLM)', items: [{ color: '#fff200', label: 'Under 5 min ago' }, { color: '#ffa500', label: '5 – 10 min ago' }, { color: '#ff5a36', label: '10 – 15 min ago' }] },
+    },
     wildfires: {
       name: 'Active Wildfires',
       info: { source: 'NIFC / IRWIN via ESRI ArcGIS', what: 'Active wildfire incidents across the US from the National Interagency Fire Center. Shows fire name, acreage, containment, and cause.', update: 'Every 30 minutes', attribution: 'NIFC / IRWIN' },
@@ -120,7 +125,7 @@ const Observatory = {
   correlations: [],
   map: null,
   mapLayers: {},
-  markers: { earthquakes: [], lightning: [], heaters: [], aircraft: [], fire: [], wildfires: [], volcanoes: [] },
+  markers: { earthquakes: [], lightning: [], heaters: [], aircraft: [], fire: [], wildfires: [], volcanoes: [], glm: [] },
   refreshInterval: 60000,
   _alertLayersActive: [],  // tracks which layers were auto-activated by alerts
 
@@ -136,8 +141,8 @@ const Observatory = {
     },
     'severe-weather': {
       name: 'Severe Weather',
-      triggers: ['nexrad', 'lightning', 'blitzortung'],
-      layers: ['radar', 'precip', 'satellite', 'fire'],
+      triggers: ['nexrad', 'lightning'],
+      layers: ['radar', 'precip', 'satellite', 'glm'],
       icon: '⛈️',
       description: 'Severe weather detected — activating radar, precipitation, satellite, and fire layers.',
     },
@@ -430,6 +435,7 @@ const Observatory = {
     this.mapLayers.aircraft = L.layerGroup();
     this.mapLayers.wildfires = L.layerGroup();
     this.mapLayers.volcanoes = L.layerGroup();
+    this.mapLayers.glm = L.layerGroup();
 
     // State/country boundaries + labels overlay (always on over satellite imagery)
     // ESRI Reference overlay — guaranteed compatible with ESRI World Imagery base
@@ -446,6 +452,8 @@ const Observatory = {
     setInterval(() => this.loadAircraftMarkers(), 5 * 60 * 1000);
     this.loadWildfireMarkers();
     this.loadVolcanoMarkers();
+    this.loadLightningMarkers();
+    setInterval(() => this.loadLightningMarkers(), 5 * 60 * 1000);
 
     this.updateLayerCount();
     this.updateDynamicLegend();
@@ -474,7 +482,7 @@ const Observatory = {
       if (name === 'aircraft' && srcGroup && !srcGroup.hasLayer(m)) return;
       const opts = Object.assign({}, m.options);
       delete opts.renderer;
-      if (name === 'aircraft') opts.renderer = this._fsAircraftRenderer || (this._fsAircraftRenderer = L.canvas({ padding: 0.3, tolerance: 3 }));
+      if (name === 'aircraft' || name === 'glm') opts.renderer = this._fsAircraftRenderer || (this._fsAircraftRenderer = L.canvas({ padding: 0.3, tolerance: 3 }));
       const copy = new m.constructor(m.getLatLng(), opts);
       const popup = m.getPopup && m.getPopup();
       if (popup) copy.bindPopup(popup.getContent(), Object.assign({ className: 'obs-popup' }, popup.options && popup.options.maxWidth ? { maxWidth: popup.options.maxWidth } : {}));
@@ -1274,7 +1282,8 @@ const Observatory = {
       if (m.scaleMin == null && Math.min(...vals) > 0 && Math.min(...vals) > hi * 0.5) lo = Math.min(...vals) * 0.9; // zoom in on narrow ranges (e.g. solar wind)
       const ticks = this._niceTicks(lo, hi);
       lo = ticks[0]; hi = ticks[ticks.length - 1];
-      const t0 = pts[0][0], t1 = pts[pts.length - 1][0];
+      const winMs = m.window === '30d' ? 30 * 86400000 : m.window === '72h' ? 72 * 3600000 : 24 * 3600000;
+      const t1 = Math.max(Date.now(), pts.length ? pts[pts.length - 1][0] : 0), t0 = t1 - winMs;
       const X = t => padL + (t1 > t0 ? ((t - t0) / (t1 - t0)) * pw : pw);
       const Y = v => padT + ph - ((v - lo) / (hi - lo)) * ph;
       axis(ticks, lo, hi, m.unit);
@@ -1804,6 +1813,33 @@ const Observatory = {
     } catch (e) { console.warn('[Observatory] Wildfire load failed:', e.message); }
   },
 
+  // ── Lightning flashes (GOES GLM, last 15 min) ───────────────
+  async loadLightningMarkers() {
+    try {
+      const res = await fetch('/api/geo/lightning');
+      const data = await res.json();
+      this.markers.glm.forEach(m => this.mapLayers.glm.removeLayer(m));
+      this.markers.glm = [];
+      const renderer = this._glmRenderer || (this._glmRenderer = L.canvas({ padding: 0.3 }));
+      // Oldest first so the newest flashes paint on top
+      const list = (data.flashes || []).slice().sort((a, b) => b[0] - a[0]);
+      list.forEach(([age, lat, lon]) => {
+        const fill = age < 300 ? '#fff200' : age < 600 ? '#ffa500' : '#ff5a36';
+        const m = L.circleMarker([lat, lon], {
+          radius: age < 300 ? 3 : 2.4, color: 'rgba(20,12,0,0.6)', weight: 0.6,
+          fillColor: fill, fillOpacity: age < 300 ? 1 : 0.8, interactive: false, renderer,
+        });
+        this.mapLayers.glm.addLayer(m);
+        this.markers.glm.push(m);
+      });
+      this._glmInfo = { count: data.count || 0, updatedAt: data.updatedAt || null };
+      if (data.count > 0) console.log(`[Observatory] Plotted ${data.count} lightning flashes (last ${data.windowMinutes || 15} min)`);
+      this._mirrorToFs('glm');
+      this.updateLayerCount();
+      this.updateDynamicLegend();
+    } catch (e) { console.warn('[Observatory] Lightning load failed:', e.message); }
+  },
+
   // ── Volcano Markers ─────────────────────────────────────────
   async loadVolcanoMarkers() {
     try {
@@ -2036,7 +2072,7 @@ const Observatory = {
 <strong>LIVE</strong> = received data within expected interval.<br>
 <strong>STALE</strong> = data is older than 3× the expected refresh interval.<br>
 <strong>OFFLINE</strong> = no data received.<br><br>
-Feeds include NEXRAD radar, GOES satellite, solar/SWPC, USGS seismic, lightning, power grid, geomagnetic, ionospheric, Schumann resonance, surface stations, Blitzortung, ADS-B aircraft, NOTAMs, cell towers, and more.`,
+Feeds include NEXRAD radar, GOES satellite, solar/SWPC, USGS seismic, lightning, power grid, geomagnetic, ionospheric, Schumann resonance, surface stations, ADS-B aircraft, FAA flight restrictions, cell towers, and more.`,
     },
     'stat-atmoscore': {
       title: 'ATMOSCORE 4/42',
@@ -2227,7 +2263,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
     this.fsMapLayers.fire = this._firmsLayer();
 
     // Marker layers mirror the main map's data
-    ['heaters', 'aircraft', 'wildfires', 'volcanoes'].forEach(k => {
+    ['heaters', 'aircraft', 'wildfires', 'volcanoes', 'glm'].forEach(k => {
       this.fsMapLayers[k] = L.layerGroup();
       this._mirrorToFs(k);
     });

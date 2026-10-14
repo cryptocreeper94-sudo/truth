@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Truth Observatory — Mission Control</title>
-  <meta name="description" content="20-stream atmospheric, geophysical, and infrastructure monitoring cockpit with AtmosCore 4/42 deterministic state engine. Live feeds, cross-feed correlation, observation suitability governance.">
+  <meta name="description" content="19-stream atmospheric, geophysical, and infrastructure monitoring cockpit with AtmosCore 4/42 deterministic state engine. Live feeds, cross-feed correlation, observation suitability governance.">
   <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Outfit:wght@400;600;800;900&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
@@ -152,6 +152,7 @@
         <label class="layer-toggle" style="color:#ff6b6b;"><input type="checkbox" data-fslayer="fire"> 🔥 Satellite Fire Detections</label>
         <label class="layer-toggle" style="color:#ff4ecf;"><input type="checkbox" data-fslayer="heaters" checked> ⚡ Research Transmitters</label>
         <label class="layer-toggle" style="color:#4ecbff;"><input type="checkbox" data-fslayer="aircraft"> ✈ Aircraft (Live)</label>
+          <label class="layer-toggle" style="color:#ffe066;"><input type="checkbox" data-fslayer="glm"> ⚡ Lightning (last 15 min)</label>
         <label class="layer-toggle" style="color:#ff5722;"><input type="checkbox" data-fslayer="wildfires"> 💥 Wildfires</label>
         <label class="layer-toggle" style="color:#e040fb;"><input type="checkbox" data-fslayer="volcanoes"> 🌋 Volcanoes</label>
       </div>
@@ -189,6 +190,7 @@
         <label class="layer-toggle" style="color:#ff6b6b;"><input type="checkbox" data-layer="fire"> 🔥 Satellite Fire Detections</label>
         <label class="layer-toggle" style="color:#ff4ecf;"><input type="checkbox" data-layer="heaters" checked> <span class="layer-name-researcher">⚡ Ionospheric Heaters</span><span class="layer-name-observer">⚡ Research Transmitters</span></label>
         <label class="layer-toggle" style="color:#4ecbff;"><input type="checkbox" data-layer="aircraft"> ✈ Aircraft (Live)</label>
+          <label class="layer-toggle" style="color:#ffe066;"><input type="checkbox" data-layer="glm"> ⚡ Lightning (last 15 min)</label>
         <label class="layer-toggle" style="color:#ff5722;"><input type="checkbox" data-layer="wildfires"> 💥 Wildfires</label>
         <label class="layer-toggle" style="color:#e040fb;"><input type="checkbox" data-layer="volcanoes"> 🌋 Volcanoes</label>
         <button class="layer-toggle layer-toggle--style" id="map-style-toggle" title="Toggle light/dark map">🌙 DARK</button>
@@ -369,7 +371,7 @@
         <button class="ledger-info-modal__close" id="ledger-info-close">&#10005;</button>
       </div>
       <div class="ledger-info-modal__body">
-        <p><strong>What is this?</strong> The Event Ledger is a chronological stream of every observation, data gap, deviation, and correlation detected across all 20 feeds.</p>
+        <p><strong>What is this?</strong> The Event Ledger is a chronological stream of every observation, data gap, deviation, and correlation detected across all 19 feeds.</p>
         <p><strong>Block Numbers:</strong> Events are grouped into 15-minute blocks. Each event carries a deterministic hash for integrity verification.</p>
         <p><strong>Correlations:</strong> When deviations in multiple feeds coincide within a 1-hour window, they are highlighted as a potential correlation. All correlations carry a <em>skeptic note</em> — the mundane explanation is always scored higher than the anomalous one.</p>
         <p><strong>Data Retention:</strong> Raw observation data is pruned after <strong>30 days</strong>. Block hashes and metadata summaries are retained <strong>permanently</strong>. Full manifests are accessible via <code>/api/ledger</code>.</p>
@@ -437,7 +439,7 @@
       <h3 style="color:#4a9;margin:0 0 0.5rem;font-size:0.9rem;letter-spacing:0.05em;">⬇ EXPORT DATA</h3>
       <p style="color:#a09080;font-size:0.7rem;margin:0 0 1.25rem;">Select the datasets to include in your CSV report. Data reflects the latest observations.</p>
       <div id="export-options" style="display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1.25rem;">
-        <label style="display:flex;align-items:center;gap:0.6rem;color:#e8dfd6;font-size:0.75rem;cursor:pointer;"><input type="checkbox" value="feeds" checked style="accent-color:#4a9;"> All Feed Data (20 streams)</label>
+        <label style="display:flex;align-items:center;gap:0.6rem;color:#e8dfd6;font-size:0.75rem;cursor:pointer;"><input type="checkbox" value="feeds" checked style="accent-color:#4a9;"> All Feed Data (19 streams)</label>
         <label style="display:flex;align-items:center;gap:0.6rem;color:#e8dfd6;font-size:0.75rem;cursor:pointer;"><input type="checkbox" value="atmoscore" checked style="accent-color:#4a9;"> AtmosCore State Engine</label>
         <label style="display:flex;align-items:center;gap:0.6rem;color:#e8dfd6;font-size:0.75rem;cursor:pointer;"><input type="checkbox" value="correlations" style="accent-color:#4a9;"> Cross-Feed Correlations</label>
         <label style="display:flex;align-items:center;gap:0.6rem;color:#e8dfd6;font-size:0.75rem;cursor:pointer;"><input type="checkbox" value="ledger" style="accent-color:#4a9;"> Event Ledger</label>
@@ -462,7 +464,7 @@
       <div class="welcome-steps" id="welcome-steps">
         <div class="welcome-step welcome-step--active">
           <span class="welcome-step__icon">◫</span>
-          <h3>20 LIVE DATA STREAMS</h3>
+          <h3>19 LIVE DATA STREAMS</h3>
           <p>Atmospheric, geophysical, and infrastructure feeds from NOAA, USGS, FAA, EPA, EIA, and SWPC — updating every 5 minutes with SHA-256 hash verification.</p>
         </div>
         <div class="welcome-step">

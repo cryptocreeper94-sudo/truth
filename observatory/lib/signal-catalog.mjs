@@ -39,6 +39,7 @@ put(SERIES, "geomag_hon", { name: "Honolulu magnetometer dX/dt", unit: "nT/min",
 put(SERIES, "wildfire_active", { name: "Active US wildfires", unit: "fires", res: "1d", stat: "mean", scope: "global", since: "2026-08", source: "NIFC / IRWIN", plain: "number of active wildfires tracked in the US" });
 put(SERIES, "wildfire_acres", { name: "US wildfire acres burning", unit: "acres", res: "1d", stat: "mean", scope: "global", since: "2026-08", source: "NIFC / IRWIN", plain: "total acres of active US wildfires" });
 put(SERIES, "volcano_elevated", { name: "Volcanoes at elevated alert", unit: "volcanoes", res: "1d", stat: "mean", scope: "global", since: "2026-09", source: "USGS Volcano Hazards Program", plain: "number of US-monitored volcanoes above normal alert level" });
+put(SERIES, "glm_flash_rate", { name: "Lightning flash rate (GOES GLM)", unit: "flashes/min", res: "1h", stat: "mean", scope: "global", since: "2026-10", source: "NOAA GOES-19 (East) + GOES-18 (West) Geostationary Lightning Mapper", plain: "how many lightning flashes per minute the GOES satellites see across the Americas, Atlantic and eastern Pacific" });
 // Discrete events (each has its own time and place).
 export let EVENT_KINDS = {  };
 put(EVENT_KINDS, "quake", { name: "Earthquakes", since: "1973", source: "USGS ComCat (M4.5+ history, M2.5+ live)", plain: "earthquakes" });

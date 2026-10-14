@@ -45,7 +45,6 @@ const FEED_MANIFESTS = [
   { id: 'solar',       manifest: 'solar-manifest.jsonl',       name: 'Solar Activity' },
   { id: 'geomag',      manifest: 'geomag-manifest.jsonl',      name: 'Geomagnetic Index' },
   { id: 'lightning',   manifest: 'lightning-manifest.jsonl',    name: 'Lightning Detection' },
-  { id: 'blitzortung', manifest: 'blitzortung-manifest.jsonl', name: 'Blitzortung Network' },
   { id: 'surface',     manifest: 'surface-manifest.jsonl',     name: 'Surface Stations' },
   { id: 'ionosonde',   manifest: 'ionosonde-manifest.jsonl',   name: 'Ionospheric Monitor' },
   { id: 'schumann',    manifest: 'schumann-manifest.jsonl',    name: 'Schumann Resonance' },

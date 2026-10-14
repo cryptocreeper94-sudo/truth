@@ -238,17 +238,17 @@ const Levels = {
     lightning: {
       observer: {
         name: 'Lightning',
-        tagline: 'Where lightning is striking across the US, detected from space.',
-        why: 'Lightning patterns tell us about storm intensity and atmospheric energy. Unusual lightning in clear air or in unexpected patterns can indicate atmospheric disturbances worth investigating.',
+        tagline: 'Every lightning flash seen from space across the Americas and nearby oceans, counted per minute.',
+        why: 'Lightning shows where storms are strongest right now. Keeping a running count of flashes per minute lets us compare storm activity with everything else we measure, hour by hour.',
       },
       analyst: {
         name: 'Geostationary Lightning Mapper',
-        tagline: 'GOES GLM L2 cluster data from both East and West platforms. 5-min integration.',
-        why: 'Lightning density anomalies are cross-referenced with radar returns and surface station pressure data. Anomalous clear-air lightning events are flagged.',
+        tagline: 'GOES-19 (East) + GOES-18 (West) GLM flash centroids from every 20-second file. Each flash counted once (split at 106.2°W).',
+        why: 'Flash rate is stored as a permanent hourly series (flashes/min) and compared against radar, surface and geomagnetic series by the correlation engine. Flash locations from the last 15 minutes are plotted on the map.',
       },
       researcher: {
         name: 'GOES GLM L2 Clusters',
-        tagline: 'Dual-satellite GLM NetCDF cluster products via NOAA CLASS.',
+        tagline: 'GLM-L2-LCFA NetCDF-4 files from NOAA public S3 (noaa-goes19 / noaa-goes18), parsed for flash_lat / flash_lon.',
         why: null,
       },
     },
@@ -364,12 +364,12 @@ const Levels = {
     aircraft: {
       observer: {
         name: 'Airplane Tracker',
-        tagline: 'Live positions of aircraft flying over the US right now.',
+        tagline: 'Live positions of aircraft flying around the world right now.',
         why: 'We track aircraft to see what\'s flying, where, and at what altitude. Sometimes the most interesting patterns come from what\'s flying where you wouldn\'t expect it — or from planes with no public flight plan.',
       },
       analyst: {
         name: 'ADS-B Exchange',
-        tagline: 'Unfiltered ADS-B transponder data. Flight, altitude, speed, heading within 500nm CONUS.',
+        tagline: 'Unfiltered ADS-B transponder data worldwide: flight, altitude, speed and heading. Two wide-area queries alternate every 5 minutes.',
         why: 'Unlike FlightRadar24 or FlightAware, ADS-B Exchange is unfiltered — military and government aircraft that are blocked on commercial trackers still appear here.',
       },
       researcher: {
@@ -383,16 +383,16 @@ const Levels = {
       observer: {
         name: 'Flight Restrictions',
         tagline: 'Official notices about airspace closures and special activities, including cloud seeding.',
-        why: 'Before anything unusual happens in the sky, there\'s usually a paper trail. NOTAMs (Notices to Air Missions) are the aviation system\'s way of saying "something is going on here." We specifically track the ones related to weather modification.',
+        why: 'Before anything unusual happens in the sky, there\'s usually a paper trail. Temporary flight restrictions are the aviation system\'s way of saying "something is going on here." We log every active one each hour and keep snapshots of state cloud-seeding program pages.',
       },
       analyst: {
-        name: 'NOTAMs / Cloud Seeding Permits',
-        tagline: 'FAA NOTAMs filtered for weather modification, TFRs, and airspace restrictions.',
-        why: 'Active cloud seeding operations, weather modification permits, and temporary flight restrictions are cross-referenced with radar returns and surface precipitation data.',
+        name: 'FAA TFRs / Cloud Seeding Programs',
+        tagline: 'Active FAA temporary flight restrictions (TFRs) by type, plus Texas and North Dakota weather modification program pages.',
+        why: 'The active-TFR count is charted hourly. Raw TFR lists and state program pages are archived with SHA-256 hashes so changes can be compared against radar and precipitation data.',
       },
       researcher: {
-        name: 'FAA NOTAM / Cloud Seeding Registry',
-        tagline: 'FAA NOTAM API + NOAA weather modification activity reports. Filtered by WX MOD keywords.',
+        name: 'FAA TFR List / State WM Programs',
+        tagline: 'tfr.faa.gov exportTfrList JSON (hourly) + TX TDLR and ND ARB program HTML snapshots. Full NOTAM API used when an FAA key is configured.',
         why: null,
       },
     },

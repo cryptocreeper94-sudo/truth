@@ -4,7 +4,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Truth Observatory — About</title>
-  <meta name="description" content="Truth Observatory: 20-stream deterministic multi-domain observation platform. Electromagnetic, atmospheric, infrastructure, and ecological data — cross-correlated and anchored to the Trust Layer.">
+  <meta name="description" content="Truth Observatory: 19-stream deterministic multi-domain observation platform. Electromagnetic, atmospheric, infrastructure, and ecological data — cross-correlated and anchored to the Trust Layer.">
+  <meta property="og:title" content="About Truth Observatory">
+  <meta property="og:description" content="How Truth Observatory collects, hashes and cross-checks 19 public scientific data streams.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://observatory.tlid.io/about">
+  <meta property="og:image" content="https://observatory.tlid.io/assets/share-card.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Truth Observatory live map showing real GOES lightning flashes across the Americas">
+  <meta property="og:site_name" content="Truth Observatory">
+  <meta name="twitter:image" content="https://observatory.tlid.io/assets/share-card.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://observatory.tlid.io/about">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔭</text></svg>">
@@ -266,7 +278,7 @@
       <h1 class="hero__title">Truth Observatory</h1>
       <div class="hero__sub">Deterministic Multi-Domain Observation</div>
       <p class="hero__desc">
-        20 independent data streams across electromagnetic, atmospheric, infrastructure, ecological, and geophysical domains. Zero editorialization. Every observation timestamped, source-attributed, hash-verified, and anchored to the Trust Layer. We don't tell you what to think — we show you what the instruments are reading.
+        19 independent data streams across electromagnetic, atmospheric, infrastructure, ecological, and geophysical domains. Zero editorialization. Every observation timestamped, source-attributed, hash-verified, and anchored to the Trust Layer. We don't tell you what to think — we show you what the instruments are reading.
       </p>
     </div>
 
@@ -281,7 +293,7 @@
       <div class="guarantee">
         <div class="guarantee__title">⚡ The Cockpit</div>
         <div class="guarantee__text">
-          This is your main view. Left side: the map with toggleable layers — radar, satellite, infrared, water vapor, precipitation, active fires, ionospheric heaters, live aircraft tracking, wildfires, and volcanic activity. Right side: the 20 data feed cards organized by domain. Each card shows what the feed is reading right now, when it last updated, and whether it's live, stale, or offline. Click any card to drill into the raw data and integrity hashes.
+          This is your main view. Left side: the map with toggleable layers — radar, satellite, infrared, water vapor, precipitation, active fires, ionospheric heaters, live aircraft tracking, wildfires, and volcanic activity. Right side: the 19 data feed cards organized by domain. Each card shows what the feed is reading right now, when it last updated, and whether it's live, stale, or offline. Click any card to drill into the raw data and integrity hashes.
         </div>
       </div>
 
@@ -361,7 +373,7 @@
           <span class="pipeline__num">01</span>
           <div>
             <div class="pipeline__label">COLLECTORS</div>
-            <div class="pipeline__desc">20 independent Node.js processes pull data from public APIs on continuous loops. Each collector writes an append-only NDJSON manifest with SHA-256 hashes, timestamps, and source attribution.</div>
+            <div class="pipeline__desc">19 independent Node.js processes pull data from public APIs on continuous loops. Each collector writes an append-only NDJSON manifest with SHA-256 hashes, timestamps, and source attribution.</div>
           </div>
         </div>
         <div class="pipeline__step">
@@ -412,7 +424,7 @@
     <!-- ═══ DATA SOURCES ═══ -->
     <section class="section">
       <div class="section__label">03 — Data Sources</div>
-      <h2 class="section__title">20 Independent Feeds</h2>
+      <h2 class="section__title">19 Independent Feeds</h2>
       <p>Feeds pull continuously from verified scientific networks, specialized telemetry streams, and authoritative government data systems.</p>
 
       <div class="feed-grid">
@@ -426,7 +438,6 @@
         <div class="feed-item"><span class="feed-item__icon">◇</span><div><div class="feed-item__name">Ionospheric TEC</div><div class="feed-item__source">GIRO/DIDBase</div></div></div>
         <div class="feed-item"><span class="feed-item__icon">∿</span><div><div class="feed-item__name">Schumann Resonance</div><div class="feed-item__source">Independent Stations</div></div></div>
         <div class="feed-item"><span class="feed-item__icon">◫</span><div><div class="feed-item__name">Surface Stations</div><div class="feed-item__source">NOAA Weather API</div></div></div>
-        <div class="feed-item"><span class="feed-item__icon">↯</span><div><div class="feed-item__name">Blitzortung</div><div class="feed-item__source">Community Network</div></div></div>
         <div class="feed-item"><span class="feed-item__icon">✈</span><div><div class="feed-item__name">ADS-B Aircraft</div><div class="feed-item__source">ADS-B Exchange</div></div></div>
         <div class="feed-item"><span class="feed-item__icon">⚐</span><div><div class="feed-item__name">NOTAMs</div><div class="feed-item__source">FAA / State Agencies</div></div></div>
         <div class="feed-item"><span class="feed-item__icon">⌁</span><div><div class="feed-item__name">Cell Towers</div><div class="feed-item__source">FCC ASR</div></div></div>
@@ -444,7 +455,7 @@
       <div class="section__label">04 — The Model</div>
       <h2 class="section__title">AtmosCore 4/42</h2>
       <p>
-        AtmosCore is the composite state engine that distills all 20 feeds into a single observation suitability score. It computes four physical primitives, each derived from a subset of feeds:
+        AtmosCore is the composite state engine that distills all 19 feeds into a single observation suitability score. It computes four physical primitives, each derived from a subset of feeds:
       </p>
 
       <div class="primitives">
@@ -551,7 +562,7 @@
       <div class="api-block">
         <span class="api-block__method">GET</span>
         <span class="api-block__url">/api/feeds</span>
-        <div class="api-block__desc">All 20 feeds with live/stale/offline status, entry counts, last update timestamps, and 24-hour sparkline data.</div>
+        <div class="api-block__desc">All 19 feeds with live/stale/offline status, entry counts, last update timestamps, and 24-hour sparkline data.</div>
       </div>
       <div class="api-block">
         <span class="api-block__method">GET</span>

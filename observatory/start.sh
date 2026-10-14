@@ -98,8 +98,6 @@ echo "[SUPERVISOR] All Stage 1+2 collectors launched (9 total). Starting Stage 3
 sleep 2
 run_collector "SURFACE"     "$SCRIPT_DIR/collectors/surface-asos.mjs"          &
 sleep 2
-run_collector "BLITZ"       "$SCRIPT_DIR/collectors/blitzortung.mjs"           &
-sleep 2
 run_collector "ADSB"        "$SCRIPT_DIR/collectors/adsb-exchange.mjs"         &
 sleep 2
 run_collector "NOTAM"       "$SCRIPT_DIR/collectors/notam-cloudseeding.mjs"    &
@@ -120,7 +118,7 @@ run_collector "WILDFIRE"   "$SCRIPT_DIR/collectors/wildfire-nifc.mjs"           
 sleep 2
 run_collector "VOLCANIC"   "$SCRIPT_DIR/collectors/volcanic-usgs.mjs"            &
 
-echo "[SUPERVISOR] All collectors launched (20 total — 9 Stage 1+2 + 9 Stage 3 + 2 Stage 4)."
+echo "[SUPERVISOR] All collectors launched (19 total — 9 Stage 1+2 + 8 Stage 3 + 2 Stage 4)."
 
 # ── API Server (serves dashboard + REST API) ────────────────────────────────
 echo "[SUPERVISOR] Starting API server on port ${PORT:-3000}..."

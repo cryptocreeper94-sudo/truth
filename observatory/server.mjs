@@ -282,9 +282,8 @@ const FEEDS = [
   { id: 'schumann',   manifest: 'schumann-manifest.jsonl',     name: 'Schumann Resonance',  domain: 'Geophysical',    icon: '∿', interval: 3600000 },
   // Stage 3
   { id: 'surface',    manifest: 'surface-manifest.jsonl',      name: 'Surface Stations',    domain: 'Atmospheric',    icon: '◫', interval: 900000 },
-  { id: 'blitzortung', manifest: 'blitzortung-manifest.jsonl', name: 'Blitzortung',         domain: 'Atmospheric',    icon: '↯', interval: 600000 },
   { id: 'aircraft',   manifest: 'aircraft-manifest.jsonl',     name: 'ADS-B Aircraft',      domain: 'Infrastructure', icon: '✈', interval: 300000 },
-  { id: 'notam',      manifest: 'notam-manifest.jsonl',        name: 'NOTAMs / Cloud Seeding', domain: 'Airspace',    icon: '⚐', interval: 3600000 },
+  { id: 'notam',      manifest: 'notam-manifest.jsonl',        name: 'Flight Restrictions / Cloud Seeding', domain: 'Airspace',    icon: '⚐', interval: 3600000 },
   { id: 'celltower',  manifest: 'celltower-manifest.jsonl',    name: 'Cell Towers',         domain: 'Infrastructure', icon: '⌁', interval: 86400000 },
   { id: 'heater',     manifest: 'heater-manifest.jsonl',       name: 'Iono. Heaters',       domain: 'RF Research',    icon: '⏛', interval: 21600000 },
   { id: 'metals',     manifest: 'trace-metals-manifest.jsonl', name: 'Trace Metals',        domain: 'Ecological',     icon: '⬡', interval: 86400000 },
@@ -327,6 +326,14 @@ const FEED_MEASURES = {
   surface: { manifestField: 'stations', label: 'Weather stations reporting', unit: 'stations',
     cond: v => [`${fmtN(v)} STATIONS REPORTING`, 'info'] },
   earthquake: { events: 'quake', label: 'Earthquakes per hour (M2.5+)', unit: 'quakes' },
+  lightning: { series: 'glm_flash_rate', label: 'Lightning flashes per minute (GOES-East + GOES-West)', unit: 'flashes/min',
+    cond: v => [`${fmtN(v)} FLASHES / MIN · AMERICAS & OCEANS`, 'info'] },
+  notam: { manifestField: 'tfrs', label: 'Active FAA temporary flight restrictions', unit: 'TFRs',
+    cond: (v, last) => {
+      const bt = (last && last.byType) || {};
+      const top = Object.entries(bt).sort((a, b) => b[1] - a[1]).slice(0, 2).map(([k, n]) => `${n} ${k}`).join(' · ');
+      return [`${fmtN(v)} ACTIVE FLIGHT RESTRICTIONS${top ? ' · ' + top : ''}`, 'info'];
+    } },
 };
 
 function seriesPoints(id, now) {
@@ -1367,6 +1374,24 @@ const server = createServer(async (req, res) => {
       }
     } catch {}
     return jsonResponse(res, 200, { timestamp: new Date().toISOString(), count: 0, aircraft: [], message: 'No aircraft snapshot yet. The collector refreshes every 5 minutes.' });
+  }
+
+  // ── Geo API: Lightning flashes, last 15 min (GOES GLM, public) ──────
+  if (path === '/api/geo/lightning') {
+    try {
+      const d = JSON.parse(readFileSync(join(STATE_DIR, 'lightning-recent.json'), 'utf8'));
+      const now = Date.now();
+      const win = (d.windowMinutes || 15) * 60000;
+      const flashes = (d.flashes || []).filter(f => now - f[0] <= win).map(f => [Math.max(0, Math.round((now - f[0]) / 1000)), f[1], f[2]]);
+      const payload = JSON.stringify({ timestamp: new Date(now).toISOString(), updatedAt: d.updatedAt || null, windowMinutes: d.windowMinutes || 15, source: 'NOAA GOES-19 / GOES-18 GLM', note: d.split || null, format: ['ageSeconds', 'lat', 'lon'], count: flashes.length, flashes });
+      if (/\bgzip\b/.test(req.headers['accept-encoding'] || '')) {
+        res.writeHead(200, { 'Content-Type': 'application/json', 'Content-Encoding': 'gzip', 'Vary': 'Accept-Encoding' });
+        return res.end(gzipSync(payload));
+      }
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      return res.end(payload);
+    } catch {}
+    return jsonResponse(res, 200, { timestamp: new Date().toISOString(), count: 0, flashes: [], message: 'No lightning data yet. The collector refreshes every 5 minutes.' });
   }
 
   // ── Geo API: Surface Stations ───────────────────────────────────────
