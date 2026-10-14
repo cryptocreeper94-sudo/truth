@@ -1203,8 +1203,9 @@ async function fetchPointAlerts(lat, lng) {
 // HTTP Server
 // ═══════════════════════════════════════════════════════════════════════════
 const server = createServer(async (req, res) => {
-  const url = new URL(req.url, `http://localhost:${PORT}`);
-  const path = url.pathname;
+  try {
+    const url = new URL(req.url, `http://localhost:${PORT}`);
+    const path = url.pathname;
 
   // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -2017,18 +2018,11 @@ const server = createServer(async (req, res) => {
     const zip = url.searchParams.get('zip');
 
     if (isNaN(lat) && isNaN(lng) && zip && /^\d{5}$/.test(zip)) {
-      try {
-        const nomRes = await fetch(`https://nominatim.openstreetmap.org/search?postalcode=${zip}&country=US&format=json&limit=1`, {
-          headers: { 'User-Agent': 'TruthObservatory/1.0' }
-        });
-        if (nomRes.ok) {
-          const nomData = await nomRes.json();
-          if (nomData.length > 0) {
-            lat = parseFloat(nomData[0].lat);
-            lng = parseFloat(nomData[0].lon);
-          }
-        }
-      } catch {}
+      const geo = await geocodeZip(zip);
+      if (geo) {
+        lat = geo.lat;
+        lng = geo.lon;
+      }
     }
 
     const cache = await fetchNWSAlerts();
@@ -2108,6 +2102,21 @@ const server = createServer(async (req, res) => {
 
   res.writeHead(404, { 'Content-Type': 'application/json' });
   res.end(JSON.stringify({ error: 'Not found' }));
+  } catch (fatalErr) {
+    console.error('[OBSERVATORY API] Unhandled Request Error:', fatalErr);
+    if (!res.headersSent) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Internal server error' }));
+    }
+  }
+});
+
+process.on('uncaughtException', (err) => {
+  console.error('[OBSERVATORY API] Process uncaughtException:', err.message || err);
+});
+
+process.on('unhandledRejection', (reason) => {
+  console.error('[OBSERVATORY API] Process unhandledRejection:', reason?.message || reason);
 });
 
 server.listen(PORT, () => {
