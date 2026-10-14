@@ -1597,7 +1597,7 @@ const Observatory = {
         return { text: 'BASELINE', color: 'var(--signal-live)' };
 
       case 'ecology':
-        return { text: 'INDEXING', color: 'var(--brass)' };
+        return { text: 'MONITORING', color: 'var(--signal-live)' };
 
       case 'deposition':
         return { text: 'SAMPLING', color: 'var(--brass)' };
@@ -1736,17 +1736,17 @@ const Observatory = {
       if (m.scaleMin == null && Math.min(...vals) > 0 && Math.min(...vals) > hi * 0.5) lo = Math.min(...vals) * 0.9; // zoom in on narrow ranges (e.g. solar wind)
       const ticks = this._niceTicks(lo, hi);
       lo = ticks[0]; hi = ticks[ticks.length - 1];
-      const winMs = m.window === '30d' ? 30 * 86400000 : m.window === '72h' ? 72 * 3600000 : 24 * 3600000;
+      const winMs = m.window === '30d' ? 30 * 86400000 : m.window === '72h' ? 72 * 3600000 : m.window === '14d' ? 14 * 86400000 : 24 * 3600000;
       const t1 = Math.max(Date.now(), pts.length ? pts[pts.length - 1][0] : 0), t0 = t1 - winMs;
       const X = t => padL + (t1 > t0 ? ((t - t0) / (t1 - t0)) * pw : pw);
       const Y = v => padT + ph - ((v - lo) / (hi - lo)) * ph;
       axis(ticks, lo, hi, m.unit);
       timeAxis(t0, t1, m.res === '1d');
 
-      const isCount = m.unit === 'quakes';
+      const isCount = m.unit === 'quakes' || m.unit === 'obs/day' || m.unit === 'obs';
       if (isCount) {
-        const bw = Math.max(2, pw / pts.length - 2);
-        pts.forEach(p => { if (!p[1]) return; ctx.fillStyle = 'rgba(0,255,136,0.55)'; ctx.fillRect(X(p[0]) - bw / 2, Y(p[1]), bw, padT + ph - Y(p[1])); });
+        const bw = Math.max(4, pw / pts.length - 3);
+        pts.forEach(p => { if (!p[1]) return; ctx.fillStyle = 'rgba(0,255,136,0.65)'; ctx.fillRect(X(p[0]) - bw / 2, Y(p[1]), bw, padT + ph - Y(p[1])); });
       } else {
         ctx.strokeStyle = 'rgba(0,255,136,0.9)'; ctx.lineWidth = 2; ctx.beginPath();
         let pen = false;
@@ -1755,13 +1755,23 @@ const Observatory = {
         ctx.fillStyle = 'rgba(0,255,136,0.85)';
         pts.forEach(p => { if (p[1] == null) return; ctx.beginPath(); ctx.arc(X(p[0]), Y(p[1]), 2, 0, Math.PI * 2); ctx.fill(); });
       }
-      const span = m.window === '30d' ? 'LAST 30 DAYS' : m.window === '72h' ? 'LAST 72 HOURS' : 'LAST 24 HOURS';
+      const span = m.window === '30d' ? 'LAST 30 DAYS' : m.window === '72h' ? 'LAST 72 HOURS' : m.window === '14d' ? 'LAST 14 DAYS' : 'LAST 24 HOURS';
       if (label) label.textContent = `${m.label.toUpperCase()} · ${span} (UTC)`;
       const extra = m.largest ? `<div><span>Largest</span>M${m.largest.mag.toFixed(1)}${m.largest.place ? ' · ' + m.largest.place : ''}</div>` : '';
+      let breakdownHtml = '';
+      if (m.breakdown) {
+        breakdownHtml = `
+          <div class="modal__chart-breakdown" style="grid-column: 1 / -1; margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 11px; display: flex; gap: 14px; flex-wrap: wrap; color: #8888aa;">
+            <span>🐝 <strong>${this._fmtVal(m.breakdown.bees)}</strong> Bees</span>
+            <span>🦋 <strong>${this._fmtVal(m.breakdown.butterflies)}</strong> Butterflies</span>
+            <span>🦗 <strong>${this._fmtVal(m.breakdown.dragonflies)}</strong> Dragonflies</span>
+          </div>`;
+      }
       stats.innerHTML = `
-        <div><span>Now</span>${this._fmtVal(m.current)} ${m.unit}</div>
-        ${m.total != null ? `<div><span>24h total</span>${m.total} ${m.unit}</div>` : `<div><span>Low</span>${this._fmtVal(m.min)} ${m.unit}</div><div><span>High</span>${this._fmtVal(m.max)} ${m.unit}</div>`}
+        <div><span>${m.unit === 'obs/day' ? 'Added today' : 'Now'}</span>${this._fmtVal(m.current)} ${m.unit}</div>
+        ${m.total != null ? `<div><span>${m.unit === 'obs/day' ? 'US Catalog' : '24h total'}</span>${this._fmtVal(m.total)} total</div>` : `<div><span>Low</span>${this._fmtVal(m.min)} ${m.unit}</div><div><span>High</span>${this._fmtVal(m.max)} ${m.unit}</div>`}
         ${extra}
+        ${breakdownHtml}
         ${m.source ? `<div class="modal__chart-src"><span>Source</span>${m.source}</div>` : ''}`;
       return;
     }
