@@ -1195,7 +1195,29 @@ const server = createServer(async (req, res) => {
         const data = readRawJson(RAW_DIR, 'adsb', Date.now());
         if (data && Array.isArray(data.ac)) {
           const num = v => (typeof v === 'number' && isFinite(v) ? Math.round(v) : null);
-          const aircraft = data.ac.slice(0, 20000).filter(a => a.lat != null && a.lon != null).map(a => {
+          // Inferred class from transponder emitter category, callsign and type code.
+          const CARGO = new Set(['FDX','UPS','GTI','ABX','ATN','CKS','PAC','CLX','GEC','BOX','DHK','BCS','CAO','CKK','ABW','NCA','MPH','AJT','SOO','KYE','WGN','CWC','DHX','TAY','LCO','QAC','MXY','RCH']);
+          const AG = new Set(['AT3T','AT3P','AT4T','AT5T','AT5P','AT6T','AT6P','AT8T','AT02','S2R','S2RT','S2RS','S2RH','M18','M18T','PA25','PA36','G164','C188','T300','T301','T660','KRUK','PL12','A9','AGWG','TH20']);
+          const airlineCs = cs => /^[A-Z]{3}\d{1,4}[A-Z]{0,2}$/.test(cs);
+          const classify = a => {
+            const cat = a.category || '', cs = (a.flight || '').trim().toUpperCase(), t = (a.t || '').toUpperCase();
+            if ((a.dbFlags || 0) & 1) return 'military';
+            if (cat === 'B6') return 'drone';
+            if (cat === 'B1' || cat === 'B2' || cat === 'B4') return 'glider';
+            if (cat === 'A7') return 'helicopter';
+            if (AG.has(t)) return 'agricultural';
+            if (airlineCs(cs)) {
+              if (CARGO.has(cs.slice(0, 3))) return 'cargo';
+              if (cat === 'A2') return 'business';
+              if (cat === 'A1') return 'private';
+              return 'airline';
+            }
+            if (cat === 'A2') return 'business';
+            if (cat === 'A1') return 'private';
+            if (cat === 'A3' || cat === 'A4' || cat === 'A5') return cs ? 'airline' : 'unknown';
+            return 'unknown';
+          };
+          const aircraft = data.ac.slice(0, 20000).filter(a => a.lat != null && a.lon != null && !String(a.category || '').startsWith('C')).map(a => {
             const ground = a.alt_baro === 'ground';
             return {
               hex: a.hex, flight: (a.flight || '').trim(), reg: a.r || null,
@@ -1205,7 +1227,7 @@ const server = createServer(async (req, res) => {
               vrate: num(a.baro_rate ?? a.geom_rate),
               type: a.t || null, desc: a.desc || null, op: a.ownOp || null,
               squawk: a.squawk || null, emergency: a.emergency && a.emergency !== 'none' ? a.emergency : null,
-              mil: !!((a.dbFlags || 0) & 1), category: a.category || null,
+              mil: !!((a.dbFlags || 0) & 1), category: a.category || null, cls: classify(a),
               seen: num(a.seen_pos ?? a.seen),
             };
           });
@@ -1299,13 +1321,25 @@ const server = createServer(async (req, res) => {
   if (existsSync(fullPath) && statSync(fullPath).isFile()) {
     const ext = extname(fullPath);
     const mime = MIME[ext] || 'application/octet-stream';
-    res.writeHead(200, { 'Content-Type': mime });
+    // Code/markup must revalidate every load (cheap 304 when unchanged) so a
+    // deploy reaches browsers immediately; media can be cached for a day.
+    const st = statSync(fullPath);
+    const etag = `W/"${st.size.toString(16)}-${Math.floor(st.mtimeMs).toString(16)}"`;
+    const revalidate = ['.html', '.js', '.mjs', '.css', '.json', '.webmanifest', ''].includes(ext) || filePath.endsWith('sw.js');
+    const headers = {
+      'Content-Type': mime,
+      'ETag': etag,
+      'Last-Modified': st.mtime.toUTCString(),
+      'Cache-Control': revalidate ? 'no-cache' : 'public, max-age=86400',
+    };
+    if (req.headers['if-none-match'] === etag) { res.writeHead(304, headers); return res.end(); }
+    res.writeHead(200, headers);
     return res.end(readFileSync(fullPath));
   }
 
   // SPA fallback
   if (!path.startsWith('/api/') && existsSync(join(SITE_DIR, 'index.html'))) {
-    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.writeHead(200, { 'Content-Type': 'text/html', 'Cache-Control': 'no-cache' });
     return res.end(readFileSync(join(SITE_DIR, 'index.html')));
   }
 

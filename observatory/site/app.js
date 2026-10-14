@@ -469,7 +469,9 @@ const Observatory = {
     const src = this.markers && this.markers[name];
     if (!group || !src) return;
     group.clearLayers();
+    const srcGroup = this.mapLayers && this.mapLayers[name];
     src.forEach(m => {
+      if (name === 'aircraft' && srcGroup && !srcGroup.hasLayer(m)) return;
       const opts = Object.assign({}, m.options);
       delete opts.renderer;
       if (name === 'aircraft') opts.renderer = this._fsAircraftRenderer || (this._fsAircraftRenderer = L.canvas({ padding: 0.3, tolerance: 3 }));
@@ -1552,7 +1554,8 @@ const Observatory = {
     return `
       <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#e8e8f0;background:#0a0a0e;padding:10px 12px;border:1px solid ${color}55;border-radius:2px;min-width:230px;line-height:1.7;">
         <div style="color:${color};font-weight:700;font-size:13px;">✈ ${esc(a.flight || a.reg || a.hex.toUpperCase())}${a.mil ? ' <span style="font-size:9px;color:#ffb020;">MILITARY</span>' : ''}</div>
-        <div style="color:#aaa;margin-bottom:6px;">${esc(a.desc || a.type || 'Aircraft type unknown')}${a.op ? ' · ' + esc(a.op) : ''}</div>
+        <div style="color:#aaa;">${esc(a.desc || a.type || 'Aircraft type unknown')}${a.op ? ' · ' + esc(a.op) : ''}</div>
+        <div style="color:#666;font-size:9px;letter-spacing:0.08em;margin-bottom:6px;">${esc(this._acClassLabel(a.cls).toUpperCase())}</div>
         ${row('Altitude', alt)}
         ${row('Vertical', vr)}
         ${row('Ground speed', spd)}
@@ -1567,6 +1570,99 @@ const Observatory = {
       </div>`;
   },
 
+  AIRCRAFT_CLASSES: [
+    ['airline', 'Airlines'], ['cargo', 'Cargo'], ['business', 'Business jets'],
+    ['private', 'Private & general aviation'], ['helicopter', 'Helicopters'],
+    ['military', 'Military'], ['agricultural', 'Agricultural / sprayers'],
+    ['glider', 'Gliders & balloons'], ['drone', 'Drones'], ['unknown', 'Unidentified'],
+  ],
+
+  _acFilter() {
+    if (!this._acFilterState) {
+      let saved = null;
+      try { saved = JSON.parse(localStorage.getItem('obs-ac-filter') || 'null'); } catch {}
+      this._acFilterState = {};
+      this.AIRCRAFT_CLASSES.forEach(([k]) => { this._acFilterState[k] = saved && k in saved ? !!saved[k] : true; });
+    }
+    return this._acFilterState;
+  },
+
+  _acClassLabel(k) { const f = this.AIRCRAFT_CLASSES.find(c => c[0] === k); return f ? f[1] : 'Unidentified'; },
+
+  // One Leaflet control per map; both stay in sync through _acFilterState.
+  _ensureAircraftFilter(map, layerGroup) {
+    if (!map || !layerGroup || layerGroup._filterCtl) return;
+    const self = this;
+    const Ctl = L.Control.extend({
+      options: { position: 'topright' },
+      onAdd() {
+        const el = L.DomUtil.create('div', 'ac-filter');
+        L.DomEvent.disableClickPropagation(el);
+        L.DomEvent.disableScrollPropagation(el);
+        if (map.getSize().x < 900) el.classList.add('ac-filter--collapsed');
+        el.innerHTML = `
+          <button class="ac-filter__head" type="button" aria-expanded="true">✈ AIRCRAFT TYPES <span class="ac-filter__total"></span><span class="ac-filter__caret">▾</span></button>
+          <div class="ac-filter__body">
+            ${self.AIRCRAFT_CLASSES.map(([k, label]) => `
+              <label class="ac-filter__row"><input type="checkbox" data-ac-class="${k}">
+                <span class="ac-filter__name">${label}</span><span class="ac-filter__count" data-ac-count="${k}">0</span></label>`).join('')}
+            <div class="ac-filter__actions"><button type="button" data-ac-all="1">All</button><button type="button" data-ac-all="0">None</button></div>
+            <div class="ac-filter__note">Types are inferred from transponder category, callsign and aircraft model. Some aircraft may be misclassified.</div>
+          </div>`;
+        el.querySelector('.ac-filter__head').addEventListener('click', () => {
+          el.classList.toggle('ac-filter--collapsed');
+          el.querySelector('.ac-filter__head').setAttribute('aria-expanded', !el.classList.contains('ac-filter--collapsed'));
+        });
+        el.addEventListener('change', e => {
+          const k = e.target.dataset && e.target.dataset.acClass;
+          if (!k) return;
+          self._acFilter()[k] = e.target.checked;
+          self._applyAircraftFilter();
+        });
+        el.querySelectorAll('[data-ac-all]').forEach(b => b.addEventListener('click', () => {
+          const on = b.dataset.acAll === '1';
+          Object.keys(self._acFilter()).forEach(k => { self._acFilter()[k] = on; });
+          self._applyAircraftFilter();
+        }));
+        return el;
+      },
+    });
+    const ctl = new Ctl();
+    layerGroup._filterCtl = ctl;
+    layerGroup.on('add', () => { ctl.addTo(map); this._syncAircraftFilterUI(); });
+    layerGroup.on('remove', () => ctl.remove());
+    if (map.hasLayer(layerGroup)) { ctl.addTo(map); this._syncAircraftFilterUI(); }
+  },
+
+  _syncAircraftFilterUI() {
+    const f = this._acFilter();
+    const counts = {};
+    (this._acData || []).forEach(a => { counts[a.cls || 'unknown'] = (counts[a.cls || 'unknown'] || 0) + 1; });
+    let shown = 0;
+    Object.keys(f).forEach(k => { if (f[k]) shown += counts[k] || 0; });
+    document.querySelectorAll('.ac-filter').forEach(el => {
+      el.querySelectorAll('[data-ac-class]').forEach(cb => { cb.checked = !!f[cb.dataset.acClass]; });
+      el.querySelectorAll('[data-ac-count]').forEach(c => { c.textContent = (counts[c.dataset.acCount] || 0).toLocaleString(); });
+      el.querySelectorAll('[data-ac-class]').forEach(cb => cb.closest('label').classList.toggle('ac-filter__row--empty', !counts[cb.dataset.acClass]));
+      const tot = el.querySelector('.ac-filter__total');
+      if (tot) tot.textContent = `${shown.toLocaleString()} / ${(this._acData || []).length.toLocaleString()}`;
+    });
+  },
+
+  _applyAircraftFilter() {
+    try { localStorage.setItem('obs-ac-filter', JSON.stringify(this._acFilter())); } catch {}
+    const f = this._acFilter();
+    const group = this.mapLayers.aircraft;
+    (this.markers.aircraft || []).forEach(m => {
+      const want = !!f[m.options.cls || 'unknown'];
+      const has = group.hasLayer(m);
+      if (want && !has) group.addLayer(m);
+      else if (!want && has) group.removeLayer(m);
+    });
+    this._mirrorToFs('aircraft');
+    this._syncAircraftFilterUI();
+  },
+
   async loadAircraftMarkers() {
     try {
       const res = await fetch('/api/geo/aircraft');
@@ -1574,6 +1670,8 @@ const Observatory = {
       const data = await res.json();
       this.markers.aircraft.forEach(m => this.mapLayers.aircraft.removeLayer(m));
       this.markers.aircraft = [];
+      this._acData = data.aircraft || [];
+      const acFilter = this._acFilter();
       const Plane = this._planeClass();
       const renderer = this._aircraftRenderer || (this._aircraftRenderer = L.canvas({ padding: 0.3, tolerance: 3 }));
       (data.aircraft || []).forEach(a => {
@@ -1584,6 +1682,7 @@ const Observatory = {
           heading: a.heading, ground: a.ground,
           color, fillColor: color, fillOpacity: 1, weight: 0,
           label: a.flight || a.reg || '',
+          cls: a.cls || 'unknown',
           renderer,
         });
         marker.bindTooltip(() => {
@@ -1591,11 +1690,13 @@ const Observatory = {
           return `<b>${a.flight || a.reg || a.hex.toUpperCase()}</b> · ${alt} · ${a.speed != null ? a.speed + ' kts' : '—'} · ${a.heading != null ? this._compass(a.heading) : ''}`;
         }, { direction: 'top', offset: [0, -6], className: 'aircraft-tip' });
         marker.bindPopup(() => this._aircraftPopup(a, color), { className: 'obs-popup', maxWidth: 300 });
-        this.mapLayers.aircraft.addLayer(marker);
+        if (acFilter[a.cls || 'unknown']) this.mapLayers.aircraft.addLayer(marker);
         this.markers.aircraft.push(marker);
       });
       if (data.count > 0) console.log(`[Observatory] Plotted ${data.count} aircraft (${data.source || 'ADS-B'})`);
+      this._ensureAircraftFilter(this.map, this.mapLayers.aircraft);
       this._mirrorToFs('aircraft');
+      this._syncAircraftFilterUI();
       this.updateLayerCount();
       this.updateDynamicLegend();
     } catch (e) { console.warn('[Observatory] Aircraft load failed:', e.message); }
@@ -1762,10 +1863,9 @@ const Observatory = {
         const cockpitRect = cockpit.getBoundingClientRect();
         const newTopHeight = startTopHeight + delta;
         const minTop = 120;
-        const minBottom = 80;
-        const maxTop = cockpitRect.height - minBottom - 8; // 8px handle
+        const maxTop = Math.max(minTop, window.innerHeight * 1.5);
         const clamped = Math.max(minTop, Math.min(maxTop, newTopHeight));
-        cockpit.style.gridTemplateRows = `${clamped}px auto 1fr`;
+        cockpit.style.gridTemplateRows = `${clamped}px auto minmax(360px, auto)`;
         // Invalidate map size so tiles render correctly
         if (this.map) this.map.invalidateSize();
       };
@@ -2065,6 +2165,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
       this.fsMapLayers[k] = L.layerGroup();
       this._mirrorToFs(k);
     });
+    this._ensureAircraftFilter(this.fullscreenMap, this.fsMapLayers.aircraft);
 
     // Add whatever is checked in the toolbar (radar + research transmitters by default)
     document.querySelectorAll('[data-fslayer]').forEach(cb => {
