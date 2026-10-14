@@ -116,7 +116,17 @@ const Observatory = {
     volcanoes: {
       name: 'Volcanic Activity',
       info: { source: 'USGS Volcano Hazards Program', what: 'US volcanoes with elevated alert levels (ADVISORY, WATCH, or WARNING). Shows alert level, aviation color code, and threat assessment.', update: 'Every hour', attribution: 'USGS VHP' },
-      legend: { type: 'dots', heading: 'VOLCANIC ACTIVITY', items: [{ color: '#f44336', label: 'WARNING' }, { color: '#ff9800', label: 'WATCH' }, { color: '#ffeb3b', label: 'ADVISORY' }] },
+      legend: { type: 'dots', heading: 'VOLCANIC ACTIVITY (HI & AK)', items: [{ color: '#f44336', label: 'WARNING' }, { color: '#ff9800', label: 'WATCH' }, { color: '#ffeb3b', label: 'ADVISORY' }] },
+    },
+    earthquakes: {
+      name: 'USGS Earthquakes (24h)',
+      info: { source: 'USGS Earthquake Hazards Program', what: 'M2.5+ earthquake events recorded across the globe in the last 24 hours. Circle size and color denote magnitude.', update: 'Every 5 minutes', attribution: 'USGS' },
+      legend: { type: 'dots', heading: 'EARTHQUAKES (24H)', items: [
+        { color: '#ff3b30', label: 'M5.0+ · Strong' },
+        { color: '#ff9500', label: 'M4.0–4.9 · Moderate' },
+        { color: '#ffd60a', label: 'M3.0–3.9 · Light' },
+        { color: '#06b6d4', label: 'M2.5–2.9 · Minor' },
+      ] },
     },
   },
 
@@ -437,6 +447,8 @@ const Observatory = {
     this.mapLayers.wildfires = L.layerGroup();
     this.mapLayers.volcanoes = L.layerGroup();
     this.mapLayers.glm = L.layerGroup();
+    this.mapLayers.earthquakes = L.layerGroup();
+    this.mapLayers.earthquakes.addTo(this.map);
 
     // State/country boundaries + labels overlay (always on over satellite imagery)
     // ESRI Reference overlay — guaranteed compatible with ESRI World Imagery base
@@ -629,21 +641,6 @@ const Observatory = {
         }
       }
       html += `</div>`;
-    }
-
-    // Always show earthquake legend (from map markers)
-    if (this.markers && this.markers.earthquakes && this.markers.earthquakes.length > 0) {
-      hasActive = true;
-      html += `<div class="map-legend__section">
-        <div class="map-legend__heading">EARTHQUAKES (24H)</div>
-        <div class="map-legend__sublabel">Circle size = magnitude</div>
-        <div class="map-legend__items">
-          <div class="map-legend__item"><span class="map-legend__dot" style="background:#06b6d4;width:8px;height:8px"></span> M2.5–2.9 · Minor</div>
-          <div class="map-legend__item"><span class="map-legend__dot" style="background:#ffd60a;width:10px;height:10px"></span> M3.0–3.9 · Light</div>
-          <div class="map-legend__item"><span class="map-legend__dot" style="background:#ff9500;width:12px;height:12px"></span> M4.0–4.9 · Moderate</div>
-          <div class="map-legend__item"><span class="map-legend__dot" style="background:#ff3b30;width:14px;height:14px"></span> M5.0+ · Strong</div>
-        </div>
-      </div>`;
     }
 
     targetEl.innerHTML = hasActive ? html : '';
@@ -1506,7 +1503,7 @@ const Observatory = {
 
   // ── Map Overlays ─────────────────────────────────────────────
   async updateMapOverlays() {
-    this.markers.earthquakes.forEach(m => this.map.removeLayer(m));
+    if (this.mapLayers.earthquakes) this.markers.earthquakes.forEach(m => this.mapLayers.earthquakes.removeLayer(m));
     this.markers.lightning.forEach(m => this.map.removeLayer(m));
     this.markers.earthquakes = [];
     this.markers.lightning = [];
@@ -1522,7 +1519,7 @@ const Observatory = {
           const marker = L.circleMarker([lat, lng], {
             radius: Math.max(4, mag * 3),
             color: color, fillColor: color, fillOpacity: 0.35, weight: 1.5,
-          }).addTo(this.map);
+          });
           marker.bindPopup(`
             <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #e8e8f0; background: #0a0a0e; padding: 8px; border: 1px solid #2a2a38; border-radius: 2px; min-width: 180px;">
               <div style="color: ${color}; font-weight: 700; font-size: 14px; margin-bottom: 4px;">M${mag.toFixed(1)}</div>
@@ -1530,9 +1527,11 @@ const Observatory = {
               <div style="color: #555568; font-size: 9px;">${new Date(f.properties.time).toISOString().slice(0, 19)} UTC</div>
             </div>
           `, { className: 'obs-popup' });
+          if (this.mapLayers.earthquakes) this.mapLayers.earthquakes.addLayer(marker);
           this.markers.earthquakes.push(marker);
         });
       }
+      this._mirrorToFs('earthquakes');
     } catch {}
 
     this.updateLayerCount();
@@ -2284,7 +2283,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
     this.fsMapLayers.fire = this._firmsLayer();
 
     // Marker layers mirror the main map's data
-    ['heaters', 'aircraft', 'wildfires', 'volcanoes', 'glm'].forEach(k => {
+    ['heaters', 'aircraft', 'wildfires', 'volcanoes', 'glm', 'earthquakes'].forEach(k => {
       this.fsMapLayers[k] = L.layerGroup();
       this._mirrorToFs(k);
     });
@@ -2328,7 +2327,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
   // ── Sync layers between Main Map and Fullscreen Map ──────────
   _syncLayersToFullscreen() {
     if (!this.fullscreenMap || !this.fsMapLayers || !this.map) return;
-    const keys = ['radar', 'satellite', 'infrared', 'watervapor', 'precip', 'fire', 'heaters', 'aircraft', 'glm', 'wildfires', 'volcanoes'];
+    const keys = ['radar', 'satellite', 'infrared', 'watervapor', 'precip', 'fire', 'heaters', 'aircraft', 'glm', 'wildfires', 'volcanoes', 'earthquakes'];
     keys.forEach(k => {
       const isMainActive = this.mapLayers[k] && this.map.hasLayer(this.mapLayers[k]);
       const cb = document.querySelector(`input[data-fslayer="${k}"]`);
@@ -2347,7 +2346,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
 
   _syncLayersFromFullscreen() {
     if (!this.fullscreenMap || !this.fsMapLayers || !this.map) return;
-    const keys = ['radar', 'satellite', 'infrared', 'watervapor', 'precip', 'fire', 'heaters', 'aircraft', 'glm', 'wildfires', 'volcanoes'];
+    const keys = ['radar', 'satellite', 'infrared', 'watervapor', 'precip', 'fire', 'heaters', 'aircraft', 'glm', 'wildfires', 'volcanoes', 'earthquakes'];
     keys.forEach(k => {
       const fsLayer = this.fsMapLayers[k];
       const isFsActive = (fsLayer && this.fullscreenMap.hasLayer(fsLayer)) ||
