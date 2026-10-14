@@ -144,9 +144,13 @@ function utcParts(d = new Date()) {
   };
 }
 
-function s3DirUrl(site, date = new Date()) {
+function s3DirUrl(site, date = new Date(), continuationToken = null) {
   const { yyyy, mm, dd } = utcParts(date);
-  return `${CONFIG.s3Base}?list-type=2&prefix=${yyyy}/${mm}/${dd}/${site}/&max-keys=50`;
+  let url = `${CONFIG.s3Base}?list-type=2&prefix=${yyyy}/${mm}/${dd}/${site}/&max-keys=1000`;
+  if (continuationToken) {
+    url += `&continuation-token=${encodeURIComponent(continuationToken)}`;
+  }
+  return url;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -191,20 +195,38 @@ async function hashRemoteFile(url, retries = CONFIG.maxRetries) {
 // [16] DOMAIN MAPPER — List available scans for a site from S3 XML listing
 // ═══════════════════════════════════════════════════════════════════════════════
 async function listScans(site, date = new Date()) {
-  const url = s3DirUrl(site, date);
+  let allKeys = [];
+  let continuationToken = null;
+  let isTruncated = true;
+  let pageCount = 0;
+
   try {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), CONFIG.timeoutMs);
-    const res = await fetch(url, { signal: controller.signal });
-    clearTimeout(timer);
-    if (!res.ok) return [];
-    const xml = await res.text();
-    // Extract <Key> values from S3 XML listing
-    const keys = [...xml.matchAll(/<Key>([^<]+)<\/Key>/g)].map(m => m[1]);
-    // Filter to Volume Coverage Pattern files (V06, V08 etc), exclude MDM
-    return keys.filter(k => /V0\d$/.test(k) || /V0\d\.gz$/.test(k));
-  } catch {
-    return [];
+    while (isTruncated && pageCount < 5) {
+      pageCount++;
+      const url = s3DirUrl(site, date, continuationToken);
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), CONFIG.timeoutMs);
+      const res = await fetch(url, { signal: controller.signal });
+      clearTimeout(timer);
+      if (!res.ok) break;
+
+      const xml = await res.text();
+      const keys = [...xml.matchAll(/<Key>([^<]+)<\/Key>/g)].map(m => m[1]);
+      allKeys.push(...keys);
+
+      const truncatedMatch = xml.match(/<IsTruncated>(true|false)<\/IsTruncated>/i);
+      isTruncated = truncatedMatch ? truncatedMatch[1].toLowerCase() === 'true' : false;
+
+      const nextTokenMatch = xml.match(/<NextContinuationToken>([^<]+)<\/NextContinuationToken>/);
+      continuationToken = nextTokenMatch ? nextTokenMatch[1] : null;
+
+      if (!continuationToken) break;
+    }
+
+    return allKeys.filter(k => /V0\d$/.test(k) || /V0\d\.gz$/.test(k));
+  } catch (err) {
+    console.warn(`[NEXRAD] listScans failed for ${site}:`, err.message);
+    return allKeys.filter(k => /V0\d$/.test(k) || /V0\d\.gz$/.test(k));
   }
 }
 

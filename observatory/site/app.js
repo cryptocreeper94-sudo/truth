@@ -591,14 +591,14 @@ const Observatory = {
     btn.textContent = this.mapStyle === 'light' ? '☀ LIGHT' : '🌙 DARK';
   },
 
-  // ── Dynamic Legend ───────────────────────────────────────────
-  updateDynamicLegend() {
-    const legend = document.getElementById('map-legend');
+  // ── Dynamic Legend (Shared for Cockpit & Fullscreen) ────────
+  _renderLegend(targetEl, mapInstance, layersMap) {
+    if (!targetEl || !mapInstance || !layersMap) return;
     let html = '<div class="map-legend__title">LEGEND</div>';
     let hasActive = false;
 
     for (const [key, def] of Object.entries(this.layerDefs)) {
-      if (!this.mapLayers[key] || !this.map.hasLayer(this.mapLayers[key])) continue;
+      if (!layersMap[key] || !mapInstance.hasLayer(layersMap[key])) continue;
       hasActive = true;
       const leg = def.legend;
 
@@ -618,14 +618,14 @@ const Observatory = {
         html += `</div>`;
       } else if (leg.type === 'dots') {
         for (const item of leg.items) {
-          html += `<div style="display:flex;align-items:center;gap:6px;margin:3px 0;"><span style="width:8px;height:8px;border-radius:50%;background:${item.color};display:inline-block;"></span><span style="font-size:9px;color:#aaa;">${item.label}</span></div>`;
+          html += `<div style="display:flex;align-items:center;gap:6px;margin:3px 0;"><span style="width:8px;height:8px;border-radius:50%;background:${item.color};display:inline-block;flex-shrink:0;"></span><span style="font-size:9px;color:#aaa;">${item.label}</span></div>`;
         }
       }
       html += `</div>`;
     }
 
     // Always show earthquake legend (from map markers)
-    if (this.markers.earthquakes.length > 0) {
+    if (this.markers && this.markers.earthquakes && this.markers.earthquakes.length > 0) {
       hasActive = true;
       html += `<div class="map-legend__section">
         <div class="map-legend__heading">EARTHQUAKES (24H)</div>
@@ -639,15 +639,26 @@ const Observatory = {
       </div>`;
     }
 
-    legend.innerHTML = hasActive ? html : '';
+    targetEl.innerHTML = hasActive ? html : '';
 
     // Bind info buttons
-    legend.querySelectorAll('.map-legend__info-btn').forEach(btn => {
+    targetEl.querySelectorAll('.map-legend__info-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         this.showLayerInfo(btn.dataset.layerInfo);
       });
     });
+  },
+
+  updateDynamicLegend() {
+    const legend = document.getElementById('map-legend');
+    if (legend && this.map) {
+      this._renderLegend(legend, this.map, this.mapLayers);
+    }
+    const fsLegend = document.getElementById('map-fullscreen-legend');
+    if (fsLegend && this.fullscreenMap) {
+      this._renderLegend(fsLegend, this.fullscreenMap, this.fsMapLayers);
+    }
   },
 
   showLayerInfo(layerKey) {
@@ -2201,6 +2212,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
       this._initFullscreenMap();
     } else {
       this.fullscreenMap.invalidateSize();
+      this.updateDynamicLegend();
     }
 
     // Try to lock landscape
@@ -2282,8 +2294,12 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
         if (!layer) return;
         if (cb.checked) layer.addTo(this.fullscreenMap);
         else this.fullscreenMap.removeLayer(layer);
+        this.updateDynamicLegend();
       });
     });
+
+    // Initial fullscreen legend render
+    this.updateDynamicLegend();
 
     // Close button
     document.getElementById('map-fullscreen-close').addEventListener('click', () => this.closeFullscreenMap());

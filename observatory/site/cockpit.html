@@ -160,7 +160,7 @@
       <button class="map-fullscreen__anim-btn" id="fullscreen-style-toggle" title="Toggle light/dark map">☀ LIGHT</button>
     </div>
     <div class="map-fullscreen__map" id="map-fullscreen-container"></div>
-    <div class="map-fullscreen__legend" id="map-fullscreen-legend"></div>
+    <div class="map-legend map-fullscreen__legend" id="map-fullscreen-legend"></div>
     <div class="map-fullscreen__anim-bar" id="anim-bar">
       <span class="anim-bar__label" id="anim-label">LIVE</span>
       <div class="anim-bar__track" id="anim-track"></div>
@@ -182,18 +182,36 @@
         <button class="panel-header__expand" id="map-expand" title="Open fullscreen map">⛶</button>
       </div>
       <div class="layer-toggles layer-toggles--collapsed" id="layer-toggles">
-        <label class="layer-toggle"><input type="checkbox" data-layer="radar" checked> <span class="layer-name-researcher">Radar Reflectivity</span><span class="layer-name-observer">Weather Radar</span></label>
-        <label class="layer-toggle"><input type="checkbox" data-layer="satellite"> <span class="layer-name-researcher">Visible Satellite</span><span class="layer-name-observer">Satellite</span></label>
-        <label class="layer-toggle"><input type="checkbox" data-layer="infrared"> <span class="layer-name-researcher">Infrared Satellite</span><span class="layer-name-observer">Infrared</span></label>
-        <label class="layer-toggle"><input type="checkbox" data-layer="watervapor"> <span class="layer-name-researcher">Water Vapor</span><span class="layer-name-observer">Moisture</span></label>
-        <label class="layer-toggle"><input type="checkbox" data-layer="precip"> <span class="layer-name-researcher">Precipitation</span><span class="layer-name-observer">Rain</span></label>
-        <label class="layer-toggle" style="color:#ff6b6b;"><input type="checkbox" data-layer="fire"> 🔥 Satellite Fire Detections</label>
-        <label class="layer-toggle" style="color:#ff4ecf;"><input type="checkbox" data-layer="heaters" checked> <span class="layer-name-researcher">⚡ Ionospheric Heaters</span><span class="layer-name-observer">⚡ Research Transmitters</span></label>
-        <label class="layer-toggle" style="color:#4ecbff;"><input type="checkbox" data-layer="aircraft"> ✈ Aircraft (Live)</label>
-          <label class="layer-toggle" style="color:#ffe066;"><input type="checkbox" data-layer="glm"> ⚡ Lightning (last 15 min)</label>
-        <label class="layer-toggle" style="color:#ff5722;"><input type="checkbox" data-layer="wildfires"> 💥 Wildfires</label>
-        <label class="layer-toggle" style="color:#e040fb;"><input type="checkbox" data-layer="volcanoes"> 🌋 Volcanoes</label>
-        <button class="layer-toggle layer-toggle--style" id="map-style-toggle" title="Toggle light/dark map">🌙 DARK</button>
+        <div class="layer-group">
+          <span class="layer-group__title">SATELLITE & ATMOSPHERE</span>
+          <div class="layer-group__items">
+            <label class="layer-toggle"><input type="checkbox" data-layer="radar" checked> <span class="layer-name-researcher">Radar Reflectivity</span><span class="layer-name-observer">Weather Radar</span></label>
+            <label class="layer-toggle"><input type="checkbox" data-layer="satellite"> <span class="layer-name-researcher">Visible Satellite</span><span class="layer-name-observer">Satellite</span></label>
+            <label class="layer-toggle"><input type="checkbox" data-layer="infrared"> <span class="layer-name-researcher">Infrared Satellite</span><span class="layer-name-observer">Infrared</span></label>
+            <label class="layer-toggle"><input type="checkbox" data-layer="watervapor"> <span class="layer-name-researcher">Water Vapor</span><span class="layer-name-observer">Moisture</span></label>
+            <label class="layer-toggle"><input type="checkbox" data-layer="precip"> <span class="layer-name-researcher">Precipitation</span><span class="layer-name-observer">Rain</span></label>
+          </div>
+        </div>
+        <div class="layer-group">
+          <span class="layer-group__title">TRANSPONDERS & SENSORS</span>
+          <div class="layer-group__items">
+            <label class="layer-toggle" style="color:#ff4ecf;"><input type="checkbox" data-layer="heaters" checked> <span class="layer-name-researcher">⚡ Ionospheric Heaters</span><span class="layer-name-observer">⚡ Research Transmitters</span></label>
+            <label class="layer-toggle" style="color:#4ecbff;"><input type="checkbox" data-layer="aircraft"> ✈ Aircraft (Live)</label>
+            <label class="layer-toggle" style="color:#ffe066;"><input type="checkbox" data-layer="glm"> ⚡ Lightning (last 15 min)</label>
+          </div>
+        </div>
+        <div class="layer-group">
+          <span class="layer-group__title">HAZARDS & ACTIVITY</span>
+          <div class="layer-group__items">
+            <label class="layer-toggle" style="color:#ff6b6b;"><input type="checkbox" data-layer="fire"> 🔥 Satellite Fire Detections</label>
+            <label class="layer-toggle" style="color:#ff5722;"><input type="checkbox" data-layer="wildfires"> 💥 Wildfires</label>
+            <label class="layer-toggle" style="color:#e040fb;"><input type="checkbox" data-layer="volcanoes"> 🌋 Volcanoes</label>
+          </div>
+        </div>
+        <div class="layer-group layer-group--actions">
+          <span class="layer-group__hint">Click ⚡ LAYERS to close drawer</span>
+          <button class="layer-toggle layer-toggle--style" id="map-style-toggle" title="Toggle light/dark map">🌙 DARK</button>
+        </div>
       </div>
       <div id="map" class="map-container">
         <!-- Dynamic Legend -->
