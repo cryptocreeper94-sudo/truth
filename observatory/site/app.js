@@ -92,8 +92,16 @@ const Observatory = {
     },
     aircraft: {
       name: 'ADS-B Aircraft',
-      info: { source: 'ADS-B Exchange + adsb.lol receiver networks', what: 'Live aircraft transponder (ADS-B) positions across the lower 48 states. Click a dot for flight, altitude, speed, and heading.', update: 'Every 5 minutes', attribution: 'ADS-B Exchange / adsb.lol (ODbL)' },
-      legend: { type: 'dots', heading: 'AIRCRAFT (ADS-B)', items: [{ color: '#4ecbff', label: 'Tracked Aircraft' }] },
+      info: { source: 'ADS-B Exchange (global feed)', what: 'Live aircraft transponder (ADS-B) positions worldwide. Each plane points in its direction of travel and is colored by altitude. Hover for the callsign; click for full flight details. Callsigns appear as labels when zoomed in.', update: 'Every 5–10 minutes', attribution: 'ADS-B Exchange' },
+      legend: { type: 'dots', heading: 'AIRCRAFT BY ALTITUDE', items: [
+        { color: '#7dffb2', label: 'Below 5,000 ft' },
+        { color: '#4ecbff', label: '5,000 – 20,000 ft' },
+        { color: '#7f8cff', label: '20,000 – 30,000 ft' },
+        { color: '#d08cff', label: 'Above 30,000 ft' },
+        { color: '#9aa0a8', label: 'On the ground' },
+        { color: '#ffb020', label: 'Military' },
+        { color: '#ff3b3b', label: 'Emergency squawk' },
+      ] },
     },
     wildfires: {
       name: 'Active Wildfires',
@@ -464,9 +472,12 @@ const Observatory = {
     src.forEach(m => {
       const opts = Object.assign({}, m.options);
       delete opts.renderer;
-      const copy = L.circleMarker(m.getLatLng(), opts);
+      if (name === 'aircraft') opts.renderer = this._fsAircraftRenderer || (this._fsAircraftRenderer = L.canvas({ padding: 0.3, tolerance: 3 }));
+      const copy = new m.constructor(m.getLatLng(), opts);
       const popup = m.getPopup && m.getPopup();
-      if (popup) copy.bindPopup(popup.getContent(), { className: 'obs-popup' });
+      if (popup) copy.bindPopup(popup.getContent(), Object.assign({ className: 'obs-popup' }, popup.options && popup.options.maxWidth ? { maxWidth: popup.options.maxWidth } : {}));
+      const tip = m.getTooltip && m.getTooltip();
+      if (tip) copy.bindTooltip(tip.getContent(), { direction: 'top', offset: [0, -6], className: tip.options.className });
       group.addLayer(copy);
     });
   },
@@ -1472,6 +1483,90 @@ const Observatory = {
   },
 
   // ── Aircraft Markers ────────────────────────────────────────
+  // Canvas-drawn plane symbols (thousands of aircraft stay smooth).
+  _planeClass() {
+    if (this._PlaneMarker) return this._PlaneMarker;
+    this._PlaneMarker = L.CircleMarker.extend({
+      _updateBounds() {
+        const r = this._radius, w = this._clickTolerance();
+        const extra = (this.options.label ? 9 + this.options.label.length * 7 : 0);
+        this._pxBounds = L.bounds(this._point.subtract([r + w, r + w]), this._point.add([r + w + extra, r + w]));
+      },
+      _updatePath() {
+        const rd = this._renderer;
+        if (!rd || !rd._drawing || this._empty()) return;
+        const ctx = rd._ctx, p = this._point, o = this.options, s = o.size || 7;
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        if (o.ground) {
+          ctx.beginPath(); ctx.arc(0, 0, 2.5, 0, Math.PI * 2);
+          ctx.fillStyle = o.fillColor; ctx.fill();
+        } else {
+          ctx.rotate(((o.heading || 0) * Math.PI) / 180);
+          ctx.beginPath();
+          // airliner silhouette pointing north, scaled by s
+          const pts = [[0,-1],[0.12,-0.72],[0.12,-0.25],[1,0.2],[1,0.36],[0.12,0.12],[0.1,0.62],[0.38,0.84],[0.38,0.96],[0,0.86]];
+          ctx.moveTo(pts[0][0] * s, pts[0][1] * s);
+          for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0] * s, pts[i][1] * s);
+          for (let i = pts.length - 2; i > 0; i--) ctx.lineTo(-pts[i][0] * s, pts[i][1] * s);
+          ctx.closePath();
+          ctx.fillStyle = o.fillColor; ctx.fill();
+          ctx.lineWidth = 0.8; ctx.strokeStyle = 'rgba(0,0,0,0.65)'; ctx.stroke();
+        }
+        ctx.restore();
+        if (o.label && this._map && this._map.getZoom() >= 7) {
+          ctx.font = '600 10px "JetBrains Mono", monospace';
+          ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(0,0,0,0.75)';
+          ctx.strokeText(o.label, p.x + s + 4, p.y + 3);
+          ctx.fillStyle = o.fillColor; ctx.fillText(o.label, p.x + s + 4, p.y + 3);
+        }
+      },
+    });
+    return this._PlaneMarker;
+  },
+
+  _aircraftColor(a) {
+    if (a.emergency || ['7500', '7600', '7700'].includes(a.squawk)) return '#ff3b3b';
+    if (a.mil) return '#ffb020';
+    if (a.ground) return '#9aa0a8';
+    const alt = a.alt || 0;
+    if (alt < 5000) return '#7dffb2';
+    if (alt < 20000) return '#4ecbff';
+    if (alt < 30000) return '#7f8cff';
+    return '#d08cff';
+  },
+
+  _compass(deg) {
+    if (deg == null) return '';
+    return ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'][Math.round(deg / 22.5) % 16];
+  },
+
+  _aircraftPopup(a, color) {
+    const esc = v => String(v == null ? '' : v).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    const alt = a.ground ? 'On the ground' : (a.alt != null ? `${a.alt.toLocaleString()} ft` : 'Unknown');
+    const vr = a.vrate == null || Math.abs(a.vrate) < 150 ? 'Level' : (a.vrate > 0 ? `▲ Climbing ${a.vrate.toLocaleString()} ft/min` : `▼ Descending ${Math.abs(a.vrate).toLocaleString()} ft/min`);
+    const spd = a.speed != null ? `${a.speed} kts (${Math.round(a.speed * 1.15078)} mph)` : 'Unknown';
+    const hdg = a.heading != null ? `${a.heading}° ${this._compass(a.heading)}` : 'Unknown';
+    const sq = a.squawk ? esc(a.squawk) + (a.emergency || ['7500','7600','7700'].includes(a.squawk) ? ' <span style="color:#ff3b3b;">EMERGENCY</span>' : '') : '—';
+    const row = (k, v) => `<div style="display:flex;justify-content:space-between;gap:12px;"><span style="color:#777;">${k}</span><span style="color:#ddd;text-align:right;">${v}</span></div>`;
+    return `
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#e8e8f0;background:#0a0a0e;padding:10px 12px;border:1px solid ${color}55;border-radius:2px;min-width:230px;line-height:1.7;">
+        <div style="color:${color};font-weight:700;font-size:13px;">✈ ${esc(a.flight || a.reg || a.hex.toUpperCase())}${a.mil ? ' <span style="font-size:9px;color:#ffb020;">MILITARY</span>' : ''}</div>
+        <div style="color:#aaa;margin-bottom:6px;">${esc(a.desc || a.type || 'Aircraft type unknown')}${a.op ? ' · ' + esc(a.op) : ''}</div>
+        ${row('Altitude', alt)}
+        ${row('Vertical', vr)}
+        ${row('Ground speed', spd)}
+        ${row('Heading', hdg)}
+        ${row('Registration', esc(a.reg || '—'))}
+        ${row('Type code', esc(a.type || '—'))}
+        ${row('Squawk', sq)}
+        ${row('ICAO hex', esc(a.hex.toUpperCase()))}
+        ${row('Position age', a.seen != null ? a.seen + ' s' : '—')}
+        <a href="https://globe.adsbexchange.com/?icao=${encodeURIComponent(a.hex)}" target="_blank" rel="noopener"
+           style="display:block;margin-top:8px;color:${color};text-decoration:none;border-top:1px solid #222;padding-top:6px;">Track this flight live ↗</a>
+      </div>`;
+  },
+
   async loadAircraftMarkers() {
     try {
       const res = await fetch('/api/geo/aircraft');
@@ -1479,26 +1574,27 @@ const Observatory = {
       const data = await res.json();
       this.markers.aircraft.forEach(m => this.mapLayers.aircraft.removeLayer(m));
       this.markers.aircraft = [];
+      const Plane = this._planeClass();
+      const renderer = this._aircraftRenderer || (this._aircraftRenderer = L.canvas({ padding: 0.3, tolerance: 3 }));
       (data.aircraft || []).forEach(a => {
-        const marker = L.circleMarker([a.lat, a.lon], {
-          radius: 3, color: '#4ecbff', fillColor: '#4ecbff', fillOpacity: 0.6, weight: 1,
-          renderer: this._aircraftRenderer || (this._aircraftRenderer = L.canvas({ padding: 0.3 })),
+        const color = this._aircraftColor(a);
+        const urgent = color === '#ff3b3b';
+        const marker = new Plane([a.lat, a.lon], {
+          radius: urgent ? 10 : 7, size: urgent ? 10 : 7,
+          heading: a.heading, ground: a.ground,
+          color, fillColor: color, fillOpacity: 1, weight: 0,
+          label: a.flight || a.reg || '',
+          renderer,
         });
-        const alt = a.alt ? `${Math.round(a.alt).toLocaleString()} ft` : 'N/A';
-        const spd = a.speed ? `${Math.round(a.speed)} kts` : 'N/A';
-        marker.bindPopup(`
-          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#e8e8f0;background:#0a0a0e;padding:10px;border:1px solid #4ecbff33;border-radius:2px;min-width:160px;">
-            <div style="color:#4ecbff;font-weight:700;font-size:13px;margin-bottom:4px;">✈ ${a.flight || a.hex}</div>
-            <div style="color:#aaa;font-size:9px;">Alt: ${alt}</div>
-            <div style="color:#aaa;font-size:9px;">Speed: ${spd}</div>
-            <div style="color:#aaa;font-size:9px;">Heading: ${a.heading ? a.heading + '°' : 'N/A'}</div>
-            ${a.type ? '<div style="color:#555;font-size:9px;margin-top:4px;">Type: ' + a.type + '</div>' : ''}
-          </div>
-        `, { className: 'obs-popup' });
+        marker.bindTooltip(() => {
+          const alt = a.ground ? 'ground' : (a.alt != null ? a.alt.toLocaleString() + ' ft' : '—');
+          return `<b>${a.flight || a.reg || a.hex.toUpperCase()}</b> · ${alt} · ${a.speed != null ? a.speed + ' kts' : '—'} · ${a.heading != null ? this._compass(a.heading) : ''}`;
+        }, { direction: 'top', offset: [0, -6], className: 'aircraft-tip' });
+        marker.bindPopup(() => this._aircraftPopup(a, color), { className: 'obs-popup', maxWidth: 300 });
         this.mapLayers.aircraft.addLayer(marker);
         this.markers.aircraft.push(marker);
       });
-      if (data.count > 0) console.log(`[Observatory] Plotted ${data.count} aircraft`);
+      if (data.count > 0) console.log(`[Observatory] Plotted ${data.count} aircraft (${data.source || 'ADS-B'})`);
       this._mirrorToFs('aircraft');
       this.updateLayerCount();
       this.updateDynamicLegend();

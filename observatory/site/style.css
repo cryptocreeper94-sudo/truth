@@ -2313,3 +2313,16 @@ body[data-level="researcher"] .feed-card__why { display: none !important; }
   display: block; margin-top: 0.75rem; font-size: 0.62rem; letter-spacing: 0.12em;
   text-transform: uppercase; color: #a09080;
 }
+
+/* Aircraft hover tooltip */
+.leaflet-tooltip.aircraft-tip {
+  background: rgba(10, 10, 14, 0.95);
+  color: #e8e8f0;
+  border: 1px solid rgba(78, 203, 255, 0.4);
+  border-radius: 2px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 3px 7px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.5);
+}
+.leaflet-tooltip.aircraft-tip::before { border-top-color: rgba(78, 203, 255, 0.4); }

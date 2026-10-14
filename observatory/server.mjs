@@ -19,6 +19,7 @@ import { readFileSync, existsSync, readdirSync, statSync } from 'fs';
 import { join, extname, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { randomBytes, createHmac } from 'crypto';
+import { gzipSync } from 'zlib';
 import { generateDailyBrief, getCurrentBrief } from './brief-generator.mjs';
 import { readTail, tailLines, parseLines, segmentsFor, segmentDay, segmentLines, feedArchiveDir, archiveRoot } from './lib/manifest-ledger.mjs';
 import { readSeries, readEvents, seriesExtent, eventsExtent } from './lib/signal-store.mjs';
@@ -1193,12 +1194,28 @@ const server = createServer(async (req, res) => {
       {
         const data = readRawJson(RAW_DIR, 'adsb', Date.now());
         if (data && Array.isArray(data.ac)) {
-          const aircraft = data.ac.slice(0, 5000).map(a => ({
-            hex: a.hex, flight: (a.flight || '').trim(), lat: a.lat, lon: a.lon,
-            alt: a.alt_baro || a.alt_geom, speed: a.gs, heading: a.track,
-            type: a.t, squawk: a.squawk, category: a.category,
-          })).filter(a => a.lat && a.lon);
-          return jsonResponse(res, 200, { timestamp: new Date().toISOString(), source: data.source || 'ADS-B Exchange', count: aircraft.length, aircraft });
+          const num = v => (typeof v === 'number' && isFinite(v) ? Math.round(v) : null);
+          const aircraft = data.ac.slice(0, 20000).filter(a => a.lat != null && a.lon != null).map(a => {
+            const ground = a.alt_baro === 'ground';
+            return {
+              hex: a.hex, flight: (a.flight || '').trim(), reg: a.r || null,
+              lat: +a.lat.toFixed(4), lon: +a.lon.toFixed(4),
+              alt: ground ? 0 : num(a.alt_baro ?? a.alt_geom), ground,
+              speed: num(a.gs), heading: num(a.track ?? a.true_heading ?? a.mag_heading),
+              vrate: num(a.baro_rate ?? a.geom_rate),
+              type: a.t || null, desc: a.desc || null, op: a.ownOp || null,
+              squawk: a.squawk || null, emergency: a.emergency && a.emergency !== 'none' ? a.emergency : null,
+              mil: !!((a.dbFlags || 0) & 1), category: a.category || null,
+              seen: num(a.seen_pos ?? a.seen),
+            };
+          });
+          const payload = JSON.stringify({ timestamp: new Date().toISOString(), source: data.source || 'ADS-B Exchange', snapshotAt: data.now || null, count: aircraft.length, aircraft });
+          if (/\bgzip\b/.test(req.headers['accept-encoding'] || '')) {
+            res.writeHead(200, { 'Content-Type': 'application/json', 'Content-Encoding': 'gzip', 'Vary': 'Accept-Encoding' });
+            return res.end(gzipSync(payload));
+          }
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          return res.end(payload);
         }
       }
     } catch {}

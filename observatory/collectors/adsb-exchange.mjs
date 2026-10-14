@@ -3,9 +3,10 @@
  * TRUTH Observatory — ADS-B Aircraft Tracking Collector
  * DarkWave Studios LLC — Copyright 2026
  *
- * Fetches aircraft position data from ADS-B Exchange via RapidAPI (when
- * ADSB_API_KEY is set) merged with the free adsb.lol community network
- * (same v2 format, ODbL open data) tiled across CONUS. Deduped by ICAO hex.
+ * Fetches GLOBAL aircraft positions from ADS-B Exchange via RapidAPI
+ * (ADSB_API_KEY, set in Coolify env — never in code). One call per cycle,
+ * alternating two zones that cover the planet. Falls back to the free
+ * adsb.lol network (CONUS tiles) only if the key fails. Deduped by ICAO hex.
  *
  * DDA 42-Doctrine module mapping:
  *   [01] Identity Kernel    → COLLECTOR_IDENTITY
@@ -86,7 +87,7 @@ async function fetchFreeNetwork() {
       }
       ok++;
     } catch (err) { lastErr = err.message; }
-    await new Promise(r => setTimeout(r, 1200)); // be polite to the community API
+    await new Promise(r => setTimeout(r, 2500)); // be polite to the community API
   }
   if (ok === 0) return { status: 'FETCH_ERROR', error: lastErr || 'all adsb.lol requests failed', body: null, sha256: null };
   const body = JSON.stringify({ source: 'adsb.lol', now: Date.now(), tiles: ok, ac: [...byHex.values()] });
@@ -113,21 +114,47 @@ async function fetchRapid(url, retries = CONFIG.maxRetries) {
   }
 }
 
-// Primary: ADS-B Exchange (1 RapidAPI call per cycle) merged with the free
-// adsb.lol tiles for full lower-48 coverage. Either source alone is enough.
-async function fetchWithRetry(url) {
-  const [rapid, free] = await Promise.all([
-    CONFIG.apiKey ? fetchRapid(url) : Promise.resolve(null),
-    fetchFreeNetwork(),
-  ]);
-  const parts = [];
-  const sources = [];
-  if (rapid && rapid.body) { try { parts.push(JSON.parse(rapid.body).ac || []); sources.push('ADS-B Exchange'); } catch {} }
-  else if (rapid) console.log(`  [WARN] ADS-B Exchange: ${rapid.error || rapid.status}`);
-  if (free && free.body) { try { parts.push(JSON.parse(free.body).ac || []); sources.push('adsb.lol'); } catch {} }
-  if (!parts.length) return { status: 'FETCH_ERROR', error: (rapid && rapid.error) || (free && free.error) || 'no source', body: null, sha256: null };
+// Global coverage on a 10,000 req/month plan: ONE RapidAPI call per cycle,
+// alternating between two zones that together cover the planet. Each zone's
+// latest result is kept and merged, so every zone refreshes every 2 cycles.
+//   Zone W: centred on North America, 10,800 nm → Americas, Europe, Africa, W. Asia
+//   Zone E: centred on SE Asia, 6,000 nm       → E. Asia, Oceania, Indian Ocean
+// 5-min interval → 8,640 calls/month. adsb.lol is used only if the key fails.
+const ZONES = [
+  { id: 'W', lat: 39.0, lon: -97.0, dist: 10800 },
+  { id: 'E', lat: 0.0, lon: 100.0, dist: 6000 },
+];
+const ZONE_MAX_AGE_MS = 25 * 60 * 1000;
+const zoneCache = new Map(); // id -> { ac, at }
+let zoneTurn = 0;
+
+function zoneUrl(z) {
+  return `https://adsbexchange-com1.p.rapidapi.com/v2/lat/${z.lat}/lon/${z.lon}/dist/${z.dist}/`;
+}
+
+async function fetchWithRetry() {
+  let sources = [];
+  if (CONFIG.apiKey) {
+    // First cycle after boot fills both zones so the map is global immediately
+    const due = zoneCache.size < ZONES.length ? ZONES.filter(z => !zoneCache.has(z.id)) : [ZONES[zoneTurn++ % ZONES.length]];
+    for (const z of due) {
+      const r = await fetchRapid(zoneUrl(z));
+      if (r && r.body) {
+        try { zoneCache.set(z.id, { ac: JSON.parse(r.body).ac || [], at: Date.now() }); console.log(`  [ZONE ${z.id}] refreshed`); }
+        catch { console.log(`  [WARN] zone ${z.id}: bad JSON`); }
+      } else console.log(`  [WARN] ADS-B Exchange zone ${z.id}: ${(r && (r.error || r.status)) || 'no response'}`);
+    }
+  }
+  const lists = [];
+  for (const [id, z] of zoneCache) if (Date.now() - z.at < ZONE_MAX_AGE_MS) lists.push(z.ac);
+  if (lists.length) sources.push('ADS-B Exchange');
+  else {
+    const free = await fetchFreeNetwork();
+    if (free && free.body) { try { lists.push(JSON.parse(free.body).ac || []); sources.push('adsb.lol'); } catch {} }
+    if (!lists.length) return { status: 'FETCH_ERROR', error: (free && free.error) || 'no source', body: null, sha256: null };
+  }
   const byHex = new Map();
-  for (const list of parts) for (const a of list) {
+  for (const list of lists) for (const a of list) {
     if (a.lat == null || a.lon == null || !a.hex) continue;
     const prev = byHex.get(a.hex);
     if (!prev || (a.seen_pos ?? 99) < (prev.seen_pos ?? 99)) byHex.set(a.hex, a);
@@ -183,7 +210,7 @@ async function runCycle() {
 }
 
 console.log(`[ADSB] ${IDENTITY.name} v${IDENTITY.version}`);
-console.log(`[ADSB] Sources: ${CONFIG.apiKey ? 'ADS-B Exchange (RapidAPI) + ' : ''}adsb.lol community network`);
+console.log(`[ADSB] Source: ${CONFIG.apiKey ? 'ADS-B Exchange global (2 alternating zones), adsb.lol fallback' : 'adsb.lol community network (no key)'}`);
 console.log(`[ADSB] Interval: ${CONFIG.intervalMs}ms`);
 
 process.on('uncaughtException', (err) => { console.error('[ADSB] FATAL:', err); appendManifest({ type: 'FATAL', error: err.message, at: new Date().toISOString() }); process.exit(1); });
