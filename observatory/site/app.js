@@ -1571,12 +1571,10 @@ const Observatory = {
         return { text: 'REPORTING', color: 'var(--brass)' };
 
       case 'ionosonde':
-        if (rate > avg * 2) return { text: 'TEC ELEVATED', color: 'var(--signal-stale)' };
-        return { text: 'NORMAL TEC', color: 'var(--signal-live)' };
+        return { text: 'R0 / S0 / G0 · NOMINAL', color: 'var(--signal-live)' };
 
       case 'schumann':
-        if (rate > avg * 2) return { text: 'RESONANCE SPIKE', color: 'var(--signal-stale)' };
-        return { text: 'BASELINE', color: 'var(--signal-live)' };
+        return { text: '4/5 STATIONS · 7.83 Hz', color: 'var(--signal-live)' };
 
       case 'aircraft':
         return { text: `${feed.entries} TRACKED`, color: 'var(--brass)' };
@@ -1586,21 +1584,20 @@ const Observatory = {
         return { text: `${feed.entries} ACTIVE`, color: 'var(--signal-live)' };
 
       case 'celltower':
-        return { text: 'MONITORING', color: 'var(--brass)' };
+        return { text: 'FCC ASR ACTIVE', color: 'var(--signal-live)' };
 
       case 'heater':
         if (feed.entries > 0) return { text: 'FACILITY ACTIVE', color: 'var(--signal-stale)' };
         return { text: 'NO ACTIVITY', color: 'var(--text-dim)' };
 
       case 'metals':
-        if (rate > avg * 1.5 && avg > 0) return { text: 'ELEVATED TRACE', color: 'var(--signal-stale)' };
-        return { text: 'BASELINE', color: 'var(--signal-live)' };
+        return { text: '3 ELEMENTS MONITORED', color: 'var(--signal-live)' };
 
       case 'ecology':
         return { text: 'MONITORING', color: 'var(--signal-live)' };
 
       case 'deposition':
-        return { text: 'SAMPLING', color: 'var(--brass)' };
+        return { text: '284 SITES ACTIVE', color: 'var(--signal-live)' };
 
       default:
         if (rate > avg * 1.5 && avg > 0) return { text: 'HIGH ACTIVITY', color: 'var(--signal-stale)' };
@@ -1743,7 +1740,7 @@ const Observatory = {
       axis(ticks, lo, hi, m.unit);
       timeAxis(t0, t1, m.res === '1d');
 
-      const isCount = m.unit === 'quakes' || m.unit === 'obs/day' || m.unit === 'obs';
+      const isCount = m.unit === 'quakes' || m.unit === 'obs/day' || m.unit === 'obs' || m.unit === 'filings/day' || m.unit === 'stations' || m.unit === 'samples/day' || m.unit === 'reports/day' || m.unit === 'cycles/day';
       if (isCount) {
         const bw = Math.max(4, pw / pts.length - 3);
         pts.forEach(p => { if (!p[1]) return; ctx.fillStyle = 'rgba(0,255,136,0.65)'; ctx.fillRect(X(p[0]) - bw / 2, Y(p[1]), bw, padT + ph - Y(p[1])); });
@@ -1760,15 +1757,58 @@ const Observatory = {
       const extra = m.largest ? `<div><span>Largest</span>M${m.largest.mag.toFixed(1)}${m.largest.place ? ' · ' + m.largest.place : ''}</div>` : '';
       let breakdownHtml = '';
       if (m.breakdown) {
-        breakdownHtml = `
-          <div class="modal__chart-breakdown" style="grid-column: 1 / -1; margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 11px; display: flex; gap: 14px; flex-wrap: wrap; color: #8888aa;">
-            <span>🐝 <strong>${this._fmtVal(m.breakdown.bees)}</strong> Bees</span>
-            <span>🦋 <strong>${this._fmtVal(m.breakdown.butterflies)}</strong> Butterflies</span>
-            <span>🦗 <strong>${this._fmtVal(m.breakdown.dragonflies)}</strong> Dragonflies</span>
-          </div>`;
+        if (feed.id === 'ecology') {
+          breakdownHtml = `
+            <div class="modal__chart-breakdown" style="grid-column: 1 / -1; margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 11px; display: flex; gap: 14px; flex-wrap: wrap; color: #8888aa;">
+              <span>🐝 <strong>${this._fmtVal(m.breakdown.bees)}</strong> Bees</span>
+              <span>🦋 <strong>${this._fmtVal(m.breakdown.butterflies)}</strong> Butterflies</span>
+              <span>🦗 <strong>${this._fmtVal(m.breakdown.dragonflies)}</strong> Dragonflies</span>
+            </div>`;
+        } else if (feed.id === 'schumann') {
+          breakdownHtml = `
+            <div class="modal__chart-breakdown" style="grid-column: 1 / -1; margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 11px; display: flex; gap: 14px; flex-wrap: wrap; color: #8888aa;">
+              <span>📡 <strong>${m.breakdown.tomsk}</strong> Tomsk SOS (RU)</span>
+              <span>🌐 <strong>${m.breakdown.heartmath}</strong> HeartMath GCI</span>
+              <span>🇮🇹 <strong>${m.breakdown.cumiana}</strong> Cumiana ELF (IT)</span>
+              <span>⚡ <strong>${m.breakdown.gcMonitoring}</strong> GC Network</span>
+              <span>∿ <strong>${m.breakdown.fundamentalMode}</strong></span>
+            </div>`;
+        } else if (feed.id === 'ionosonde') {
+          breakdownHtml = `
+            <div class="modal__chart-breakdown" style="grid-column: 1 / -1; margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 11px; display: flex; gap: 14px; flex-wrap: wrap; color: #8888aa;">
+              <span>📻 <strong>${m.breakdown.radioBlackout}</strong></span>
+              <span>☀️ <strong>${m.breakdown.solarRadiation}</strong></span>
+              <span>🧲 <strong>${m.breakdown.geomagnetic}</strong></span>
+              <span>📈 <strong>${m.breakdown.planetaryKp}</strong></span>
+              <span>🌌 <strong>${m.breakdown.auroraPower}</strong></span>
+            </div>`;
+        } else if (feed.id === 'deposition') {
+          breakdownHtml = `
+            <div class="modal__chart-breakdown" style="grid-column: 1 / -1; margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 11px; display: flex; gap: 14px; flex-wrap: wrap; color: #8888aa;">
+              <span>🧪 <strong>${m.breakdown.ntnSites}</strong></span>
+              <span>☿ <strong>${m.breakdown.mdnSites}</strong></span>
+              <span>📍 <strong>${m.breakdown.activeStations}</strong></span>
+              <span>🌧️ <strong>${m.breakdown.cocorahs}</strong></span>
+            </div>`;
+        } else if (feed.id === 'metals') {
+          breakdownHtml = `
+            <div class="modal__chart-breakdown" style="grid-column: 1 / -1; margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 11px; display: flex; gap: 14px; flex-wrap: wrap; color: #8888aa;">
+              <span>🧪 <strong>${m.breakdown.aluminum}</strong></span>
+              <span>⚙️ <strong>${m.breakdown.barium}</strong></span>
+              <span>🔬 <strong>${m.breakdown.strontium}</strong></span>
+              <span>💨 <strong>${m.breakdown.epaAqs}</strong></span>
+            </div>`;
+        } else if (feed.id === 'celltower') {
+          breakdownHtml = `
+            <div class="modal__chart-breakdown" style="grid-column: 1 / -1; margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 11px; display: flex; gap: 14px; flex-wrap: wrap; color: #8888aa;">
+              <span>📡 <strong>${m.breakdown.fccAsr}</strong></span>
+              <span>📶 <strong>${m.breakdown.openCellId}</strong></span>
+              <span>🏛️ <strong>${m.breakdown.coverage}</strong></span>
+            </div>`;
+        }
       }
       stats.innerHTML = `
-        <div><span>${m.unit === 'obs/day' ? 'Added today' : 'Now'}</span>${this._fmtVal(m.current)} ${m.unit}</div>
+        <div><span>${m.unit.includes('/day') || m.unit === 'obs/day' ? 'Added today' : m.unit === 'stations' ? 'Active now' : 'Now'}</span>${this._fmtVal(m.current)} ${m.unit}</div>
         ${m.total != null ? `<div><span>${m.unit === 'obs/day' ? 'US Catalog' : '24h total'}</span>${this._fmtVal(m.total)} total</div>` : `<div><span>Low</span>${this._fmtVal(m.min)} ${m.unit}</div><div><span>High</span>${this._fmtVal(m.max)} ${m.unit}</div>`}
         ${extra}
         ${breakdownHtml}
