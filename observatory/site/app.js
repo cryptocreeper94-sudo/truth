@@ -1127,6 +1127,17 @@ const Observatory = {
     }
   },
 
+  // Layers the user explicitly switched off: smart alert auto-activation must not turn them back on.
+  _userOffSet() {
+    try { return new Set(JSON.parse(localStorage.getItem('obs-map-user-off') || '[]')); } catch (e) { return new Set(); }
+  },
+  _markUserLayer(key, on) {
+    if (!key) return;
+    const s = this._userOffSet();
+    if (on) s.delete(key); else s.add(key);
+    try { localStorage.setItem('obs-map-user-off', JSON.stringify([...s])); } catch (e) {}
+  },
+
   // ── Persist which map overlays the user selected (shared by cockpit + expanded map) ──
   _saveLayerPrefs() {
     try {
@@ -1435,7 +1446,7 @@ const Observatory = {
     // Activate layers that aren't already on
     const newlyActivated = [];
     for (const layerName of layersToActivate) {
-      if (this.mapLayers[layerName] && !this.map.hasLayer(this.mapLayers[layerName])) {
+      if (this.mapLayers[layerName] && !this.map.hasLayer(this.mapLayers[layerName]) && !this._userOffSet().has(layerName)) {
         this.mapLayers[layerName].addTo(this.map);
         newlyActivated.push(layerName);
         // Sync checkbox
@@ -1462,7 +1473,7 @@ const Observatory = {
 
     this.updateLayerCount();
     this.updateDynamicLegend();
-      this._saveLayerPrefs();
+
     this.checkLayerDensity();
   },
 
@@ -2740,7 +2751,7 @@ const Observatory = {
       }
       this.updateLayerCount();
       this.updateDynamicLegend();
-      this.checkLayerDensity(); this._saveLayerPrefs();
+      this.checkLayerDensity(); this._markUserLayer(layerName, cb.checked); this._saveLayerPrefs();
     });
 
     // Map style toggle (light/dark)
@@ -3125,7 +3136,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
         if (!layer) return;
         if (cb.checked) layer.addTo(this.fullscreenMap);
         else this.fullscreenMap.removeLayer(layer);
-        this._saveLayerPrefs();
+        this._markUserLayer(cb.dataset.fslayer, cb.checked); this._saveLayerPrefs();
         this.updateDynamicLegend();
       });
     });
@@ -3187,7 +3198,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
       }
     });
     this.updateLayerCount();
-    this._saveLayerPrefs();
+
     this.updateDynamicLegend();
   },
 
