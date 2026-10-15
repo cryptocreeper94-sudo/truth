@@ -97,3 +97,6 @@ input[type="radio"] { accent-color: var(--brass); }
 .ac-filter__actions button { border-radius: 0; }
 .ac-filter__actions button:hover { border-color: var(--brass); background: var(--brass); color: var(--bg-void); }
 .ac-filter__body { scrollbar-width: thin; }
+
+/* Footer must clear the fixed bottom nav on every view (AtmosCore, Feeds, Ledger, Map) */
+.site-footer { margin-bottom: calc(var(--bottomnav-h) + env(safe-area-inset-bottom, 0px)) !important; position: relative; z-index: 1; }
