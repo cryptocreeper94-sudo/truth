@@ -216,6 +216,7 @@ const Observatory = {
     this.initTopbarDrawer();
     this.initWelcome();
     this.initWeatherModals();
+    this.initTimezoneModal();
 
     // Initialize AtmosCore engine
     AtmosCore.init();
@@ -381,15 +382,199 @@ const Observatory = {
     });
   },
 
-  // ── UTC Clock ────────────────────────────────────────────────
+  // ── Timezone & Temporal Clock ────────────────────────────────
+  getTimezone() {
+    try {
+      const saved = localStorage.getItem('observatory_timezone');
+      if (saved) {
+        if (saved === 'auto') {
+          return Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/Chicago';
+        }
+        return saved;
+      }
+    } catch {}
+    // Standard ecosystem default: Gladeville, TN (Central Time)
+    return 'America/Chicago';
+  },
+
+  getTimezoneShort(date = new Date()) {
+    try {
+      const tz = this.getTimezone();
+      const parts = new Intl.DateTimeFormat('en-US', {
+        timeZone: tz,
+        timeZoneName: 'short'
+      }).formatToParts(date);
+      const part = parts.find(p => p.type === 'timeZoneName');
+      return part ? part.value : 'CT';
+    } catch {
+      return 'CT';
+    }
+  },
+
+  formatTime(dateInput, opts = {}) {
+    if (!dateInput) return '—';
+    const date = typeof dateInput === 'string' || typeof dateInput === 'number' ? new Date(dateInput) : dateInput;
+    if (isNaN(date.getTime())) return '—';
+    const tz = this.getTimezone();
+    const withSeconds = opts.withSeconds ?? false;
+    const withZone = opts.withZone ?? true;
+    const withDate = opts.withDate ?? false;
+
+    try {
+      const formatterOptions = {
+        timeZone: tz,
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      };
+      if (withSeconds) formatterOptions.second = '2-digit';
+      if (withDate) {
+        formatterOptions.year = 'numeric';
+        formatterOptions.month = '2-digit';
+        formatterOptions.day = '2-digit';
+      }
+      if (withZone) formatterOptions.timeZoneName = 'short';
+
+      return new Intl.DateTimeFormat('en-US', formatterOptions).format(date);
+    } catch (e) {
+      return date.toISOString().slice(11, withSeconds ? 19 : 16) + ' UTC';
+    }
+  },
+
+  setTimezone(tz) {
+    try {
+      localStorage.setItem('observatory_timezone', tz);
+    } catch {}
+    this.updateClock();
+    this.highlightActiveTimezone();
+    if (this.ledgerData) this.renderLedger(this.ledgerData);
+  },
+
   startClock() {
     const el = document.getElementById('utc-clock');
-    const tick = () => {
-      const now = new Date();
+    if (!el) return;
+
+    this.updateClock();
+    if (this._clockInterval) clearInterval(this._clockInterval);
+    this._clockInterval = setInterval(() => this.updateClock(), 1000);
+
+    el.addEventListener('click', () => {
+      this.openTimezoneModal();
+    });
+  },
+
+  updateClock() {
+    const el = document.getElementById('utc-clock');
+    if (!el) return;
+    const now = new Date();
+    const tz = this.getTimezone();
+    const tzShort = this.getTimezoneShort(now);
+
+    try {
+      const timeStr = new Intl.DateTimeFormat('en-US', {
+        timeZone: tz,
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+      }).format(now);
+      el.textContent = `${timeStr} ${tzShort}`;
+      const tzLabel = tz === 'America/Chicago' ? 'Central Time (Gladeville, TN)' : tz;
+      el.title = `Timezone: ${tzLabel} (Click to change)`;
+    } catch {
       el.textContent = now.toISOString().slice(11, 19) + ' UTC';
+    }
+  },
+
+  highlightActiveTimezone() {
+    const saved = localStorage.getItem('observatory_timezone') || 'America/Chicago';
+    const options = document.querySelectorAll('.timezone-option');
+    options.forEach(opt => {
+      const tzVal = opt.getAttribute('data-tz');
+      opt.classList.toggle('timezone-option--active', tzVal === saved);
+    });
+  },
+
+  openTimezoneModal() {
+    const modal = document.getElementById('timezone-picker-modal');
+    if (!modal) return;
+
+    const det = document.getElementById('tz-browser-detected');
+    if (det) {
+      try {
+        const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        det.textContent = `${localTz} (Local Browser Detection)`;
+      } catch {
+        det.textContent = 'Auto-detect browser timezone';
+      }
+    }
+
+    this.highlightActiveTimezone();
+    modal.style.display = 'flex';
+  },
+
+  closeTimezoneModal() {
+    const modal = document.getElementById('timezone-picker-modal');
+    if (modal) modal.style.display = 'none';
+  },
+
+  initTimezoneModal() {
+    const modal = document.getElementById('timezone-picker-modal');
+    if (!modal) return;
+
+    const closeBtn = document.getElementById('tz-modal-close');
+    const dismissBtn = document.getElementById('tz-modal-dismiss');
+    if (closeBtn) closeBtn.addEventListener('click', () => this.closeTimezoneModal());
+    if (dismissBtn) dismissBtn.addEventListener('click', () => this.closeTimezoneModal());
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) this.closeTimezoneModal();
+    });
+
+    const resetBtn = document.getElementById('tz-modal-reset');
+    if (resetBtn) {
+      resetBtn.addEventListener('click', () => {
+        this.setTimezone('America/Chicago');
+      });
+    }
+
+    const options = modal.querySelectorAll('.timezone-option');
+    options.forEach(opt => {
+      opt.addEventListener('click', () => {
+        const tz = opt.getAttribute('data-tz');
+        if (tz) {
+          this.setTimezone(tz);
+        }
+      });
+    });
+
+    const customInput = document.getElementById('tz-custom-input');
+    const customApply = document.getElementById('tz-custom-apply');
+    const customFeedback = document.getElementById('tz-custom-feedback');
+
+    const applyCustom = () => {
+      if (!customInput) return;
+      const raw = customInput.value.trim();
+      if (!raw) return;
+      try {
+        new Intl.DateTimeFormat('en-US', { timeZone: raw }).format(new Date());
+        this.setTimezone(raw);
+        if (customFeedback) {
+          customFeedback.style.display = 'block';
+          customFeedback.style.color = 'var(--signal-live)';
+          customFeedback.textContent = `Applied timezone: ${raw}`;
+          setTimeout(() => { customFeedback.style.display = 'none'; }, 3000);
+        }
+      } catch (err) {
+        if (customFeedback) {
+          customFeedback.style.display = 'block';
+          customFeedback.style.color = '#ff1438';
+          customFeedback.textContent = `Invalid IANA timezone identifier: "${raw}"`;
+        }
+      }
     };
-    tick();
-    setInterval(tick, 1000);
+
+    if (customApply) customApply.addEventListener('click', applyCustom);
+    if (customInput) customInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') applyCustom(); });
   },
 
   // ── Map Init with Expanded Layers ────────────────────────────
@@ -509,9 +694,12 @@ const Observatory = {
   },
 
   initMap() {
+    const savedLoc = this._getSavedLocation();
+    const center = savedLoc ? [savedLoc.lat, savedLoc.lng] : [36.12, -86.26];
+    const zoom = savedLoc ? 7 : 7;
     this.map = L.map('map', {
-      center: [39.5, -98.35],
-      zoom: 4,
+      center,
+      zoom,
       zoomControl: false,
       attributionControl: false,
       worldCopyJump: false,
@@ -1945,7 +2133,7 @@ const Observatory = {
         const row = document.createElement('div');
         row.className = 'entry-row';
         row.innerHTML = `
-          <span class="entry-row__time">${time ? new Date(time).toISOString().slice(0, 19).replace('T', ' ') : '—'}</span>
+          <span class="entry-row__time">${time ? this.formatTime(time, { withDate: true, withSeconds: true, withZone: true }) : '—'}</span>
           <span class="entry-row__type">${type}</span>
           <span class="entry-row__detail">${detail}</span>
           ${hash ? `<span class="entry-row__hash">${hash}</span>` : ''}
@@ -2039,7 +2227,7 @@ const Observatory = {
             <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #e8e8f0; background: #0a0a0e; padding: 8px; border: 1px solid #2a2a38; border-radius: 2px; min-width: 180px; max-width: 250px; word-break: break-word;">
               <div style="color: ${color}; font-weight: 700; font-size: 14px; margin-bottom: 4px;">M${mag.toFixed(1)}</div>
               <div style="color: #8888a0; margin-bottom: 2px;">${f.properties.place}</div>
-              <div style="color: #555568; font-size: 9px;">${new Date(f.properties.time).toISOString().slice(0, 19)} UTC</div>
+              <div style="color: #555568; font-size: 9px;">${this.formatTime(f.properties.time, { withDate: true, withSeconds: true, withZone: true })}</div>
             </div>
           `, { className: 'obs-popup', maxWidth: 260, autoPanPadding: [20, 20] });
           if (this.mapLayers.earthquakes) this.mapLayers.earthquakes.addLayer(marker);
@@ -3104,7 +3292,8 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
         const mins = Math.round((Date.now() - frame.time.getTime()) / 60000);
         const last = i === this.animFrames.length - 1;
         if (label) {
-          label.textContent = last || mins <= 0 ? 'LIVE' : `-${mins}m`;
+          const timeStr = this.formatTime(frame.time, { withSeconds: false, withZone: true });
+          label.textContent = last || mins <= 0 ? `LIVE • ${timeStr}` : `-${mins}m • ${timeStr}`;
           label.style.color = last ? 'var(--signal-live)' : 'var(--brass)';
         }
       }
@@ -3225,21 +3414,25 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
           if (!data.location) { status.textContent = 'ZIP NOT FOUND'; return; }
           const s = data.station || {};
           this.localStation = s;
+          const locLabel = (data.location && data.location.label) || (s.city && s.state ? `${s.city}, ${s.state}` : zip);
           this.userLocation = {
             lat: data.location.lat,
             lng: data.location.lon,
             zip,
-            label: s.city && s.state ? `${s.city}, ${s.state}` : zip
+            label: locLabel,
+            city: (data.location && data.location.city) || s.city || '',
+            state: (data.location && data.location.state) || s.state || ''
           };
           this._saveLocation(this.userLocation);
           this._applyLocation();
-          status.textContent = `ZIP ${zip}: ${this.userLocation.label}`;
+          status.textContent = `ZIP ${zip}: ${locLabel}`;
           geoBtn.classList.add('location-bar__geo--active');
 
           const btn = document.getElementById('local-station-btn');
           const label = document.getElementById('local-station-label');
           if (btn && label && s.wfo) {
-            label.textContent = `${s.wfo} • ${s.city || s.market.split('/')[0].trim()}`;
+            const cityName = (this.userLocation.city === 'Gladeville') ? 'Nashville / Gladeville' : (s.city || s.market.split('/')[0].trim());
+            label.textContent = `${s.wfo} • ${cityName}`;
             btn.style.display = 'inline-flex';
           }
         })
@@ -3270,8 +3463,17 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
   _getSavedLocation() {
     try {
       const raw = localStorage.getItem('observatory_location');
-      return raw ? JSON.parse(raw) : null;
+      if (raw) return JSON.parse(raw);
     } catch { return null; }
+    // Platform standard default location: Gladeville, TN 37090
+    return {
+      lat: 36.12,
+      lng: -86.26,
+      zip: '37090',
+      label: 'Gladeville, TN 37090',
+      city: 'Gladeville',
+      state: 'TN'
+    };
   },
 
   _saveLocation(loc) {
@@ -3344,7 +3546,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
       }
 
       const time = new Date(ev.at);
-      const timeStr = time.toISOString().slice(11, 16) + ' UTC';
+      const timeStr = this.formatTime(time, { withSeconds: false, withZone: true });
       const kindClass = `ledger-event--${ev.kind}`;
       const clickAttr = `onclick="Observatory.openEventDetail(${data.events.indexOf(ev)})"`;
 
@@ -3714,7 +3916,8 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
       if (diffMs > 0) {
         const hours = Math.floor(diffMs / 3600000);
         const mins = Math.floor((diffMs % 3600000) / 60000);
-        expires.textContent = hours > 0 ? `${hours}h ${mins}m (${exp.toLocaleTimeString()})` : `${mins} min (${exp.toLocaleTimeString()})`;
+        const formattedExp = this.formatTime(exp, { withSeconds: false, withZone: true });
+        expires.textContent = hours > 0 ? `${hours}h ${mins}m (${formattedExp})` : `${mins} min (${formattedExp})`;
       } else {
         expires.textContent = 'Expired';
       }
@@ -3802,7 +4005,9 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
       if (!data.station) return;
       this.localStation = data.station;
 
-      label.textContent = `${this.localStation.wfo} • ${this.localStation.city || this.localStation.market.split('/')[0].trim()}`;
+      const isGladeville = (data.location && data.location.city === 'Gladeville') || zip === '37090';
+      const cityDisplay = isGladeville ? 'Nashville / Gladeville' : (this.localStation.city || this.localStation.market.split('/')[0].trim());
+      label.textContent = `${this.localStation.wfo} • ${cityDisplay}`;
       btn.style.display = 'inline-flex';
     } catch (e) {
       console.warn('[Observatory] Local station fetch failed:', e);

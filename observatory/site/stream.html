@@ -1018,7 +1018,16 @@
       if (!ts) return '-';
       try {
         const d = new Date(ts);
-        return d.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZoneName: 'short' });
+        const tz = localStorage.getItem('observatory_timezone') || 'America/Chicago';
+        const realTz = tz === 'auto' ? (Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/Chicago') : tz;
+        return d.toLocaleString('en-US', {
+          timeZone: realTz,
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          timeZoneName: 'short'
+        });
       } catch { return ts; }
     }
 

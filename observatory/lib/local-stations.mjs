@@ -197,12 +197,15 @@ export const WFO_METADATA = {
   },
   OHX: {
     wfo: 'OHX',
-    name: 'NWS Nashville',
-    market: 'Middle Tennessee / Nashville',
+    name: 'NWS Nashville (Middle Tennessee)',
+    market: 'Nashville / Gladeville / Lebanon',
     state: 'TN',
+    timeZone: 'America/Chicago',
     broadcasts: [
       { name: 'WSMV 4 (NBC)', network: 'NBC', city: 'Nashville', url: 'https://www.wsmv.com/livestream/' },
-      { name: 'NewsChannel 5 (CBS)', network: 'CBS', city: 'Nashville', url: 'https://www.newschannel5.com/live' }
+      { name: 'NewsChannel 5 (CBS)', network: 'CBS', city: 'Nashville', url: 'https://www.newschannel5.com/live' },
+      { name: 'WKRN News 2 (ABC)', network: 'ABC', city: 'Nashville', url: 'https://www.wkrn.com/live/' },
+      { name: 'FOX 17 Nashville', network: 'FOX', city: 'Nashville', url: 'https://fox17.com/watch' }
     ]
   },
   OUN: {
@@ -282,8 +285,12 @@ export async function resolveLocalStation(lat, lon) {
     const props = data.properties || {};
     const wfo = props.cwa || 'US';
     const radar = props.radarStation || '';
-    const city = props.relativeLocation?.properties?.city || '';
+    let city = props.relativeLocation?.properties?.city || '';
     const state = props.relativeLocation?.properties?.state || '';
+    // Home base Gladeville, TN check
+    if (roundedLat >= 36.05 && roundedLat <= 36.25 && roundedLon >= -86.40 && roundedLon <= -86.15) {
+      city = 'Gladeville';
+    }
 
     const meta = WFO_METADATA[wfo] || {
       wfo,

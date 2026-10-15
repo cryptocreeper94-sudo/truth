@@ -47,7 +47,7 @@
       <button class="topbar__action-btn topbar__action-btn--desktop" id="manage-sub-btn" onclick="document.getElementById('manage-sub-modal').style.display='flex'">ACCOUNT</button>
       <a class="topbar__action-btn topbar__back-btn" href="/" style="text-decoration:none;" title="Back to Observatory Home">← HOME</a>
       <button class="topbar__action-btn topbar__action-btn--desktop level-toggle-btn" id="level-toggle-btn" title="Change how much detail you see" aria-haspopup="menu" aria-expanded="false">🟢 OBSERVER ▾</button>
-      <span class="topbar__clock" id="utc-clock">00:00:00 UTC</span>
+      <button class="topbar__clock" id="utc-clock" title="Click to configure timezone (Standard: Central Time / Gladeville, TN)">00:00:00 CT</button>
       <span class="topbar__pulse" id="global-pulse" data-info="stat-pulse" title="Data connection status"></span>
       <!-- Mobile kebab menu -->
       <button class="topbar-menu-toggle" id="topbar-menu-toggle" aria-label="Menu">⋮</button>
@@ -541,7 +541,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="atmoscore.js"></script>
   <script src="atmoscore-viz.js"></script>
-  <script src="app.js?v=20261014-filtersfix"></script>
+  <script src="app.js?v=20261014-gladeville-tz"></script>
   <script>
     // CSV Export
     async function __exportData() {
@@ -964,6 +964,79 @@
       </div>
       <div class="weather-modal__footer">
         <button class="weather-modal__btn weather-modal__btn--primary" id="station-modal-dismiss">CLOSE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TIMEZONE SELECTOR MODAL ═══ -->
+  <div class="weather-modal" id="timezone-picker-modal" style="display:none;" role="dialog" aria-modal="true">
+    <div class="weather-modal__dialog" style="max-width: 560px;">
+      <div class="weather-modal__header">
+        <div class="weather-modal__header-title">
+          <span class="weather-modal__badge" style="background:var(--brass);color:#000;">TEMPORAL ENGINE</span>
+          <span class="weather-modal__title">TIMEZONE CONFIGURATION</span>
+        </div>
+        <button class="weather-modal__close" id="tz-modal-close" title="Close dialog">&times;</button>
+      </div>
+      <div class="weather-modal__body">
+        <p style="font-size:0.75rem;color:var(--text-secondary);margin:0 0 12px;line-height:1.45;">
+          All clocks, radar sweeps, and event ledger timestamps will render in your chosen timezone. The ecosystem standard is calibrated to <strong style="color:var(--brass);">Gladeville, TN 37090 (Central Time)</strong>.
+        </p>
+
+        <div class="weather-modal__section">
+          <span class="weather-modal__label">SELECT PREFERRED TIMEZONE</span>
+          <div class="timezone-picker-grid" id="timezone-options-grid">
+            <button class="timezone-option" data-tz="America/Chicago">
+              <div class="timezone-option__title">Central Time (US & Canada) <span class="timezone-option__tag">DEFAULT • GLADEVILLE, TN</span></div>
+              <div class="timezone-option__sub">America/Chicago (CST / CDT) — Standard Ecosystem Reference</div>
+            </button>
+            <button class="timezone-option" data-tz="America/New_York">
+              <div class="timezone-option__title">Eastern Time (US & Canada)</div>
+              <div class="timezone-option__sub">America/New_York (EST / EDT)</div>
+            </button>
+            <button class="timezone-option" data-tz="America/Denver">
+              <div class="timezone-option__title">Mountain Time (US & Canada)</div>
+              <div class="timezone-option__sub">America/Denver (MST / MDT)</div>
+            </button>
+            <button class="timezone-option" data-tz="America/Phoenix">
+              <div class="timezone-option__title">Mountain Standard (Arizona)</div>
+              <div class="timezone-option__sub">America/Phoenix (MST - No Daylight Saving)</div>
+            </button>
+            <button class="timezone-option" data-tz="America/Los_Angeles">
+              <div class="timezone-option__title">Pacific Time (US & Canada)</div>
+              <div class="timezone-option__sub">America/Los_Angeles (PST / PDT)</div>
+            </button>
+            <button class="timezone-option" data-tz="America/Anchorage">
+              <div class="timezone-option__title">Alaska Time</div>
+              <div class="timezone-option__sub">America/Anchorage (AKST / AKDT)</div>
+            </button>
+            <button class="timezone-option" data-tz="Pacific/Honolulu">
+              <div class="timezone-option__title">Hawaii-Aleutian Standard Time</div>
+              <div class="timezone-option__sub">Pacific/Honolulu (HST - No Daylight Saving)</div>
+            </button>
+            <button class="timezone-option" data-tz="UTC">
+              <div class="timezone-option__title">UTC (Universal Coordinated Time)</div>
+              <div class="timezone-option__sub">00:00 UTC Scientific Baseline</div>
+            </button>
+            <button class="timezone-option" data-tz="auto">
+              <div class="timezone-option__title">Auto-Detect Browser Timezone</div>
+              <div class="timezone-option__sub" id="tz-browser-detected">Detecting local browser zone...</div>
+            </button>
+          </div>
+        </div>
+
+        <div class="weather-modal__section" style="margin-top:14px;">
+          <span class="weather-modal__label">CUSTOM IANA TIMEZONE IDENTIFIER</span>
+          <div style="display:flex;gap:8px;margin-top:6px;">
+            <input type="text" id="tz-custom-input" placeholder="e.g. Europe/London or Asia/Tokyo" style="flex:1;padding:8px 12px;background:#0d0b09;border:1px solid #3a3530;border-radius:4px;color:#e8dfd6;font-family:var(--font-mono);font-size:0.75rem;">
+            <button id="tz-custom-apply" class="weather-modal__btn" style="padding:6px 12px;font-size:0.75rem;">APPLY</button>
+          </div>
+          <div id="tz-custom-feedback" style="font-size:0.65rem;color:#f59e0b;margin-top:4px;display:none;"></div>
+        </div>
+      </div>
+      <div class="weather-modal__footer">
+        <button class="weather-modal__btn" id="tz-modal-reset">RESET TO GLADEVILLE (CENTRAL)</button>
+        <button class="weather-modal__btn weather-modal__btn--primary" id="tz-modal-dismiss">DONE</button>
       </div>
     </div>
   </div>

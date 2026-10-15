@@ -41,6 +41,18 @@ const zipCache = new Map();
 /** US ZIP → { lat, lon, label } via api.zippopotam.us (free, no key). */
 async function geocodeZip(zip) {
   if (zipCache.has(zip)) return zipCache.get(zip);
+  // User home base override: Gladeville, TN 37090 (USPS / Lebanon postal district)
+  if (zip === '37090') {
+    const place = {
+      lat: 36.12,
+      lon: -86.26,
+      label: 'Gladeville, TN 37090',
+      city: 'Gladeville',
+      state: 'TN'
+    };
+    zipCache.set(zip, place);
+    return place;
+  }
   try {
     const ctl = new AbortController();
     const timer = setTimeout(() => ctl.abort(), 5000);
@@ -2046,8 +2058,9 @@ const server = createServer(async (req, res) => {
     let lon = parseFloat(url.searchParams.get('lon') || url.searchParams.get('lng') || NaN);
     const zip = url.searchParams.get('zip');
 
+    let geo = null;
     if (isNaN(lat) && isNaN(lon) && zip && /^\d{5}$/.test(zip)) {
-      const geo = await geocodeZip(zip);
+      geo = await geocodeZip(zip);
       if (geo) {
         lat = geo.lat;
         lon = geo.lon;
@@ -2059,9 +2072,20 @@ const server = createServer(async (req, res) => {
     }
 
     const station = await resolveLocalStation(lat, lon);
+    const isGladeville = zip === '37090' || (lat >= 36.05 && lat <= 36.25 && lon >= -86.40 && lon <= -86.15);
+    const city = isGladeville ? 'Gladeville' : (geo?.city || station?.city || null);
+    const label = isGladeville ? 'Gladeville, TN 37090' : (geo?.label || (station?.city ? `${station.city}, ${station.state || ''}`.trim() : null));
+
     return jsonResponse(res, 200, {
       timestamp: new Date().toISOString(),
-      location: { lat, lon, zip: zip || null },
+      location: {
+        lat,
+        lon,
+        zip: zip || (isGladeville ? '37090' : null),
+        label,
+        city,
+        state: isGladeville ? 'TN' : (geo?.state || station?.state || null)
+      },
       station
     });
   }
