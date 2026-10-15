@@ -1,0 +1,91 @@
+/* ═══════════════════════════════════════════════════════════════════
+   Ecosystem Theme Layer — monochrome + brass
+   Aligns Observatory with the Invariant ecosystem look:
+   #050505/#0a0a0a surfaces, white/#888 text, hairline borders,
+   4% noise (set in style.css), brass as the single accent,
+   brass fill on hover. Colour is kept only where it carries meaning
+   (severity / status / map imagery), and is muted.
+   Load AFTER style.css. Remove this file to revert.
+   ═══════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Muted functional status palette (replaces neon) */
+  --signal-live:    #8fb09a;
+  --signal-stale:   #d4a054;
+  --signal-offline: #b5524c;
+  --signal-blue:    #b8b8b8;
+  --signal-purple:  #9a9a9a;
+  --signal-yellow:  #d4a054;
+
+  --radius-sm: 0;
+  --radius-md: 0;
+}
+
+/* Headings follow the ecosystem: Outfit, uppercase, heavy, tight */
+h1, h2, h3, h4,
+.topbar__title,
+.modal__title {
+  font-family: var(--font-heading);
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+}
+
+/* No glow, no pulse on brand mark / status dots */
+.topbar__logo,
+.welcome-logo { animation: none; }
+.topbar__pulse { animation: none; }
+* { text-shadow: none !important; }
+.leaflet-container * { text-shadow: revert !important; }
+
+/* ── Layer chips: neutral by default, brass on hover/active ───── */
+.layer-toggle[data-accent] { --chip-accent: var(--brass); }
+
+.layer-toggle {
+  color: var(--text-secondary);
+  background: transparent;
+  border-color: var(--border-mid);
+  border-radius: 0;
+}
+.layer-toggle:hover {
+  color: var(--bg-void);
+  background: var(--brass);
+  border-color: var(--brass);
+}
+.layer-toggle:hover::before { border-color: var(--bg-void); background: var(--bg-void); }
+.layer-toggle:has(input:checked) {
+  color: var(--brass);
+  border-color: var(--brass);
+  background: var(--brass-dim);
+  box-shadow: none;
+}
+.layer-toggle:has(input:checked):hover { color: var(--bg-void); background: var(--brass); }
+.layer-toggle:has(input:checked)::before {
+  background: var(--brass);
+  border-color: var(--brass);
+  box-shadow: none;
+}
+.layer-toggle--style { border-radius: 0; }
+
+/* ── Generic buttons / pills: square, hairline, brass fill hover ─ */
+button, .btn, [class*="__btn"], [class*="-btn"], [class*="pill"], [class*="badge"] {
+  border-radius: 0;
+}
+.topbar button:hover,
+.modal button:hover,
+.btn:hover,
+[class*="__btn"]:hover,
+[class*="-btn"]:hover {
+  background: var(--brass);
+  border-color: var(--brass);
+  color: var(--bg-void);
+}
+
+/* Warning-filter category checkboxes: brass, not per-category colour */
+input[type="checkbox"],
+input[type="radio"] { accent-color: var(--brass); }
+
+/* Emoji: render as flat, desaturated glyphs rather than colour icons */
+.emoji, [class*="__icon"], .ledger__icon {
+  filter: grayscale(1) contrast(1.1);
+  opacity: 0.85;
+}
