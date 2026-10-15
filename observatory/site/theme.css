@@ -11,11 +11,11 @@
 :root {
   /* Muted functional status palette (replaces neon) */
   --signal-live:    #8fb09a;
-  --signal-stale:   #d4a054;
+  --signal-stale:   #e8e8e8;
   --signal-offline: #b5524c;
   --signal-blue:    #b8b8b8;
   --signal-purple:  #9a9a9a;
-  --signal-yellow:  #d4a054;
+  --signal-yellow:  #e8e8e8;
 
   --radius-sm: 0;
   --radius-md: 0;

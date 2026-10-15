@@ -42,7 +42,7 @@
     if (document.getElementById('obs-pricing-style')) return;
     var s = document.createElement('style');
     s.id = 'obs-pricing-style';
-    s.textContent = '.pricing-founders{margin:.35rem 0 .9rem;font-size:.78rem;line-height:1.45;color:#d4a054;font-family:var(--font-mono,monospace);letter-spacing:.02em;}';
+    s.textContent = '.pricing-founders{margin:.35rem 0 .9rem;font-size:.78rem;line-height:1.45;color:#e8e8e8;font-family:var(--font-mono,monospace);letter-spacing:.02em;}';
     document.head.appendChild(s);
   }
 

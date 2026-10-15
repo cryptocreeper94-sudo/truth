@@ -67,12 +67,12 @@
 
   <!-- Manage Subscription Modal -->
   <div id="manage-sub-modal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.7);align-items:center;justify-content:center;">
-    <div style="background:#1a1714;border:1px solid #d4a054;border-radius:8px;padding:2rem;max-width:400px;width:90%;font-family:var(--font-mono);">
-      <h3 style="color:#d4a054;margin:0 0 0.5rem;font-size:1rem;letter-spacing:0.05em;">MANAGE SUBSCRIPTION</h3>
+    <div style="background:#1a1714;border:1px solid #e8e8e8;border-radius:8px;padding:2rem;max-width:400px;width:90%;font-family:var(--font-mono);">
+      <h3 style="color:#e8e8e8;margin:0 0 0.5rem;font-size:1rem;letter-spacing:0.05em;">MANAGE SUBSCRIPTION</h3>
       <p style="color:#a09080;font-size:0.75rem;margin:0 0 1rem;">You'll be taken to Stripe's secure billing page for the account you're signed in with. Update your payment method, view invoices, or cancel anytime.</p>
       <p id="portal-error" style="color:#e05050;font-size:0.7rem;margin:0 0 0.75rem;display:none;"></p>
       <div style="display:flex;gap:0.75rem;">
-        <button id="portal-submit" onclick="__manageSubscription()" style="flex:1;padding:0.7rem;background:#d4a054;color:#1a1714;border:none;border-radius:4px;cursor:pointer;font-family:var(--font-mono);font-weight:600;font-size:0.75rem;letter-spacing:0.05em;">OPEN BILLING PORTAL</button>
+        <button id="portal-submit" onclick="__manageSubscription()" style="flex:1;padding:0.7rem;background:#e8e8e8;color:#1a1714;border:none;border-radius:4px;cursor:pointer;font-family:var(--font-mono);font-weight:600;font-size:0.75rem;letter-spacing:0.05em;">OPEN BILLING PORTAL</button>
         <button onclick="document.getElementById('manage-sub-modal').style.display='none'" style="padding:0.7rem 1rem;background:transparent;border:1px solid #3a3530;color:#a09080;border-radius:4px;cursor:pointer;font-family:var(--font-mono);font-size:0.75rem;">CLOSE</button>
       </div>
     </div>
@@ -869,7 +869,7 @@
               <input type="checkbox" id="wf-fire" data-cat="fire" checked>
             </div>
             <div class="weather-filter-card">
-              <label for="wf-other"><span class="weather-filter-swatch" style="background:#ffd60a;"></span> ⚠️ Other Advisories & Marine</label>
+              <label for="wf-other"><span class="weather-filter-swatch" style="background:#b8b8b8;"></span> ⚠️ Other Advisories & Marine</label>
               <input type="checkbox" id="wf-other" data-cat="other" checked>
             </div>
           </div>
@@ -881,10 +881,10 @@
             <label style="font-size:0.72rem;color:#ccc;display:flex;align-items:center;gap:6px;cursor:pointer;">
               <input type="radio" name="wf-severity" value="all" checked style="accent-color:var(--brass);"> All Warnings
             </label>
-            <label style="font-size:0.72rem;color:#ffd60a;display:flex;align-items:center;gap:6px;cursor:pointer;">
+            <label style="font-size:0.72rem;color:#b8b8b8;display:flex;align-items:center;gap:6px;cursor:pointer;">
               <input type="radio" name="wf-severity" value="moderate" style="accent-color:var(--brass);"> Moderate+
             </label>
-            <label style="font-size:0.72rem;color:#ff9800;display:flex;align-items:center;gap:6px;cursor:pointer;">
+            <label style="font-size:0.72rem;color:#b8b8b8;display:flex;align-items:center;gap:6px;cursor:pointer;">
               <input type="radio" name="wf-severity" value="severe" style="accent-color:var(--brass);"> Severe+
             </label>
             <label style="font-size:0.72rem;color:#ff1438;display:flex;align-items:center;gap:6px;cursor:pointer;">
@@ -1030,7 +1030,7 @@
             <input type="text" id="tz-custom-input" placeholder="e.g. Europe/London or Asia/Tokyo" style="flex:1;padding:8px 12px;background:#0d0b09;border:1px solid #3a3530;border-radius:4px;color:#e8dfd6;font-family:var(--font-mono);font-size:0.75rem;">
             <button id="tz-custom-apply" class="weather-modal__btn" style="padding:6px 12px;font-size:0.75rem;">APPLY</button>
           </div>
-          <div id="tz-custom-feedback" style="font-size:0.65rem;color:#f59e0b;margin-top:4px;display:none;"></div>
+          <div id="tz-custom-feedback" style="font-size:0.65rem;color:#b8b8b8;margin-top:4px;display:none;"></div>
         </div>
       </div>
       <div class="weather-modal__footer">

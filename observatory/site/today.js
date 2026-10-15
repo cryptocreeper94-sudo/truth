@@ -155,8 +155,8 @@
   // ── Kp chart (canvas) ───────────────────────────────────────
   function kpColor(v) {
     if (v >= 7) return '#ef4444';
-    if (v >= 5) return '#f97316';
-    if (v >= 4) return '#d4a054';
+    if (v >= 5) return '#c084fc';
+    if (v >= 4) return '#4ecbff';
     return '#22c55e';
   }
   function keyToDate(k) { return new Date(k.length === 13 ? k + ':00:00Z' : k); }

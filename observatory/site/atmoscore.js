@@ -25,12 +25,12 @@ const AtmosCore = {
   // ── Color Palette (from spec) ─────────────────────────────────
   colors: {
     thermodynamic: '#1E6FA8',  // Deep cerulean
-    optical:       '#D4A017',  // Amber-gold
+    optical:       '#b8b8b8',  // Amber-gold
     dynamic:       '#5A7A8A',  // Slate
     temporal:      '#4A3060',  // Deep violet
     optimal:       '#87CEEB',  // Clear sky blue
-    advisory:      '#D4A017',  // Haze amber
-    caution:       '#D4601A',  // Storm orange
+    advisory:      '#b8b8b8',  // Haze amber
+    caution:       '#b5524c',  // Storm orange
     critical:      '#8B1A1A',  // Deep crimson
   },
 
@@ -41,7 +41,7 @@ const AtmosCore = {
   // ── Primitive State Vector P ──────────────────────────────────
   primitives: {
     TH: { value: 0, label: 'Thermodynamic Flow', color: '#1E6FA8', nodes: [] },
-    OP: { value: 0, label: 'Optical Propagation', color: '#D4A017', nodes: [] },
+    OP: { value: 0, label: 'Optical Propagation', color: '#b8b8b8', nodes: [] },
     DY: { value: 0, label: 'Dynamic Flow', color: '#5A7A8A', nodes: [] },
     TS: { value: 0, label: 'Temporal Stability', color: '#4A3060', nodes: [] },
   },

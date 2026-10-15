@@ -25,7 +25,7 @@ const AtmosCoreViz = {
   // ── Primitive arc config ─────────────────────────────────────
   arcs: [
     { key: 'TH', label: 'THERMO', color: '#1E6FA8', start: 0,   count: 10 },
-    { key: 'OP', label: 'OPTICAL', color: '#D4A017', start: 10,  count: 10 },
+    { key: 'OP', label: 'OPTICAL', color: '#b8b8b8', start: 10,  count: 10 },
     { key: 'DY', label: 'DYNAMIC', color: '#5A7A8A', start: 20,  count: 12 },
     { key: 'TS', label: 'TEMPORAL', color: '#4A3060', start: 32,  count: 10 },
   ],
@@ -315,7 +315,7 @@ const AtmosCoreViz = {
 
     // Trend indicator
     const trendChar = suit.trend === 'improving' ? '▲' : suit.trend === 'degrading' ? '▼' : '●';
-    const trendColor = suit.trend === 'improving' ? '#87CEEB' : suit.trend === 'degrading' ? '#D4601A' : '#5A7A8A';
+    const trendColor = suit.trend === 'improving' ? '#87CEEB' : suit.trend === 'degrading' ? '#b5524c' : '#5A7A8A';
     ctx.font = '8px sans-serif';
     ctx.fillStyle = trendColor;
     ctx.fillText(trendChar, cx, cy + 20);
@@ -324,8 +324,8 @@ const AtmosCoreViz = {
   // ── Helpers ─────────────────────────────────────────────────
   _getBandColor(value) {
     if (value >= 0) return '#87CEEB';      // optimal — clear sky blue
-    if (value >= -0.3) return '#D4A017';   // advisory — haze amber
-    if (value >= -0.7) return '#D4601A';   // caution — storm orange
+    if (value >= -0.3) return '#b8b8b8';   // advisory — haze amber
+    if (value >= -0.7) return '#b5524c';   // caution — storm orange
     return '#8B1A1A';                       // critical — deep crimson
   },
 

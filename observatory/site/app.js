@@ -46,8 +46,8 @@ const Observatory = {
   // ── Domain Config ────────────────────────────────────────────
   domains: {
     'Atmospheric':    { color: '#1E6FA8', order: 1 },
-    'Space Weather':  { color: '#D4A017', order: 2 },
-    'Geological':     { color: '#D4601A', order: 3 },
+    'Space Weather':  { color: '#b8b8b8', order: 2 },
+    'Geological':     { color: '#b5524c', order: 3 },
     'RF Research':    { color: '#a855f7', order: 4 },
     'Infrastructure': { color: '#5A7A8A', order: 5 },
     'Ecological':     { color: '#06b6d4', order: 6 },
@@ -83,7 +83,7 @@ const Observatory = {
     fire: {
       name: 'Active Fires (Global VIIRS)',
       info: { source: 'NASA FIRMS via NASA GIBS', what: 'Fire and thermal hotspots detected worldwide (including Canada, Mexico, US, and globally) by the VIIRS instruments on the NOAA-20 and Suomi NPP satellites (375 m resolution). Shows the most recent full day.', update: 'Daily', attribution: 'NASA FIRMS / GIBS / VIIRS' },
-      legend: { type: 'dots', heading: 'ACTIVE FIRES (GLOBAL VIIRS)', items: [{ color: '#ff3b30', label: 'High Confidence' }, { color: '#ff9500', label: 'Nominal' }, { color: '#ffd60a', label: 'Low Confidence' }] },
+      legend: { type: 'dots', heading: 'ACTIVE FIRES (GLOBAL VIIRS)', items: [{ color: '#ff3b30', label: 'High Confidence' }, { color: '#c084fc', label: 'Nominal' }, { color: '#4ecbff', label: 'Low Confidence' }] },
     },
     heaters: {
       name: 'Ionospheric Heaters',
@@ -111,20 +111,20 @@ const Observatory = {
     wildfires: {
       name: 'US Wildfires (NIFC)',
       info: { source: 'NIFC / IRWIN via ESRI ArcGIS', what: 'Active wildfire incidents across the United States from the National Interagency Fire Center (uncontained incidents, acreage, personnel, and containment). For Canadian and Mexican fire hotspots, toggle the satellite Fires (VIIRS) layer.', update: 'Every 30 minutes', attribution: 'NIFC / IRWIN' },
-      legend: { type: 'dots', heading: 'US WILDFIRES (NIFC)', items: [{ color: '#ff5722', label: '>10,000 acres' }, { color: '#ff9800', label: '1,000-10,000' }, { color: '#ffc107', label: '<1,000 acres' }] },
+      legend: { type: 'dots', heading: 'US WILDFIRES (NIFC)', items: [{ color: '#ff3b30', label: '>10,000 acres' }, { color: '#c084fc', label: '1,000-10,000' }, { color: '#4ecbff', label: '<1,000 acres' }] },
     },
     volcanoes: {
       name: 'Volcanic Activity',
       info: { source: 'USGS Volcano Hazards Program', what: 'US volcanoes with elevated alert levels (ADVISORY, WATCH, or WARNING). Shows alert level, aviation color code, and threat assessment.', update: 'Every hour', attribution: 'USGS VHP' },
-      legend: { type: 'dots', heading: 'VOLCANIC ACTIVITY (HI & AK)', items: [{ color: '#f44336', label: 'WARNING' }, { color: '#ff9800', label: 'WATCH' }, { color: '#ffeb3b', label: 'ADVISORY' }] },
+      legend: { type: 'dots', heading: 'VOLCANIC ACTIVITY (HI & AK)', items: [{ color: '#f44336', label: 'WARNING' }, { color: '#c084fc', label: 'WATCH' }, { color: '#4ecbff', label: 'ADVISORY' }] },
     },
     earthquakes: {
       name: 'USGS Earthquakes (24h)',
       info: { source: 'USGS Earthquake Hazards Program', what: 'M2.5+ earthquake events recorded across the globe in the last 24 hours. Circle size and color denote magnitude.', update: 'Every 5 minutes', attribution: 'USGS' },
       legend: { type: 'dots', heading: 'EARTHQUAKES (24H)', items: [
         { color: '#ff3b30', label: 'M5.0+ · Strong' },
-        { color: '#ff9500', label: 'M4.0–4.9 · Moderate' },
-        { color: '#ffd60a', label: 'M3.0–3.9 · Light' },
+        { color: '#c084fc', label: 'M4.0–4.9 · Moderate' },
+        { color: '#4ecbff', label: 'M3.0–3.9 · Light' },
         { color: '#06b6d4', label: 'M2.5–2.9 · Minor' },
       ] },
     },
@@ -138,7 +138,7 @@ const Observatory = {
         { color: '#00ff66', label: 'Flash Flood / Flood' },
         { color: '#00e5ff', label: 'High Wind / Gale' },
         { color: '#60a5fa', label: 'Winter / Freeze' },
-        { color: '#ff5722', label: 'Fire Weather / Red Flag' },
+        { color: '#ff3b30', label: 'Fire Weather / Red Flag' },
       ] },
     },
   },
@@ -891,7 +891,7 @@ const Observatory = {
       } else if (key === 'volcanoes') {
         const volcanoes = this.elevatedVolcanoes || [];
         const count = volcanoes.length;
-        const colorMap = { WARNING: '#f44336', WATCH: '#ff9800', ADVISORY: '#ffeb3b' };
+        const colorMap = { WARNING: '#f44336', WATCH: '#c084fc', ADVISORY: '#4ecbff' };
 
         let rosterHtml = `
           <div class="layer-tip__roster-title">
@@ -1273,7 +1273,7 @@ const Observatory = {
     } else if (layerKey === 'volcanoes') {
       const volcanoes = this.elevatedVolcanoes || [];
       const count = volcanoes.length;
-      const colorMap = { WARNING: '#f44336', WATCH: '#ff9800', ADVISORY: '#ffeb3b' };
+      const colorMap = { WARNING: '#f44336', WATCH: '#c084fc', ADVISORY: '#4ecbff' };
 
       bodyHtml += `
         <div class="layer-tip__roster-title" style="margin-top:12px;">
@@ -2040,13 +2040,13 @@ const Observatory = {
         const x = padL + (i + 0.5) * (pw / n) - bw / 2;
         const okH = (hlt.ok[i] / hi) * ph, gapH = (hlt.gap[i] / hi) * ph;
         ctx.fillStyle = 'rgba(0,255,136,0.55)'; ctx.fillRect(x, padT + ph - okH, bw, okH);
-        ctx.fillStyle = 'rgba(255,149,0,0.75)'; ctx.fillRect(x, padT + ph - okH - gapH, bw, gapH);
+        ctx.fillStyle = 'rgba(255, 255, 255,0.75)'; ctx.fillRect(x, padT + ph - okH - gapH, bw, gapH);
       }
       if (label) label.textContent = `COLLECTION HEALTH · ${hlt.window === '14d' ? 'LAST 14 DAYS' : 'LAST 24 HOURS'} (UTC)`;
       const pct = hlt.okTotal + hlt.gapTotal ? Math.round((hlt.okTotal / (hlt.okTotal + hlt.gapTotal)) * 100) : 0;
       stats.innerHTML = `
         <div><span style="color:#00ff88;">Successful</span>${hlt.okTotal}</div>
-        <div><span style="color:#ff9500;">Failed</span>${hlt.gapTotal}</div>
+        <div><span style="color:#ff3b30;">Failed</span>${hlt.gapTotal}</div>
         <div><span>Success rate</span>${pct}%</div>
         <div class="modal__chart-src">This feed stores images or files, not a single number, so this chart shows whether the source is delivering, not a physical reading.</div>`;
       return;
@@ -2217,7 +2217,7 @@ const Observatory = {
         data.features.slice(0, 80).forEach(f => {
           const [lng, lat] = f.geometry.coordinates;
           const mag = f.properties.mag;
-          const color = mag >= 5 ? '#ff3b30' : mag >= 4 ? '#ff9500' : mag >= 3 ? '#ffd60a' : '#06b6d4';
+          const color = mag >= 5 ? '#ff3b30' : mag >= 4 ? '#c084fc' : mag >= 3 ? '#4ecbff' : '#06b6d4';
           const marker = L.circleMarker([lat, lng], {
             radius: Math.max(5, mag * 3),
             color: color, fillColor: color, fillOpacity: 0.35, weight: 1.5,
@@ -2561,7 +2561,7 @@ const Observatory = {
       (data.fires || []).forEach(f => {
         if (!f.lat || !f.lon) return;
         const acres = f.acres || 0;
-        const color = acres > 10000 ? '#ff5722' : acres > 1000 ? '#ff9800' : '#ffc107';
+        const color = acres > 10000 ? '#ff3b30' : acres > 1000 ? '#c084fc' : '#4ecbff';
         const radius = Math.min(12, Math.max(5, Math.log10(acres + 1) * 3));
         const marker = L.circleMarker([f.lat, f.lon], {
           radius, color, fillColor: color, fillOpacity: 0.35, weight: 2,
@@ -2569,7 +2569,7 @@ const Observatory = {
         });
         marker.bindPopup(`
           <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#e8e8f0;background:#0a0a0e;padding:10px;border:1px solid #ff572233;border-radius:2px;min-width:180px;max-width:250px;word-break:break-word;">
-            <div style="color:#ff5722;font-weight:700;font-size:13px;margin-bottom:4px;">🔥 ${f.name}</div>
+            <div style="color:#ff3b30;font-weight:700;font-size:13px;margin-bottom:4px;">🔥 ${f.name}</div>
             <div style="color:#aaa;margin-bottom:2px;">${f.state || 'Unknown location'}</div>
             <div style="color:#888;font-size:9px;">Acres: ${acres.toLocaleString()}</div>
             <div style="color:#888;font-size:9px;">Contained: ${f.contained != null ? f.contained + '%' : 'N/A'}</div>
@@ -2641,7 +2641,7 @@ const Observatory = {
       this.markers.volcanoes = [];
       this.elevatedVolcanoes.forEach(v => {
         if (!v.lat || !v.lon) return;
-        const colorMap = { WARNING: '#f44336', WATCH: '#ff9800', ADVISORY: '#ffeb3b' };
+        const colorMap = { WARNING: '#f44336', WATCH: '#c084fc', ADVISORY: '#4ecbff' };
         const color = colorMap[v.alertLevel] || '#e040fb';
         const marker = L.circleMarker([v.lat, v.lon], {
           radius: 9, color, fillColor: color, fillOpacity: 0.35, weight: 2,
@@ -3722,8 +3722,8 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
       case 'flood': return '#00ff66';
       case 'wind': return '#00e5ff';
       case 'winter': return '#60a5fa';
-      case 'fire': return '#ff5722';
-      default: return '#ffd60a';
+      case 'fire': return '#ff3b30';
+      default: return '#4ecbff';
     }
   },
 
@@ -3804,7 +3804,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
           if (p.expires) {
             const exp = new Date(p.expires);
             const mins = Math.max(0, Math.round((exp - Date.now()) / 60000));
-            tooltipText += ` <span style="color:#f59e0b;">(${mins}m left)</span>`;
+            tooltipText += ` <span style="color:#b8b8b8;">(${mins}m left)</span>`;
           }
 
           layer.bindTooltip(tooltipText, {

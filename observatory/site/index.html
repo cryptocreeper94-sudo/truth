@@ -33,8 +33,8 @@
       text-transform: uppercase;
       text-decoration: none;
       color: #1a1714;
-      background: #d4a054;
-      border: 2px solid #d4a054;
+      background: #e8e8e8;
+      border: 2px solid #e8e8e8;
       box-sizing: border-box;
       transition: all 0.3s ease;
       text-align: center;
@@ -44,15 +44,15 @@
       background: #e0b06a;
       border-color: #e0b06a;
       transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(212, 160, 84, 0.3);
+      box-shadow: 0 8px 24px rgba(255, 255, 255, 0.3);
     }
     .hero__cta--outline {
       background: transparent !important;
-      color: #d4a054 !important;
+      color: #e8e8e8 !important;
       cursor: pointer;
     }
     .hero__cta--outline:hover {
-      background: rgba(212, 160, 84, 0.1) !important;
+      background: rgba(255, 255, 255, 0.1) !important;
       color: #e0b06a !important;
     }
     .hero__buttons {
@@ -68,13 +68,13 @@
       font-size: 0.9rem;
       color: #e8dfd6;
       text-decoration: none;
-      border-bottom: 1px solid rgba(212, 160, 84, 0.5);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.5);
       padding-bottom: 2px;
       transition: color 0.2s ease, border-color 0.2s ease;
     }
     .hero__help:hover {
-      color: #d4a054;
-      border-color: #d4a054;
+      color: #e8e8e8;
+      border-color: #e8e8e8;
     }
     @media (max-width: 768px) {
       .hero__buttons {
@@ -615,10 +615,10 @@
       <div id="dev-bypass-modal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.85);align-items:center;justify-content:center;">
         <div style="background:#0d0b09;border:1px solid #3a3530;border-radius:8px;padding:2rem;max-width:320px;width:90%;font-family:'JetBrains Mono',monospace;text-align:center;">
           <p style="color:#555;font-size:0.65rem;margin:0 0 1rem;letter-spacing:0.1em;">SYSTEM ACCESS</p>
-          <input id="dev-pin" type="password" maxlength="20" placeholder="enter code" style="width:100%;padding:0.7rem;background:#1a1714;border:1px solid #3a3530;border-radius:4px;color:#d4a054;font-family:inherit;font-size:0.9rem;text-align:center;box-sizing:border-box;letter-spacing:0.2em;">
+          <input id="dev-pin" type="password" maxlength="20" placeholder="enter code" style="width:100%;padding:0.7rem;background:#1a1714;border:1px solid #3a3530;border-radius:4px;color:#e8e8e8;font-family:inherit;font-size:0.9rem;text-align:center;box-sizing:border-box;letter-spacing:0.2em;">
           <p id="dev-pin-error" style="color:#e05050;font-size:0.65rem;margin:0.5rem 0 0;display:none;"></p>
           <div style="margin-top:1rem;display:flex;gap:0.5rem;">
-            <button onclick="__devBypassSubmit()" style="flex:1;padding:0.6rem;background:#d4a054;color:#0d0b09;border:none;border-radius:4px;cursor:pointer;font-family:inherit;font-size:0.7rem;font-weight:600;letter-spacing:0.1em;">ENTER</button>
+            <button onclick="__devBypassSubmit()" style="flex:1;padding:0.6rem;background:#e8e8e8;color:#0d0b09;border:none;border-radius:4px;cursor:pointer;font-family:inherit;font-size:0.7rem;font-weight:600;letter-spacing:0.1em;">ENTER</button>
             <button onclick="document.getElementById('dev-bypass-modal').style.display='none'" style="padding:0.6rem 1rem;background:transparent;border:1px solid #3a3530;color:#555;border-radius:4px;cursor:pointer;font-family:inherit;font-size:0.7rem;">×</button>
           </div>
         </div>
@@ -783,7 +783,7 @@
       const params = new URLSearchParams(window.location.search);
       if (params.get('upgrade') === '1') {
         const banner = document.createElement('div');
-        banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:linear-gradient(135deg,#d4a054,#e0b06a);color:#1a1714;text-align:center;padding:1rem;font-family:var(--font-mono);font-size:0.8rem;font-weight:600;letter-spacing:0.05em;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;';
+        banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:linear-gradient(135deg,#e8e8e8,#e0b06a);color:#1a1714;text-align:center;padding:1rem;font-family:var(--font-mono);font-size:0.8rem;font-weight:600;letter-spacing:0.05em;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;';
         banner.innerHTML = '<span>🔒 This area requires a subscription.</span> <a href="#" onclick="window.__subscribe(); return false;" style="color:#1a1714;text-decoration:underline;font-weight:700;">Subscribe — <span data-sub-price>$4.99/mo</span></a> <span style="opacity:0.4;">|</span> <a href="#" onclick="window.openSignInModal(event); return false;" style="color:#1a1714;text-decoration:underline;font-weight:700;">Already subscribed? Sign in &rarr;</a> <button onclick="this.parentElement.remove()" style="background:transparent;border:none;font-weight:700;cursor:pointer;font-size:1rem;margin-left:12px;color:#1a1714;">✕</button>';
         document.body.prepend(banner);
         setTimeout(() => banner.remove(), 25000);
