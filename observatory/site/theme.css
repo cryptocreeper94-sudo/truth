@@ -100,3 +100,6 @@ input[type="radio"] { accent-color: var(--brass); }
 
 /* Footer must clear the fixed bottom nav on every view (AtmosCore, Feeds, Ledger, Map) */
 .site-footer { margin-bottom: calc(var(--bottomnav-h) + env(safe-area-inset-bottom, 0px)) !important; position: relative; z-index: 1; }
+
+/* Emoji glyphs in header controls render flat/grey rather than amber */
+.topbar__action-btn, .topbar-drawer button, .location-bar button, .map-preview__layers-btn { filter: grayscale(1); }
