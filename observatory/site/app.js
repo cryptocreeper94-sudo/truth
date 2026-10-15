@@ -2411,7 +2411,7 @@ const Observatory = {
         const el = L.DomUtil.create('div', 'ac-filter');
         L.DomEvent.disableClickPropagation(el);
         L.DomEvent.disableScrollPropagation(el);
-        if (map.getSize().x < 900) el.classList.add('ac-filter--collapsed');
+        if (map.getSize().x < 900 || map.getSize().y < 480) el.classList.add('ac-filter--collapsed');
         el.innerHTML = `
           <button class="ac-filter__head" type="button" aria-expanded="true">✈ AIRCRAFT TYPES <span class="ac-filter__total"></span><span class="ac-filter__caret">▾</span></button>
           <div class="ac-filter__body">
@@ -2428,7 +2428,7 @@ const Observatory = {
             <div class="ac-filter__note">Grounded planes hidden by default to declutter airports. Check to include surface taxiway traffic.</div>
           </div>`;
         el.querySelector('.ac-filter__head').addEventListener('click', () => {
-          el.classList.toggle('ac-filter--collapsed');
+          el.classList.toggle('ac-filter--collapsed'); if (el._fit) el._fit();
           el.querySelector('.ac-filter__head').setAttribute('aria-expanded', !el.classList.contains('ac-filter--collapsed'));
         });
         el.addEventListener('change', e => {
@@ -2447,6 +2447,8 @@ const Observatory = {
           Object.keys(self._acFilter()).forEach(k => { self._acFilter()[k] = on; });
           self._applyAircraftFilter();
         }));
+        el._fit = () => { const b = el.querySelector('.ac-filter__body'); if (!b) return; const head = el.querySelector('.ac-filter__head').offsetHeight || 30; b.style.maxHeight = Math.max(80, map.getSize().y - head - 24) + 'px'; b.style.overflowY = 'auto'; };
+        map.on('resize', el._fit); setTimeout(el._fit, 0);
         return el;
       },
     });
