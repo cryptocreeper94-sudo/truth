@@ -546,7 +546,7 @@ const Observatory = {
     });
 
     // Precipitation — RainViewer (free, no API key)
-    this.mapLayers.precip = L.tileLayer('', { opacity: 0.5, maxZoom: 18, noWrap: true });
+    this.mapLayers.precip = L.tileLayer('', { opacity: 0.5, maxNativeZoom: 7, maxZoom: 19, noWrap: true });
     this._loadRainViewerTiles();
 
     // NASA FIRMS active fires (WMS)
@@ -921,16 +921,16 @@ const Observatory = {
       if (latest) {
         const radarTileUrl = `${host}${latest.path}/256/{z}/{x}/{y}/2/1_1.png`;
 
-        // Update static radar on main map with high-res tiles up to zoom 18
+        // Update static radar on main map with high-res tiles up to zoom 19
         const wasMainRadar = this.map && this.map.hasLayer(this.mapLayers.radar);
         if (wasMainRadar) this.map.removeLayer(this.mapLayers.radar);
-        this.mapLayers.radar = L.tileLayer(radarTileUrl, { opacity: 0.6, maxZoom: 18, noWrap: true });
+        this.mapLayers.radar = L.tileLayer(radarTileUrl, { opacity: 0.6, maxNativeZoom: 7, maxZoom: 19, noWrap: true });
         if (wasMainRadar) this.mapLayers.radar.addTo(this.map);
 
         // Update static precip on main map
         const wasMainPrecip = this.map && this.map.hasLayer(this.mapLayers.precip);
         if (wasMainPrecip) this.map.removeLayer(this.mapLayers.precip);
-        this.mapLayers.precip = L.tileLayer(radarTileUrl, { opacity: 0.5, maxZoom: 18, noWrap: true });
+        this.mapLayers.precip = L.tileLayer(radarTileUrl, { opacity: 0.5, maxNativeZoom: 7, maxZoom: 19, noWrap: true });
         if (wasMainPrecip) this.mapLayers.precip.addTo(this.map);
       }
     } catch (e) {
@@ -2883,7 +2883,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
     this.fsMapLayers.watervapor = L.tileLayer('https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/goes-east-wv-4km-900913/{z}/{x}/{y}.png', {
       opacity: 0.5, maxNativeZoom: 8, maxZoom: 19, noWrap: true,
     });
-    this.fsMapLayers.precip = L.tileLayer('', { opacity: 0.5, maxZoom: 18, noWrap: true });
+    this.fsMapLayers.precip = L.tileLayer('', { opacity: 0.5, maxNativeZoom: 7, maxZoom: 19, noWrap: true });
     this.fsMapLayers.fire = this._firmsLayer();
 
     // Marker layers mirror the main map's data
@@ -3007,7 +3007,8 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
           if (wasOn) this.fullscreenMap.removeLayer(this.fsMapLayers[key]);
           this.fsMapLayers[key] = L.tileLayer(latest.url, {
             opacity,
-            maxZoom: 18,
+            maxNativeZoom: 7,
+            maxZoom: 19,
             noWrap: true,
           });
           if (wasOn) this.fsMapLayers[key].addTo(this.fullscreenMap);
@@ -3070,7 +3071,8 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
     const mk = (layer) => { layer.setOpacity(0); layer.addTo(map); return layer; };
     this.animLayers = this.animFrames.map(f => mk(L.tileLayer(f.url, {
       opacity: 0,
-      maxZoom: 18,
+      maxNativeZoom: 7,
+      maxZoom: 19,
       noWrap: true,
       keepBuffer: 6
     })));
