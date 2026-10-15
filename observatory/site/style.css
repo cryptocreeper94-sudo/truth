@@ -35,7 +35,7 @@
   --oxblood-dim:    rgba(159, 29, 29, 0.08);
 
   /* Functional signal colors — these indicate real data states */
-  --signal-live:    #00ff88;
+  --signal-live:    #8fb09a;
   --signal-stale:   #b8b8b8;
   --signal-offline: #ff3b30;
   --signal-blue:    #0af;
@@ -261,7 +261,7 @@ body::after {
   letter-spacing: 0.1em; transition: all 0.2s;
 }
 .welcome-btn--primary { background: var(--brass); color: var(--bg-primary); border: none; }
-.welcome-btn--primary:hover { background: #e0b06a; }
+.welcome-btn--primary:hover { background: #e8e8e8; }
 .welcome-btn--skip { background: transparent; border: 1px solid var(--border-dim); color: var(--text-dim); }
 .welcome-btn--skip:hover { border-color: var(--text-secondary); color: var(--text-secondary); }
 .welcome-footer { font-size: 0.5rem; color: var(--text-dim); letter-spacing: 0.1em; margin: 0; opacity: 0.5; }
@@ -457,8 +457,8 @@ body::after {
   animation: layers-pulse 2s ease-in-out 3;
 }
 .layers-btn:hover {
-  background: #e0b06a;
-  border-color: #e0b06a;
+  background: #e8e8e8;
+  border-color: #e8e8e8;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
 }
@@ -695,7 +695,7 @@ body[data-level="analyst"] .layer-name-researcher { display: inline; }
   padding: 6px 10px;
   background: rgba(10, 10, 14, 0.88);
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 171, 0, 0.3);
+  border: 1px solid rgba(189, 189, 189, 0.3);
   border-radius: 4px;
   font-family: var(--font-mono);
   font-size: 0.55rem;
@@ -706,7 +706,7 @@ body[data-level="analyst"] .layer-name-researcher { display: inline; }
 .layer-density-warning span { flex: 1; }
 .layer-density-warning button {
   background: none;
-  border: 1px solid rgba(255, 171, 0, 0.3);
+  border: 1px solid rgba(189, 189, 189, 0.3);
   color: var(--text-dim);
   font-size: 0.55rem;
   padding: 2px 6px;
@@ -943,8 +943,8 @@ body[data-level="analyst"] .layer-name-researcher { display: inline; }
 }
 .daily-brief__badge--verified {
   color: var(--signal-live);
-  border-color: rgba(0, 255, 136, 0.3);
-  background: rgba(0, 255, 136, 0.08);
+  border-color: rgba(143, 176, 154, 0.3);
+  background: rgba(143, 176, 154, 0.08);
 }
 .daily-brief__badge--template {
   color: var(--brass);
@@ -1138,7 +1138,7 @@ body[data-level="analyst"] .layer-name-researcher { display: inline; }
   padding: 1px 5px;
   border: 1px solid;
 }
-.feed-card__badge--live { color: var(--signal-live); border-color: rgba(0,255,136,0.3); background: rgba(0,255,136,0.08); }
+.feed-card__badge--live { color: var(--signal-live); border-color: rgba(143, 176, 154,0.3); background: rgba(143, 176, 154,0.08); }
 .feed-card__badge--stale { color: var(--signal-stale); border-color: rgba(184, 184, 184,0.3); background: rgba(184, 184, 184,0.08); }
 .feed-card__badge--offline { color: var(--signal-offline); border-color: rgba(255,59,48,0.3); background: rgba(255,59,48,0.08); }
 
@@ -1434,7 +1434,7 @@ body[data-level="analyst"] .layer-name-researcher { display: inline; }
   padding: 2px 6px;
   border: 1px solid;
 }
-.bento-tile__badge--live, .feed-card__badge--live { color: var(--signal-live); border-color: rgba(0,255,136,0.3); }
+.bento-tile__badge--live, .feed-card__badge--live { color: var(--signal-live); border-color: rgba(143, 176, 154,0.3); }
 .bento-tile__badge--stale, .feed-card__badge--stale { color: var(--signal-stale); border-color: rgba(184, 184, 184,0.3); }
 .bento-tile__badge--offline, .feed-card__badge--offline { color: var(--signal-offline); border-color: rgba(255,59,48,0.3); }
 .modal__close {
@@ -1828,9 +1828,9 @@ body[data-level="analyst"] .layer-name-researcher { display: inline; }
   background: rgba(255, 255, 255, 0.12);
 }
 .location-bar__geo--active {
-  color: #00ff88;
-  border-color: rgba(0, 255, 136, 0.4);
-  background: rgba(0, 255, 136, 0.08);
+  color: #8fb09a;
+  border-color: rgba(143, 176, 154, 0.4);
+  background: rgba(143, 176, 154, 0.08);
 }
 .location-bar__input {
   width: 74px;
@@ -1905,9 +1905,9 @@ body[data-level="analyst"] .layer-name-researcher { display: inline; }
   100% { box-shadow: 0 0 0 0 rgba(255, 20, 56, 0.4); }
 }
 .location-bar__alert-pill.is-safe {
-  background: rgba(0, 255, 136, 0.08);
-  border-color: rgba(0, 255, 136, 0.3);
-  color: #00ff88;
+  background: rgba(143, 176, 154, 0.08);
+  border-color: rgba(143, 176, 154, 0.3);
+  color: #8fb09a;
   animation: none;
 }
 .location-bar__alert-pill:hover {
@@ -2096,13 +2096,13 @@ body[data-level="analyst"] .layer-name-researcher { display: inline; }
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 .layer-tip__roster-count {
-  color: #00ff88;
+  color: #8fb09a;
   font-weight: 700;
   letter-spacing: 0.08em;
-  background: rgba(0, 255, 136, 0.12);
+  background: rgba(143, 176, 154, 0.12);
   padding: 1px 6px;
   border-radius: 2px;
-  border: 1px solid rgba(0, 255, 136, 0.3);
+  border: 1px solid rgba(143, 176, 154, 0.3);
 }
 
 .layer-tip__facilities {
@@ -2151,8 +2151,8 @@ body[data-level="analyst"] .layer-name-researcher { display: inline; }
   display: inline-block;
 }
 .facility-pip--active {
-  background: #00ff88;
-  box-shadow: 0 0 6px #00ff88, inset 0 0 2px #fff;
+  background: #8fb09a;
+  box-shadow: 0 0 6px #8fb09a, inset 0 0 2px #fff;
 }
 .facility-pip--decom {
   background: #666;
@@ -2234,7 +2234,7 @@ body[data-level="analyst"] .layer-name-researcher { display: inline; }
   font-size: 0.44rem;
   letter-spacing: 0.05em;
   opacity: 0.85;
-  color: #00ff88;
+  color: #8fb09a;
   font-weight: 700;
   margin-left: 3px;
 }
@@ -2283,7 +2283,7 @@ body[data-level="analyst"] .layer-name-researcher { display: inline; }
   transition: all 0.2s;
 }
 .map-fullscreen__anim-btn:hover { color: var(--text-primary); border-color: var(--border-active); }
-.map-fullscreen__anim-btn--active { color: var(--signal-live); border-color: rgba(0,255,136,0.3); }
+.map-fullscreen__anim-btn--active { color: var(--signal-live); border-color: rgba(143, 176, 154,0.3); }
 
 .map-fullscreen__map { flex: 1; }
 
@@ -3144,7 +3144,7 @@ body[data-level="researcher"] .feed-card__why { display: none !important; }
   font-weight: 700;
 }
 .weather-modal__btn--primary:hover {
-  background: #e2b36e;
+  background: #e8e8e8;
   color: #000;
 }
 

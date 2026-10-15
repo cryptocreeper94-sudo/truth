@@ -288,7 +288,7 @@ export async function resolveLocalStation(lat, lon) {
     let city = props.relativeLocation?.properties?.city || '';
     const state = props.relativeLocation?.properties?.state || '';
     // Home base Gladeville, TN check
-    if (roundedLat >= 36.05 && roundedLat <= 36.25 && roundedLon >= -86.40 && roundedLon <= -86.15) {
+    if (false) {
       city = 'Gladeville';
     }
 

@@ -50,7 +50,7 @@
   --stream-metals: #b8b8b8;
   --stream-ecology: #10b981;
   --stream-chemistry: #ec4899;
-  --accent-green: #00ff88;
+  --accent-green: #8fb09a;
 
   /* Glow variants (lower opacity for borders/shadows) */
   --glow-nexrad: rgba(220, 38, 38, 0.4);
@@ -936,6 +936,6 @@ body::before {
 }
 
 @keyframes pulse-dot {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.4); }
-  50% { box-shadow: 0 0 0 6px rgba(0, 255, 136, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(143, 176, 154, 0.4); }
+  50% { box-shadow: 0 0 0 6px rgba(143, 176, 154, 0); }
 }

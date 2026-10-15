@@ -540,7 +540,8 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="atmoscore.js"></script>
   <script src="atmoscore-viz.js"></script>
-  <script src="app.js?v=20261014-gladeville-tz"></script>
+  <script src="app.js?v=20261015-launch"></script>
+  <script src="a11y.js" defer></script>
   <script>
     // CSV Export
     async function __exportData() {
@@ -720,19 +721,19 @@
       </div>
       <div class="level-onboarding__cards">
         <button class="level-onboarding__card" data-select-level="observer">
-          <span class="level-onboarding__card-icon" style="color:#00e676;">&#9679;</span>
+          <span class="level-onboarding__card-icon" style="color:#8a8a8a;">&#9679;</span>
           <span class="level-onboarding__card-label">OBSERVER</span>
           <span class="level-onboarding__card-desc">I'm curious. Show me what's happening and explain it like I'm new to this.</span>
           <span class="level-onboarding__card-hint">Plain English &bull; Guided explanations &bull; No jargon</span>
         </button>
         <button class="level-onboarding__card" data-select-level="analyst">
-          <span class="level-onboarding__card-icon" style="color:#ffab00;">&#9679;</span>
+          <span class="level-onboarding__card-icon" style="color:#bdbdbd;">&#9679;</span>
           <span class="level-onboarding__card-label">ANALYST</span>
           <span class="level-onboarding__card-desc">I know the basics. I want to explore the data and understand the patterns.</span>
           <span class="level-onboarding__card-hint">Technical context &bull; Cross-references &bull; Pattern analysis</span>
         </button>
         <button class="level-onboarding__card" data-select-level="researcher">
-          <span class="level-onboarding__card-icon" style="color:#ff5252;">&#9679;</span>
+          <span class="level-onboarding__card-icon" style="color:#ffffff;">&#9679;</span>
           <span class="level-onboarding__card-label">RESEARCHER</span>
           <span class="level-onboarding__card-desc">Give me the raw data, provenance, and full technical interface.</span>
           <span class="level-onboarding__card-hint">Full API access &bull; SHA-256 provenance &bull; NDJSON manifests</span>
@@ -744,15 +745,15 @@
   <div class="level-menu" id="level-menu" role="menu" aria-label="Choose how much detail you see">
     <p class="level-menu__title">How should we explain things?</p>
     <button class="level-menu__opt" role="menuitemradio" data-pick-level="observer">
-      <span class="level-menu__dot" style="background:#00e676;"></span>
+      <span class="level-menu__dot" style="background:#8a8a8a;"></span>
       <span class="level-menu__text"><strong>Observer</strong><small>Plain English. Explain it like I'm new.</small></span>
     </button>
     <button class="level-menu__opt" role="menuitemradio" data-pick-level="analyst">
-      <span class="level-menu__dot" style="background:#ffab00;"></span>
+      <span class="level-menu__dot" style="background:#bdbdbd;"></span>
       <span class="level-menu__text"><strong>Analyst</strong><small>Proper terms, with context and patterns.</small></span>
     </button>
     <button class="level-menu__opt" role="menuitemradio" data-pick-level="researcher">
-      <span class="level-menu__dot" style="background:#ff5252;"></span>
+      <span class="level-menu__dot" style="background:#ffffff;"></span>
       <span class="level-menu__text"><strong>Researcher</strong><small>Raw data, provenance, full detail.</small></span>
     </button>
   </div>
@@ -845,7 +846,7 @@
               <input type="checkbox" id="wf-tornado" data-cat="tornado" checked>
             </div>
             <div class="weather-filter-card">
-              <label for="wf-severe_storm"><span class="weather-filter-swatch" style="background:#ffa500;"></span> ⛈️ Severe Thunderstorm (SVR)</label>
+              <label for="wf-severe_storm"><span class="weather-filter-swatch" style="background:#c084fc;"></span> ⛈️ Severe Thunderstorm (SVR)</label>
               <input type="checkbox" id="wf-severe_storm" data-cat="severe_storm" checked>
             </div>
             <div class="weather-filter-card">

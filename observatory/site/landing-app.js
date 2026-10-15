@@ -205,7 +205,7 @@
         }
 
         // Status indicator
-        const statusColor = feed.status === 'live' ? '#00ff88' : feed.status === 'stale' ? '#f0a030' : '#ff4444';
+        const statusColor = feed.status === 'live' ? '#8fb09a' : feed.status === 'stale' ? '#b8b8b8' : '#ff4444';
         const statusLabel = feed.status === 'live' ? 'LIVE' : feed.status === 'stale' ? 'STALE' : 'OFFLINE';
 
         metricEl.innerHTML = `
@@ -258,8 +258,8 @@
       carousel.innerHTML = '';
 
       data.patterns.forEach((pattern) => {
-        const confColor = pattern.confidence === 'HIGH' ? '#00ff88'
-          : pattern.confidence === 'MODERATE' ? '#f0a030'
+        const confColor = pattern.confidence === 'HIGH' ? '#8fb09a'
+          : pattern.confidence === 'MODERATE' ? '#b8b8b8'
           : '#888';
 
         const feedTags = (pattern.domains || []).map(d =>

@@ -45,7 +45,7 @@ const Levels = {
     observer: {
       label: 'OBSERVER',
       icon: '🟢',
-      color: '#00e676',
+      color: '#8a8a8a',
       tagline: "I'm curious. Show me what's happening and explain it like I'm new to this.",
       cockpitLabel: 'START WATCHING',
       heroSubtitle: 'See what\'s really happening in the atmosphere — in plain English.',
@@ -54,7 +54,7 @@ const Levels = {
     analyst: {
       label: 'ANALYST',
       icon: '🟡',
-      color: '#ffab00',
+      color: '#bdbdbd',
       tagline: 'I know the basics. I want to explore the data and understand the patterns.',
       cockpitLabel: 'OPEN DASHBOARD',
       heroSubtitle: 'Multi-stream atmospheric monitoring with cross-feed correlation analysis.',
@@ -63,7 +63,7 @@ const Levels = {
     researcher: {
       label: 'RESEARCHER',
       icon: '🔴',
-      color: '#ff5252',
+      color: '#ffffff',
       tagline: 'Give me the raw data, provenance, and full technical interface.',
       cockpitLabel: 'ENTER COCKPIT',
       heroSubtitle: 'Continuous atmospheric, geophysical, and infrastructure monitoring. Every observation hashed, manifest-logged, and provenance-tracked.',

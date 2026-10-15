@@ -64,9 +64,9 @@ const LiveStatus = {
     const badge = card.querySelector('.stream-card__badge');
     if (badge && badge.textContent === 'Live') {
       badge.textContent = '● Live';
-      badge.style.background = 'rgba(0, 255, 136, 0.15)';
-      badge.style.color = '#00ff88';
-      badge.style.borderColor = 'rgba(0, 255, 136, 0.3)';
+      badge.style.background = 'rgba(143, 176, 154, 0.15)';
+      badge.style.color = '#8fb09a';
+      badge.style.borderColor = 'rgba(143, 176, 154, 0.3)';
     }
   },
 

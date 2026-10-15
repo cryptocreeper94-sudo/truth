@@ -246,11 +246,10 @@ async function getSubscriberFromRequest(req) {
   } catch { return null; }
 }
 
-const SUBSCRIBER_WHITELIST = new Set([
-  'gladevillej@gmail.com',
-  'team@dwsc.io',
-  'jason@livfitoken.com'
-]);
+const SUBSCRIBER_WHITELIST = new Set(
+  (process.env.SUBSCRIBER_WHITELIST || '').split(',').map(e => e.trim().toLowerCase()).filter(Boolean)
+);
+if (SUBSCRIBER_WHITELIST.size === 0) console.warn('[AUTH] SUBSCRIBER_WHITELIST is empty — no complimentary accounts are active.');
 
 // ── Auth hardening helpers ──────────────────────────────────────────────
 // Auth codes / magic-link tokens live in Postgres (table auth_tokens) so they survive
@@ -1395,6 +1394,13 @@ const server = createServer(async (req, res) => {
 
   // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
+  // Baseline security headers
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  res.setHeader('Permissions-Policy', 'geolocation=(self), camera=(), microphone=(), payment=(self "https://checkout.stripe.com")');
+  res.setHeader('Content-Security-Policy', "frame-ancestors 'self'; base-uri 'self'; object-src 'none'; form-action 'self' https://checkout.stripe.com https://buy.stripe.com https://billing.stripe.com");
 
   // ── Billing Routes ──────────────────────────────────────────────────
   if (path === '/api/subscribe' && req.method === 'POST') {
@@ -2291,7 +2297,7 @@ const server = createServer(async (req, res) => {
     }
 
     const station = await resolveLocalStation(lat, lon);
-    const isGladeville = zip === '37090' || (lat >= 36.05 && lat <= 36.25 && lon >= -86.40 && lon <= -86.15);
+    const isGladeville = zip === '37090';
     const city = isGladeville ? 'Gladeville' : (geo?.city || station?.city || null);
     const label = isGladeville ? 'Gladeville, TN 37090' : (geo?.label || (station?.city ? `${station.city}, ${station.state || ''}`.trim() : null));
 

@@ -99,14 +99,14 @@ const Observatory = {
         { color: '#7f8cff', label: '20,000 – 30,000 ft' },
         { color: '#d08cff', label: 'Above 30,000 ft' },
         { color: '#9aa0a8', label: 'On the ground' },
-        { color: '#ffb020', label: 'Military' },
+        { color: '#c084fc', label: 'Military' },
         { color: '#ff3b3b', label: 'Emergency squawk' },
       ] },
     },
     glm: {
       name: 'Lightning (last 15 min)',
       info: { source: 'NOAA GOES-19 (East) and GOES-18 (West) Geostationary Lightning Mapper', what: 'Every lightning flash the GOES satellites detected in the last 15 minutes across the Americas, the Atlantic and the eastern Pacific. Brighter dots are more recent. Where the two satellites overlap, each flash is counted only once.', update: 'Every 5 minutes', attribution: 'NOAA GOES GLM' },
-      legend: { type: 'dots', heading: 'LIGHTNING FLASHES (GOES GLM)', items: [{ color: '#fff200', label: 'Under 5 min ago' }, { color: '#ffa500', label: '5 – 10 min ago' }, { color: '#ff5a36', label: '10 – 15 min ago' }] },
+      legend: { type: 'dots', heading: 'LIGHTNING FLASHES (GOES GLM)', items: [{ color: '#4ecbff', label: 'Under 5 min ago' }, { color: '#c084fc', label: '5 – 10 min ago' }, { color: '#ff5a36', label: '10 – 15 min ago' }] },
     },
     wildfires: {
       name: 'US Wildfires (NIFC)',
@@ -133,7 +133,7 @@ const Observatory = {
       info: { source: 'NOAA National Weather Service (NWS)', what: 'Real-time Doppler radar polygons and hazardous weather warnings including Tornadoes, Severe Thunderstorms, Flash Floods, Hurricanes, High Winds, Winter Storms, and Fire Weather across the United States.', update: 'Every 60 seconds', attribution: 'NOAA / NWS' },
       legend: { type: 'dots', heading: 'NWS ACTIVE WARNINGS', items: [
         { color: '#ff1438', label: 'Tornado Warning / Watch' },
-        { color: '#ffa500', label: 'Severe Thunderstorm' },
+        { color: '#c084fc', label: 'Severe Thunderstorm' },
         { color: '#d946ef', label: 'Hurricane / Tropical' },
         { color: '#00ff66', label: 'Flash Flood / Flood' },
         { color: '#00e5ff', label: 'High Wind / Gale' },
@@ -393,8 +393,8 @@ const Observatory = {
         return saved;
       }
     } catch {}
-    // Standard ecosystem default: Gladeville, TN (Central Time)
-    return 'America/Chicago';
+    // No saved choice: use the visitor's own browser timezone
+    try { return Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/Chicago'; } catch { return 'America/Chicago'; }
   },
 
   getTimezoneShort(date = new Date()) {
@@ -479,7 +479,7 @@ const Observatory = {
         hour12: false
       }).format(now);
       el.textContent = `${timeStr} ${tzShort}`;
-      const tzLabel = tz === 'America/Chicago' ? 'Central Time (Gladeville, TN)' : tz;
+      const tzLabel = tz;
       el.title = `Timezone: ${tzLabel} (Click to change)`;
     } catch {
       el.textContent = now.toISOString().slice(11, 19) + ' UTC';
@@ -487,7 +487,7 @@ const Observatory = {
   },
 
   highlightActiveTimezone() {
-    const saved = localStorage.getItem('observatory_timezone') || 'America/Chicago';
+    const saved = localStorage.getItem('observatory_timezone') || 'auto';
     const options = document.querySelectorAll('.timezone-option');
     options.forEach(opt => {
       const tzVal = opt.getAttribute('data-tz');
@@ -695,8 +695,8 @@ const Observatory = {
 
   initMap() {
     const savedLoc = this._getSavedLocation();
-    const center = savedLoc ? [savedLoc.lat, savedLoc.lng] : [36.12, -86.26];
-    const zoom = savedLoc ? 7 : 7;
+    const center = savedLoc ? [savedLoc.lat, savedLoc.lng] : [39.0, -95.0];
+    const zoom = savedLoc ? 7 : 4;
     this.map = L.map('map', {
       center,
       zoom,
@@ -1991,13 +1991,13 @@ const Observatory = {
       const isCount = m.unit === 'quakes' || m.unit === 'obs/day' || m.unit === 'obs' || m.unit === 'filings/day' || m.unit === 'stations' || m.unit === 'samples/day' || m.unit === 'reports/day' || m.unit === 'cycles/day';
       if (isCount) {
         const bw = Math.max(4, pw / pts.length - 3);
-        pts.forEach(p => { if (!p[1]) return; ctx.fillStyle = 'rgba(0,255,136,0.65)'; ctx.fillRect(X(p[0]) - bw / 2, Y(p[1]), bw, padT + ph - Y(p[1])); });
+        pts.forEach(p => { if (!p[1]) return; ctx.fillStyle = 'rgba(143, 176, 154,0.65)'; ctx.fillRect(X(p[0]) - bw / 2, Y(p[1]), bw, padT + ph - Y(p[1])); });
       } else {
-        ctx.strokeStyle = 'rgba(0,255,136,0.9)'; ctx.lineWidth = 2; ctx.beginPath();
+        ctx.strokeStyle = 'rgba(143, 176, 154,0.9)'; ctx.lineWidth = 2; ctx.beginPath();
         let pen = false;
         pts.forEach(p => { if (p[1] == null) { pen = false; return; } const x = X(p[0]), y = Y(p[1]); pen ? ctx.lineTo(x, y) : ctx.moveTo(x, y); pen = true; });
         ctx.stroke();
-        ctx.fillStyle = 'rgba(0,255,136,0.85)';
+        ctx.fillStyle = 'rgba(143, 176, 154,0.85)';
         pts.forEach(p => { if (p[1] == null) return; ctx.beginPath(); ctx.arc(X(p[0]), Y(p[1]), 2, 0, Math.PI * 2); ctx.fill(); });
       }
       const span = m.window === '30d' ? 'LAST 30 DAYS' : m.window === '72h' ? 'LAST 72 HOURS' : m.window === '14d' ? 'LAST 14 DAYS' : 'LAST 24 HOURS';
@@ -2076,13 +2076,13 @@ const Observatory = {
       for (let i = 0; i < n; i++) {
         const x = padL + (i + 0.5) * (pw / n) - bw / 2;
         const okH = (hlt.ok[i] / hi) * ph, gapH = (hlt.gap[i] / hi) * ph;
-        ctx.fillStyle = 'rgba(0,255,136,0.55)'; ctx.fillRect(x, padT + ph - okH, bw, okH);
+        ctx.fillStyle = 'rgba(143, 176, 154,0.55)'; ctx.fillRect(x, padT + ph - okH, bw, okH);
         ctx.fillStyle = 'rgba(255, 255, 255,0.75)'; ctx.fillRect(x, padT + ph - okH - gapH, bw, gapH);
       }
       if (label) label.textContent = `COLLECTION HEALTH · ${hlt.window === '14d' ? 'LAST 14 DAYS' : 'LAST 24 HOURS'} (UTC)`;
       const pct = hlt.okTotal + hlt.gapTotal ? Math.round((hlt.okTotal / (hlt.okTotal + hlt.gapTotal)) * 100) : 0;
       stats.innerHTML = `
-        <div><span style="color:#00ff88;">Successful</span>${hlt.okTotal}</div>
+        <div><span style="color:#8fb09a;">Successful</span>${hlt.okTotal}</div>
         <div><span style="color:#ff3b30;">Failed</span>${hlt.gapTotal}</div>
         <div><span>Success rate</span>${pct}%</div>
         <div class="modal__chart-src">This feed stores images or files, not a single number, so this chart shows whether the source is delivering, not a physical reading.</div>`;
@@ -2375,7 +2375,7 @@ const Observatory = {
 
   _aircraftColor(a) {
     if (a.emergency || ['7500', '7600', '7700'].includes(a.squawk)) return '#ff3b3b';
-    if (a.mil) return '#ffb020';
+    if (a.mil) return '#c084fc';
     if (a.ground) return '#9aa0a8';
     const alt = a.alt || 0;
     if (alt < 5000) return '#7dffb2';
@@ -2399,7 +2399,7 @@ const Observatory = {
     const row = (k, v) => `<div style="display:flex;justify-content:space-between;gap:12px;"><span style="color:#777;">${k}</span><span style="color:#ddd;text-align:right;">${v}</span></div>`;
     return `
       <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#e8e8f0;background:#0a0a0e;padding:10px 12px;border:1px solid ${color}55;border-radius:2px;min-width:230px;line-height:1.7;">
-        <div style="color:${color};font-weight:700;font-size:13px;">✈ ${esc(a.flight || a.reg || a.hex.toUpperCase())}${a.mil ? ' <span style="font-size:9px;color:#ffb020;">MILITARY</span>' : ''}</div>
+        <div style="color:${color};font-weight:700;font-size:13px;">✈ ${esc(a.flight || a.reg || a.hex.toUpperCase())}${a.mil ? ' <span style="font-size:9px;color:#c084fc;">MILITARY</span>' : ''}</div>
         <div style="color:#aaa;">${esc(a.desc || a.type || 'Aircraft type unknown')}${a.op ? ' · ' + esc(a.op) : ''}</div>
         <div style="color:#666;font-size:9px;letter-spacing:0.08em;margin-bottom:6px;">${esc(this._acClassLabel(a.cls).toUpperCase())}</div>
         ${row('Altitude', alt)}
@@ -2641,7 +2641,7 @@ const Observatory = {
       // Oldest first so the newest flashes paint on top
       const list = (data.flashes || []).slice().sort((a, b) => b[0] - a[0]);
       list.forEach(([age, lat, lon]) => {
-        const fill = age < 300 ? '#fff200' : age < 600 ? '#ffa500' : '#ff5a36';
+        const fill = age < 300 ? '#4ecbff' : age < 600 ? '#c084fc' : '#ff5a36';
         const m = L.circleMarker([lat, lon], {
           radius: age < 300 ? 3 : 2.4, color: 'rgba(20,12,0,0.6)', weight: 0.6,
           fillColor: fill, fillOpacity: age < 300 ? 1 : 0.8, interactive: false, renderer,
@@ -3428,6 +3428,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
       this.checkLocationWeatherAlerts(saved.lat, saved.lng, saved.zip);
       this.fetchLocalStation(saved.lat, saved.lng, saved.zip);
     }
+    else { status.textContent = 'ENTER YOUR ZIP FOR LOCAL WEATHER'; zipInput.placeholder = 'ZIP'; }
 
     // Geolocation button
     geoBtn.addEventListener('click', () => {
@@ -3508,15 +3509,8 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
       const raw = localStorage.getItem('observatory_location');
       if (raw) return JSON.parse(raw);
     } catch { return null; }
-    // Platform standard default location: Gladeville, TN 37090
-    return {
-      lat: 36.12,
-      lng: -86.26,
-      zip: '37090',
-      label: 'Gladeville, TN 37090',
-      city: 'Gladeville',
-      state: 'TN'
-    };
+    // First visit: no location until the visitor sets one (ZIP or GPS)
+    return null;
   },
 
   _saveLocation(loc) {
@@ -3758,7 +3752,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
   getWarningColor(cat) {
     switch (cat) {
       case 'tornado': return '#ff1438';
-      case 'severe_storm': return '#ffa500';
+      case 'severe_storm': return '#c084fc';
       case 'tropical': return '#d946ef';
       case 'flood': return '#00ff66';
       case 'wind': return '#00e5ff';

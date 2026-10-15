@@ -179,8 +179,8 @@
 .section--cream .level-card { background: rgba(255,255,255,0.7); border-color: rgba(0,0,0,0.08); }
 .section--cream .level-card__tag { color: var(--text-cream-secondary); }
 .section--cream .level-card__eg { color: var(--text-cream-muted); }
-.section--cream .level-card[aria-pressed="true"] { border-color: #b07e36; background: #fff; }
-.section--cream .level-card__name { color: #9a6a26; }
+.section--cream .level-card[aria-pressed="true"] { border-color: #bdbdbd; background: #fff; }
+.section--cream .level-card__name { color: #9a9a9a; }
 
 /* ══════════════════════════════════════════════════════════════
    /today page

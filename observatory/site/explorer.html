@@ -17,8 +17,8 @@
       --text-secondary: #8b95a5;
       --text-dim: #4a5568;
       --signal-cyan: #00d2ff;
-      --signal-live: #00e676;
-      --signal-stale: #ffa726;
+      --signal-live: #8a8a8a;
+      --signal-stale: #b8b8b8;
       --signal-warn: #ff6b35;
       --signal-dead: #ff3b30;
       --border-dim: rgba(255,255,255,0.06);
@@ -95,7 +95,7 @@
       background: rgba(0, 210, 255, 0.12); border-color: var(--signal-cyan);
       color: var(--signal-cyan); font-weight: 600;
     }
-    .filter-chip--obs.filter-chip--active { background: rgba(0,230,118,0.12); border-color: var(--signal-live); color: var(--signal-live); }
+    .filter-chip--obs.filter-chip--active { background: rgba(138, 138, 138,0.12); border-color: var(--signal-live); color: var(--signal-live); }
     .filter-chip--gap.filter-chip--active { background: rgba(255,167,38,0.12); border-color: var(--signal-stale); color: var(--signal-stale); }
     .filter-chip--dev.filter-chip--active { background: rgba(255,107,53,0.12); border-color: var(--signal-warn); color: var(--signal-warn); }
     .filter-chip--corr.filter-chip--active { background: rgba(0,210,255,0.12); border-color: var(--signal-cyan); color: var(--signal-cyan); }
@@ -155,7 +155,7 @@
       font-size: 0.55rem; font-weight: 700; text-transform: uppercase;
       letter-spacing: 0.05em;
     }
-    .cell-kind--observation { background: rgba(0,230,118,0.12); color: var(--signal-live); }
+    .cell-kind--observation { background: rgba(138, 138, 138,0.12); color: var(--signal-live); }
     .cell-kind--gap { background: rgba(255,167,38,0.12); color: var(--signal-stale); }
     .cell-kind--deviation { background: rgba(255,107,53,0.15); color: var(--signal-warn); }
     .cell-kind--correlation { background: rgba(0,210,255,0.12); color: var(--signal-cyan); }
