@@ -781,6 +781,7 @@ const Observatory = {
     this.loadWeatherWarnings();
     setInterval(() => this.loadWeatherWarnings(), 60 * 1000);
 
+    this._restoreLayerPrefs();
     this.updateLayerCount();
     this.updateDynamicLegend();
     this._initLayerTooltips();
@@ -1126,6 +1127,30 @@ const Observatory = {
     }
   },
 
+  // ── Persist which map overlays the user selected (shared by cockpit + expanded map) ──
+  _saveLayerPrefs() {
+    try {
+      const prefs = {};
+      document.querySelectorAll('input[data-layer]').forEach(cb => { prefs[cb.dataset.layer] = !!cb.checked; });
+      localStorage.setItem('obs-map-layers', JSON.stringify(prefs));
+    } catch (e) {}
+  },
+
+  _restoreLayerPrefs() {
+    let prefs = null;
+    try { prefs = JSON.parse(localStorage.getItem('obs-map-layers') || 'null'); } catch (e) {}
+    if (!prefs || !this.map) return;
+    Object.keys(prefs).forEach(k => {
+      const layer = this.mapLayers[k];
+      if (!layer) return;
+      const want = !!prefs[k];
+      const has = this.map.hasLayer(layer);
+      if (want && !has) layer.addTo(this.map);
+      else if (!want && has) this.map.removeLayer(layer);
+      const cb = document.querySelector(`input[data-layer="${k}"]`);
+      if (cb) cb.checked = want;
+    });
+  },
   updateLayerCount() {
     let count = 0;
     Object.values(this.mapLayers).forEach(layer => {
@@ -1437,6 +1462,7 @@ const Observatory = {
 
     this.updateLayerCount();
     this.updateDynamicLegend();
+      this._saveLayerPrefs();
     this.checkLayerDensity();
   },
 
@@ -2714,7 +2740,7 @@ const Observatory = {
       }
       this.updateLayerCount();
       this.updateDynamicLegend();
-      this.checkLayerDensity();
+      this.checkLayerDensity(); this._saveLayerPrefs();
     });
 
     // Map style toggle (light/dark)
@@ -3007,6 +3033,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
       this.renderWeatherWarningLayers();
     }
     this._syncLayersToFullscreen();
+    try { this.fullscreenMap.invalidateSize(); this.fullscreenMap.setView(this.map.getCenter(), this.map.getZoom(), { animate: false }); } catch (e) {}
 
     // Try to lock landscape
     try {
@@ -3018,6 +3045,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
 
   closeFullscreenMap() {
     this._syncLayersFromFullscreen();
+    try { this.map.setView(this.fullscreenMap.getCenter(), this.fullscreenMap.getZoom(), { animate: false }); } catch (e) {}
     document.getElementById('map-fullscreen').classList.remove('map-fullscreen--open');
     this.stopAnimation();
 
@@ -3097,6 +3125,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
         if (!layer) return;
         if (cb.checked) layer.addTo(this.fullscreenMap);
         else this.fullscreenMap.removeLayer(layer);
+        this._saveLayerPrefs();
         this.updateDynamicLegend();
       });
     });
@@ -3158,6 +3187,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
       }
     });
     this.updateLayerCount();
+    this._saveLayerPrefs();
     this.updateDynamicLegend();
   },
 
