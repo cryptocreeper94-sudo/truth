@@ -1481,7 +1481,11 @@ const server = createServer(async (req, res) => {
     try { event = StripeLib.webhooks.constructEvent(body, sig, webhookSecret); }
     catch (err) { console.error('[WEBHOOK] Signature failed:', err.message); return jsonResponse(res, 400, { error: 'Invalid signature' }); }
 
-    if (pool) {
+    if (!pool) {
+      console.error('[WEBHOOK] Database unavailable, asking Stripe to retry');
+      return jsonResponse(res, 503, { error: 'Database unavailable' });
+    }
+    {
       try {
         if (event.type === 'checkout.session.completed') {
           const session = event.data.object;
@@ -1549,7 +1553,12 @@ const server = createServer(async (req, res) => {
             console.log(`[WEBHOOK] Subscription ${invoice.subscription} → past_due`);
           }
         }
-      } catch (err) { console.error('[WEBHOOK] DB error:', err.message); }
+      } catch (err) {
+        // Never answer 200 for an event we failed to record: a non-2xx makes Stripe retry it
+        // (for days), so a paying customer can't be silently lost to a transient DB error.
+        console.error('[WEBHOOK] DB error, asking Stripe to retry:', err.message);
+        return jsonResponse(res, 500, { error: 'Temporary processing error' });
+      }
     }
     return jsonResponse(res, 200, { received: true });
   }
