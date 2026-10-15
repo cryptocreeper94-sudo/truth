@@ -1805,7 +1805,7 @@ const server = createServer(async (req, res) => {
   // ── API Routes ──────────────────────────────────────────────────────
   if (path === '/api/health') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    return res.end(JSON.stringify({ status: 'ok', timestamp: new Date().toISOString(), feeds: FEEDS.length, billing: !!STRIPE_PRICE_ID }));
+    return res.end(JSON.stringify({ status: 'ok', timestamp: new Date().toISOString(), feeds: FEEDS.length, billing: !!process.env.STRIPE_SECRET_KEY, webhook: !!process.env.STRIPE_WEBHOOK_SECRET, checkout_session: !!STRIPE_PRICE_ID }));
   }
 
   // ── Dev Auth — validates admin password, sets a signed, expiring bypass token ──
