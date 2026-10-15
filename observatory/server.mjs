@@ -89,6 +89,40 @@ const SESSION_SECRET = process.env.SESSION_SECRET || 'dev-secret-change-me';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '';
 const PK_KEY = process.env.STRIPE_PUBLISHABLE_KEY || '';
 
+// ── Founders pricing ───────────────────────────────────────────────────
+// First FOUNDERS_CAP paying subscribers get the founders price for as long as they stay
+// subscribed. After that the standard price applies. The counter is real: it counts
+// subscribers.tier = 'founder' in Postgres, and /api/pricing hands the site the checkout
+// link that matches the current tier. Set STANDARD_CHECKOUT_URL once the standard-price
+// Stripe Payment Link exists; until then a sold-out round shows no checkout button.
+const FOUNDERS_CAP = parseInt(process.env.FOUNDERS_CAP || '200', 10);
+const FOUNDERS_PRICE = 4.99;
+const STANDARD_PRICE = 9.99;
+const FOUNDERS_CHECKOUT_URL = process.env.FOUNDERS_CHECKOUT_URL || 'https://buy.stripe.com/bJe8wR4Zq2vM83Z3vTfEk00';
+const STANDARD_CHECKOUT_URL = process.env.STANDARD_CHECKOUT_URL || '';
+let pricingCache = { at: 0, data: null };
+
+// Tier from the amount Stripe actually charged (in cents). Anything near the standard
+// price is 'standard'; the threshold leaves room for tax so a taxed founders charge is
+// never misfiled.
+function tierFromAmount(amountTotalCents) {
+  return Number.isFinite(amountTotalCents) && amountTotalCents >= 900 ? 'standard' : 'founder';
+}
+
+function buildPricing(foundersTaken) {
+  const known = Number.isFinite(foundersTaken);
+  const spotsLeft = known ? Math.max(0, FOUNDERS_CAP - foundersTaken) : null;
+  const soldOut = known && spotsLeft === 0;
+  return {
+    founders: { cap: FOUNDERS_CAP, taken: known ? foundersTaken : null, spots_left: spotsLeft, price: FOUNDERS_PRICE },
+    standard: { price: STANDARD_PRICE },
+    sold_out: soldOut,
+    current: soldOut
+      ? { tier: 'standard', price: STANDARD_PRICE, checkout_url: STANDARD_CHECKOUT_URL || null }
+      : { tier: 'founder', price: FOUNDERS_PRICE, checkout_url: FOUNDERS_CHECKOUT_URL },
+  };
+}
+
 // Load Stripe (optional — server starts without it)
 try {
   const Stripe = (await import('stripe')).default;
@@ -145,6 +179,13 @@ async function initDatabase() {
         UNIQUE (email, kind)
       );
       CREATE INDEX IF NOT EXISTS auth_tokens_token_hash_idx ON auth_tokens (token_hash);
+      ALTER TABLE subscribers ADD COLUMN IF NOT EXISTS tier TEXT;
+      ALTER TABLE subscribers ADD COLUMN IF NOT EXISTS price_cents INTEGER;
+      -- Everyone who paid before launch day paid the founders price (it was the only price).
+      UPDATE subscribers SET tier = 'founder'
+        WHERE tier IS NULL AND price_cents IS NULL
+          AND LEFT(stripe_customer_id, 10) <> 'whitelist_'
+          AND created_at < TIMESTAMPTZ '2026-10-15 00:00:00+00';
     `);
     console.log('[OBSERVATORY] Database tables ready');
   } catch (err) {
@@ -1387,16 +1428,21 @@ const server = createServer(async (req, res) => {
       const subscriptionId = typeof session.subscription === 'object' ? session.subscription.id : session.subscription;
 
       // Upsert subscriber
+      const amountTotal = Number.isFinite(session.amount_total) ? session.amount_total : null;
+      const tier = tierFromAmount(amountTotal);
       await pool.query(
-        `INSERT INTO subscribers (email, stripe_customer_id, stripe_subscription_id, status, updated_at)
-         VALUES ($1, $2, $3, 'active', NOW())
+        `INSERT INTO subscribers (email, stripe_customer_id, stripe_subscription_id, status, tier, price_cents, updated_at)
+         VALUES ($1, $2, $3, 'active', $4, $5, NOW())
          ON CONFLICT (stripe_customer_id) DO UPDATE SET
            email = EXCLUDED.email,
            stripe_subscription_id = EXCLUDED.stripe_subscription_id,
            status = 'active',
+           tier = COALESCE(subscribers.tier, EXCLUDED.tier),
+           price_cents = COALESCE(subscribers.price_cents, EXCLUDED.price_cents),
            updated_at = NOW()`,
-        [email, customerId, subscriptionId]
+         [email, customerId, subscriptionId, tier, amountTotal]
       );
+      pricingCache.at = 0;
 
       const sub = await pool.query('SELECT id FROM subscribers WHERE stripe_customer_id = $1', [customerId]);
       const subscriberId = sub.rows[0]?.id;
@@ -1443,17 +1489,22 @@ const server = createServer(async (req, res) => {
           const customerId = session.customer;
           const subscriptionId = typeof session.subscription === 'object' ? session.subscription?.id : session.subscription;
           if (email) {
+            const amountTotal = Number.isFinite(session.amount_total) ? session.amount_total : null;
+            const tier = tierFromAmount(amountTotal);
             const upsert = await pool.query(
-              `INSERT INTO subscribers (email, stripe_customer_id, stripe_subscription_id, status, updated_at)
-               VALUES ($1, $2, $3, 'active', NOW())
+              `INSERT INTO subscribers (email, stripe_customer_id, stripe_subscription_id, status, tier, price_cents, updated_at)
+               VALUES ($1, $2, $3, 'active', $4, $5, NOW())
                ON CONFLICT (email) DO UPDATE SET
                  stripe_customer_id = COALESCE(EXCLUDED.stripe_customer_id, subscribers.stripe_customer_id),
                  stripe_subscription_id = COALESCE(EXCLUDED.stripe_subscription_id, subscribers.stripe_subscription_id),
                  status = 'active',
+                 tier = COALESCE(subscribers.tier, EXCLUDED.tier),
+                 price_cents = COALESCE(subscribers.price_cents, EXCLUDED.price_cents),
                  updated_at = NOW()
                RETURNING id`,
-              [email, customerId, subscriptionId]
+              [email, customerId, subscriptionId, tier, amountTotal]
             );
+            pricingCache.at = 0; // new subscriber: refresh the founders counter immediately
             console.log(`[WEBHOOK] Checkout session completed for ${email} (${customerId})`);
 
             // Send instant welcome email with magic link (token persisted in Postgres, 24h)
@@ -1723,6 +1774,23 @@ const server = createServer(async (req, res) => {
     }
     clearSessionCookie(res);
     return redirect(res, '/');
+  }
+
+  // ── Public pricing: real founders counter + the checkout link to use right now ──
+  if (path === '/api/pricing' && req.method === 'GET') {
+    const now = Date.now();
+    if (!pricingCache.data || now - pricingCache.at > 15000) {
+      let taken = null;
+      if (pool) {
+        try {
+          const r = await pool.query(`SELECT COUNT(*)::int AS n FROM subscribers WHERE tier = 'founder'`);
+          taken = r.rows[0].n;
+        } catch (err) { console.error('[PRICING] count failed:', err.message); }
+      }
+      pricingCache = { at: now, data: buildPricing(taken) };
+    }
+    res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=15' });
+    return res.end(JSON.stringify(pricingCache.data));
   }
 
   // ── API Routes ──────────────────────────────────────────────────────

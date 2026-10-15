@@ -662,12 +662,10 @@
   <script src="landing-app.js"></script>
   <script src="live.js"></script>
   <script src="now.js"></script>
+  <script src="pricing.js"></script>
   <script src="home.js"></script>
   <script>
-    // Subscribe handler — direct Stripe Payment Link
-    window.__subscribe = function() {
-      window.location.href = 'https://buy.stripe.com/bJe8wR4Zq2vM83Z3vTfEk00';
-    };
+    // Subscribe handler (window.__subscribe) lives in pricing.js: founders counter + checkout link from /api/pricing.
 
     // Subscriber Sign-in Modal & Auth logic
     window.openSignInModal = function(e) {
@@ -786,7 +784,7 @@
       if (params.get('upgrade') === '1') {
         const banner = document.createElement('div');
         banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:linear-gradient(135deg,#d4a054,#e0b06a);color:#1a1714;text-align:center;padding:1rem;font-family:var(--font-mono);font-size:0.8rem;font-weight:600;letter-spacing:0.05em;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;';
-        banner.innerHTML = '<span>🔒 This area requires a subscription.</span> <a href="#" onclick="window.__subscribe(); return false;" style="color:#1a1714;text-decoration:underline;font-weight:700;">Subscribe — $4.99/mo</a> <span style="opacity:0.4;">|</span> <a href="#" onclick="window.openSignInModal(event); return false;" style="color:#1a1714;text-decoration:underline;font-weight:700;">Already subscribed? Sign in &rarr;</a> <button onclick="this.parentElement.remove()" style="background:transparent;border:none;font-weight:700;cursor:pointer;font-size:1rem;margin-left:12px;color:#1a1714;">✕</button>';
+        banner.innerHTML = '<span>🔒 This area requires a subscription.</span> <a href="#" onclick="window.__subscribe(); return false;" style="color:#1a1714;text-decoration:underline;font-weight:700;">Subscribe — <span data-sub-price>$4.99/mo</span></a> <span style="opacity:0.4;">|</span> <a href="#" onclick="window.openSignInModal(event); return false;" style="color:#1a1714;text-decoration:underline;font-weight:700;">Already subscribed? Sign in &rarr;</a> <button onclick="this.parentElement.remove()" style="background:transparent;border:none;font-weight:700;cursor:pointer;font-size:1rem;margin-left:12px;color:#1a1714;">✕</button>';
         document.body.prepend(banner);
         setTimeout(() => banner.remove(), 25000);
       }

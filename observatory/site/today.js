@@ -21,9 +21,7 @@
   const $ = function (id) { return document.getElementById(id); };
   const DAY = 86400000;
 
-  window.__subscribe = function () {
-    window.location.href = 'https://buy.stripe.com/bJe8wR4Zq2vM83Z3vTfEk00';
-  };
+  // window.__subscribe is provided by pricing.js (founders counter + checkout link from /api/pricing).
 
   // ── Copy per level (fixed, deterministic) ───────────────────
   const COPY = {
