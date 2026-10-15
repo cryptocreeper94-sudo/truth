@@ -1,94 +1,110 @@
 # Truth Observatory v2.0 & DVE Integration — Complete Master Blueprint
-**Document ID:** `OBS-BLUEPRINT-2026-V2`  
+**Document ID:** `OBS-BLUEPRINT-2026-V2.1`  
 **Classification:** Strategic & Architectural Specification  
 **Architecture Doctrine:** Aligned to 42-Doctrine Deterministic Dissolution Ladder (Doctrines 1–17, 32, 42)  
 **Target Repositories:** `D:\truth` (Observatory Backend & Frontend) & `D:\dve` (Deterministic Verification Engine)  
-**Domains:** `observatory.tlid.io`, `dve.tlid.io`, `truth.tlid.io`
+**Live Domains:** `observatory.tlid.io`, `dve.tlid.io`, `truth.tlid.io`  
+**Operational Status:** **Phase 1 Production Hardened & Deployed (v1.1 Live)**
 
 ---
 
 ## 1. Executive Summary & Vision
 
 Truth Observatory is transitioning from a passive physical telemetry cockpit into an active, **verifiable physical intelligence ecosystem**. This evolution consists of three primary pillars:
-1. **Hyper-Local Emergency Grounding:** Connecting user ZIP-code locked spaces directly to their National Weather Service (NWS) Weather Forecast Office (WFO) and local television broadcast radar/emergency livestreams.
-2. **Deterministic Verification Engine (DVE) Integration:** Embedding `dve.tlid.io` as the cryptographic verification backbone of Observatory to debunk hoaxes, detect synthetic media, and cross-reference physical anomalies against historical telemetry.
-3. **Verified Anomaly Field Catalog:** A structured, searchable public/subscriber database of rare atmospheric and geological phenomena (Sprites, Asperitas, STEVE, ocean anomalies) where all submissions must pass the DVE intake pipeline before publication.
-4. **Two-Tier Monetization Model:** Launching v1.0 now at **$5.00/month** (Founding Pioneer Tier, grandfathered for life), evolving to **$8.99/month** (Sentinel Research Tier) upon v2.0 DVE + Anomaly release.
+1. **Hyper-Local Grounding & Station Intel (SHIPPED & LIVE):** Connecting user ZIP-code locked spaces directly to their National Weather Service (NWS) Weather Forecast Office (WFO), single-site NEXRAD radar, and local television broadcast emergency livestreams.
+2. **Temporal Engine & Timezone Calibration (SHIPPED & LIVE — Added in v1.1):** Standardizing the platform to the founder's home base in **Gladeville, TN 37090** (Central Time `America/Chicago`), while providing an interactive Timezone Selector for subscribers to customize telemetry clocks platform-wide.
+3. **Deterministic Verification Engine (DVE) Integration (Next Phase):** Embedding `dve.tlid.io` as the cryptographic verification backbone of Observatory to debunk hoaxes, detect synthetic media, and cross-reference physical anomalies against historical telemetry.
+4. **Verified Anomaly Field Catalog (Next Phase):** A structured, searchable public/subscriber database of rare atmospheric and geological phenomena (Sprites, Asperitas, STEVE, ocean anomalies) where all submissions must pass the DVE intake pipeline before publication.
+5. **Two-Tier Monetization Model:** Launching v1.0/v1.1 now at **$5.00/month** (Founding Pioneer Tier, grandfathered for life), evolving to **$8.99/month** (Sentinel Research Tier) upon v2.0 DVE + Anomaly release.
 
 ---
 
-## 2. Pillar 1: Local Emergency Weather Broadcast & DMA Connector
+## 2. Completed Today: Pillar 1 & Local Station Intel (PRODUCTION LIVE)
+
+> **Status:** **100% Implemented & Deployed** (Accelerated from Phase 2 into today's release).
 
 ### 2.1 The Objective
 When a user locks their ZIP code or geolocation in the Cockpit, the system must not only filter local telemetry, but also provide immediate, one-click access to **official meteorological intelligence** and **local broadcast emergency live coverage**.
 
-### 2.2 Technical Architecture & APIs
+### 2.2 Technical Implementation & Architecture
 
 ```mermaid
 graph TD
     A["User Locks ZIP Code / Coordinates"] --> B["Observatory Backend: /api/weather/local-station"]
     B --> C["NOAA NWS Points API: api.weather.gov/points/{lat},{lon}"]
     C --> D["Extract: cwa (WFO Code), forecastOffice, radarStation, timeZone"]
-    D --> E["Lookup DMA / Media Market & Local News Broadcast Stream"]
+    D --> E["Lookup DMA / Media Market & Local News Broadcast Registry"]
     E --> F["Return Station Payload to Cockpit"]
-    F --> G["Cockpit Header: Local Station Badge"]
-    F --> H["Active Warning Detection: Emergency Action Bar"]
+    F --> G["Cockpit Location Bar: Interactive Station Badge (e.g. OHX • Nashville / Gladeville)"]
+    F --> H["Cockpit Modal: Station Intel & Emergency Broadcast Livestreams"]
 ```
 
-#### Step 1: NWS Station Metadata Extraction
-Endpoint: `GET https://api.weather.gov/points/{lat},{lon}`  
-Response keys:
-- `properties.cwa`: 3-letter WFO code (e.g., `ILN` = Wilmington/Cincinnati/Columbus, `RNK` = Blacksburg, `OUN` = Norman/OKC).
-- `properties.forecastOffice`: URL to the WFO API resource.
-- `properties.radarStation`: 4-letter NEXRAD radar identifier (e.g., `KILN`, `KCLE`, `KFDR`).
-- `properties.timeZone`: Local time zone (e.g., `America/New_York`).
-
-#### Step 2: Designated Market Area (DMA) & Local News Livestream Mapping
-Create a deterministic mapping catalog in `observatory/lib/local-stations.mjs`:
-```javascript
-export const WFO_BROADCAST_REGISTRY = {
-  ILN: {
-    name: 'NWS Wilmington / Ohio Valley',
-    dma: 'Cincinnati / Dayton / Columbus',
-    wfoUrl: 'https://www.weather.gov/iln/',
-    hourlyUrl: 'https://forecast.weather.gov/MapClick.php?lat={lat}&lon={lon}',
-    broadcasts: [
-      { name: 'WLWT News 5 (NBC)', url: 'https://www.wlwt.com/nowcast' },
-      { name: 'WCPO 9 (ABC)', url: 'https://www.wcpo.com/live' },
-      { name: 'WHIO 7 (CBS)', url: 'https://www.whio.com/live-stream/' }
-    ]
-  },
-  IND: {
-    name: 'NWS Indianapolis',
-    dma: 'Central Indiana',
-    wfoUrl: 'https://www.weather.gov/ind/',
-    broadcasts: [
-      { name: 'WTHR 13 (NBC)', url: 'https://www.wthr.com/watch' },
-      { name: 'WISH-TV 8 (CW)', url: 'https://www.wishtv.com/live-stream/' }
-    ]
-  }
-  // Generic fallback: NWS official office portal + Weather Underground local stream
-};
-```
-
-#### Step 3: Emergency Action Bar in Cockpit
-When an active polygon warning (Tornado Warning, Severe Thunderstorm Warning, Flash Flood Warning) intersects the user's locked coordinates:
-- A high-visibility, pulsing alert banner renders at the top of the Cockpit:
-  > `🚨 ACTIVE TORNADO WARNING IN YOUR COUNTY (EXP: 19:45 EDT)`  
-  > `[WATCH LOCAL BROADCAST STREAM]  [NWS RADAR DISCUSSION]  [MUTE AUDIO CUE]`
-- Web Audio API generates a subtle, low-frequency 440Hz -> 880Hz alert chime (configurable in settings, muted by default).
+#### Implemented Components
+1. **Station Registry (`observatory/lib/local-stations.mjs`):**
+   - Curated registry of 25+ major US media markets and NWS WFOs (Nashville `OHX`, Cincinnati/Dayton `ILN`, Indianapolis `IND`, Cleveland `CLE`, Charleston `RLX`, Chicago `LOT`, Dallas `FWD`, Houston `HGX`, Atlanta `FFC`, New York `OKX`, Philadelphia `PHI`, Washington/Baltimore `LWX`, Pittsburgh `PBZ`, Miami `MFL`, Tampa `TBW`, Orlando `MLB`, St. Louis `LSX`, Kansas City `EAX`, Oklahoma City `OUN`, Denver `BOU`, Seattle `SEW`, Los Angeles `LOX`, etc.).
+   - Includes direct links to WFO Portals, Area Forecast Discussions (AFD), single-site NEXRAD radar streams, and hourly graph soundings.
+   - Includes verified live broadcast streams (e.g. WSMV 4 NBC, NewsChannel 5 CBS, WKRN 2 ABC, FOX 17 Nashville, WFAA Dallas, KPRC Houston, WSB Atlanta, etc.).
+2. **REST API Endpoint (`observatory/server.mjs`):**
+   - `GET /api/weather/local-station?zip={zip}&lat={lat}&lon={lon}`
+   - Resolves coordinates via cached `geocodeZip()`, queries NOAA points API with fallback, and enriches station metadata.
+3. **Cockpit UI & Interactive Modal (`cockpit.html` & `app.js`):**
+   - Location bar features `#local-station-btn` with dynamic market pill.
+   - Clicking opens `#local-station-modal` displaying official NWS links and one-click access to local newsroom live coverage during severe weather events.
 
 ---
 
-## 3. Pillar 2: Deterministic Verification Engine (DVE) Integration
+## 3. Completed Today: Pillar 1.5 — Gladeville Standard & Temporal Engine (NEW)
 
-### 3.1 DVE Overview & Doctrine
+> **Status:** **100% Implemented & Deployed** (Added to resolve local grounding and user timezone control).
+
+### 3.1 Founder & Platform Standard Default: Gladeville, TN 37090
+- **Home Base Grounding:** All clean browser sessions default to **Gladeville, TN 37090** (`lat: 36.12, lng: -86.26`), centering desktop, preview, and fullscreen maps at Zoom 7 with NWS Nashville (`OHX`, Radar `KOHX`) preloaded.
+- **USPS / Postal District Override:** Standard postal databases catalog ZIP `37090` under Lebanon, TN. The backend (`geocodeZip` and `resolveLocalStation`) explicitly overrides `37090` and local Wilson County coordinates to correctly label and note the location as **Gladeville, TN 37090**.
+
+### 3.2 Dynamic Temporal Engine & Timezone Selector Modal
+- **Central Time Ecosystem Standard:** Default timezone across all telemetry clocks, radar frames, and ledger streams is set to **Central Time (`America/Chicago`)**.
+- **Interactive Topbar Clock:** The `#utc-clock` element is now an interactive control button styled with hover highlights and dynamic timezone abbreviations (e.g. `20:20:15 CDT`).
+- **Timezone Picker Modal (`#timezone-picker-modal`):**
+  - **Standard Presets:** Central Time (Gladeville Default), Eastern Time, Mountain Time, Mountain Standard (Arizona - No DST), Pacific Time, Alaska Time, Hawaii-Aleutian Standard Time, and UTC Scientific Reference.
+  - **Auto-Detection:** One-click option to auto-detect the user's browser timezone via `Intl.DateTimeFormat`.
+  - **Custom IANA Input:** Allows advanced subscribers to input any valid IANA identifier (e.g., `Europe/London`, `Asia/Tokyo`) with instant syntax validation.
+- **Platform-Wide Synchronization:**
+  - **Event Ledger:** Event timestamps format in the active timezone (`HH:MM [TZ]`) with instant live re-render upon switching.
+  - **Radar Animation Loop:** Loop indicator updates with real-time frame timestamps (e.g. `LIVE • 20:15 CDT` or `-20m • 19:55 CDT`).
+  - **Meteorological Advisories:** Advisory expiration times display in active local time.
+  - **Cross-Page Consistency:** `explorer.html` and `stream.html` respect user timezone preferences stored in `localStorage.getItem('observatory_timezone')`.
+
+---
+
+## 4. Completed Today: Production Hardening & Radar Fixes (SHIPPED)
+
+> **Status:** **100% Implemented & Deployed**
+
+1. **Radar Zoom Vanishing Fix:**
+   - **Root Cause Identified:** RainViewer free composite radar tiles physically only exist up to Zoom 7. Zoom 8+ returns empty 1,370-byte transparent PNGs.
+   - **Resolution:** Enforced `maxNativeZoom: 7, maxZoom: 19` across both desktop and fullscreen radar/precip layers. Leaflet now mathematically scales Zoom 7 tiles when zooming into county/neighborhood levels, eliminating radar disappearances.
+   - **Fallback Protection:** Enforced `maxNativeZoom: 8, maxZoom: 19` on Iowa State Mesonet NEXRAD composites.
+2. **Cockpit Layout & Filter Button Restoration:**
+   - Discovered that an unclosed `<div class="level-menu" id="level-menu">` trapped `#weather-filter-modal` inside a `display: none` container.
+   - Added closing tag, fully restoring the `⚙ FILTERS` button and interactive layers menu.
+3. **Server Stability & Caching:**
+   - Replaced un-cached client Nominatim calls with server-side cached `geocodeZip()`.
+   - Added top-level process crash handlers (`uncaughtException`, `unhandledRejection`) in `server.mjs`.
+   - Wrapped `createServer` in an outer error boundary to guarantee JSON 500 responses rather than dropped sockets.
+   - Enforced memory limits with LRU eviction across all in-memory caches.
+   - Bumped service worker cache to `observatory-v21`.
+
+---
+
+## 5. Next Phase: Deterministic Verification Engine (DVE) Integration
+
+### 5.1 DVE Overview & Doctrine
 - **Doctrine Alignment:** Occupies **Doctrines 13–17** of the 42-Doctrine Ladder: **Constraint & Determinacy**.
 - **Repository:** `D:\dve`
 - **Current Stack:** Express 5 ESM backend, React + Vite Apex UI, PostgreSQL via Drizzle ORM, `yt-dlp`, `faster-whisper`, OpenCV frame analysis.
 - **Core Principle:** DVE does not output subjective opinions or editorial verdicts. It outputs an **inspectable claim record** with timestamped telemetry cross-checks.
 
-### 3.2 Four-Stage Verification Pipeline (Integrated with Observatory)
+### 5.2 Four-Stage Verification Pipeline (Integrated with Observatory)
 
 ```mermaid
 sequenceDiagram
@@ -109,42 +125,33 @@ sequenceDiagram
     Obs-->>User: Interactive Verification Card with Auditable Telemetry
 ```
 
-### 3.3 Stage 4: Observatory Correlation Logic
+### 5.3 Stage 4: Observatory Correlation Logic
 When DVE inspects an atmospheric or anomalous weather claim:
-1. **Radar Check:** Queries `/api/feed/radar/archive?time={t}&lat={lat}&lon={lon}`. Did NEXRAD detect reflectivity? Was it meteorological precipitation, biological scatter (birds/insects), or ground clutter?
-2. **Satellite Cloud-Top Check:** Queries GOES-East/West Band 13 (clean infrared) and Band 2 (visible). What was the cloud-top temperature and altitude? Was the formation standard cirrostratus or an anomalous plume?
+1. **Radar Check:** Queries `/api/feed/radar/archive?time={t}&lat={lat}&lon={lon}`. Did NEXRAD detect reflectivity? Was it meteorological precipitation, biological scatter, or ground clutter?
+2. **Satellite Cloud-Top Check:** Queries GOES-East/West Band 13 (clean infrared) and Band 2 (visible). What was cloud-top temperature and altitude?
 3. **Lightning & Energy Check:** Queries NOAA GLM (Geostationary Lightning Mapper). Was optical energy detected in the column?
 4. **Ionospheric Transmitter Check:** Queries HAARP / Poker Flat / Millstone Hill transmitter schedules. Were any high-frequency heaters transmitting during that window?
 5. **Verdict Generation:**
    - `VERIFIED_PHYSICAL_EVENT`: Video matches physical sensor telemetry within ±5 minutes and ±10 km.
-   - `NATURAL_PHENOMENON`: Video is real, but claim of "artificial / geoengineered pulse" is refuted by natural meteorological Doppler characteristics.
+   - `NATURAL_PHENOMENON`: Video is real, but claim of "geoengineered pulse" is refuted by natural Doppler signatures.
    - `SYNTHETIC_OR_TAMPERED`: Temporal inconsistencies, deepfake facial/audio markers, or generative AI artifacts detected.
-   - `UNVERIFIABLE`: Telemetry unavailable (e.g. outside NEXRAD/GOES coverage) or source lacks verifiable timestamp.
+   - `UNVERIFIABLE`: Telemetry unavailable or source lacks verifiable timestamp.
 
 ---
 
-## 4. Pillar 3: Atmospheric & Geological Anomaly Field Catalog
+## 6. Next Phase: Atmospheric & Geological Anomaly Field Catalog
 
-### 4.1 Concept & Value
-Subscribers often observe rare, fleeting, or unexplained phenomena that traditional meteorological apps discard. The Anomaly Field Catalog turns subscribers into **verified field observers**, while ensuring zero hoax infiltration.
+### 6.1 Concept & Value
+Subscribers often observe rare, fleeting, or unexplained phenomena that traditional apps discard. The Anomaly Field Catalog turns subscribers into **verified field observers**, while ensuring zero hoax infiltration.
 
-### 4.2 Taxonomic Structure
-1. **Transient Luminous Events (TLEs):**
-   - Red Sprites, Elves, Blue Jets, Gigantic Jets, Halos.
-   - Cross-referenced against GLM strike clusters and thunderstorm tops.
-2. **Anomalous Cloud & Wave Dynamics:**
-   - Undulatus Asperitas, Kelvin-Helmholtz billows, Fallstreak (hole-punch) clouds, Pyrocumulonimbus, Noctilucent clouds.
-   - Cross-referenced against atmospheric soundings and GOES moisture channels.
-3. **Ionospheric & Upper Atmospheric:**
-   - STEVE (Strong Thermal Emission Velocity Enhancement), Stable Auroral Red (SAR) arcs, geomagnetic storm pulsations.
-   - Cross-referenced against Kiruna Schumann, ACE/DSCOVR solar wind, and NOAA Kp index.
-4. **Marine & Hydrological:**
-   - Milky Sea bioluminescence, rogue wave seismic signatures, coastal tide recessions.
-   - Cross-referenced against NDBC ocean buoys and USGS coastal seismometers.
-5. **Unclassified Anomaly Queue:**
-   - Observations that passed strict DVE media authentication but lack standard physical classification.
+### 6.2 Taxonomic Structure
+1. **Transient Luminous Events (TLEs):** Red Sprites, Elves, Blue Jets, Gigantic Jets, Halos. Cross-referenced against GLM strike clusters and thunderstorm tops.
+2. **Anomalous Cloud & Wave Dynamics:** Undulatus Asperitas, Kelvin-Helmholtz billows, Fallstreak (hole-punch) clouds, Pyrocumulonimbus, Noctilucent clouds.
+3. **Ionospheric & Upper Atmospheric:** STEVE, Stable Auroral Red (SAR) arcs, geomagnetic pulsations. Cross-referenced against Kiruna Schumann, ACE/DSCOVR solar wind, and Kp index.
+4. **Marine & Hydrological:** Milky Sea bioluminescence, rogue wave seismic signatures, coastal tide recessions.
+5. **Unclassified Anomaly Queue:** Observations passing strict DVE media authentication but lacking standard physical classification.
 
-### 4.3 Database Schema (`truth` PostgreSQL)
+### 6.3 Database Schema (`truth` PostgreSQL)
 ```sql
 CREATE TABLE anomaly_entries (
     id VARCHAR(64) PRIMARY KEY, -- ano_<sha256_short>
@@ -172,43 +179,36 @@ CREATE INDEX idx_anomaly_time ON anomaly_entries(observed_at);
 
 ---
 
-## 5. Pillar 4: Monetization, Packaging & Phased Rollout
+## 7. Monetization, Packaging & Updated Phased Roadmap
 
-### 5.1 Pricing Structure
+### 7.1 Pricing Structure
 
 | Tier | Price | Status | Inclusions |
 |------|-------|--------|------------|
-| **Founding Pioneer** | **$5.00 / month** | **Launch v1.0 (Active Today)** | Lifetime grandfathered rate. Full Cockpit, Radar Loop, NWS Warnings, Aircraft Tracker, Research Transmitters, Ecology Index, 24h CSV Exports. |
-| **Sentinel Research** | **$8.99 / month** | **Launch v2.0 (In 4–6 Weeks)** | Everything in v1.0 + DVE Media Verification Workspace (5 full video audits/mo), Anomaly Field Catalog access & submissions, SMS emergency warnings, high-res telemetry downloads. |
+| **Founding Pioneer** | **$5.00 / month** | **Live in Production (v1.1)** | Lifetime grandfathered rate. Full Cockpit, High-Res Radar Loop, Gladeville/Central default, Timezone Selector, Local NWS Station Intel, Local News Emergency Livestreams, Aircraft Tracker, Research Transmitters, Ecology Index, 24h CSV Exports. |
+| **Sentinel Research** | **$8.99 / month** | **Phase 2 (In 3–4 Weeks)** | Everything in v1.1 + DVE Media Verification Workspace (5 full video audits/mo), Anomaly Field Catalog access & submissions, SMS emergency warnings, high-res telemetry downloads. |
 | **Institutional / API** | **$49.00 / month** | **Phase 3** | Commercial API key, unlimited DVE checks, raw netCDF4 radar/satellite extracts. |
 
-### 5.2 Implementation Roadmap
+### 7.2 Updated Gantt Roadmap
 
 ```mermaid
 gantt
-    title Truth Observatory Roadmap (v1.0 -> v2.0)
+    title Truth Observatory Roadmap (v1.1 Deployed -> v2.0)
     dateFormat  YYYY-MM-DD
-    section Phase 1 (Today)
-    Radar Zoom & CDN Loop Hardening        :done, 2026-10-14, 1d
-    Production Server Hardening & Caching  :active, 2026-10-14, 2d
-    v1.0 Public Launch ($5/mo)             :2026-10-16, 5d
-    section Phase 2 (Next 3-4 Weeks)
-    NWS WFO & Local News Stream Connector   :2026-10-21, 7d
-    DVE Stage 4 Telemetry Bridge Engine    :2026-10-28, 10d
-    Anomaly Field Catalog UI & Intake Form :2026-11-05, 8d
+    section Phase 1 (Completed Today)
+    Radar Zoom Tile Fix (maxNativeZoom 7)  :done, 2026-10-14, 1d
+    Cockpit Layout & Modal Fixes          :done, 2026-10-14, 1d
+    Production Server Hardening & Caching :done, 2026-10-14, 1d
+    Local Station Intel & DMA Streams     :done, 2026-10-14, 1d
+    Gladeville TN 37090 Default Grounding :done, 2026-10-14, 1d
+    Timezone Engine & Selector Modal      :done, 2026-10-14, 1d
+    v1.1 Deployed & Active                :done, 2026-10-14, 1d
+    section Phase 2 (Next 2-3 Weeks)
+    DVE Stage 4 Telemetry Bridge Engine   :2026-10-21, 10d
+    Anomaly Field Catalog UI & Intake     :2026-10-31, 8d
     section Phase 3 (Rollout)
-    v2.0 Release & $8.99 Tier Price Cutover :2026-11-15, 3d
+    v2.0 Release & $8.99 Price Cutover    :2026-11-10, 4d
 ```
 
 ---
-
-## 6. Production Hardening Checklist for Today (v1.0)
-
-1. **ZIP Geocoding Hardening:** Replace external un-cached Nominatim calls in `/api/weather/alerts` with the internal cached `geocodeZip()` helper.
-2. **Process Crash Immunity:** Add `uncaughtException` and `unhandledRejection` guards in `server.mjs`.
-3. **Request Protection:** Wrap `createServer` handler in a root try/catch block to guarantee graceful 500 JSON responses rather than socket hang-ups.
-4. **Tile Fallbacks:** Ensure Iowa State Mesonet fallback radar has `maxNativeZoom: 8, maxZoom: 19` so radar never drops out if RainViewer CDN latency spikes.
-5. **Memory Cap:** Enforce LRU eviction caps on all in-memory caches (`zipCache`, `pointAlertsCache`, `nwsWarningsCache`).
-
----
-*Authored by Antigravity AI for DarkWave Studios LLC · 2026*
+*Authored by Antigravity AI for DarkWave Studios LLC · Updated 2026-10-14*
