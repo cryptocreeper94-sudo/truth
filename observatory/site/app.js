@@ -2981,7 +2981,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
   // ═══════════════════════════════════════════════════════════════
   fullscreenMap: null,
   fsBaseLayer: null,
-  fsMapStyle: 'light',
+  fsMapStyle: 'dark',
   fsMapLayers: {},
   animFrames: [],
   animLayers: [],
