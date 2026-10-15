@@ -40,7 +40,7 @@ const LiveStatus = {
       if (f && f.status === 'live') this.markLive(cardId);
     }
 
-    const total = data.total || feeds.length || 20;
+    const total = data.total || feeds.length || 19;
     const live = data.live != null ? data.live : feeds.filter(f => f.status === 'live').length;
 
     // Update the hero badge count

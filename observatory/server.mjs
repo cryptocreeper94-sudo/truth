@@ -18,7 +18,7 @@ import { createServer } from 'http';
 import { readFileSync, existsSync, readdirSync, statSync } from 'fs';
 import { join, extname, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { randomBytes, createHmac } from 'crypto';
+import { randomBytes, randomInt, createHmac, createHash, timingSafeEqual } from 'crypto';
 import { gzipSync, gunzipSync } from 'zlib';
 import { generateDailyBrief, getCurrentBrief } from './brief-generator.mjs';
 import { readTail, tailLines, parseLines, segmentsFor, segmentDay, segmentLines, feedArchiveDir, archiveRoot } from './lib/manifest-ledger.mjs';
@@ -80,6 +80,7 @@ async function geocodeZip(zip) {
 // Stripe & Database Configuration (dynamic imports — graceful degradation)
 // ═══════════════════════════════════════════════════════════════════════════
 let stripe = null;
+let StripeLib = null; // Stripe class (static webhook verification works without STRIPE_SECRET_KEY)
 let pool = null;
 
 const STRIPE_PRICE_ID = process.env.STRIPE_PRICE_ID || '';
@@ -91,6 +92,7 @@ const PK_KEY = process.env.STRIPE_PUBLISHABLE_KEY || '';
 // Load Stripe (optional — server starts without it)
 try {
   const Stripe = (await import('stripe')).default;
+  StripeLib = Stripe;
   stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', { apiVersion: '2024-12-18.acacia' });
   console.log('[OBSERVATORY] Stripe loaded');
 } catch (err) {
@@ -130,6 +132,19 @@ async function initDatabase() {
         created_at TIMESTAMPTZ DEFAULT NOW(),
         expires_at TIMESTAMPTZ DEFAULT NOW() + INTERVAL '30 days'
       );
+      CREATE TABLE IF NOT EXISTS auth_tokens (
+        id SERIAL PRIMARY KEY,
+        email TEXT NOT NULL,
+        kind TEXT NOT NULL,
+        code_hash TEXT,
+        token_hash TEXT NOT NULL,
+        sub_id INTEGER,
+        attempts INTEGER NOT NULL DEFAULT 0,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        expires_at TIMESTAMPTZ NOT NULL,
+        UNIQUE (email, kind)
+      );
+      CREATE INDEX IF NOT EXISTS auth_tokens_token_hash_idx ON auth_tokens (token_hash);
     `);
     console.log('[OBSERVATORY] Database tables ready');
   } catch (err) {
@@ -196,7 +211,104 @@ const SUBSCRIBER_WHITELIST = new Set([
   'jason@livfitoken.com'
 ]);
 
-const AUTH_CODES = new Map(); // key: email, value: { code, token, expiresAt, subId }
+// ── Auth hardening helpers ──────────────────────────────────────────────
+// Auth codes / magic-link tokens live in Postgres (table auth_tokens) so they survive
+// restarts and deploys. Only HMAC hashes are stored — never the raw code or token.
+const SESSION_SECRET_IS_CUSTOM = !!process.env.SESSION_SECRET && process.env.SESSION_SECRET !== 'dev-secret-change-me';
+if (!SESSION_SECRET_IS_CUSTOM) {
+  console.warn('[AUTH] SESSION_SECRET is not set — dev bypass is disabled until it is configured.');
+}
+const MAX_CODE_ATTEMPTS = 5;
+const AUTH_CODE_TTL_SECONDS = 15 * 60;
+const WELCOME_TOKEN_TTL_SECONDS = 24 * 60 * 60;
+const DEV_AUTH_MAX_FAILURES = 5;
+const DEV_AUTH_LOCKOUT_MS = 15 * 60 * 1000;
+const DEV_BYPASS_TTL_SECONDS = 30 * 24 * 60 * 60;
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const GENERIC_CODE_REPLY = { ok: true, message: 'If that email has an active subscription, an access code is on its way.' };
+
+function hmacHex(label, value) {
+  return createHmac('sha256', SESSION_SECRET).update(`${label}:${value}`).digest('hex');
+}
+
+function safeEqualStr(a, b) {
+  const ab = Buffer.from(String(a));
+  const bb = Buffer.from(String(b));
+  return ab.length === bb.length && timingSafeEqual(ab, bb);
+}
+
+// Client IP as seen by the reverse proxy: the proxy appends the real peer address
+// to X-Forwarded-For, so the right-most entry cannot be spoofed by the client.
+function getClientIp(req) {
+  const parts = String(req.headers['x-forwarded-for'] || '').split(',').map(s => s.trim()).filter(Boolean);
+  if (parts.length) return parts[parts.length - 1];
+  return req.socket?.remoteAddress || 'unknown';
+}
+
+// In-memory fixed-window rate limiter (per process).
+const RATE_BUCKETS = new Map();
+function rlHit(key, windowMs) {
+  const now = Date.now();
+  let b = RATE_BUCKETS.get(key);
+  if (!b || b.resetAt <= now) {
+    b = { count: 0, resetAt: now + windowMs };
+    RATE_BUCKETS.set(key, b);
+  }
+  b.count++;
+  return b.count;
+}
+function rlCount(key) {
+  const b = RATE_BUCKETS.get(key);
+  return b && b.resetAt > Date.now() ? b.count : 0;
+}
+function rateLimited(key, max, windowMs) {
+  return rlHit(key, windowMs) > max;
+}
+setInterval(() => {
+  const now = Date.now();
+  for (const [k, b] of RATE_BUCKETS) if (b.resetAt <= now) RATE_BUCKETS.delete(k);
+  if (pool) pool.query(`DELETE FROM auth_tokens WHERE expires_at < NOW() - INTERVAL '1 day'`).catch(() => {});
+}, 5 * 60 * 1000).unref();
+
+async function storeAuthToken({ email, kind, code, token, ttlSeconds, subId }) {
+  await pool.query(
+    `INSERT INTO auth_tokens (email, kind, code_hash, token_hash, sub_id, attempts, created_at, expires_at)
+     VALUES ($1, $2, $3, $4, $5, 0, NOW(), NOW() + make_interval(secs => $6::double precision))
+     ON CONFLICT (email, kind) DO UPDATE SET
+       code_hash = EXCLUDED.code_hash,
+       token_hash = EXCLUDED.token_hash,
+       sub_id = EXCLUDED.sub_id,
+       attempts = 0,
+       created_at = NOW(),
+       expires_at = EXCLUDED.expires_at`,
+    [email, kind, code ? hmacHex('code', `${email}:${code}`) : null, hmacHex('token', token), subId || null, ttlSeconds]
+  );
+}
+
+async function createSessionFor(res, subId, days) {
+  const sid = randomBytes(32).toString('hex');
+  await pool.query(
+    `INSERT INTO sessions (id, subscriber_id, expires_at) VALUES ($1, $2, NOW() + make_interval(days => $3::int))`,
+    [sid, subId, days]
+  );
+  setSessionCookie(res, sid);
+}
+
+// Dev bypass: a random-looking, expiring, HMAC-signed token — never the admin password.
+function makeDevBypassToken() {
+  const exp = Date.now() + DEV_BYPASS_TTL_SECONDS * 1000;
+  return `${exp}.${hmacHex('dev-bypass', exp)}`;
+}
+function hasDevBypass(req) {
+  if (!ADMIN_PASSWORD || !SESSION_SECRET_IS_CUSTOM) return false;
+  const token = parseCookies(req).obs_dev_bypass;
+  if (!token) return false;
+  const dot = token.indexOf('.');
+  if (dot < 1) return false;
+  const exp = Number(token.slice(0, dot));
+  if (!Number.isFinite(exp) || exp <= Date.now()) return false;
+  return safeEqualStr(token.slice(dot + 1), hmacHex('dev-bypass', exp));
+}
 
 async function sendResendEmail({ to, subject, html, text }) {
   const apiKey = process.env.RESEND_API_KEY;
@@ -243,13 +355,33 @@ function isSubscribed(subscriber) {
 // ═══════════════════════════════════════════════════════════════════════════
 // Request Body Parser
 // ═══════════════════════════════════════════════════════════════════════════
-function readBody(req) {
+function readBody(req, maxBytes = Infinity) {
   return new Promise((resolve, reject) => {
     const chunks = [];
-    req.on('data', c => chunks.push(c));
+    let size = 0;
+    req.on('data', c => {
+      size += c.length;
+      if (size > maxBytes) {
+        reject(Object.assign(new Error('Payload too large'), { statusCode: 413 }));
+        req.destroy();
+        return;
+      }
+      chunks.push(c);
+    });
     req.on('end', () => resolve(Buffer.concat(chunks)));
     req.on('error', reject);
   });
+}
+
+// Size-capped JSON body parser. Throws an Error carrying .statusCode (400/413).
+async function readJson(req, maxBytes = 8 * 1024) {
+  const raw = await readBody(req, maxBytes);
+  try {
+    const value = JSON.parse(raw.toString() || '{}');
+    return value && typeof value === 'object' ? value : {};
+  } catch {
+    throw Object.assign(new Error('Invalid JSON'), { statusCode: 400 });
+  }
 }
 
 function jsonResponse(res, status, data) {
@@ -1285,18 +1417,23 @@ const server = createServer(async (req, res) => {
   }
 
   if (path === '/api/webhook' && req.method === 'POST') {
-    const body = await readBody(req);
-    const sig = req.headers['stripe-signature'];
+    // Fail closed: an event is only trusted if Stripe's signature verifies.
+    // Unconfigured => 503 so Stripe keeps retrying (and replays the events once
+    // STRIPE_WEBHOOK_SECRET is set); unsigned => 400.
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+    if (!StripeLib || !webhookSecret) {
+      console.error('[WEBHOOK] Rejected: STRIPE_WEBHOOK_SECRET is not configured');
+      return jsonResponse(res, 503, { error: 'Webhook not configured' });
+    }
+    let body;
+    try { body = await readBody(req, 1024 * 1024); }
+    catch { return jsonResponse(res, 413, { error: 'Payload too large' }); }
+    const sig = req.headers['stripe-signature'];
+    if (!sig) return jsonResponse(res, 400, { error: 'Missing signature' });
 
     let event;
-    if (webhookSecret && sig && stripe) {
-      try { event = stripe.webhooks.constructEvent(body, sig, webhookSecret); }
-      catch (err) { console.error('[WEBHOOK] Signature failed:', err.message); return jsonResponse(res, 400, { error: 'Invalid signature' }); }
-    } else {
-      try { event = JSON.parse(body.toString()); }
-      catch { return jsonResponse(res, 400, { error: 'Invalid JSON' }); }
-    }
+    try { event = StripeLib.webhooks.constructEvent(body, sig, webhookSecret); }
+    catch (err) { console.error('[WEBHOOK] Signature failed:', err.message); return jsonResponse(res, 400, { error: 'Invalid signature' }); }
 
     if (pool) {
       try {
@@ -1306,22 +1443,22 @@ const server = createServer(async (req, res) => {
           const customerId = session.customer;
           const subscriptionId = typeof session.subscription === 'object' ? session.subscription?.id : session.subscription;
           if (email) {
-            await pool.query(
+            const upsert = await pool.query(
               `INSERT INTO subscribers (email, stripe_customer_id, stripe_subscription_id, status, updated_at)
                VALUES ($1, $2, $3, 'active', NOW())
                ON CONFLICT (email) DO UPDATE SET
                  stripe_customer_id = COALESCE(EXCLUDED.stripe_customer_id, subscribers.stripe_customer_id),
                  stripe_subscription_id = COALESCE(EXCLUDED.stripe_subscription_id, subscribers.stripe_subscription_id),
                  status = 'active',
-                 updated_at = NOW()`,
+                 updated_at = NOW()
+               RETURNING id`,
               [email, customerId, subscriptionId]
             );
             console.log(`[WEBHOOK] Checkout session completed for ${email} (${customerId})`);
 
-            // Send instant welcome email with magic link
+            // Send instant welcome email with magic link (token persisted in Postgres, 24h)
             const token = randomBytes(32).toString('hex');
-            const expiresAt = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
-            AUTH_CODES.set(email, { code: 'WELCOME', token, expiresAt });
+            await storeAuthToken({ email, kind: 'welcome', code: null, token, ttlSeconds: WELCOME_TOKEN_TTL_SECONDS, subId: upsert.rows[0]?.id || null });
             const magicLink = `${SITE_URL}/api/auth/magic?token=${token}`;
 
             await sendResendEmail({
@@ -1332,7 +1469,7 @@ const server = createServer(async (req, res) => {
                 <div style="font-family:'Courier New',Courier,monospace;background:#0a0e14;color:#d4dae3;padding:32px;border-radius:6px;max-width:520px;margin:0 auto;border:1px solid rgba(255,255,255,0.1);">
                   <div style="font-size:11px;color:#00d2ff;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:8px;">Truth Observatory</div>
                   <h2 style="color:#fff;margin-top:0;font-size:20px;letter-spacing:0.05em;">Welcome to Full Access</h2>
-                  <p style="color:#8b95a5;font-size:14px;line-height:1.6;">Your subscription is confirmed. You now have complete access to all 20 real-time streams, interactive layers, pattern detection, and verified data exports.</p>
+                  <p style="color:#8b95a5;font-size:14px;line-height:1.6;">Your subscription is confirmed. You now have complete access to all 19 real-time streams, interactive layers, pattern detection, and verified data exports.</p>
                   <div style="text-align:center;margin:28px 0;">
                     <a href="${magicLink}" style="display:inline-block;background:#00d2ff;color:#0a0e14;padding:12px 32px;text-decoration:none;font-weight:700;font-size:13px;border-radius:3px;letter-spacing:0.05em;">ENTER THE COCKPIT &rarr;</a>
                   </div>
@@ -1367,55 +1504,62 @@ const server = createServer(async (req, res) => {
   }
 
   // ── Subscriber Auth & Magic Link Routes ─────────────────────────────
+  // Codes and magic-link tokens are stored (hashed) in Postgres, so they survive
+  // restarts/deploys. Codes come from crypto.randomInt, allow MAX_CODE_ATTEMPTS
+  // guesses, and request-code replies identically whether or not the email
+  // belongs to a subscriber (no account enumeration).
   if (path === '/api/auth/request-code' && req.method === 'POST') {
+    if (!pool) return jsonResponse(res, 503, { error: 'Sign-in is temporarily unavailable. Please try again shortly.' });
+    if (rateLimited(`reqcode:ip:${getClientIp(req)}`, 10, 15 * 60 * 1000)) {
+      return jsonResponse(res, 429, { error: 'Too many requests. Please wait a few minutes and try again.' });
+    }
     try {
-      const body = await readBody(req);
-      const { email: rawEmail } = JSON.parse(body);
-      const email = (rawEmail || '').toLowerCase().trim();
-      if (!email || !email.includes('@')) {
+      const { email: rawEmail } = await readJson(req);
+      const email = String(rawEmail || '').toLowerCase().trim();
+      if (!email || email.length > 254 || !EMAIL_RE.test(email)) {
         return jsonResponse(res, 400, { error: 'Please enter a valid email address.' });
       }
 
       let isAllowed = SUBSCRIBER_WHITELIST.has(email);
       let subId = null;
 
-      if (pool) {
-        const result = await pool.query(
-          'SELECT id, status FROM subscribers WHERE LOWER(email) = $1',
-          [email]
-        );
-        if (result.rows.length > 0) {
-          subId = result.rows[0].id;
-          if (result.rows[0].status === 'active' || result.rows[0].status === 'trialing') {
-            isAllowed = true;
-          }
-        } else if (isAllowed) {
-          const inserted = await pool.query(
-            `INSERT INTO subscribers (email, stripe_customer_id, status, created_at, updated_at)
-             VALUES ($1, $2, 'active', NOW(), NOW())
-             ON CONFLICT (email) DO UPDATE SET status = 'active', updated_at = NOW()
-             RETURNING id`,
-            [email, `whitelist_${Buffer.from(email).toString('hex').slice(0, 16)}`]
-          );
-          subId = inserted.rows[0]?.id;
+      const result = await pool.query(
+        'SELECT id, status FROM subscribers WHERE LOWER(email) = $1',
+        [email]
+      );
+      if (result.rows.length > 0) {
+        subId = result.rows[0].id;
+        if (result.rows[0].status === 'active' || result.rows[0].status === 'trialing') {
+          isAllowed = true;
         }
+      } else if (isAllowed) {
+        const inserted = await pool.query(
+          `INSERT INTO subscribers (email, stripe_customer_id, status, created_at, updated_at)
+           VALUES ($1, $2, 'active', NOW(), NOW())
+           ON CONFLICT (email) DO UPDATE SET status = 'active', updated_at = NOW()
+           RETURNING id`,
+          [email, `whitelist_${Buffer.from(email).toString('hex').slice(0, 16)}`]
+        );
+        subId = inserted.rows[0]?.id;
       }
 
-      if (!isAllowed) {
-        return jsonResponse(res, 404, {
-          error: 'No active subscription found for this email. If you just subscribed, please allow a moment or contact team@dwsc.io.'
-        });
-      }
+      // Same reply for non-subscribers and throttled requests.
+      if (!isAllowed) return jsonResponse(res, 200, GENERIC_CODE_REPLY);
+      if (rateLimited(`reqcode:email:${email}`, 5, 60 * 60 * 1000)) return jsonResponse(res, 200, GENERIC_CODE_REPLY);
+      const recent = await pool.query(
+        `SELECT 1 FROM auth_tokens WHERE email = $1 AND kind = 'code' AND created_at > NOW() - INTERVAL '60 seconds'`,
+        [email]
+      );
+      if (recent.rowCount > 0) return jsonResponse(res, 200, GENERIC_CODE_REPLY);
 
-      const code = String(Math.floor(100000 + Math.random() * 900000));
+      const code = String(randomInt(100000, 1000000));
       const token = randomBytes(32).toString('hex');
-      const expiresAt = Date.now() + 15 * 60 * 1000; // 15 mins
-
-      AUTH_CODES.set(email, { code, token, expiresAt, subId });
+      await storeAuthToken({ email, kind: 'code', code, token, ttlSeconds: AUTH_CODE_TTL_SECONDS, subId });
 
       const magicLink = `${SITE_URL}/api/auth/magic?token=${token}`;
 
-      await sendResendEmail({
+      // Not awaited: response time is the same for subscribers and non-subscribers.
+      void sendResendEmail({
         to: email,
         subject: `Your Truth Observatory Access Code: ${code}`,
         text: `Your Truth Observatory access code is: ${code}\n\nOr click here to access the Cockpit directly:\n${magicLink}\n\nThis link and code expire in 15 minutes.`,
@@ -1435,80 +1579,90 @@ const server = createServer(async (req, res) => {
         `
       });
 
-      return jsonResponse(res, 200, { ok: true, message: 'Access code sent to your email.' });
+      return jsonResponse(res, 200, GENERIC_CODE_REPLY);
     } catch (err) {
+      if (err.statusCode) return jsonResponse(res, err.statusCode, { error: 'Invalid request.' });
       console.error('[AUTH] request-code error:', err.message);
       return jsonResponse(res, 500, { error: 'Failed to process login request.' });
     }
   }
 
   if (path === '/api/auth/verify-code' && req.method === 'POST') {
+    if (!pool) return jsonResponse(res, 503, { error: 'Sign-in is temporarily unavailable. Please try again shortly.' });
+    if (rateLimited(`verify:ip:${getClientIp(req)}`, 30, 15 * 60 * 1000)) {
+      return jsonResponse(res, 429, { error: 'Too many attempts. Please wait a few minutes and try again.' });
+    }
     try {
-      const body = await readBody(req);
-      const { email: rawEmail, code } = JSON.parse(body);
-      const email = (rawEmail || '').toLowerCase().trim();
-      const record = AUTH_CODES.get(email);
+      const { email: rawEmail, code: rawCode } = await readJson(req);
+      const email = String(rawEmail || '').toLowerCase().trim();
+      const code = String(rawCode ?? '').trim();
+      const invalid = () => jsonResponse(res, 400, { error: 'Invalid or expired access code.' });
+      if (!email || email.length > 254 || !/^\d{6}$/.test(code)) return invalid();
 
-      if (!record || record.expiresAt < Date.now() || record.code !== String(code).trim()) {
-        return jsonResponse(res, 400, { error: 'Invalid or expired access code.' });
+      // Count this attempt first; after MAX_CODE_ATTEMPTS the code is destroyed.
+      const attempt = await pool.query(
+        `UPDATE auth_tokens SET attempts = attempts + 1
+         WHERE email = $1 AND kind = 'code' AND expires_at > NOW()
+         RETURNING attempts`,
+        [email]
+      );
+      if (attempt.rowCount === 0) return invalid();
+      if (attempt.rows[0].attempts > MAX_CODE_ATTEMPTS) {
+        await pool.query(`DELETE FROM auth_tokens WHERE email = $1 AND kind = 'code'`, [email]);
+        return jsonResponse(res, 429, { error: 'Too many incorrect attempts. Please request a new code.' });
       }
 
-      AUTH_CODES.delete(email);
+      // Atomic check-and-consume: a correct code can only be used once.
+      const consumed = await pool.query(
+        `DELETE FROM auth_tokens
+         WHERE email = $1 AND kind = 'code' AND code_hash = $2 AND expires_at > NOW()
+         RETURNING sub_id`,
+        [email, hmacHex('code', `${email}:${code}`)]
+      );
+      if (consumed.rowCount === 0) return invalid();
 
-      let subId = record.subId;
-      if (!subId && pool) {
+      let subId = consumed.rows[0].sub_id;
+      if (!subId) {
         const sub = await pool.query('SELECT id FROM subscribers WHERE LOWER(email) = $1', [email]);
         subId = sub.rows[0]?.id;
       }
+      if (!subId) return invalid();
 
-      if (pool && subId) {
-        const sid = randomBytes(32).toString('hex');
-        await pool.query(
-          `INSERT INTO sessions (id, subscriber_id, expires_at) VALUES ($1, $2, NOW() + INTERVAL '90 days')`,
-          [sid, subId]
-        );
-        setSessionCookie(res, sid);
-      }
-
+      await createSessionFor(res, subId, 90);
       return jsonResponse(res, 200, { ok: true, redirect: '/cockpit' });
     } catch (err) {
+      if (err.statusCode) return jsonResponse(res, err.statusCode, { error: 'Invalid request.' });
       console.error('[AUTH] verify-code error:', err.message);
       return jsonResponse(res, 500, { error: 'Verification failed.' });
     }
   }
 
   if (path === '/api/auth/magic' && req.method === 'GET') {
-    const token = url.searchParams.get('token');
-    if (!token) return redirect(res, '/?error=invalid_token');
+    const token = url.searchParams.get('token') || '';
+    if (!pool || !/^[a-f0-9]{64}$/.test(token)) return redirect(res, '/?error=invalid_token');
+    if (rateLimited(`magic:ip:${getClientIp(req)}`, 30, 15 * 60 * 1000)) return redirect(res, '/?error=expired_token');
 
-    let matchedEmail = null;
-    let subId = null;
-    for (const [em, data] of AUTH_CODES.entries()) {
-      if (data.token === token && data.expiresAt > Date.now()) {
-        matchedEmail = em;
-        subId = data.subId;
-        AUTH_CODES.delete(em);
-        break;
-      }
-    }
-
-    if (!matchedEmail) return redirect(res, '/?error=expired_token');
-
-    if (!subId && pool) {
-      const sub = await pool.query('SELECT id FROM subscribers WHERE LOWER(email) = $1', [matchedEmail]);
-      subId = sub.rows[0]?.id;
-    }
-
-    if (pool && subId) {
-      const sid = randomBytes(32).toString('hex');
-      await pool.query(
-        `INSERT INTO sessions (id, subscriber_id, expires_at) VALUES ($1, $2, NOW() + INTERVAL '90 days')`,
-        [sid, subId]
+    try {
+      // Atomic single-use: the token is deleted as it is read.
+      const consumed = await pool.query(
+        `DELETE FROM auth_tokens WHERE token_hash = $1 AND expires_at > NOW() RETURNING email, sub_id`,
+        [hmacHex('token', token)]
       );
-      setSessionCookie(res, sid);
-    }
+      if (consumed.rowCount === 0) return redirect(res, '/?error=expired_token');
 
-    return redirect(res, '/cockpit?welcome=1');
+      let subId = consumed.rows[0].sub_id;
+      if (!subId) {
+        const sub = await pool.query('SELECT id FROM subscribers WHERE LOWER(email) = $1', [consumed.rows[0].email]);
+        subId = sub.rows[0]?.id;
+      }
+      if (!subId) return redirect(res, '/?error=expired_token');
+
+      await createSessionFor(res, subId, 90);
+      return redirect(res, '/cockpit?welcome=1');
+    } catch (err) {
+      console.error('[AUTH] magic-link error:', err.message);
+      return redirect(res, '/?error=setup');
+    }
   }
 
   if (path === '/api/auth/claim-session' && req.method === 'GET') {
@@ -1535,50 +1689,29 @@ const server = createServer(async (req, res) => {
     return jsonResponse(res, 200, { subscribed: false });
   }
 
+  // Billing portal — authenticated by the signed session cookie only.
+  // (The former email-only /api/portal-email route was removed: it was broken and,
+  // if repaired as written, would have handed a billing-portal link to anyone who
+  // typed a subscriber's email address.)
   if (path === '/api/portal' && req.method === 'POST') {
     const subscriber = await getSubscriberFromRequest(req);
-    if (!isSubscribed(subscriber)) return jsonResponse(res, 401, { error: 'Not subscribed' });
+    if (!isSubscribed(subscriber)) return jsonResponse(res, 401, { error: 'Please sign in with your subscriber email to manage billing.' });
+    if (!stripe || !process.env.STRIPE_SECRET_KEY) {
+      return jsonResponse(res, 503, { error: 'The billing portal is not available right now. Email team@dwsc.io and we will update or cancel your subscription.' });
+    }
+    const customerId = subscriber.stripe_customer_id || '';
+    if (!customerId || customerId.startsWith('whitelist_')) {
+      return jsonResponse(res, 400, { error: 'This is a complimentary account, so there is no billing to manage.' });
+    }
     try {
       const session = await stripe.billingPortal.sessions.create({
-        customer: subscriber.stripe_customer_id,
+        customer: customerId,
         return_url: `${SITE_URL}/cockpit`,
       });
       return jsonResponse(res, 200, { url: session.url });
     } catch (err) {
       console.error('[BILLING] Portal error:', err.message);
-      return jsonResponse(res, 500, { error: 'Portal unavailable' });
-    }
-  }
-
-  // Email-based portal — for Payment Link subscribers without session cookies
-  if (path === '/api/portal-email' && req.method === 'POST') {
-    if (!stripe || !pool) return jsonResponse(res, 503, { error: 'Billing not configured' });
-    try {
-      const { email } = JSON.parse(body);
-      if (!email) return jsonResponse(res, 400, { error: 'Email required' });
-      const result = await pool.query(
-        'SELECT stripe_customer_id, status FROM subscribers WHERE LOWER(email) = LOWER($1)',
-        [email]
-      );
-      if (result.rows.length === 0) {
-        // Try Stripe directly — Payment Link customers may not be in our DB yet
-        const customers = await stripe.customers.list({ email: email.toLowerCase(), limit: 1 });
-        if (customers.data.length === 0) return jsonResponse(res, 404, { error: 'No subscription found for this email' });
-        const session = await stripe.billingPortal.sessions.create({
-          customer: customers.data[0].id,
-          return_url: `${SITE_URL}/cockpit`,
-        });
-        return jsonResponse(res, 200, { url: session.url });
-      }
-      const sub = result.rows[0];
-      const session = await stripe.billingPortal.sessions.create({
-        customer: sub.stripe_customer_id,
-        return_url: `${SITE_URL}/cockpit`,
-      });
-      return jsonResponse(res, 200, { url: session.url });
-    } catch (err) {
-      console.error('[BILLING] Email portal error:', err.message);
-      return jsonResponse(res, 500, { error: 'Portal unavailable' });
+      return jsonResponse(res, 500, { error: 'The billing portal is unavailable right now. Email team@dwsc.io and we will update or cancel your subscription.' });
     }
   }
 
@@ -1598,19 +1731,29 @@ const server = createServer(async (req, res) => {
     return res.end(JSON.stringify({ status: 'ok', timestamp: new Date().toISOString(), feeds: FEEDS.length, billing: !!STRIPE_PRICE_ID }));
   }
 
-  // ── Dev Auth — validates admin password, sets bypass cookie ──────────
+  // ── Dev Auth — validates admin password, sets a signed, expiring bypass token ──
+  // The cookie never contains the password: it carries "<expiry>.<HMAC>" and is
+  // verified server-side (see hasDevBypass). Brute force is cut off by a global
+  // lockout (5 failures / 15 min) plus a per-IP lockout.
   if (path === '/api/dev-auth' && req.method === 'POST') {
-    if (!ADMIN_PASSWORD) return jsonResponse(res, 403, { error: 'Admin access not configured' });
+    if (!ADMIN_PASSWORD || !SESSION_SECRET_IS_CUSTOM) return jsonResponse(res, 403, { error: 'Admin access not configured' });
+    const ip = getClientIp(req);
+    if (rlCount('devauth:fail:global') >= DEV_AUTH_MAX_FAILURES || rlCount(`devauth:fail:ip:${ip}`) >= DEV_AUTH_MAX_FAILURES) {
+      return jsonResponse(res, 429, { error: 'Too many attempts. Try again later.' });
+    }
     try {
-      const body = await readBody(req);
-      const { password } = JSON.parse(body);
-      if (password === ADMIN_PASSWORD) {
+      const { password } = await readJson(req, 2048);
+      const supplied = createHash('sha256').update(String(password ?? '')).digest();
+      const expected = createHash('sha256').update(ADMIN_PASSWORD).digest();
+      if (timingSafeEqual(supplied, expected)) {
         res.writeHead(200, {
           'Content-Type': 'application/json',
-          'Set-Cookie': `obs_dev_bypass=${ADMIN_PASSWORD}; Path=/; Max-Age=31536000; SameSite=Lax; HttpOnly`,
+          'Set-Cookie': `obs_dev_bypass=${encodeURIComponent(makeDevBypassToken())}; Path=/; Max-Age=${DEV_BYPASS_TTL_SECONDS}; SameSite=Lax; HttpOnly; Secure`,
         });
         return res.end(JSON.stringify({ ok: true }));
       }
+      rlHit('devauth:fail:global', DEV_AUTH_LOCKOUT_MS);
+      rlHit(`devauth:fail:ip:${ip}`, DEV_AUTH_LOCKOUT_MS);
       return jsonResponse(res, 401, { error: 'Invalid code' });
     } catch { return jsonResponse(res, 400, { error: 'Bad request' }); }
   }
@@ -1866,8 +2009,7 @@ const server = createServer(async (req, res) => {
   // ── Geo API: ADS-B Aircraft (subscriber-only) ───────────────────────
   if (path === '/api/geo/aircraft') {
     // Subscriber-only
-    const cookies = parseCookies(req);
-    const devBypass = ADMIN_PASSWORD && cookies.obs_dev_bypass === ADMIN_PASSWORD;
+    const devBypass = hasDevBypass(req);
     if (!devBypass) {
       const subscriber = await getSubscriberFromRequest(req);
       if (!isSubscribed(subscriber)) return jsonResponse(res, 401, { error: 'Subscription required' });
@@ -2094,8 +2236,7 @@ const server = createServer(async (req, res) => {
   const PREMIUM_PAGES = ['/cockpit', '/explorer', '/stream'];
   if (PREMIUM_PAGES.some(p => path === p || path.startsWith(p + '?'))) {
     // Dev bypass: obs_dev_bypass cookie skips subscription check
-    const cookies = parseCookies(req);
-    const devBypass = ADMIN_PASSWORD && cookies.obs_dev_bypass === ADMIN_PASSWORD;
+    const devBypass = hasDevBypass(req);
     if (!devBypass) {
       const subscriber = await getSubscriberFromRequest(req);
       if (!isSubscribed(subscriber)) {

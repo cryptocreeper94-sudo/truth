@@ -25,12 +25,12 @@
     <div class="topbar__left">
       <span class="topbar__logo">&#9673;</span>
       <span class="topbar__title">TRUTH OBSERVATORY</span>
-      <span class="topbar__version">v3.0</span>
+      <span class="topbar__version">v1.1</span>
     </div>
     <div class="topbar__center">
       <div class="topbar__stat" data-info="stat-feeds">
         <span class="topbar__stat-label"><span data-label-key="stat.feeds">FEEDS</span> <span class="topbar__info-icon">ⓘ</span></span>
-        <span class="topbar__stat-value" id="stat-live">&mdash;/20</span>
+        <span class="topbar__stat-value" id="stat-live">&mdash;/19</span>
       </div>
       <div class="topbar__stat" data-info="stat-atmoscore">
         <span class="topbar__stat-label"><span data-label-key="stat.atmoscore">ATMOSCORE</span> <span class="topbar__info-icon">ⓘ</span></span>
@@ -68,8 +68,7 @@
   <div id="manage-sub-modal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.7);align-items:center;justify-content:center;">
     <div style="background:#1a1714;border:1px solid #d4a054;border-radius:8px;padding:2rem;max-width:400px;width:90%;font-family:var(--font-mono);">
       <h3 style="color:#d4a054;margin:0 0 0.5rem;font-size:1rem;letter-spacing:0.05em;">MANAGE SUBSCRIPTION</h3>
-      <p style="color:#a09080;font-size:0.75rem;margin:0 0 1rem;">Enter the email you used to subscribe. You'll be redirected to Stripe to manage billing, update payment, or cancel.</p>
-      <input id="portal-email" type="email" placeholder="your@email.com" style="width:100%;padding:0.7rem;background:#0d0b09;border:1px solid #3a3530;border-radius:4px;color:#e8dfd6;font-family:var(--font-mono);font-size:0.8rem;box-sizing:border-box;margin-bottom:0.75rem;">
+      <p style="color:#a09080;font-size:0.75rem;margin:0 0 1rem;">You'll be taken to Stripe's secure billing page for the account you're signed in with. Update your payment method, view invoices, or cancel anytime.</p>
       <p id="portal-error" style="color:#e05050;font-size:0.7rem;margin:0 0 0.75rem;display:none;"></p>
       <div style="display:flex;gap:0.75rem;">
         <button id="portal-submit" onclick="__manageSubscription()" style="flex:1;padding:0.7rem;background:#d4a054;color:#1a1714;border:none;border-radius:4px;cursor:pointer;font-family:var(--font-mono);font-weight:600;font-size:0.75rem;letter-spacing:0.05em;">OPEN BILLING PORTAL</button>
@@ -79,17 +78,16 @@
   </div>
   <script>
     async function __manageSubscription() {
-      const email = document.getElementById('portal-email').value.trim();
       const errEl = document.getElementById('portal-error');
       const btn = document.getElementById('portal-submit');
       errEl.style.display = 'none';
-      if (!email) { errEl.textContent = 'Please enter your email.'; errEl.style.display = 'block'; return; }
       btn.textContent = 'LOADING...'; btn.disabled = true;
       try {
-        const res = await fetch('/api/portal-email', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) });
-        const data = await res.json();
-        if (data.url) { window.location.href = data.url; }
-        else { errEl.textContent = data.error || 'No subscription found.'; errEl.style.display = 'block'; }
+        // Authenticated by the signed session cookie — no email is accepted from the client.
+        const res = await fetch('/api/portal', { method: 'POST', credentials: 'same-origin' });
+        const data = await res.json().catch(() => ({}));
+        if (data.url) { window.location.href = data.url; return; }
+        errEl.textContent = data.error || 'The billing portal is unavailable right now. Email team@dwsc.io and we will help.'; errEl.style.display = 'block';
       } catch (err) { errEl.textContent = 'Connection error. Try again.'; errEl.style.display = 'block'; }
       btn.textContent = 'OPEN BILLING PORTAL'; btn.disabled = false;
     }
