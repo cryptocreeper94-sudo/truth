@@ -455,29 +455,29 @@
       <div class="section__label">04 — The Model</div>
       <h2 class="section__title">AtmosCore 4/42</h2>
       <p>
-        AtmosCore is the composite state engine that distills all 19 feeds into a single observation suitability score. It computes four physical primitives, each derived from a subset of feeds:
+        AtmosCore turns live conditions at your location into a single observation suitability score, from -1 (worst) to +1 (best). It uses the nearest NOAA airport weather station to your ZIP, National Weather Service warnings at your ZIP, and the geomagnetic field. With no location or no recent station report, it shows no score instead of guessing. It computes four primitives:
       </p>
 
       <div class="primitives">
         <div class="primitive-card">
           <div class="primitive-card__label">Primitive 1</div>
           <div class="primitive-card__name">Thermodynamic State</div>
-          <div class="primitive-card__desc">Surface temperature, pressure, humidity, and convective potential. How much energy is in the atmosphere right now.</div>
+          <div class="primitive-card__desc">Temperature, pressure, humidity and dew point from the nearest station. How comfortable and settled the air is right now.</div>
         </div>
         <div class="primitive-card">
           <div class="primitive-card__label">Primitive 2</div>
           <div class="primitive-card__name">Optical Propagation</div>
-          <div class="primitive-card__desc">Cloud cover, aerosol loading, radar reflectivity. How clearly can instruments see through the atmosphere.</div>
+          <div class="primitive-card__desc">Visibility distance, plus fog, haze, smoke and dust reports. How clearly you can see through the air. This group counts the most.</div>
         </div>
         <div class="primitive-card">
           <div class="primitive-card__label">Primitive 3</div>
-          <div class="primitive-card__name">Dynamic Stability</div>
-          <div class="primitive-card__desc">Geomagnetic indices, ionospheric variability, solar flux. How stable is the electromagnetic environment.</div>
+          <div class="primitive-card__name">Dynamic Flow</div>
+          <div class="primitive-card__desc">Steady wind, gusts, gust spread, rain and snow. How rough the air is.</div>
         </div>
         <div class="primitive-card">
           <div class="primitive-card__label">Primitive 4</div>
-          <div class="primitive-card__name">Temporal Coherence</div>
-          <div class="primitive-card__desc">Feed freshness, data gap frequency, baseline consistency. How trustworthy is the data we're seeing right now.</div>
+          <div class="primitive-card__name">Temporal Stability</div>
+          <div class="primitive-card__desc">Time of day at your longitude and the geomagnetic field (NOAA Kp, which is national). Pre-dawn air is calm, mid-afternoon is rough.</div>
         </div>
       </div>
 

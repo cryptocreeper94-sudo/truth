@@ -12,6 +12,7 @@
     ['modal-overlay', 'modal-close'],
     ['manage-sub-modal', null],
     ['email-alerts-modal', 'ea-close'],
+    ['atmoscore-help-modal', 'ah-close'],
     ['download-modal', null],
     ['weather-advisory-modal', 'advisory-close'],
     ['weather-filter-modal', 'filter-modal-close'],

@@ -1382,7 +1382,8 @@ const Observatory = {
         this.updateMapOverlays();
 
         // ── AtmosCore compute ──────────────────────────────
-        AtmosCore.compute(this.feeds);
+        await this._refreshAtmosLocal();
+        AtmosCore.compute(this.feeds, this.atmosLocal);
         AtmosCoreViz.update(AtmosCore);
         this.updateAtmosCoreUI();
 
@@ -1557,6 +1558,46 @@ const Observatory = {
     if (sf) { sf.textContent = `${live}/${data.total || 19}`; sf.style.color = liveEl.style.color; }
   },
 
+  // ── AtmosCore local inputs (nearest station + warnings at the saved location) ──
+  async _refreshAtmosLocal(force) {
+    const loc = this.userLocation || this._getSavedLocation();
+    if (!loc || !Number.isFinite(loc.lat) || !Number.isFinite(loc.lng)) { this.atmosLocal = null; this._atmosKey = null; return; }
+    const key = `${loc.lat.toFixed(2)},${loc.lng.toFixed(2)}`;
+    if (!force && this._atmosKey === key && Date.now() - (this._atmosAt || 0) < 4 * 60000) return;
+    try {
+      const r = await fetch(`/api/atmoscore/local?lat=${loc.lat.toFixed(4)}&lon=${loc.lng.toFixed(4)}`);
+      if (r.ok) { this.atmosLocal = await r.json(); this._atmosKey = key; this._atmosAt = Date.now(); }
+    } catch (e) { console.warn('[Observatory] AtmosCore local fetch failed:', e); }
+  },
+
+  async refreshAtmosCore() {
+    await this._refreshAtmosLocal(true);
+    if (this.feeds && this.feeds.length && typeof AtmosCore !== 'undefined') {
+      AtmosCore.compute(this.feeds, this.atmosLocal);
+      if (typeof AtmosCoreViz !== 'undefined') AtmosCoreViz.update(AtmosCore);
+      this.updateAtmosCoreUI();
+    }
+  },
+
+  _atmosBasisMessage() {
+    const b = AtmosCore.basis;
+    if (!b || !b.located) return 'Set your ZIP to score your sky';
+    if (b.stale) return 'Nearest station is out of date';
+    if (b.noStation) return 'No station within 100 miles';
+    return 'Still gathering readings';
+  },
+
+  _atmosBasisLine() {
+    const b = AtmosCore.basis;
+    if (!b || !b.station) return this._atmosBasisMessage() + '. Score is for your location only.';
+    const s = b.station;
+    const mi = (s.km / 1.609).toFixed(0);
+    let when = '';
+    if (s.observedAt) { try { when = ', observed ' + new Date(s.observedAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); } catch (e) {} }
+    return `Scored for your location from ${s.name} (${s.id}), ${mi} mi away${when}.`;
+  },
+
+
   // ── Update AtmosCore UI ──────────────────────────────────────
   updateAtmosCoreUI() {
     const P = AtmosCore.primitives;
@@ -1568,8 +1609,8 @@ const Observatory = {
       const el = document.getElementById(`prim-${key}`);
       if (el) {
         const v = P[key].value;
-        el.textContent = v >= 0 ? `+${v.toFixed(2)}` : v.toFixed(2);
-        el.style.color = AtmosCore.getBandColor(v);
+        el.textContent = P[key].available ? (v >= 0 ? `+${v.toFixed(2)}` : v.toFixed(2)) : '—';
+        el.style.color = P[key].available ? AtmosCore.getBandColor(v) : 'var(--text-dim)';
       }
     }
 
@@ -1580,14 +1621,14 @@ const Observatory = {
 
     if (scoreEl) {
       const v = suit.overall;
-      scoreEl.textContent = v >= 0 ? `+${v.toFixed(2)}` : v.toFixed(2);
-      scoreEl.style.color = AtmosCore.getBandColor(v);
+      scoreEl.textContent = suit.scored ? (v >= 0 ? `+${v.toFixed(2)}` : v.toFixed(2)) : '—';
+      scoreEl.style.color = !suit.scored ? 'var(--text-dim)' : (suit.status === 'unsuitable' && v > -0.3 ? AtmosCore.colors.caution : AtmosCore.getBandColor(v));
     }
     const hasLevels = (typeof Levels !== 'undefined');
     const word = (s) => hasLevels ? Levels.statusWord(s) : String(s).toUpperCase();
 
     if (statusEl) {
-      statusEl.textContent = hasLevels ? Levels.statusLong(suit.status).toUpperCase() : suit.status.toUpperCase();
+      statusEl.textContent = suit.scored ? (hasLevels ? Levels.statusLong(suit.status).toUpperCase() : suit.status.toUpperCase()) : this._atmosBasisMessage().toUpperCase();
       statusEl.style.color = suit.status === 'suitable' ? 'var(--ac-optimal)' :
                              suit.status === 'qualified' ? 'var(--ac-advisory)' :
                              suit.status === 'unsuitable' ? 'var(--ac-critical)' : 'var(--text-dim)';
@@ -1611,8 +1652,8 @@ const Observatory = {
     const suitStat = document.getElementById('stat-suitability');
     if (suitStat) {
       const v = suit.overall;
-      suitStat.textContent = v >= 0 ? `+${v.toFixed(2)}` : v.toFixed(2);
-      suitStat.style.color = AtmosCore.getBandColor(v);
+      suitStat.textContent = suit.scored ? (v >= 0 ? `+${v.toFixed(2)}` : v.toFixed(2)) : '—';
+      suitStat.style.color = suit.scored ? AtmosCore.getBandColor(v) : 'var(--text-dim)';
     }
 
     // Update mobile summary cards
@@ -1624,9 +1665,11 @@ const Observatory = {
     // Provenance badge
     const provEl = document.getElementById('atmoscore-provenance');
     if (provEl) {
-      provEl.textContent = `${prov.measured + prov.estimated + prov.derived}/${prov.total} nodes active`;
+      provEl.textContent = `${prov.measured + prov.estimated + prov.derived}/${prov.total} nodes with live data`;
     }
 
+    const basisEl = document.getElementById('atmoscore-basis');
+    if (basisEl) basisEl.textContent = this._atmosBasisLine();
     // Hard constraint bar
     const hcBar = document.getElementById('atmoscore-hc-bar');
     const hcText = document.getElementById('atmoscore-hc-text');
@@ -3502,6 +3545,7 @@ If this dot turns <strong>red</strong> or stops pulsing, the connection to the d
 
     // Check point weather alerts
     this.checkLocationWeatherAlerts(lat, lng, zip);
+    this.refreshAtmosCore();
   },
 
   _getSavedLocation() {

@@ -25,12 +25,12 @@ const AtmosCore = {
   // ── Color Palette (from spec) ─────────────────────────────────
   colors: {
     thermodynamic: '#1E6FA8',  // Deep cerulean
-    optical:       '#b8b8b8',  // Amber-gold
+    optical:       '#b8b8b8',  // Light grey
     dynamic:       '#5A7A8A',  // Slate
     temporal:      '#4A3060',  // Deep violet
     optimal:       '#87CEEB',  // Clear sky blue
-    advisory:      '#b8b8b8',  // Haze amber
-    caution:       '#b5524c',  // Storm orange
+    advisory:      '#b8b8b8',  // Light grey
+    caution:       '#b5524c',  // Muted red
     critical:      '#8B1A1A',  // Deep crimson
   },
 
@@ -55,7 +55,8 @@ const AtmosCore = {
 
   // ── Observation Suitability ───────────────────────────────────
   suitability: {
-    overall: 0,       // -1.0 to +1.0
+    overall: 0,       // -1.0 to +1.0 (meaningful only when scored)
+    scored: false,    // true once a fresh local observation exists
     status: 'unknown', // suitable | qualified | unsuitable | unknown
     trend: 'stable',   // improving | stable | degrading
     bindingConstraint: null,
@@ -128,303 +129,187 @@ const AtmosCore = {
   },
 
   // ═══════════════════════════════════════════════════════════════
-  // Normalized State Mapping — raw feed data → node values [-1, +1]
+  // Normalized State Mapping — real observations → node values [-1, +1]
+  // Positive = good for observing the sky and being outside. Negative = poor.
+  // Only nodes with a real input are scored. Everything else stays
+  // 'unavailable' and is left OUT of every average (never filled with a guess).
   // ═══════════════════════════════════════════════════════════════
 
   /** Clamp to [-1, +1] */
   clamp(v) { return Math.max(-1, Math.min(1, v)); },
 
-  /** Map surface temperature (°C) to TH1 */
+  _num(v) { const n = Number(v); return (v === null || v === undefined || v === '' || !Number.isFinite(n)) ? null : n; },
+
+  /** Surface temperature (°C) → TH1 */
   mapTH1(tempC) {
-    if (tempC === null || tempC === undefined) return { value: 0, confidence: 'unavailable' };
+    if (tempC === null) return { value: 0, confidence: 'unavailable' };
     let v;
     if (tempC < -10 || tempC > 40) v = -0.9;
     else if (tempC < 0 || tempC > 35) v = -0.5;
     else if (tempC < 5 || tempC > 25) v = -0.1;
     else v = 0.3 + (1 - Math.abs(tempC - 15) / 10) * 0.7;
-    return { value: this.clamp(v), confidence: 'estimated' };
+    return { value: this.clamp(v), confidence: 'measured' };
   },
 
-  /** Map pressure (hPa) to TH2 */
+  /** Pressure (hPa) → TH2. Far from normal usually means an active weather system. */
   mapTH2(pressHpa) {
     if (!pressHpa) return { value: 0, confidence: 'unavailable' };
-    // Standard sea-level ~1013.25. Deviation from normal indicates weather systems.
     const dev = Math.abs(pressHpa - 1013.25);
-    let v;
-    if (dev < 5) v = 0.8;
-    else if (dev < 10) v = 0.4;
-    else if (dev < 20) v = -0.2;
-    else v = -0.7;
-    return { value: this.clamp(v), confidence: 'estimated' };
+    const v = dev < 5 ? 0.8 : dev < 10 ? 0.4 : dev < 20 ? -0.2 : -0.7;
+    return { value: v, confidence: 'measured' };
   },
 
-  /** Map humidity (%) to TH4 */
+  /** Relative humidity (%) → TH4 */
   mapTH4(humPct) {
-    if (humPct === null || humPct === undefined) return { value: 0, confidence: 'unavailable' };
-    // Optimal 30-60%, marginal outside, critical at extremes
-    if (humPct >= 30 && humPct <= 60) return { value: 0.7, confidence: 'estimated' };
-    if (humPct >= 20 && humPct <= 75) return { value: 0.2, confidence: 'estimated' };
-    if (humPct >= 10 && humPct <= 90) return { value: -0.3, confidence: 'estimated' };
-    return { value: -0.8, confidence: 'estimated' };
+    if (humPct === null) return { value: 0, confidence: 'unavailable' };
+    if (humPct >= 30 && humPct <= 60) return { value: 0.7, confidence: 'measured' };
+    if (humPct >= 20 && humPct <= 75) return { value: 0.2, confidence: 'measured' };
+    if (humPct >= 10 && humPct <= 90) return { value: -0.3, confidence: 'measured' };
+    return { value: -0.8, confidence: 'measured' };
   },
 
-  /** Map wind speed (m/s) to DY1 */
+  /** Temperature minus dew point (°C): small gap means fog, haze or cloud is near. */
+  mapTH5(marginC) {
+    if (marginC === null) return { value: 0, confidence: 'unavailable' };
+    const v = marginC > 10 ? 0.9 : marginC > 5 ? 0.4 : marginC > 2 ? -0.2 : -0.8;
+    return { value: v, confidence: 'derived' };
+  },
+
+  /** Sustained wind (m/s) → DY1 */
   mapDY1(windMs) {
-    if (windMs === null || windMs === undefined) return { value: 0, confidence: 'unavailable' };
-    if (windMs < 3) return { value: 0.9, confidence: 'estimated' };
-    if (windMs < 8) return { value: 0.4, confidence: 'estimated' };
-    if (windMs < 15) return { value: -0.2, confidence: 'estimated' };
-    if (windMs < 25) return { value: -0.6, confidence: 'estimated' };
-    return { value: -0.9, confidence: 'estimated' };
+    if (windMs === null) return { value: 0, confidence: 'unavailable' };
+    const v = windMs < 3 ? 0.9 : windMs < 8 ? 0.4 : windMs < 15 ? -0.2 : windMs < 25 ? -0.6 : -0.9;
+    return { value: v, confidence: 'measured' };
   },
 
-  /** Map precipitation state from NEXRAD to DY8 */
-  mapDY8(radarActive) {
-    if (radarActive === null) return { value: 0, confidence: 'unavailable' };
-    return { value: radarActive ? -0.6 : 0.8, confidence: 'estimated' };
+  /** Gust speed (m/s) → DY9. A station that reports no gust is reporting steady wind. */
+  mapDY9(gustMs, hasWind) {
+    if (gustMs === null) return hasWind ? { value: 0.7, confidence: 'measured' } : { value: 0, confidence: 'unavailable' };
+    const v = gustMs < 8 ? 0.5 : gustMs < 13 ? -0.2 : gustMs < 20 ? -0.6 : -0.9;
+    return { value: v, confidence: 'measured' };
   },
 
-  /** Map lightning density to DY6 (CAPE proxy) and DY9 (squall probability) */
-  mapLightning(lightningEntries) {
-    if (!lightningEntries) return { DY6: { value: 0, confidence: 'unavailable' }, DY9: { value: 0, confidence: 'unavailable' } };
-    const rate = lightningEntries;
-    let dy6, dy9;
-    if (rate > 50) { dy6 = -0.8; dy9 = -0.7; }
-    else if (rate > 20) { dy6 = -0.4; dy9 = -0.3; }
-    else if (rate > 5) { dy6 = -0.1; dy9 = 0.1; }
-    else { dy6 = 0.6; dy9 = 0.7; }
-    return {
-      DY6: { value: this.clamp(dy6), confidence: 'estimated' },
-      DY9: { value: this.clamp(dy9), confidence: 'estimated' },
-    };
+  /** Gust spread (knots above steady wind) → DY5 turbulence */
+  mapDY5(spreadKt, hasWind) {
+    if (spreadKt === null) return hasWind ? { value: 0.6, confidence: 'derived' } : { value: 0, confidence: 'unavailable' };
+    const v = spreadKt < 5 ? 0.5 : spreadKt < 10 ? 0 : spreadKt < 15 ? -0.4 : -0.8;
+    return { value: v, confidence: 'derived' };
   },
 
-  /** Map visibility (km) to OP1 */
-  mapOP1(visKm) {
-    if (!visKm) return { value: 0, confidence: 'unavailable' };
-    if (visKm > 20) return { value: 0.9, confidence: 'estimated' };
-    if (visKm > 10) return { value: 0.5, confidence: 'estimated' };
-    if (visKm > 5) return { value: 0.1, confidence: 'estimated' };
-    if (visKm > 1) return { value: -0.4, confidence: 'estimated' };
-    return { value: -0.9, confidence: 'estimated' };
+  /** Present-weather codes / hourly precipitation → DY8 */
+  mapDY8(codes, phour) {
+    const wet = /\b(-|\+)?(RA|SN|DZ|TS|GR|GS|SG|PL|IC|SH|FZRA)/.test(codes) || (phour !== null && phour > 0);
+    return { value: wet ? -0.6 : 0.8, confidence: 'measured' };
   },
 
-  /** Map solar activity to TS8 anomaly index */
-  mapSolar(solarEntries, sparkline) {
-    if (!sparkline || !sparkline.length) return { value: 0, confidence: 'unavailable' };
-    const recent = sparkline[sparkline.length - 1] || 0;
-    const avg = sparkline.reduce((a, b) => a + b, 0) / sparkline.length;
-    if (avg === 0) return { value: 0.5, confidence: 'estimated' };
-    const ratio = recent / avg;
-    if (ratio > 3) return { value: -0.8, confidence: 'estimated' };
-    if (ratio > 2) return { value: -0.4, confidence: 'estimated' };
-    if (ratio > 1.5) return { value: -0.1, confidence: 'estimated' };
-    return { value: 0.5, confidence: 'estimated' };
+  /** Visibility (statute miles) → OP1 */
+  mapOP1(visMiles) {
+    if (visMiles === null) return { value: 0, confidence: 'unavailable' };
+    const km = visMiles * 1.609;
+    const v = km > 20 ? 0.9 : km > 10 ? 0.5 : km > 5 ? 0.1 : km > 1 ? -0.4 : -0.9;
+    return { value: v, confidence: 'measured' };
   },
 
-  /** Map geomagnetic activity to TS8 */
-  mapGeomag(entries, sparkline) {
-    return this.mapSolar(entries, sparkline); // Same anomaly detection pattern
+  /** Haze, fog, smoke, dust codes → OP3 scattering */
+  mapOP3(codes) {
+    const murky = /\b(FG|BR|HZ|FU|DU|SA|VA)\b/.test(codes);
+    return { value: murky ? -0.6 : 0.5, confidence: 'measured' };
   },
 
-  /** Map Schumann resonance to TS9 trend coherence */
-  mapSchumann(sparkline) {
-    if (!sparkline || !sparkline.length) return { value: 0, confidence: 'unavailable' };
-    // Stable Schumann = coherent atmosphere
-    const variance = this._variance(sparkline);
-    if (variance < 0.5) return { value: 0.8, confidence: 'estimated' };
-    if (variance < 2) return { value: 0.3, confidence: 'estimated' };
-    return { value: -0.3, confidence: 'estimated' };
+  /** Planetary Kp (0-9) → TS8. Quiet geomagnetic field means a stable radio and GPS environment. */
+  mapKp(kp) {
+    if (kp === null) return { value: 0, confidence: 'unavailable' };
+    const v = kp < 3 ? 0.7 : kp < 4 ? 0.2 : kp < 5 ? -0.2 : kp < 6 ? -0.5 : -0.8;
+    return { value: v, confidence: 'measured' };
   },
 
-  /** Map diurnal phase to TS6 */
-  mapTS6() {
-    const hour = new Date().getUTCHours();
-    // Pre-dawn (3-6 UTC) most stable, midday (14-18 UTC) least stable
-    if (hour >= 3 && hour <= 6) return { value: 0.9, confidence: 'measured' };
-    if (hour >= 6 && hour <= 10) return { value: 0.5, confidence: 'measured' };
-    if (hour >= 10 && hour <= 14) return { value: -0.1, confidence: 'measured' };
-    if (hour >= 14 && hour <= 18) return { value: -0.5, confidence: 'measured' };
-    if (hour >= 18 && hour <= 22) return { value: 0.2, confidence: 'measured' };
-    return { value: 0.7, confidence: 'measured' }; // nighttime
-  },
-
-  _variance(arr) {
-    if (!arr.length) return 0;
-    const mean = arr.reduce((a, b) => a + b, 0) / arr.length;
-    return arr.reduce((s, v) => s + (v - mean) ** 2, 0) / arr.length;
+  /** Time of day at the user's longitude (local solar time) → TS6 */
+  mapTS6(lon) {
+    const now = new Date();
+    let h = now.getUTCHours() + now.getUTCMinutes() / 60 + (lon === null ? 0 : lon / 15);
+    h = ((h % 24) + 24) % 24;
+    let v;
+    if (h >= 3 && h < 7) v = 0.9;          // pre-dawn: most stable air
+    else if (h >= 7 && h < 10) v = 0.5;
+    else if (h >= 10 && h < 14) v = -0.1;
+    else if (h >= 14 && h < 18) v = -0.5;  // afternoon: most turbulent
+    else if (h >= 18 && h < 22) v = 0.2;
+    else v = 0.7;                           // night
+    return { value: v, confidence: lon === null ? 'unavailable' : 'derived' };
   },
 
   // ═══════════════════════════════════════════════════════════════
-  // Core Compute — ingest feeds, compute state ring + primitives
+  // Core Compute
+  //   feeds = /api/feeds list (national collectors; only Kp is used here)
+  //   local = /api/atmoscore/local for the user's saved location (or null)
   // ═══════════════════════════════════════════════════════════════
-  compute(feeds) {
-    if (!feeds || !feeds.length) return;
+  compute(feeds, local) {
     if (!this.nodes.length) this.init();
 
-    // Save previous state for trend detection
-    this._prevP = {
-      TH: this.primitives.TH.value,
-      OP: this.primitives.OP.value,
-      DY: this.primitives.DY.value,
-      TS: this.primitives.TS.value,
-    };
+    // Previous state for trend detection
+    this._prevOverall = this.suitability.scored ? this.suitability.overall : null;
 
-    // Build feed lookup
+    // Reset every node before applying inputs
+    for (const n of this.nodes) { n.value = 0; n.confidence = 'unavailable'; n.source = null; }
+
     const feedMap = {};
-    for (const f of feeds) feedMap[f.id] = f;
+    for (const f of (feeds || [])) feedMap[f.id] = f;
 
-    // ── Map feeds to nodes ────────────────────────────────────
-    const surface = feedMap.surface;
-    const surfaceData = surface?.latestEntry || {};
+    // ── Local station (nearest NOAA airport station to the user's location) ──
+    const st = local && local.station ? local.station : null;
+    const ageMin = st && st.observedAt ? (Date.now() - Date.parse(st.observedAt)) / 60000 : Infinity;
+    const fresh = !!st && ageMin <= 180;
+    const lon = local && local.location && Number.isFinite(local.location.lon) ? local.location.lon : null;
+    this.basis = { located: !!(local && local.location), station: fresh ? st : null, stale: !!st && !fresh, noStation: !!local && !st };
 
-    // TH nodes from Surface Stations
-    if (surface && surface.status !== 'offline') {
-      this._setNode('TH1', this.mapTH1(surfaceData.tmpf != null ? (surfaceData.tmpf - 32) * 5/9 : null));
-      this._setNode('TH2', this.mapTH2(surfaceData.mslp || surfaceData.alti ? (surfaceData.alti || 0) * 33.8639 : null));
-      this._setNode('TH4', this.mapTH4(surfaceData.relh));
-      this._setNode('DY1', this.mapDY1(surfaceData.sknt ? surfaceData.sknt * 0.5144 : null));
+    if (fresh) {
+      const tmpf = this._num(st.tmpf), dwpf = this._num(st.dwpf), sknt = this._num(st.sknt), gust = this._num(st.gust);
+      const alti = this._num(st.alti), mslp = this._num(st.mslp);
+      const codes = Array.isArray(st.wxcodes) ? st.wxcodes.join(' ') : String(st.wxcodes || '');
+      const hasWind = sknt !== null;
 
-      // Dew point margin TH5
-      if (surfaceData.tmpf != null && surfaceData.dwpf != null) {
-        const margin = (surfaceData.tmpf - surfaceData.dwpf) * 5/9;
-        const v = margin > 10 ? 0.9 : margin > 5 ? 0.4 : margin > 2 ? -0.2 : -0.8;
-        this._setNode('TH5', { value: this.clamp(v), confidence: 'estimated' });
+      this._setNode('TH1', this.mapTH1(tmpf !== null ? (tmpf - 32) * 5 / 9 : null));
+      this._setNode('TH2', this.mapTH2(mslp !== null ? mslp : (alti !== null ? alti * 33.8639 : null)));
+      this._setNode('TH4', this.mapTH4(this._num(st.relh)));
+      this._setNode('TH5', this.mapTH5(tmpf !== null && dwpf !== null ? (tmpf - dwpf) * 5 / 9 : null));
+      this._setNode('DY1', this.mapDY1(hasWind ? sknt * 0.5144 : null));
+      this._setNode('DY9', this.mapDY9(gust !== null ? gust * 0.5144 : null, hasWind));
+      this._setNode('DY5', this.mapDY5(gust !== null && hasWind ? gust - sknt : null, hasWind));
+      this._setNode('DY8', this.mapDY8(codes, this._num(st.phour)));
+      this._setNode('OP1', this.mapOP1(this._num(st.vsby)));
+      this._setNode('OP3', this.mapOP3(codes));
+
+      // TH8 air density: derived from the two measured nodes above
+      const th1 = this._getNode('TH1'), th2 = this._getNode('TH2');
+      if (th1.confidence !== 'unavailable' && th2.confidence !== 'unavailable') {
+        this._setNode('TH8', { value: this.clamp((th1.value + th2.value) / 2), confidence: 'derived' });
       }
     }
 
-    // OP nodes from NEXRAD radar
-    const nexrad = feedMap.nexrad;
-    if (nexrad && nexrad.status !== 'offline') {
-      const hasActivity = nexrad.sparkline && nexrad.sparkline.some(v => v > 0);
-      this._setNode('DY8', this.mapDY8(hasActivity));
-      this._setNode('OP1', this.mapOP1(hasActivity ? 8 : 25));
-      this._setNode('OP3', { value: hasActivity ? -0.3 : 0.6, confidence: 'estimated' });
-    }
-
-    // GOES satellite — aerosol/cloud proxy
-    const goes = feedMap.goes;
-    if (goes && goes.status !== 'offline') {
-      const goesRate = goes.sparkline ? goes.sparkline[goes.sparkline.length - 1] || 0 : 0;
-      this._setNode('OP2', { value: this.clamp(0.5 - goesRate * 0.1), confidence: 'estimated' });
-      this._setNode('TH9', { value: this.clamp(0.3 - goesRate * 0.05), confidence: 'estimated' });
-    }
-
-    // Lightning (GLM + Blitzortung) → DY6, DY9
-    const lightning = feedMap.lightning;
-    const blitz = feedMap.blitzortung;
-    const lightningTotal = (lightning?.entries || 0) + (blitz?.entries || 0);
-    if (lightningTotal > 0) {
-      const lm = this.mapLightning(lightningTotal);
-      this._setNode('DY6', lm.DY6);
-      this._setNode('DY9', lm.DY9);
-    }
-
-    // Solar/SWPC → TS8
-    const solar = feedMap.solar;
-    if (solar && solar.status !== 'offline') {
-      this._setNode('TS8', this.mapSolar(solar.entries, solar.sparkline));
-    }
-
-    // Geomagnetic → TS8 (combines with solar)
+    // ── National inputs ──
     const geomag = feedMap.geomag;
-    if (geomag && geomag.status !== 'offline') {
-      const gm = this.mapGeomag(geomag.entries, geomag.sparkline);
-      const existing = this._getNode('TS8');
-      if (existing.confidence !== 'unavailable') {
-        // Average with solar contribution
-        this._setNode('TS8', { value: this.clamp((existing.value + gm.value) / 2), confidence: 'estimated' });
-      } else {
-        this._setNode('TS8', gm);
-      }
+    if (geomag && geomag.status !== 'offline' && geomag.sparkline && geomag.sparkline.length) {
+      this._setNode('TS8', this.mapKp(this._num(geomag.sparkline[geomag.sparkline.length - 1])));
     }
+    this._setNode('TS6', this.mapTS6(lon));
 
-    // Schumann → TS9
-    const schumann = feedMap.schumann;
-    if (schumann && schumann.status !== 'offline') {
-      this._setNode('TS9', this.mapSchumann(schumann.sparkline));
-    }
-
-    // Ionosonde → OP4 (refractive index proxy)
-    const iono = feedMap.ionosonde;
-    if (iono && iono.status !== 'offline') {
-      const ionoRate = iono.sparkline ? iono.sparkline[iono.sparkline.length - 1] || 0 : 0;
-      this._setNode('OP4', { value: this.clamp(0.4 - ionoRate * 0.05), confidence: 'estimated' });
-    }
-
-    // Heaters → OP4 perturbation, TS8
-    const heater = feedMap.heater;
-    if (heater && heater.status !== 'offline' && heater.entries > 0) {
-      this._setNode('TS8', { value: this.clamp(this._getNode('TS8').value - 0.1), confidence: 'estimated' });
-    }
-
-    // Trace metals → OP2 (aerosol contribution)
-    const metals = feedMap.metals;
-    if (metals && metals.status !== 'offline' && metals.entries > 0) {
-      const op2 = this._getNode('OP2');
-      this._setNode('OP2', { value: this.clamp(op2.value - 0.1), confidence: 'estimated' });
-    }
-
-    // Deposition → OP2, TH7
-    const deposition = feedMap.deposition;
-    if (deposition && deposition.status !== 'offline') {
-      this._setNode('TH7', { value: this.clamp(0.3), confidence: 'estimated' });
-    }
-
-    // Ecology → TS5 seasonal proxy
-    const ecology = feedMap.ecology;
-    if (ecology && ecology.status !== 'offline') {
-      this._setNode('TS5', { value: 0.4, confidence: 'estimated' });
-    }
-
-    // NOTAMs → DY7 (frontal proximity if cloud seeding active)
-    const notam = feedMap.notam;
-    if (notam && notam.status !== 'offline' && notam.entries > 5) {
-      this._setNode('DY7', { value: -0.3, confidence: 'estimated' });
-      this._setNode('OP2', { value: this.clamp(this._getNode('OP2').value - 0.15), confidence: 'estimated' });
-    }
-
-    // ADS-B → DY3 (wind shear proxy), DY4 (boundary layer)
-    const aircraft = feedMap.aircraft;
-    if (aircraft && aircraft.status !== 'offline') {
-      this._setNode('DY3', { value: 0.3, confidence: 'estimated' });
-      this._setNode('DY4', { value: 0.2, confidence: 'estimated' });
-    }
-
-    // Diurnal phase (always available)
-    this._setNode('TS6', this.mapTS6());
-
-    // ── Derive composite nodes ────────────────────────────────
-    this._deriveComposites();
-
-    // ── Compute primitive aggregates ──────────────────────────
+    // ── Aggregate ──
     this._computePrimitives();
-
-    // ── Enforce hard constraints ─────────────────────────────
-    this._enforceHardConstraints();
-
-    // ── Compute observation suitability ──────────────────────
-    this._computeSuitability();
-
-    // ── Compute trend ────────────────────────────────────────
+    this._enforceHardConstraints(local, fresh);
+    this._computeSuitability(fresh);
     this._computeTrend();
 
-    // ── Store history ────────────────────────────────────────
-    this._history.push({
-      timestamp: Date.now(),
-      P: { ...this._prevP },
-      suitability: this.suitability.overall,
-    });
+    this._history.push({ timestamp: Date.now(), suitability: this.suitability.overall });
     if (this._history.length > 60) this._history.shift();
   },
 
   // ── Node accessors ──────────────────────────────────────────
   _setNode(id, { value, confidence }) {
     const node = this.nodes.find(n => n.id === id);
-    if (node) {
+    if (node && confidence !== 'unavailable') {
       node.value = value;
       node.confidence = confidence;
-      node.source = 'observatory-feed';
+      node.source = confidence === 'measured' ? 'station-observation' : 'derived';
     }
   },
 
@@ -433,168 +318,79 @@ const AtmosCore = {
     return node || { value: 0, confidence: 'unavailable' };
   },
 
-  // ── Derive composite nodes from other nodes ─────────────────
-  _deriveComposites() {
-    // TH10 = f(TH3, TH6, TH9)
-    const th3 = this._getNode('TH3').value;
-    const th6 = this._getNode('TH6').value;
-    const th9 = this._getNode('TH9').value;
-    const th10val = (th3 * 3 + th6 * 3 + th9) / 7;
-    this._setNode('TH10', { value: this.clamp(th10val), confidence: 'derived' });
-
-    // TH3 and TH6 — estimate from available surface data
-    const th1 = this._getNode('TH1');
-    if (th1.confidence !== 'unavailable') {
-      // Estimate gradient from temperature and time of day
-      const ts6 = this._getNode('TS6').value;
-      const gradientEstimate = ts6 > 0 ? 0.3 : -0.2; // simplified: stable at night, less stable midday
-      this._setNode('TH3', { value: this.clamp(gradientEstimate), confidence: 'estimated' });
-      this._setNode('TH6', { value: this.clamp(gradientEstimate * 0.8), confidence: 'estimated' });
-    }
-
-    // TH8 — atmospheric density from temp and pressure
-    const th2 = this._getNode('TH2');
-    if (th1.confidence !== 'unavailable' && th2.confidence !== 'unavailable') {
-      this._setNode('TH8', { value: this.clamp((th1.value + th2.value) / 2), confidence: 'derived' });
-    }
-
-    // OP5 — refraction coefficient (from gradient + density)
-    const th3v = this._getNode('TH3').value;
-    const op5val = th3v > 0 ? 0.5 - th3v * 0.5 : -0.3 - Math.abs(th3v) * 0.5;
-    this._setNode('OP5', { value: this.clamp(op5val), confidence: 'derived' });
-
-    // OP6 — shimmer from thermal plume and wind
-    const dy1 = this._getNode('DY1').value;
-    this._setNode('OP6', { value: this.clamp((th9 + dy1) / 2), confidence: 'derived' });
-
-    // OP7 — ducting from gradient inversion
-    const duckVal = th3v < -0.5 ? th3v : 0.5;
-    this._setNode('OP7', { value: this.clamp(duckVal), confidence: 'derived' });
-
-    // OP8 — sub-refraction risk (opposite of ducting)
-    this._setNode('OP8', { value: this.clamp(-duckVal * 0.5), confidence: 'derived' });
-
-    // OP9 — geometry compatibility (default moderate)
-    this._setNode('OP9', { value: 0.3, confidence: 'estimated' });
-
-    // OP10 — composite of OP1-OP9
-    const opNodes = this.nodes.filter(n => n.primitive === 'OP' && n.id !== 'OP10');
-    const opAvg = opNodes.reduce((s, n) => s + n.value * n.weight, 0) / opNodes.reduce((s, n) => s + n.weight, 0);
-    this._setNode('OP10', { value: this.clamp(opAvg), confidence: 'derived' });
-
-    // DY2 — wind coherence (estimated from wind speed stability)
-    this._setNode('DY2', { value: this.clamp(dy1 * 0.8), confidence: 'estimated' });
-
-    // DY5 — surface turbulence
-    this._setNode('DY5', { value: this.clamp(dy1 * 0.7), confidence: 'estimated' });
-
-    // DY10-11 — default moderate
-    this._setNode('DY10', { value: 0.2, confidence: 'estimated' });
-    this._setNode('DY11', { value: 0.3, confidence: 'estimated' });
-
-    // DY12 — composite
-    const dyNodes = this.nodes.filter(n => n.primitive === 'DY' && n.id !== 'DY12');
-    const dyAvg = dyNodes.reduce((s, n) => s + n.value * n.weight, 0) / dyNodes.reduce((s, n) => s + n.weight, 0);
-    this._setNode('DY12', { value: this.clamp(dyAvg), confidence: 'derived' });
-
-    // TS1 — pressure trend (from sparkline if available)
-    this._setNode('TS1', { value: 0.3, confidence: 'estimated' });
-    this._setNode('TS2', { value: 0.2, confidence: 'estimated' });
-    this._setNode('TS3', { value: 0.5, confidence: 'estimated' }); // no inversion by default
-    this._setNode('TS4', { value: 0.3, confidence: 'estimated' });
-    this._setNode('TS7', { value: this._getNode('TS6').value > 0 ? 0.3 : -0.2, confidence: 'derived' });
-
-    // TS10 — composite
-    const tsNodes = this.nodes.filter(n => n.primitive === 'TS' && n.id !== 'TS10');
-    const tsAvg = tsNodes.reduce((s, n) => s + n.value * n.weight, 0) / tsNodes.reduce((s, n) => s + n.weight, 0);
-    this._setNode('TS10', { value: this.clamp(tsAvg), confidence: 'derived' });
-  },
-
-  // ── Compute primitive aggregates (weighted mean) ────────────
+  // ── Primitive aggregates: weighted mean over nodes that have data ──
   _computePrimitives() {
     for (const key of Object.keys(this.primitives)) {
       const prim = this.primitives[key];
-      const nodes = prim.nodes;
-      let wSum = 0, wTotal = 0;
-      for (const n of nodes) {
+      let wSum = 0, wTotal = 0, count = 0;
+      for (const n of prim.nodes) {
+        if (n.confidence === 'unavailable') continue;
         wSum += n.value * n.weight;
         wTotal += n.weight;
+        count++;
       }
+      prim.available = wTotal > 0;
+      prim.nodeCount = count;
       prim.value = wTotal > 0 ? this.clamp(wSum / wTotal) : 0;
     }
   },
 
-  // ── Hard Constraint Enforcement ─────────────────────────────
-  _enforceHardConstraints() {
-    // HC1: Observer Safety — wind, lightning, temperature extremes
+  // ── Hard Constraints ────────────────────────────────────────
+  _enforceHardConstraints(local, fresh) {
+    const has = id => this._getNode(id).confidence !== 'unavailable';
     const dy1 = this._getNode('DY1').value;
     const th1 = this._getNode('TH1').value;
     const dy9 = this._getNode('DY9').value;
-    if (dy1 < -0.7 || th1 < -0.8 || dy9 < -0.6) {
-      this.hardConstraints.HC1.active = true;
-      this.hardConstraints.HC1.reason =
-        dy1 < -0.7 ? 'Extreme wind conditions' :
-        th1 < -0.8 ? 'Temperature extremes' : 'High squall/gust probability';
-    } else {
-      this.hardConstraints.HC1.active = false;
-      this.hardConstraints.HC1.reason = '';
-    }
 
-    // HC2: Optical Propagation Validity
-    const op5 = this._getNode('OP5').value;
-    const op7 = this._getNode('OP7').value;
-    if (op5 < -0.5 || op7 < -0.5) {
-      this.hardConstraints.HC2.active = true;
-      this.hardConstraints.HC2.reason =
-        op7 < -0.5 ? 'Active atmospheric ducting detected' :
-        'Refraction coefficient outside reliable range';
-    } else {
-      this.hardConstraints.HC2.active = false;
-      this.hardConstraints.HC2.reason = '';
-    }
+    // HC1 Observer Safety: official severe warning at the location, or measured extremes.
+    const DANGER = /(Tornado|Severe Thunderstorm|Flash Flood|Hurricane|Tropical Storm|Blizzard|Ice Storm|Extreme Wind|Dust Storm|Excessive Heat|Extreme Cold|Wind Chill|Winter Storm)/i;
+    const warning = ((local && local.alerts) || []).find(a => (a.severity === 'Severe' || a.severity === 'Extreme') && DANGER.test(a.event || ''));
+    let hc1 = '';
+    if (warning) hc1 = `${warning.event} in effect at your location`;
+    else if (has('DY1') && dy1 < -0.7) hc1 = 'Extreme wind at the nearest station';
+    else if (has('TH1') && th1 < -0.8) hc1 = 'Temperature extreme at the nearest station';
+    else if (has('DY9') && dy9 < -0.6) hc1 = 'Strong gusts at the nearest station';
+    this.hardConstraints.HC1.active = !!hc1;
+    this.hardConstraints.HC1.reason = hc1;
 
-    // HC3: Data Provenance — count unavailable nodes
-    const unavailCount = this.nodes.filter(n => n.confidence === 'unavailable').length;
-    const totalNodes = this.nodes.length;
-    if (unavailCount > totalNodes * 0.5) {
-      this.hardConstraints.HC3.active = true;
-      this.hardConstraints.HC3.reason = `${unavailCount}/${totalNodes} nodes have no data source`;
-    } else {
-      this.hardConstraints.HC3.active = false;
-      this.hardConstraints.HC3.reason = '';
-    }
+    // HC2 Optical validity: needs refraction / ducting measurements we do not have yet. Never fires.
+    this.hardConstraints.HC2.active = false;
+    this.hardConstraints.HC2.reason = '';
+
+    // HC3 Data provenance: no fresh local observation means no local score.
+    const hc3 = !local || !local.location ? 'No location set'
+      : !fresh ? (local.station ? 'Nearest station report is more than 3 hours old' : 'No weather station within 100 miles') : '';
+    this.hardConstraints.HC3.active = !!hc3;
+    this.hardConstraints.HC3.reason = hc3;
   },
 
   // ── Observation Suitability ─────────────────────────────────
-  _computeSuitability() {
+  _computeSuitability(fresh) {
     const P = this.primitives;
-    // Weighted aggregate: TH and OP weighted higher for observation
-    const overall = (P.TH.value * 0.3 + P.OP.value * 0.35 + P.DY.value * 0.2 + P.TS.value * 0.15);
-    this.suitability.overall = this.clamp(overall);
+    const W = { TH: 0.3, OP: 0.35, DY: 0.2, TS: 0.15 };
+    let wSum = 0, wTotal = 0;
+    for (const k of Object.keys(W)) if (P[k].available) { wSum += P[k].value * W[k]; wTotal += W[k]; }
+    const scored = fresh && wTotal > 0;
+    const overall = scored ? this.clamp(wSum / wTotal) : 0;
+    this.suitability.scored = scored;
+    this.suitability.overall = overall;
 
-    // Status classification
-    if (this.hardConstraints.HC1.active || this.hardConstraints.HC2.active) {
-      this.suitability.status = 'unsuitable';
-    } else if (overall > 0.2) {
-      this.suitability.status = 'suitable';
-    } else if (overall > -0.3) {
-      this.suitability.status = 'qualified';
-    } else {
-      this.suitability.status = 'unsuitable';
-    }
+    if (!scored) this.suitability.status = 'unknown';
+    else if (this.hardConstraints.HC1.active || this.hardConstraints.HC2.active) this.suitability.status = 'unsuitable';
+    else if (P.OP.available && P.OP.value <= -0.4) this.suitability.status = 'unsuitable'; // can't see: poor no matter what else is fine
+    else if (overall > 0.2) this.suitability.status = 'suitable';
+    else if (overall > -0.3) this.suitability.status = 'qualified';
+    else this.suitability.status = 'unsuitable';
 
-    // Find binding constraint
-    const primEntries = Object.entries(P);
-    primEntries.sort((a, b) => a[1].value - b[1].value);
-    this.suitability.bindingConstraint = primEntries[0][0];
+    // Binding constraint: the weakest primitive that has data
+    const avail = Object.entries(P).filter(([, p]) => p.available).sort((a, b) => a[1].value - b[1].value);
+    this.suitability.bindingConstraint = avail.length ? avail[0][0] : null;
   },
 
-  // ── Trend Detection ─────────────────────────────────────────
+  // ── Trend: change since the previous refresh ────────────────
   _computeTrend() {
-    if (!this._prevP) { this.suitability.trend = 'stable'; return; }
-    const curr = this.suitability.overall;
-    const prev = (this._prevP.TH * 0.3 + this._prevP.OP * 0.35 + this._prevP.DY * 0.2 + this._prevP.TS * 0.15);
-    const delta = curr - prev;
+    if (!this.suitability.scored || this._prevOverall === null || this._prevOverall === undefined) { this.suitability.trend = 'stable'; return; }
+    const delta = this.suitability.overall - this._prevOverall;
     if (delta > 0.05) this.suitability.trend = 'improving';
     else if (delta < -0.05) this.suitability.trend = 'degrading';
     else this.suitability.trend = 'stable';

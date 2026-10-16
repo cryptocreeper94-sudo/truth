@@ -24,7 +24,7 @@ import { generateDailyBrief, getCurrentBrief } from './brief-generator.mjs';
 import { readTail, tailLines, parseLines, segmentsFor, segmentDay, segmentLines, feedArchiveDir, archiveRoot } from './lib/manifest-ledger.mjs';
 import { readSeries, readEvents, seriesExtent, eventsExtent } from './lib/signal-store.mjs';
 import { SERIES, EVENT_KINDS, KNOWN_LINKS } from './lib/signal-catalog.mjs';
-import { buildNow, buildNear, readRawJson } from './lib/now-snapshot.mjs';
+import { buildNow, buildNear, readRawJson, distanceKm } from './lib/now-snapshot.mjs';
 import { resolveLocalStation } from './lib/local-stations.mjs';
 import { createAlertService, ALERT_SCHEMA_SQL } from './alerts-service.mjs';
 
@@ -1949,6 +1949,48 @@ const server = createServer(async (req, res) => {
       nowCache.at = now;
     }
     return jsonResponse(res, 200, nowCache.data);
+  }
+  // ── AtmosCore local inputs: nearest NOAA airport station + NWS warnings at the point ──
+  // Public, read-only. Same data the free "Weather near you" tile uses.
+  if (path === '/api/atmoscore/local') {
+    let place = null;
+    const zipQ = (url.searchParams.get('zip') || '').trim();
+    if (zipQ) {
+      if (!/^\d{5}$/.test(zipQ)) return jsonResponse(res, 400, { error: 'Enter a 5-digit US ZIP code' });
+      place = await geocodeZip(zipQ);
+      if (!place) return jsonResponse(res, 404, { error: 'ZIP code not found' });
+    } else {
+      const la = parseFloat(url.searchParams.get('lat'));
+      const lo = parseFloat(url.searchParams.get('lon'));
+      if (!Number.isFinite(la) || !Number.isFinite(lo) || Math.abs(la) > 90 || Math.abs(lo) > 180) {
+        return jsonResponse(res, 400, { error: 'Provide zip, or lat and lon' });
+      }
+      place = { lat: Math.round(la * 100) / 100, lon: Math.round(lo * 100) / 100, label: 'Your location' };
+    }
+    let station = null;
+    try {
+      const j = readRawJson(RAW_DIR, 'asos', Date.now());
+      let best = null, bestKm = Infinity;
+      for (const s of ((j && j.stations) || [])) {
+        if (s.lat == null || s.lon == null || s.tmpf == null) continue;
+        const km = distanceKm(place.lat, place.lon, s.lat, s.lon);
+        if (km < bestKm) { best = s; bestKm = km; }
+      }
+      if (best && bestKm <= 160) {
+        const t = best.utc_valid ? Date.parse(String(best.utc_valid).replace(' ', 'T').replace(/Z?$/, 'Z')) : NaN;
+        station = {
+          id: best.station, name: best.name || best.station, km: Math.round(bestKm * 10) / 10,
+          observedAt: Number.isFinite(t) ? new Date(t).toISOString() : null,
+          tmpf: best.tmpf, dwpf: best.dwpf ?? null, relh: best.relh ?? null, sknt: best.sknt ?? null, gust: best.gust ?? null,
+          alti: best.alti ?? null, mslp: best.mslp ?? null, vsby: best.vsby ?? null, phour: best.phour ?? null, wxcodes: best.wxcodes ?? null,
+        };
+      }
+    } catch {}
+    let alerts = [];
+    try {
+      alerts = (await fetchPointAlerts(place.lat, place.lon)).map(a => ({ event: a.event, severity: a.severity, category: a.category }));
+    } catch {}
+    return jsonResponse(res, 200, { timestamp: new Date().toISOString(), location: { lat: place.lat, lon: place.lon, label: place.label }, station, alerts });
   }
   if (path === '/api/now/near') {
     const zip = (url.searchParams.get('zip') || '').trim();

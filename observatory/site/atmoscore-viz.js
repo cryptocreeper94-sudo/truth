@@ -306,12 +306,13 @@ const AtmosCoreViz = {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillStyle = this._getBandColor(score);
-    ctx.fillText(score >= 0 ? `+${score.toFixed(2)}` : score.toFixed(2), cx, cy - 8);
+    if (!suit.scored) ctx.fillStyle = 'rgba(255,255,255,0.45)';
+    ctx.fillText(suit.scored ? (score >= 0 ? `+${score.toFixed(2)}` : score.toFixed(2)) : '—', cx, cy - 8);
 
     // Status label
     ctx.font = '600 7px "JetBrains Mono"';
     ctx.fillStyle = this._withAlpha(this._getBandColor(score), 0.7);
-    ctx.fillText(status.toUpperCase(), cx, cy + 8);
+    ctx.fillText(suit.scored ? status.toUpperCase() : 'NO LOCAL DATA', cx, cy + 8);
 
     // Trend indicator
     const trendChar = suit.trend === 'improving' ? '▲' : suit.trend === 'degrading' ? '▼' : '●';
