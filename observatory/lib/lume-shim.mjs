@@ -42,3 +42,28 @@ export function sleepSync(ms) {
 export function iso(ms) {
   return new Date(ms).toISOString();
 }
+
+/** Hour 0-23 of epoch ms in an IANA timezone (UTC if the zone is invalid). */
+export function localHour(ms, tz) {
+  try {
+    return Number(new Intl.DateTimeFormat('en-US', { timeZone: tz || 'UTC', hour: 'numeric', hourCycle: 'h23' }).format(new Date(ms)));
+  } catch { return new Date(ms).getUTCHours(); }
+}
+
+/** YYYY-MM-DD of epoch ms in an IANA timezone (UTC if the zone is invalid). */
+export function localDay(ms, tz) {
+  try {
+    return new Intl.DateTimeFormat('en-CA', { timeZone: tz || 'UTC', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(ms));
+  } catch { return new Date(ms).toISOString().slice(0, 10); }
+}
+
+/** Truncate text to n characters with an ellipsis. */
+export function clip(s, n) {
+  const t = String(s || '').replace(/\s+/g, ' ').trim();
+  return t.length > n ? t.slice(0, n - 1) + '…' : t;
+}
+
+/** Escape text for safe HTML interpolation. */
+export function escHtml(s) {
+  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}

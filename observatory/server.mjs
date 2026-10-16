@@ -26,6 +26,7 @@ import { readSeries, readEvents, seriesExtent, eventsExtent } from './lib/signal
 import { SERIES, EVENT_KINDS, KNOWN_LINKS } from './lib/signal-catalog.mjs';
 import { buildNow, buildNear, readRawJson } from './lib/now-snapshot.mjs';
 import { resolveLocalStation } from './lib/local-stations.mjs';
+import { createAlertService, ALERT_SCHEMA_SQL } from './alerts-service.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const STATE_DIR = process.env.STATE_DIR || join(__dirname, 'state');
@@ -186,6 +187,7 @@ async function initDatabase() {
         WHERE tier IS NULL AND price_cents IS NULL
           AND LEFT(stripe_customer_id, 10) <> 'whitelist_'
           AND created_at < TIMESTAMPTZ '2026-10-15 00:00:00+00';
+      ${ALERT_SCHEMA_SQL}
     `);
     console.log('[OBSERVATORY] Database tables ready');
   } catch (err) {
@@ -350,7 +352,7 @@ function hasDevBypass(req) {
   return safeEqualStr(token.slice(dot + 1), hmacHex('dev-bypass', exp));
 }
 
-async function sendResendEmail({ to, subject, html, text }) {
+async function sendResendEmail({ to, subject, html, text, from, headers }) {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
     console.warn('[AUTH] RESEND_API_KEY not configured. Skipping email to', to);
@@ -364,11 +366,12 @@ async function sendResendEmail({ to, subject, html, text }) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'Truth Observatory <access@observatory.tlid.io>',
+        from: from || 'Truth Observatory <access@observatory.tlid.io>',
         to: [to],
         subject,
         html,
         text,
+        ...(headers ? { headers } : {}),
       }),
     });
     const data = await res.json();
@@ -376,7 +379,7 @@ async function sendResendEmail({ to, subject, html, text }) {
       console.error('[AUTH] Resend email failed:', data);
       return false;
     }
-    console.log('[AUTH] Access email sent to', to, data.id);
+    console.log('[EMAIL] Sent to', to, data.id);
     return true;
   } catch (err) {
     console.error('[AUTH] Resend network error:', err.message);
@@ -433,6 +436,12 @@ function redirect(res, url) {
   res.writeHead(303, { Location: url });
   res.end();
 }
+
+const alertService = createAlertService({
+  pool, siteUrl: SITE_URL, sendEmail: sendResendEmail, fetchPointAlerts, geocodeZip,
+  getBrief: getCurrentBrief, isSubscribed, getSubscriber: getSubscriberFromRequest,
+  readJson, jsonResponse,
+});
 
 // ═══════════════════════════════════════════════════════════════════════════
 // MIME types for static serving
@@ -1781,6 +1790,9 @@ const server = createServer(async (req, res) => {
     }
   }
 
+  // ── Opt-in email alerts (preferences, test send, one-click unsubscribe) ──
+  if (await alertService.handle(req, res, path, url)) return;
+
   if (path === '/api/logout' && req.method === 'POST') {
     const cookies = parseCookies(req);
     const sessionId = verifyCookie(cookies.obs_session);
@@ -2414,4 +2426,8 @@ server.listen(PORT, () => {
   setTimeout(runBrief, 30000);
   // Then every 6 hours
   setInterval(runBrief, BRIEF_INTERVAL);
+
+  // ── Email alert sweep (opt-in subscribers only; dedupe + daily cap inside) ──
+  setTimeout(() => alertService.sweep(), 60000);
+  setInterval(() => alertService.sweep(), 5 * 60000);
 });
