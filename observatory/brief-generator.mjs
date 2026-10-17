@@ -177,17 +177,18 @@ async function generateBriefText(dataSnapshot, level = 'observer') {
 
 // ── Template fallback (deterministic, no AI) ────────────────
 function generateTemplateBrief(dataSnapshot) {
-  const { snapshot, activeFeeds, totalEntries } = dataSnapshot;
-  const parts = [`${activeFeeds} of ${FEED_MANIFESTS.length} feeds reported ${totalEntries} observations in the last 24 hours.`];
+  // Deterministic, factual fallback. Entry counts are snapshot counts (capped tail reads),
+  // not event counts, so they are never described as activity levels.
+  const { snapshot, activeFeeds } = dataSnapshot;
+  const parts = [`${activeFeeds} of ${FEED_MANIFESTS.length} feeds have reported in the last 24 hours.`];
 
-  // Highlight notable conditions
-  if (snapshot.earthquake?.entries > 15) parts.push(`Elevated seismic activity: ${snapshot.earthquake.entries} events recorded.`);
-  if (snapshot.geomag?.status === 'live' && snapshot.geomag.kpIndex > 4) parts.push(`Geomagnetic conditions are active (Kp ${snapshot.geomag.kpIndex}).`);
-  if (snapshot.lightning?.entries > 50) parts.push(`High lightning density detected across monitoring network.`);
-  if (snapshot.wildfire?.entries > 0) parts.push(`Active wildfire incidents being tracked.`);
-  if (snapshot.volcanic?.entries > 0) parts.push(`Elevated volcanic activity reported.`);
-
-  if (parts.length === 1) parts.push('All systems nominal — no significant anomalies detected.');
+  const kp = snapshot.geomag?.status === 'live' ? snapshot.geomag.kpIndex : null;
+  if (kp != null) parts.push(`The latest geomagnetic Kp reading is ${kp}${kp >= 5 ? ' (storm level, G1 or higher)' : ' (below storm level)'}.`);
+  const mag = snapshot.earthquake?.magnitude;
+  if (mag != null) parts.push(`The most recent earthquake in the feed was magnitude ${mag}.`);
+  const lvl = snapshot.volcanic?.alertLevel;
+  if (lvl) parts.push(`The latest volcano alert level in the feed is ${lvl}.`);
+  parts.push('Open the feeds for current readings. This summary was assembled from fixed rules, not an AI model.');
 
   return parts.join(' ');
 }
