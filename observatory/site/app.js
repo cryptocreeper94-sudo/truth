@@ -1462,14 +1462,7 @@ const Observatory = {
     // Show alert notification if new layers were activated
     if (newlyActivated.length > 0 && triggered.length > 0) {
       this._showAlertBanner(triggered, newlyActivated);
-      // Expand layer panel if collapsed
-      const layerToggles = document.getElementById('layer-toggles');
-      const layersBtn = document.getElementById('layers-btn');
-      if (layerToggles && layerToggles.classList.contains('layer-toggles--collapsed')) {
-        layerToggles.classList.remove('layer-toggles--collapsed');
-        if (layersBtn) layersBtn.classList.add('layers-btn--active');
-        setTimeout(() => { if (this.map) this.map.invalidateSize(); }, 350);
-      }
+      // The layers panel is left as the user set it: auto-expanding it covered most of the map on short screens.
     }
 
     this.updateLayerCount();
@@ -1489,11 +1482,11 @@ const Observatory = {
 
     let message;
     if (level === 'observer') {
-      message = `${firstGroup.icon} Something interesting is happening — we've turned on ${newLayers.length} extra map layer${newLayers.length > 1 ? 's' : ''} to show you the full picture.`;
+      message = `Something interesting is happening — we've turned on ${newLayers.length} extra map layer${newLayers.length > 1 ? 's' : ''} to show you the full picture.`;
     } else if (level === 'analyst') {
-      message = `${firstGroup.icon} ${firstGroup.name} — Auto-activated ${newLayers.join(', ').toUpperCase()} layers for cross-correlation.`;
+      message = `${firstGroup.name} — Auto-activated ${newLayers.join(', ').toUpperCase()} layers for cross-correlation.`;
     } else {
-      message = `${firstGroup.icon} ${firstGroup.name} detected. Auto-enabled: ${newLayers.join(', ').toUpperCase()}. ${firstGroup.description}`;
+      message = `${firstGroup.name} detected. Auto-enabled: ${newLayers.join(', ').toUpperCase()}. ${firstGroup.description}`;
     }
 
     const banner = document.createElement('div');
