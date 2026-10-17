@@ -41,12 +41,15 @@
     .optin-disclosure p { font-size: 0.62rem; color: var(--text-dim); line-height: 1.6; margin-bottom: 8px; }
     .optin-disclosure strong { color: var(--text-secondary); }
     .optin-sample { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-secondary); border-left: 2px solid var(--border-mid); padding: 6px 10px; margin: 6px 0 10px; line-height: 1.5; }
+    .soon-badge { display: inline-block; margin-left: 10px; padding: 2px 8px; border: 1px solid var(--border-mid); font-size: 0.55rem; letter-spacing: 0.15em; color: var(--text-secondary); vertical-align: middle; }
+    .soon-banner { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.04em; line-height: 1.6; color: var(--text-primary); border: 1px solid var(--border-mid); background: var(--bg-tile); padding: 12px 14px; margin-bottom: 20px; }
   </style>
 </head>
 <body>
   <a href="/" class="legal-back" id="sms-back">&larr; OBSERVATORY</a>
   <main class="optin-page">
-    <h1>TEXT ALERTS (SMS)</h1>
+    <h1>TEXT ALERTS (SMS)<span class="soon-badge" id="soon-badge">COMING SOON</span></h1>
+    <div class="soon-banner" id="soon-banner">Text alerts are coming soon. Sign-up opens once carrier registration is approved. Email alerts work today: turn them on in your <a href="/cockpit.html#email-alerts">cockpit</a>.</div>
     <p class="optin-sub">Truth Observatory can text you when something you chose happens. Texts are for paying subscribers only and use the same alert types and ZIP code as your email alerts. Nothing is sent unless an event matches.</p>
 
     <h2>WHAT YOU CAN RECEIVE</h2>
@@ -119,10 +122,13 @@
       function load() {
         fetch('/api/sms/status', { credentials: 'same-origin' }).then(function (r) { return r.json(); }).then(function (s) {
           ready = false; stopBtn.hidden = true;
-          if (!s.signedIn) {
+          var live = Boolean(s.configured);
+          $('soon-badge').hidden = live; $('soon-banner').hidden = live;
+          submit.textContent = live ? 'TURN ON TEXT ALERTS' : 'COMING SOON';
+          if (!live) {
+            setState('Text alerts are coming soon. This form opens once carrier registration is approved.');
+          } else if (!s.signedIn) {
             setState('Text alerts are for subscribers. <a href="/" id="sms-signin-link">Sign in or subscribe on the home page</a>, then come back here.');
-          } else if (!s.configured) {
-            setState('Signed in as ' + esc(s.email) + '. Text alerts open once carrier registration is approved. Email alerts work now from your <a href="/cockpit.html#email-alerts">cockpit</a>.');
           } else if (!s.categories || !s.categories.length) {
             setState('Signed in as ' + esc(s.email) + '. First choose your alert types (and ZIP for weather) in your <a href="/cockpit.html#email-alerts">cockpit alert settings</a>. Texts use the same settings.');
           } else {
