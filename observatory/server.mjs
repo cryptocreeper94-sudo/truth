@@ -440,7 +440,7 @@ function redirect(res, url) {
 const alertService = createAlertService({
   pool, siteUrl: SITE_URL, sendEmail: sendResendEmail, fetchPointAlerts, geocodeZip,
   getBrief: getCurrentBrief, isSubscribed, getSubscriber: getSubscriberFromRequest,
-  readJson, jsonResponse,
+  readJson, readBody, jsonResponse, getClientIp,
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1810,7 +1810,8 @@ const server = createServer(async (req, res) => {
       let taken = null;
       if (pool) {
         try {
-          const r = await pool.query(`SELECT COUNT(*)::int AS n FROM subscribers WHERE tier = 'founder'`);
+          // Only founders who are still paying hold a slot; refunded or lapsed founders free theirs.
+          const r = await pool.query(`SELECT COUNT(*)::int AS n FROM subscribers WHERE tier = 'founder' AND status IN ('active','trialing')`);
           taken = r.rows[0].n;
         } catch (err) { console.error('[PRICING] count failed:', err.message); }
       }

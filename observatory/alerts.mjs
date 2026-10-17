@@ -22,7 +22,10 @@ import { localHour, localDay, clip, escHtml } from "./lib/lume-shim.mjs";
 let SEVERITY_RANK = { Minor: 1, Moderate: 2, Severe: 3, Extreme: 4 };
 let MIN_TO_RANK = { moderate: 2, severe: 3, extreme: 4 };
 let MAX_PER_DAY = 12;
+let SMS_MAX_PER_DAY = 4;
 let BRIEF_LOCAL_HOUR = 7;
+let SMS_TAG = "Truth Observatory: ";
+let SMS_STOP = " Reply STOP to opt out.";
 // Rank of an NWS severity word. Unknown severities rank 0 and never send.
 function severityRank(sev) {
   let r = SEVERITY_RANK[sev];
@@ -81,6 +84,13 @@ export function briefKey(nowMs, tz) {
 // How many more emails this subscriber may receive today.
 export function remainingToday(sentToday) {
   return Math.max(0, (MAX_PER_DAY - sentToday));
+}
+// How many more text messages this subscriber may receive today.
+export function smsRemainingToday(sentToday) {
+  return Math.max(0, (SMS_MAX_PER_DAY - sentToday));
+}
+export function smsMaxPerDay() {
+  return SMS_MAX_PER_DAY;
 }
 // ── Rendering ───────────────────────────────────────────────────────────────
 function shell(title, bodyHtml, manageUrl, unsubUrl) {
@@ -166,4 +176,23 @@ export function testMail(placeLabel, links) {
     html = (html + para(l));
   }
   return { subject: "Test — Truth Observatory email alerts", html: shell("Email alerts are on", html, links.manage, links.unsub), plain: (lines.join("\n\n") + footerText(links.manage, links.unsub)) };
+  // ── Text messages (SMS) ─────────────────────────────────────────────────────
+  // Short, plain, branded, and every one carries the STOP instruction.
+  // The daily brief is email only and never goes out by text.
+}
+export function weatherSms(a, placeLabel) {
+  return (((((SMS_TAG + clip(a.event, 60)) + " for ") + clip(placeLabel, 50)) + ". Source: National Weather Service. Follow official instructions.") + SMS_STOP);
+}
+export function quakeSms(q) {
+  return ((((((SMS_TAG + "M") + q.mag) + " earthquake, ") + clip(q.place, 70)) + ". Source: USGS.") + SMS_STOP);
+}
+export function spaceSms(scale) {
+  return ((((SMS_TAG + "NOAA reports geomagnetic storm level G") + scale) + " (scale G1-G5). Source: NOAA SWPC.") + SMS_STOP);
+}
+export function volcanoSms(v) {
+  return (((((SMS_TAG + clip(v.name, 50)) + " is at alert level ") + v.alertLevel) + ". Source: USGS.") + SMS_STOP);
+  // Sent once, right after a subscriber opts in on the website.
+}
+export function smsConfirm() {
+  return (((SMS_TAG + "You are signed up for text alerts for the alert types in your account. Msg frequency varies, up to ") + SMS_MAX_PER_DAY) + "/day. Msg & data rates may apply. Reply HELP for help, STOP to opt out.");
 }

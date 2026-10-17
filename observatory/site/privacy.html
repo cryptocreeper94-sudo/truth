@@ -22,39 +22,50 @@
   <a href="/" class="legal-back">&larr; OBSERVATORY</a>
   <div class="legal-page">
     <h1>PRIVACY POLICY</h1>
-    <div class="legal-date">Last updated: August 19, 2026</div>
+    <div class="legal-date">Last updated: October 16, 2026</div>
 
     <h2>1. DATA WE COLLECT</h2>
-    <p>When you create an account, we collect your email address and payment information (processed by Stripe — we do not store card numbers). We collect basic usage analytics (page views, feature usage) to improve the Service.</p>
+    <ul>
+      <li>Account: your email address. Payment is handled by Stripe; we never see or store card numbers.</li>
+      <li>Location, only if you provide it: a ZIP code or GPS coordinates. Your browser stores it so the app remembers it. It is sent to our server to find the nearest weather station and active National Weather Service alerts.</li>
+      <li>Email alerts, only if you turn them on: your ZIP, the alert types and thresholds you picked, and a record of which alerts were sent (so you are not alerted twice).</li>
+      <li>Text alerts, only if you sign up: your mobile number, a record of your consent (date, time, IP address and the exact consent wording you agreed to), opt-in and opt-out events, and a record of which alerts were texted.</li>
+      <li>Basic usage analytics (page views, feature usage).</li>
+    </ul>
 
-    <h2>2. DATA WE DO NOT COLLECT</h2>
-    <p>We do not collect location data, device fingerprints, advertising identifiers, or sell any user data to third parties. We do not use tracking cookies for advertising purposes.</p>
+    <h2>2. WHAT WE DO NOT DO</h2>
+    <p>We do not sell your data. We do not use advertising identifiers, device fingerprinting, or advertising cookies.</p>
 
     <h2>3. HOW WE USE YOUR DATA</h2>
     <ul>
-      <li>Email: account management, subscription receipts, service announcements.</li>
-      <li>Payment data: processed securely by Stripe, Inc. See Stripe's privacy policy.</li>
+      <li>Email: account access, receipts, service notices, and alert emails if you turned them on.</li>
+      <li>ZIP/location: weather readings for your area and, if enabled, alerts for that ZIP.</li>
+      <li>Alerts are off by default. Every alert email has a one-click unsubscribe link, and you can change settings in your cockpit at any time.</li>
+      <li>Payment data: handled by Stripe, Inc. See Stripe's privacy policy.</li>
       <li>Usage data: aggregate analytics to improve the Service. Never shared externally.</li>
     </ul>
 
-    <h2>4. SMS COMMUNICATIONS</h2>
-    <p>If you opt in to SMS alerts, we use Twilio to deliver atmospheric event notifications to your phone number. You may opt out at any time by replying STOP or visiting your account settings. Message frequency varies. Standard message and data rates apply.</p>
+    <h2>4. TEXT MESSAGES (SMS)</h2>
+    <p>If you sign up on our <a href="/sms-optin" style="color:var(--text-primary)">text alerts page</a>, we use Twilio to text your mobile number when an event matches the alert types you chose. Message frequency varies, up to 4 messages per day. Message and data rates may apply. Reply STOP to cancel or HELP for help, or turn texts off on the text alerts page.</p>
+    <p>No mobile information will be shared with third parties or affiliates for marketing or promotional purposes. Text-message opt-in data and consent are excluded from every other category of sharing in this policy and are never shared with any third party, except Twilio, which delivers the messages on our behalf.</p>
 
     <h2>5. DATA RETENTION</h2>
-    <p>Account data is retained for the duration of your subscription. Upon account deletion, your personal data is purged within 30 days. Anonymized usage analytics may be retained indefinitely.</p>
+    <p>Account data is retained for the duration of your subscription. Upon account deletion, your personal data is purged within 30 days. Records of text-message consent and opt-outs are kept for 5 years after your last text, so we can prove consent if asked by a carrier or regulator. Anonymized usage analytics may be retained indefinitely.</p>
 
     <h2>6. THIRD-PARTY SERVICES</h2>
     <ul>
-      <li>Stripe — payment processing</li>
-      <li>Twilio — SMS delivery (if opted in)</li>
-      <li>Hetzner — server infrastructure (Germany/Finland)</li>
+      <li>Stripe: payment processing</li>
+      <li>Resend: sending account and alert emails</li>
+      <li>Twilio: sending text messages (only if you sign up)</li>
+      <li>Hetzner: server infrastructure (Germany/Finland)</li>
+      <li>NOAA/NWS, USGS and similar public data services: data sources. Your location is looked up from our server.</li>
     </ul>
 
     <h2>7. YOUR RIGHTS</h2>
     <p>You may request a copy of your data, request deletion, or update your information at any time by contacting us.</p>
 
     <h2>8. CONTACT</h2>
-    <p>DarkWave Studios LLC — contact@darkwavestudios.com</p>
+    <p>DarkWave Studios LLC: <a href="mailto:team@dwsc.io" style="color:var(--text-primary)">team@dwsc.io</a></p>
   </div>
 </body>
 </html>
